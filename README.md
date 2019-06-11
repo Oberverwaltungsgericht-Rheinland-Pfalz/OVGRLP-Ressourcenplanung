@@ -1,29 +1,45 @@
-# raumplanung
+# Raumplanungssystem
 
-## Project setup
-```
-npm install
-```
+## Beschreibung
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+Das System ist dazu bestimmt die Verwaltung der Räume im Haus zu planen und zu steuern
 
-### Compiles and minifies for production
-```
-npm run build
-```
 
-### Run your tests
-```
-npm run test
-```
 
-### Lints and fixes files
-```
-npm run lint
-```
+## Anforderungen
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Funktional
+
+* Zu bedienen von der Verwaltung des Arbeitsgerichts
+
+* Read-Only-Ansicht für andere Beteiligte
+
+* 
+
+### Fachlich:
+
+* Eine Kalenderansicht 
+
+### Technisch
+
+* Realisierung des Frontends mit SPA
+
+* Realisierung des Back-Ends mit .net Core
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
