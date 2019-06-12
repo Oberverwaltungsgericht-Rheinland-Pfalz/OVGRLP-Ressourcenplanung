@@ -12,7 +12,7 @@ namespace DbRaumplanung.DataAccess
         public DbSet<AllocationPurpose> AllocationPurposes { get; set; }
         public DbSet<Gadget> Gadgets{ get; set; }
         public DbSet<Ressource> Ressources{ get; set; }
-        public DbSet<SupplierGroup> supplierGroups{ get; set; }
+        public DbSet<SupplierGroup> SupplierGroups{ get; set; }
         public DbSet<User> Users { get; set; }
 
         public RpDbContext(DbContextOptions<RpDbContext> options) : base(options) { }
@@ -21,7 +21,7 @@ namespace DbRaumplanung.DataAccess
         {
             base.OnModelCreating(modelBuilder);
 
-
+            modelBuilder.Entity<Ressource>().HasIndex(e => e.Name);
         }
     }
 }

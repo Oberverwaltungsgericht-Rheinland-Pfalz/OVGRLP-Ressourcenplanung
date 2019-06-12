@@ -7,7 +7,11 @@ namespace DbRaumplanung.Contracts
 {
     public interface IAllocationPurposeStore
     {
+        AllocationPurpose CreateAllocationPurpose(AllocationPurpose allocationPurpose);
         AllocationPurpose GetAllocationPurposeById(long id);
 
+        AllocationPurpose UpdateAllocationPurpose(AllocationPurpose allocationPurpose);
+
+        bool DeleteAllocationPurpose(long id);
     }
 }

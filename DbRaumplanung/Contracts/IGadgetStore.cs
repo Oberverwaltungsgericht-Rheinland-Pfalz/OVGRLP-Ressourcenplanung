@@ -5,9 +5,15 @@ using System.Text;
 
 namespace DbRaumplanung.Contracts
 {
-    public interface IGadgets
+    public interface IGadgetStore
     {
+        Gadget CreateGadget(Gadget gadget);
+
         Gadget GetGadgetById(long id);
         IEnumerable<Gadget> GetGadgetsBySupplierGroup(long supplierGroupId);
+
+        Gadget UpdateGadget(Gadget gadget);
+
+        bool DeleteGadget(long id);
     }
 }
