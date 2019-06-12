@@ -12,7 +12,8 @@ namespace DbRaumplanung.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } // todo: should be unique
         public string FunctionDescription { get; set; }
         public string Usability { get; set; }
         public ICollection<Gadget> Gadgets { get; set; }

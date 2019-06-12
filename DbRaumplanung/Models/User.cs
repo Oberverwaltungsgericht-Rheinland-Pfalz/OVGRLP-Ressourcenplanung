@@ -11,7 +11,11 @@ namespace DbRaumplanung.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
+
+        [Required]
         public string Name { get; set; }
+
+        [Required]
         public string Email { get; set; }
         public string Mobile { get; set; }
         public string Phone { get; set; }
