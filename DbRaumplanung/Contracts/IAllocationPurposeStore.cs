@@ -13,5 +13,7 @@ namespace DbRaumplanung.Contracts
         AllocationPurpose UpdateAllocationPurpose(AllocationPurpose allocationPurpose);
 
         bool DeleteAllocationPurpose(long id);
+
+        IEnumerable<AllocationPurpose> GetPurposes();
     }
 }

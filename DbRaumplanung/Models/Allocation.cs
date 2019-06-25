@@ -29,8 +29,8 @@ namespace DbRaumplanung.Models
         public DateTime LastModified { get; set; }
         public User LastModifiedBy { get; set; }
 
-        public virtual User AcknowledgedBy { get; set; }
-        public DateTime AcknowledgedAt { get; set; }
+        public virtual User ApprovedBy { get; set; }
+        public DateTime ApprovedAt { get; set; }
 
         public virtual User ReferencePerson { get; set; }
     }
@@ -44,7 +44,7 @@ namespace DbRaumplanung.Models
         Pending,
 
         [EnumMember(Value = "Acknowledged")]
-        Acknowledged,
+        Approved,
 
         [EnumMember(Value = "Clarification")]
         Clarification,

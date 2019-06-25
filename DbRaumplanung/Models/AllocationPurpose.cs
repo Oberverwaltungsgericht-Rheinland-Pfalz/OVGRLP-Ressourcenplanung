@@ -15,11 +15,12 @@ namespace DbRaumplanung.Models
         [Required]
         public string Title { get; set; }
         [MaxLength(3000)]
-        public string Beschreibung { get; set; }
+        public string Description { get; set; }
 
         [MaxLength(3000)]
         public string Notes { get; set; }
         public string ContactPhone { get; set; }
         public virtual ICollection<Allocation> Allocations { get; set; }
+        public virtual ICollection<Gadget> Gadgets { get; set; }
     }
 }

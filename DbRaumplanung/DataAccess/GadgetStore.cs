@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace DbRaumplanung.DataAccess
 {
-    public class GadgetStore:IGadgetStore
+    public class GadgetStore: IGadgetStore
     {
         private readonly RpDbContext _context;
 
@@ -43,6 +43,10 @@ namespace DbRaumplanung.DataAccess
             var entity = _context.Gadgets.Find(id);
             return entity;
         }
+        public IEnumerable<Gadget> GetGadgets()
+        {
+            return _context.Gadgets.ToList();
+        }
 
         public IEnumerable<Gadget> GetGadgetsBySupplierGroup(long supplierGroupId)
         {
@@ -62,6 +66,10 @@ namespace DbRaumplanung.DataAccess
             //return query.ToList();
         }
 
+        public IEnumerable<Gadget> GetGadgetsByRessourceId(long ressourceId)
+        {
+            return _context.Ressources.Where(s => s.Id == ressourceId).SelectMany(e => e.Gadgets);
+        }
         public Gadget UpdateGadget(Gadget gadget)
         {
             var entity = _context.Gadgets.Update(gadget);

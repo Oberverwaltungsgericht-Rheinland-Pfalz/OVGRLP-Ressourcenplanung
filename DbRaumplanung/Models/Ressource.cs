@@ -16,7 +16,7 @@ namespace DbRaumplanung.Models
         public string Name { get; set; } // todo: should be unique
         public string FunctionDescription { get; set; }
         public string Usability { get; set; }
-        public ICollection<Gadget> Gadgets { get; set; }
+        public virtual ICollection<Gadget> Gadgets { get; set; }
 
         public string SpecialsDescription { get; set; }
     }
