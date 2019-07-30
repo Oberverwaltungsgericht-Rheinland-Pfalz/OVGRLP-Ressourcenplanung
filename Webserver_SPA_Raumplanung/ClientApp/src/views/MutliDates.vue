@@ -1,5 +1,4 @@
 <template>
-  <v-container fluid>
     <v-slide-y-transition mode="out-in">
       <v-layout column>
         <h1>Mehrfachauswahl</h1>
@@ -9,7 +8,6 @@
         <multi-dates/>
       </v-layout>
     </v-slide-y-transition>
-  </v-container>
 </template>
 
 <script lang="ts">
