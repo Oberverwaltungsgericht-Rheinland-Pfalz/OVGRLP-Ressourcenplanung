@@ -91,7 +91,7 @@
         {
           text: 'Bar',
           color: 'red',
-        },
+        }
       ],
       nonce: 1,
       menu: false,
@@ -99,7 +99,7 @@
         {
           text: 'Foo',
           color: 'blue',
-        },
+        }
       ],
       x: 0,
       search: null,
@@ -124,11 +124,11 @@
 
           return v
         })
-      },
+      }
     },
 
     methods: {
-      edit (index, item) {
+      edit(index, item) {
         if (!this.editing) {
           this.editing = item
           this.index = index
@@ -137,10 +137,10 @@
           this.index = -1
         }
       },
-      filter (item, queryText, itemText) {
+      filter(item, queryText, itemText) {
         if (item.header) return false
 
-        const hasValue = val => val != null ? val : ''
+        const hasValue = (val) => val != null ? val : ''
 
         const text = hasValue(itemText)
         const query = hasValue(queryText)
@@ -148,7 +148,7 @@
         return text.toString()
           .toLowerCase()
           .indexOf(query.toString().toLowerCase()) > -1
-      },
-    },
+      }
+    }
   }
 </script>
