@@ -1,74 +1,101 @@
 <template>
-  <table>
-    <thead>
-        <tr>
-            <th>Status</th>
-            <th>Name</th>
-            <th>Raum</th>
-            <th>Datum</th>
-        </tr>
-    </thead>
-    <tbody class="appointment-open-list">
-        <tr v-for="(item, idx) in list" v-bind:key="idx">
-            <td>
-                <v-menu bottom offset-y>
-                    <template v-slot:activator="{ on }">
-                        <v-btn v-on="on"><v-icon>edit</v-icon>{{item.status}}</v-btn>
-                    </template>
-                    <v-list>
-                        <v-list-tile @click="acknowledge(item)">
-                            <v-list-tile-title>
-                                <v-icon v-html="'done'"></v-icon> Erledigt
-                            </v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="reject(item)">
-                            <v-list-tile-title>
-                                <v-icon v-html="'close'"></v-icon> In Arbeit
-                            </v-list-tile-title>
-                        </v-list-tile>
-                        <v-list-tile @click="move(item)">
-                            <v-list-tile-title>
-                                <v-icon v-html="'create'"></v-icon>  Gecancelt
-                            </v-list-tile-title>
-                        </v-list-tile>
-                    </v-list>
-                </v-menu>
-            </td>
-            <td>{{item.name}}</td>
-            <td>{{item.ressource}}</td>
-            <td>{{item.dateTime}}</td>
-        </tr>
-    </tbody>
-  </table>
+<v-layout column>
+ <v-data-table
+    :headers="headers"
+    :items="list"
+    :search="search"
+    sort-by="calories"
+    class="elevation-1"
+  >
+    <template v-slot:top>
+      <v-toolbar flat color="white">
+        <v-toolbar-title>Wartende Aufgaben</v-toolbar-title>
+        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-spacer></v-spacer>
+        <v-text-field v-model="search" append-icon="search" label="Filter" single-line hide-details/>
+      </v-toolbar>
+    </template>
+    <template v-slot:item.DateTime="{ item }">{{item.DateTime | toLocal}}</template>
+    <template v-slot:item.action="{ item }">
+        <v-menu bottom offset-y eager>
+            <template v-slot:activator="{ on }">
+                <v-btn v-on="on"><v-icon>edit</v-icon> {{item.status}}</v-btn>
+            </template>
+            <v-list>
+                <v-list-item @click="acknowledge(item)">
+                    <v-list-item-title>
+                        <v-icon v-html="'done'"></v-icon> Erledigt
+                    </v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="reject(item)">
+                    <v-list-item-title>
+                        <v-icon v-html="'close'"></v-icon> In Arbeit
+                    </v-list-item-title>
+                </v-list-item>
+                <v-list-item @click="move(item)">
+                    <v-list-item-title>
+                        <v-icon v-html="'create'"></v-icon> Gecancelt
+                    </v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-menu>
+    </template>
+    <template v-slot:no-data>
+      <v-btn color="primary" @click="initialize">Neu laden</v-btn>
+    </template>
+  </v-data-table>
+
+  <v-divider/>
+  <v-spacer/>
+  <h3 v-if="isEmpty">Es liegen keine zu bearbeitenden Terminanfragen vor</h3>
+  
+  </v-layout>
 </template>
 
-<script>
-import {VMenu} from 'vuetify'
-export default {
-    components: { VMenu},
-    data() {
-        return {
-            list: [
-                {name: 'Meeting', status: 'offen', ressource: 'Raum1', dateTime: new Date()},
-                {name: 'Meeting2', status: 'erledigt', ressource: 'Raum2', dateTime: new Date()}
+<script lang="ts">
+import dayjs from 'dayjs'
+import { State, Action, Getter, Mutation } from 'vuex-class'
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Names as Fnn} from '../store/Acknowledges/types'
+
+@Component({
+ filters: {
+    toLocal(dateVal: Date): string {
+      return dayjs(dateVal).format(' DD.MM.YYYY hh:mm')
+    }
+  }
+})
+
+export default class GadgetList extends Vue {
+    private isEmpty: boolean = false // todo: listen fn nutzen
+    private search: string = ''
+    private headers: object[] = [
+      { text: 'Bearbeiten', value: 'action', sortable: false },
+      { text: 'Name', value: 'Title' },
+      { text: 'Status' , value: 'Status' },
+      { text: 'Ressource', value: 'Ressource' },
+      { text: 'Hilfsmittel', value: 'Gadget'},
+      { text: 'Datum', value: 'DateTime'}
+    ]
+
+    private list: object[] = [
+                {Title: 'Meeting', Status: 'offen', Ressource: 'Raum1', Gadget: 'Beamer', DateTime: new Date()},
+                {Title: 'Meeting2', Status: 'erledigt', Ressource: 'Raum2', Gadget: 'Monitor', DateTime: new Date()}
             ]
-        }
-    },
-    methods: {
-        acknowledge() {
+    private acknowledge() {
             // change appointment status to accepted
             return true
-        },
-        reject() {
+        }
+    private reject() {
             // change appointment status to rejected
             return false
-        },
-        move() {
+        }
+    private move() {
             // change appointment status to changed and change the date
             return false
         }
     }
-}
+
 </script>
 
 <style scoped lang="stylus">

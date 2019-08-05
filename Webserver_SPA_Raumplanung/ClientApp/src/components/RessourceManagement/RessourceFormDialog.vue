@@ -1,6 +1,6 @@
 <template>
     <v-dialog v-model="showDialog" max-width="75vw">
-        <template v-slot:activator="{ on }">
+        <template v-if="!hideButton" v-slot:activator="{ on }">
             <v-btn color="primary" dark class="mb-2" v-on="on">Neue Ressource erstellen</v-btn>
         </template>
         <v-card>
@@ -41,14 +41,18 @@ export default {
     props: {
         editedItem: Object,
         formTitle: String,
-        showFormDialog: Boolean
+        showFormDialog: Boolean,
+        hideButton: {
+            type: Boolean, 
+            default: false
+        }
     },
     data(){
         return{
             name: this.editedItem.name,
             type: this.editedItem.type,
             FunctionDescription: this.editedItem.FunctionDescription,
-            SpecialDescription: this.SpecialDescription,
+            SpecialDescription: this.editedItem.SpecialDescription,
             showDialog: this.showFormDialog
         }
     },
@@ -58,13 +62,15 @@ export default {
       }
     },
     watch:{
-        showFormDialog(val){
-            this.showDialog = val
-            console.log(val)
+        showDialog(val){
+            if (!val) {
+                this.$emit('close')
+            }
         }
     },
     methods:{
         close() {
+            this.showDialog = false
             this.$emit('close')
         },
         save(){

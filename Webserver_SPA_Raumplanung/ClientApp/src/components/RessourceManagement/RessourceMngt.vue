@@ -1,18 +1,17 @@
 <template>
+<v-layout column>
+  <ressource-form-dialog v-if="showEditDialog" hideButton :showFormDialog="showEditDialog" :formTitle="'Ressource bearbeiten'" :editedItem="editedItem" @save="save($event)" @close="showEditDialog = false"/>
   <v-data-table
     :headers="headers"
-    :items="desserts"
+    :items="ressourceTypes"
     sort-by="calories"
     class="elevation-1"
   >
     <template v-slot:top>
       <v-toolbar flat color="white">
         <v-toolbar-title>Enthaltene Ressourcen</v-toolbar-title>
-        <v-divider class="mx-4" inset vertical></v-divider>
-        <v-spacer></v-spacer>
-        <ressource-form-dialog :showFormDialog="showFormDialog" :formTitle="formTitle" :editedItem="editedItem" @save="save($event)" @close="showFormDialog = false">
-        </ressource-form-dialog>
-
+        <v-divider class="mx-4" inset vertical/><v-spacer/>
+        <ressource-form-dialog :showFormDialog="showFormDialog" :formTitle="'Ressource erstellen'" :editedItem="editedItem" @save="save($event)" @close="showFormDialog = false"/>
       </v-toolbar>
     </template>
     <template v-slot:item.action="{ item }">
@@ -23,6 +22,7 @@
       <v-btn color="primary" @click="initialize">Reset</v-btn>
     </template>
   </v-data-table>
+  </v-layout>
 </template>
 
 <script>
@@ -32,20 +32,21 @@
     components: {RessourceFormDialog},
     data: () => ({
       showFormDialog: false,
+      showEditDialog: false,
       ressourceTypes: ['Gemeinschaftsraum', 'Gerichtssaal'],
       headers: [
         {
           text: 'Bezeichnung',
           align: 'left',
           sortable: false,
-          value: 'name',
+          value: 'name'
         },
         { text: 'Ressourcen-Typ', value: 'type' },
         { text: 'Funktionsbeschreibung', value: 'FunctionDescription' },
         { text: 'Details', value: 'SpecialDescription' },
-        { text: 'Actions', value: 'action', sortable: false },
+        { text: 'Actions', value: 'action', sortable: false }
       ],
-      desserts: [],
+      ressourceTypes: [],
       editedIndex: -1,
       editedItem: {
         name: '',
@@ -58,28 +59,24 @@
         type: 0,
         FunctionDescription: 0,
         SpecialDescription: 0
-      },
+      }
     }),
 
     computed: {
-      formTitle () {
-          if(this.editDialog) return 'Ressource bearbeiten'
-          return 'Ressource erstellen'
-      },
-      editDialog () {
+      editDialog() {
           return this.editedIndex !== -1
       }
     },
 
     watch: {
-      showFormDialog (val) {
-          if(!val) {
+      showFormDialog(val) {
+          if (!val) {
             this.$nextTick(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
                 this.editedIndex = -1
             })
         }
-      },
+      }
     },
 
     created() {
@@ -87,9 +84,9 @@
     },
 
     methods: {
-      initialize () {
+      initialize() {
           // load the ressources from server here
-        this.desserts = [
+        this.ressourceTypes = [
           {
             name: 'Multifunktionsraum',
             type: 'Gemeinschaftsraum',
@@ -111,34 +108,35 @@
         ]
       },
 
-      editItem (item) {
-        this.editedIndex = this.desserts.indexOf(item)
+      editItem(item) {
+        this.editedIndex = this.ressourceTypes.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.showFormDialog = true
+        this.showEditDialog = true
       },
 
-      async deleteItem (item) {
-        const index = this.desserts.indexOf(item)
+      async deleteItem(item) {
+        const index = this.ressourceTypes.indexOf(item)
         const confirmation = await this.$dialog.confirm({
             text: 'Möchten sie diese Ressource wirklich löschen?',
             title: 'Löschen bestätigen',
             persistent: true
         })
-        if(confirmation) this.desserts.splice(index, 1)
+        if (confirmation) {this.ressourceTypes.splice(index, 1)}
 
         // delete from server
       },
 
-      save () {
+      save() {
         if (this.editDialog) {
           // Update to server here
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
+          Object.assign(this.ressourceTypes[this.editedIndex], this.editedItem)
         } else {
           // Save to server here
-          this.desserts.push(this.editedItem)
+          this.ressourceTypes.push(this.editedItem)
         }
         this.showFormDialog = false
-      },
-    },
+        this.showEditDialog = false
+      }
+    }
   }
 </script>

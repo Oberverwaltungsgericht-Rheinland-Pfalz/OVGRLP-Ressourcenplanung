@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbRaumplanung", "DbRaumplan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreVueStarter", "Webserver_SPA_Raumplanung\AspNetCoreVueStarter.csproj", "{1523BAF5-8A3D-4C09-91C6-007A090AA998}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{17F9D787-B339-4290-9E10-0672426C3623}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{1523BAF5-8A3D-4C09-91C6-007A090AA998}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1523BAF5-8A3D-4C09-91C6-007A090AA998}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1523BAF5-8A3D-4C09-91C6-007A090AA998}.Release|Any CPU.Build.0 = Release|Any CPU
-		{17F9D787-B339-4290-9E10-0672426C3623}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17F9D787-B339-4290-9E10-0672426C3623}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17F9D787-B339-4290-9E10-0672426C3623}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17F9D787-B339-4290-9E10-0672426C3623}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

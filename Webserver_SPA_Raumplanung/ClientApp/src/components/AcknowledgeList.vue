@@ -15,7 +15,7 @@
         <v-text-field v-model="search" append-icon="search" label="Filter" single-line hide-details/>
       </v-toolbar>
     </template>
-    <template v-slot:item.DateTime="{ item }">{{item.DateTime}}</template>
+    <template v-slot:item.DateTime="{ item }">{{item.DateTime | toLocal}}</template>
     <template v-slot:item.action="{ item }">
         <v-menu bottom offset-y eager>
             <template v-slot:activator="{ on }">
@@ -59,7 +59,13 @@ import { Names as Fnn} from '../store/Acknowledges/types'
 import AllocationRequest from '../models/AllocationRequest'
 const namespace = 'acknowledges'
 
-@Component
+@Component({
+ filters: {
+    toLocal(dateVal: Date): string {
+      return dayjs(dateVal).format(' DD.MM.YYYY hh:mm')
+    }
+  }
+})
 export default class AcknowledgeList extends Vue {
   @State('tasks', { namespace })
   private list!: AllocationRequest[]
@@ -76,7 +82,7 @@ export default class AcknowledgeList extends Vue {
       { text: 'Bezeichnung', value: 'Title' },
       { text: 'Status' , value: 'Status' },
       { text: 'Raum', value: 'Description' },
-      { text: 'Datum', value: 'DateTime', class: 'Date'}
+      { text: 'Datum', value: 'DateTime'}
     ]
 
   public mounted() {

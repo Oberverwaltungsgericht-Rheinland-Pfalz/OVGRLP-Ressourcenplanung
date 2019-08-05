@@ -19,5 +19,6 @@ namespace DbRaumplanung.Models
         public virtual ICollection<Gadget> Gadgets { get; set; }
 
         public string SpecialsDescription { get; set; }
+        public string Type { get; set; }
     }
 }
