@@ -10,7 +10,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import AcknowledgeList from '@/components/AcknowledgeList.vue'
 
 @Component({
-   components: { AcknowledgeList }
+  components: { AcknowledgeList }
 })
 export default class Acknowledge extends Vue {}
 </script>

@@ -1,6 +1,6 @@
 import AllocationRequest from '../../models/AllocationRequest'
 // export {default as AllocationRequest}  from '../../models/AllocationRequest'
-export { AllocationRequest}
+export { AllocationRequest }
 
 export interface AcknowledgeState {
   tasks: AllocationRequest[],

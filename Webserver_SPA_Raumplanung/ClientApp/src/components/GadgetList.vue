@@ -56,46 +56,45 @@
 import dayjs from 'dayjs'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Names as Fnn} from '../store/Acknowledges/types'
+import { Names as Fnn } from '../store/Acknowledges/types'
 
 @Component({
- filters: {
-    toLocal(dateVal: Date): string {
+  filters: {
+    toLocal (dateVal: Date): string {
       return dayjs(dateVal).format(' DD.MM.YYYY hh:mm')
     }
   }
 })
 
 export default class GadgetList extends Vue {
-    private isEmpty: boolean = false // todo: listen fn nutzen
-    private search: string = ''
-    private headers: object[] = [
+  private isEmpty: boolean = false // todo: listen fn nutzen
+  private search: string = ''
+  private headers: object[] = [
       { text: 'Bearbeiten', value: 'action', sortable: false },
       { text: 'Name', value: 'Title' },
       { text: 'Status' , value: 'Status' },
       { text: 'Ressource', value: 'Ressource' },
-      { text: 'Hilfsmittel', value: 'Gadget'},
-      { text: 'Datum', value: 'DateTime'}
-    ]
+      { text: 'Hilfsmittel', value: 'Gadget' },
+      { text: 'Datum', value: 'DateTime' }
+  ]
 
-    private list: object[] = [
-                {Title: 'Meeting', Status: 'offen', Ressource: 'Raum1', Gadget: 'Beamer', DateTime: new Date()},
-                {Title: 'Meeting2', Status: 'erledigt', Ressource: 'Raum2', Gadget: 'Monitor', DateTime: new Date()}
-            ]
-    private acknowledge() {
+  private list: object[] = [
+                { Title: 'Meeting', Status: 'offen', Ressource: 'Raum1', Gadget: 'Beamer', DateTime: new Date() },
+                { Title: 'Meeting2', Status: 'erledigt', Ressource: 'Raum2', Gadget: 'Monitor', DateTime: new Date() }
+  ]
+  private acknowledge () {
             // change appointment status to accepted
-            return true
-        }
-    private reject() {
+    return true
+  }
+  private reject () {
             // change appointment status to rejected
-            return false
-        }
-    private move() {
+    return false
+  }
+  private move () {
             // change appointment status to changed and change the date
-            return false
-        }
-    }
-
+    return false
+  }
+}
 </script>
 
 <style scoped lang="stylus">

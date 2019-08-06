@@ -4,7 +4,7 @@
       <v-sheet height="64">
         <v-toolbar flat color="white">
           <v-btn outlined class="mr-4" @click="setToday">
-            Today
+            Heute
           </v-btn>
           <v-btn fab text small @click="prev">
             <v-icon small>arrow_back_ios</v-icon>
@@ -26,21 +26,22 @@
             </template>
             <v-list>
               <v-list-item @click="type = 'day'">
-                <v-list-item-title>Day</v-list-item-title>
+                <v-list-item-title>Tag</v-list-item-title>
               </v-list-item>
               <v-list-item @click="type = 'week'">
-                <v-list-item-title>Week</v-list-item-title>
+                <v-list-item-title>Woche</v-list-item-title>
               </v-list-item>
               <v-list-item @click="type = 'month'">
-                <v-list-item-title>Month</v-list-item-title>
+                <v-list-item-title>Monat</v-list-item-title>
               </v-list-item>
               <v-list-item @click="type = '4day'">
-                <v-list-item-title>4 days</v-list-item-title>
+                <v-list-item-title>4 tage</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
         </v-toolbar>
       </v-sheet>
+
       <v-sheet height="600">
         <v-calendar
           ref="calendar"
@@ -51,6 +52,9 @@
           :event-margin-bottom="3"
           :now="today"
           :type="type"
+          locale="de"
+          :weekdays="[1, 2, 3, 4, 5, 6, 0]"
+          :short-weekdays="false"
           @click:event="showEvent"
           @click:more="viewDay"
           @click:date="viewDay"
@@ -63,15 +67,8 @@
           full-width
           offset-x
         >
-          <v-card
-            color="grey lighten-4"
-            min-width="350px"
-            flat
-          >
-            <v-toolbar
-              :color="selectedEvent.color"
-              dark
-            >
+          <v-card color="grey lighten-4" min-width="350px" flat>
+            <v-toolbar :color="selectedEvent.color" dark>
               <v-btn icon>
                 <v-icon>edit</v-icon>
               </v-btn>
@@ -88,11 +85,7 @@
               <span v-html="selectedEvent.details"></span>
             </v-card-text>
             <v-card-actions>
-              <v-btn
-                text
-                color="secondary"
-                @click="selectedOpen = false"
-              >
+              <v-btn text color="secondary" @click="selectedOpen = false">
                 Cancel
               </v-btn>
             </v-card-actions>
@@ -104,16 +97,18 @@
 </template>
 
 <script>
+import dayjs from 'dayjs'
+
   export default {
     data: () => ({
-      today: '2019-01-08',
-      focus: '2019-01-08',
+      today: dayjs().format('YYYY-MM-DD'),
+      focus: dayjs().format('YYYY-MM-DD'),
       type: 'month',
       typeToLabel: {
-        'month': 'Month',
-        'week': 'Week',
-        'day': 'Day',
-        '4day': '4 Days'
+        'month': 'Monat',
+        'week': 'Woche',
+        'day': 'Tag',
+        '4day': '4 Tage'
       },
       start: null,
       end: null,
@@ -124,62 +119,21 @@
         {
           name: 'Vacation',
           details: 'Going to the beach!',
-          start: '2018-12-29',
-          end: '2019-01-01',
+          start: '2019-08-19',
+          end: '2019-08-29',
           color: 'blue'
         },
         {
           name: 'Meeting',
           details: 'Spending time on how we do not have enough time',
-          start: '2019-01-07 09:00',
-          end: '2019-01-07 09:30',
+          start: '2019-08-07 09:00',
+          end: '2019-08-07 10:30',
           color: 'indigo'
-        },
-        {
-          name: 'Large Event',
-          details: 'This starts in the middle of an event and spans over multiple events',
-          start: '2018-12-31',
-          end: '2019-01-04',
-          color: 'deep-purple'
-        },
-        {
-          name: '3rd to 7th',
-          details: 'Testing',
-          start: '2019-01-03',
-          end: '2019-01-07',
-          color: 'cyan'
-        },
-        {
-          name: 'Big Meeting',
-          details: 'A very important meeting about nothing',
-          start: '2019-01-07 08:00',
-          end: '2019-01-07 11:30',
-          color: 'red'
-        },
-        {
-          name: 'Another Meeting',
-          details: 'Another important meeting about nothing',
-          start: '2019-01-07 10:00',
-          end: '2019-01-07 13:30',
-          color: 'brown'
-        },
-        {
-          name: '7th to 8th',
-          start: '2019-01-07',
-          end: '2019-01-08',
-          color: 'blue'
-        },
-        {
-          name: 'Lunch',
-          details: 'Time to feed',
-          start: '2019-01-07 12:00',
-          end: '2019-01-07 15:00',
-          color: 'deep-orange'
         },
         {
           name: '30th Birthday',
           details: 'Celebrate responsibly',
-          start: '2019-01-03',
+          start: '2019-08-03',
           color: 'teal'
         },
         {
@@ -202,48 +156,6 @@
           start: '2019-01-30 23:00',
           end: '2019-02-01 08:00',
           color: 'black'
-        },
-        {
-          name: 'event 1',
-          start: '2019-01-14 18:00',
-          end: '2019-01-14 19:00',
-          color: '#4285F4'
-        },
-        {
-          name: 'event 2',
-          start: '2019-01-14 18:00',
-          end: '2019-01-14 19:00',
-          color: '#4285F4'
-        },
-        {
-          name: 'event 5',
-          start: '2019-01-14 18:00',
-          end: '2019-01-14 19:00',
-          color: '#4285F4'
-        },
-        {
-          name: 'event 3',
-          start: '2019-01-14 18:30',
-          end: '2019-01-14 20:30',
-          color: '#4285F4'
-        },
-        {
-          name: 'event 4',
-          start: '2019-01-14 19:00',
-          end: '2019-01-14 20:00',
-          color: '#4285F4'
-        },
-        {
-          name: 'event 6',
-          start: '2019-01-14 21:00',
-          end: '2019-01-14 23:00',
-          color: '#4285F4'
-        },
-        {
-          name: 'event 7',
-          start: '2019-01-14 22:00',
-          end: '2019-01-14 23:00',
-          color: '#4285F4'
         }
       ]
     }),

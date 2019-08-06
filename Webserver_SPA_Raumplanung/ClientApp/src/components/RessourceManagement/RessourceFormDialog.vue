@@ -36,47 +36,53 @@
     </v-dialog>
 </template>
 
-<script>
+<script lang="ts">
+
 export default {
-    props: {
-        editedItem: Object,
-        formTitle: String,
-        showFormDialog: Boolean,
-        hideButton: {
-            type: Boolean, 
-            default: false
-        }
-    },
-    data(){
-        return{
-            name: this.editedItem.name,
-            type: this.editedItem.type,
-            FunctionDescription: this.editedItem.FunctionDescription,
-            SpecialDescription: this.editedItem.SpecialDescription,
-            showDialog: this.showFormDialog
-        }
-    },
-    computed: {
-      formInvalid () {
-          return !this.name
-      }
-    },
-    watch:{
-        showDialog(val){
-            if (!val) {
-                this.$emit('close')
-            }
-        }
-    },
-    methods:{
-        close() {
-            this.showDialog = false
-            this.$emit('close')
-        },
-        save(){
-            let updateObject = {name: this.name, type: this.type, FunctionDescription: this.FunctionDescription, SpecialDescription: this.SpecialDescription}
-            this.$emit('save', updateObject)
-        }
+  props: {
+    editedItem: Object,
+    formTitle: String,
+    showFormDialog: Boolean,
+    hideButton: {
+      type: Boolean,
+      default: false
     }
+  },
+  data () {
+    return{
+      name: this.editedItem.name,
+      type: this.editedItem.type,
+      FunctionDescription: this.editedItem.FunctionDescription,
+      SpecialDescription: this.editedItem.SpecialDescription,
+      showDialog: this.showFormDialog
+    }
+  },
+  computed: {
+    formInvalid (): boolean {
+      return !this.name
+    }
+  },
+  watch: {
+    showDialog (val) {
+      if (!val) {
+        this.$emit('close')
+      }
+    }
+  },
+  methods: {
+    close () {
+      this.showDialog = false
+      this.$emit('close')
+    },
+    save () {
+      const updateObject = {
+        name: this.name,
+        type: this.type,
+        FunctionDescription: this.FunctionDescription,
+        SpecialDescription: this.SpecialDescription
+      }
+      this.$emit('save', updateObject)
+    }
+  }
 }
 </script>

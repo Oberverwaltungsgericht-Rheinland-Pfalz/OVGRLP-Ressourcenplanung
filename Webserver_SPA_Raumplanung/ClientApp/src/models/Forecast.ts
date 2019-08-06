@@ -1,5 +1,5 @@
 export class Forecast {
-  constructor(
+  constructor (
     public dateFormatted: Date,
     public temperatureC: number,
     public temperatureF: number,

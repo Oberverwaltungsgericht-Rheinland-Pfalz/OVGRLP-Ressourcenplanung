@@ -38,7 +38,7 @@
 import HelloWorld from '@/components/HelloWorld.vue'
 import { Component, Vue } from 'vue-property-decorator'
 import Router from 'vue-router'
-import {MyRouteConfig} from './router'
+import { MyRouteConfig } from './router'
 
 @Component({
   components: { HelloWorld }
@@ -51,16 +51,16 @@ export default class App extends Vue {
   private right: boolean = true
   private title: string = 'ASP.NET Core Vue Starter'
   private items: MyRouteConfig[] = []
-  public created() {
-          (this.$router as any).options.routes.forEach((route: any) => {
-              this.items.push({
+  public created () {
+    (this.$router as any).options.routes.forEach((route: any) => {
+      this.items.push({
                   // name: route.name,
                   // path: route.path,
-                  path: route.path,
-                  name: route.name,
-                  icon: route.icon
-              })
-          })
-      }
+        path: route.path,
+        name: route.name,
+        icon: route.icon
+      })
+    })
+  }
 }
 </script>

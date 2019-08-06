@@ -11,7 +11,7 @@ namespace DbRaumplanung.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-        public string Name { get; set; }
+        public string Title { get; set; }
         public virtual SupplierGroup SuppliedBy{ get; set; }
     }
 }

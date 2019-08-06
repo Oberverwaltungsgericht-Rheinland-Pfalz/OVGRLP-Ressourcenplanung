@@ -16,7 +16,7 @@ namespace DbRaumplanung.DataAccess
 
         public SupplierGroup CreateSupplierGroup(string name, string groupEmail)
         {
-            var supplierGroup = new SupplierGroup() { Name = name, GroupEmail = groupEmail };
+            var supplierGroup = new SupplierGroup() { Title = name, GroupEmail = groupEmail };
             var savedEntity = _context.SupplierGroups.Add(supplierGroup);
             return savedEntity.Entity;
         }

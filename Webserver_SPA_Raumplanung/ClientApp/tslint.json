@@ -1,7 +1,8 @@
 {
   "defaultSeverity": "warning",
   "extends": [
-    "tslint:recommended"
+    "tslint:recommended",
+    "tslint-config-standard"
   ],
   "linterOptions": {
     "exclude": [
@@ -22,6 +23,7 @@
           "multiline": "never",
           "singleline": "never"
       }
-  }
+    },
+    "curly": [true, "ignore-same-line"]
   }
 }

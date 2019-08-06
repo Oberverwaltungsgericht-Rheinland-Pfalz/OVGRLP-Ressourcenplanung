@@ -6,6 +6,7 @@ import App from './App.vue'
 import router from './router'
 import store from '@/store/index'
 import './registerServiceWorker'
+import dayjs from 'dayjs'
 
 import VuetifyDialog from 'vuetify-dialog'
 import 'vuetify-dialog/dist/vuetify-dialog.css'
@@ -21,6 +22,8 @@ Vue.use(VuetifyDialog, {
     vuetify
   }
 })
+
+Vue.filter('toLocal', (dateVal: Date) => dayjs(dateVal).format(' DD.MM.YYYY hh:mm'))
 
 new Vue({
   router,

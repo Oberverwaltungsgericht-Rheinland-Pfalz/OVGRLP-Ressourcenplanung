@@ -108,17 +108,16 @@
 
     watch: {
       model (val, prev) {
-        if (val.length === prev.length) return
+        if (val.length === prev.length) {return}
 
         this.model = val.map(v => {
           if (typeof v === 'string') {
             v = {
               text: v,
-              color: this.colors[this.nonce - 1],
+              color: this.colors[this.nonce - 1]
             }
 
             this.items.push(v)
-
             this.nonce++
           }
 
@@ -138,7 +137,7 @@
         }
       },
       filter(item, queryText, itemText) {
-        if (item.header) return false
+        if (item.header) {return false}
 
         const hasValue = (val) => val != null ? val : ''
 

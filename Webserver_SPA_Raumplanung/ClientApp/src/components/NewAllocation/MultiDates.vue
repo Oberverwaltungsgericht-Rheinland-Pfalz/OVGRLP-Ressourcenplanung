@@ -30,13 +30,13 @@ export default class RessourceMaintenance extends Vue {
   private activeDates: any = [
         { date: '2019-02-13' },
         { date: '2019-02-16' }
-      ]
-  private async toggleDate(d: any) {
-const res = await this.$dialog.prompt({
-  text: 'Your name',
-  title: 'Please input your name',
-  persistent: true
-})
+  ]
+  private async toggleDate (d: any) {
+    const res = await this.$dialog.prompt({
+      text: 'Your name',
+      title: 'Please input your name',
+      persistent: true
+    })
   }
 }
 </script>

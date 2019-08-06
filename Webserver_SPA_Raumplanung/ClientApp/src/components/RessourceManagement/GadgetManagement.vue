@@ -5,9 +5,11 @@
     <v-data-table
     :headers="headers"
     :items="items">
-<template v-slot:top>
-    <v-btn v-if="!createNew" @click="createNew=true">Neues Hilfsmittel hinzufügen<v-icon>add</v-icon></v-btn>
-<v-card v-if="createNew">
+  <template v-slot:top>
+    <v-toolbar v-if="!createNew" flat color="white">
+      <v-btn @click="createNew=true" color="primary">Neues Hilfsmittel hinzufügen<v-icon>add</v-icon></v-btn>
+    </v-toolbar>
+ <v-card v-if="createNew">
   <v-card-title class="blue white--text">
     <span class="headline">Neues Hilfsmittel</span>
     <v-spacer/>
@@ -42,12 +44,17 @@
                     :key="index"
                     @click="InRoom = item">
                     <v-list-item-title>{{ item }}</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-                </v-menu>-->
+                    </v-list-item></v-list></v-menu>-->
+        </v-flex>
+        <v-flex xs12 md3>
+          <v-combobox
+            v-model="InGroup"
+            :items="SupplierNames"
+            label="Unterstützergruppe"
+          ></v-combobox>
         </v-flex>
 
-        <v-flex xs12 md4>
+        <v-flex xs12 md1>
             <v-btn @click="add"><v-icon>save</v-icon></v-btn>
         </v-flex>
       </v-layout>
@@ -65,50 +72,60 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import Gadgets from '../../models/GadgetModel'
 import { consoleInfo } from 'vuetify/src/util/console'
-import Gadget from '../../models/GadgetModel'
 import Ressources from '../../models/RessourceModel'
+import Suppliers from '../../models/SupplierModel'
 
 @Component
 export default class GadgetManagement extends Vue {
   private createNew: boolean = false
   private Title: string = ''
   private InRoom: string = ''
+  private InGroup: string = ''
   private nameRules = [
-        (v: string) => !!v || 'Name is required'
-      ]
+    (v: string) => !!v || 'Name is required'
+  ]
 
   private valid: boolean = false
   private headers: object[] = [
       { text: 'Bezeichnung', value: 'Title' },
-      { text: 'In Raum', value: 'Gadget'},
+      { text: 'In Raum', value: 'Gadget' },
       { text: 'Bearbeiten', value: 'action', sortable: false }
+  ]
+
+  private get RessourceNames () {
+    return Ressources.all().filter((v: any) => !!v.Title).map((v: any) => v.Title)
+  }
+  private get SupplierNames () {
+    return Suppliers.query().where('Title', (v: string) => v.length).get().map((v: any) => v.Title)
+  }
+  private get items () {
+    return Gadgets.all()
+  }
+  private add () {
+        // @ts-ignore
+    if (!this.$refs.form.validate()) return
+    const data = [
+            { Title: this.Title, Gadget: this.InRoom }
     ]
 
-    private get RessourceNames() {
-        return Ressources.all().filter((v: any) => !!v.Title).map((v: any) => v.Title)
-    }
-    private get items() {
-        return Gadgets.all()
-    }
-    private add() {
-        // @ts-ignore
-        if (!this.$refs.form.validate()) {return}
-        const data = [
-            {Title: this.Title, Gadget: this.InRoom}
-        ]
+    Gadgets.insert({ data })
+  }
 
-        Gadgets.insert({data})
-    }
-
-    private mounted() {
-        const data = [
-            {id: Date.now, Title: 't', Gadget: 'Hilfsmittel'}
-        ]
-        Gadgets.insert({data})
-        const data2 = [
-            {id: Date.now, Title: 'titlee', Type: 'Gerichtssaal', FunctionDescription: 'für verh.', SpecialDescription: 'groß'}
-        ]
-        Ressources.insert({data: data2})
-    }
+  private mounted () {
+    const data = [
+            { id: Date.now, Title: 't', Gadget: 'Hilfsmittel' }
+    ]
+    Gadgets.insert({ data })
+    const data2 = [
+      {
+        id: Date.now,
+        Title: 'titlee',
+        Type: 'Gerichtssaal',
+        FunctionDescription: 'für verh.',
+        SpecialDescription: 'groß'
+      }
+    ]
+    Ressources.insert({ data: data2 })
+  }
 }
 </script>

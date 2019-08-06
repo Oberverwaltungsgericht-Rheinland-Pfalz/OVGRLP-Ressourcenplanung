@@ -55,13 +55,13 @@
 import dayjs from 'dayjs'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Names as Fnn} from '../store/Acknowledges/types'
+import { Names as Fnn } from '../store/Acknowledges/types'
 import AllocationRequest from '../models/AllocationRequest'
 const namespace = 'acknowledges'
 
 @Component({
- filters: {
-    toLocal(dateVal: Date): string {
+  filters: {
+    toLocal (dateVal: Date): string {
       return dayjs(dateVal).format(' DD.MM.YYYY hh:mm')
     }
   }
@@ -69,11 +69,11 @@ const namespace = 'acknowledges'
 export default class AcknowledgeList extends Vue {
   @State('tasks', { namespace })
   private list!: AllocationRequest[]
-  @Getter('isEmpty', {namespace})
+  @Getter('isEmpty', { namespace })
   private isEmpty!: boolean
   @Action(Fnn.a.loadTasks, { namespace })
   private loadTasks: any
-  @Action(Fnn.a.updateTask, {namespace})
+  @Action(Fnn.a.updateTask, { namespace })
   private updateTask: any
 
   private search: string = ''
@@ -82,32 +82,32 @@ export default class AcknowledgeList extends Vue {
       { text: 'Bezeichnung', value: 'Title' },
       { text: 'Status' , value: 'Status' },
       { text: 'Raum', value: 'Description' },
-      { text: 'Datum', value: 'DateTime'}
-    ]
+      { text: 'Datum', value: 'DateTime' }
+  ]
 
-  public mounted() {
-      this.initialize()
+  public mounted () {
+    this.initialize()
   }
 
-  public initialize() {
-      this.loadTasks()
+  public initialize () {
+    this.loadTasks()
   }
 
-  public acknowledge(task: AllocationRequest) {
+  public acknowledge (task: AllocationRequest) {
     // change appointment status to accepted
-    const editableTask = {...task}
+    const editableTask = { ...task }
     editableTask.Status = 'Bestätigt'
     this.updateTask(editableTask)
   }
-  public reject(task: AllocationRequest) {
+  public reject (task: AllocationRequest) {
             // change appointment status to rejected
-    const editableTask = {...task}
+    const editableTask = { ...task }
     editableTask.Status = 'Abgelehnt'
     this.updateTask(editableTask)
   }
-  public async move(task: AllocationRequest) {
+  public async move (task: AllocationRequest) {
     // change appointment status to changed and change the date
-    const editableTask = {...task}
+    const editableTask = { ...task }
     editableTask.Status = 'Verschoben'
 
     const res = await this.$dialog.prompt({
@@ -116,15 +116,15 @@ export default class AcknowledgeList extends Vue {
       persistent: true
     })
     if (res) {
-        if (!/(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2})|(\d{4}-\d{2}-\d{2})/.test(res)) {
-            this.$dialog.message.warning(`Das eigegebene Datum ${res} ist nicht gültig`, {position: 'top-center'})
-            return false
-        }
+      if (!/(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2})|(\d{4}-\d{2}-\d{2})/.test(res)) {
+        await this.$dialog.message.warning(`Das eigegebene Datum ${res} ist nicht gültig`, { position: 'top-center' })
+        return false
+      }
 
-        const newDate = dayjs(res)
-        const newDateTime = new Date(newDate.format())
-        editableTask.DateTime = newDateTime
-        this.updateTask(editableTask)
+      const newDate = dayjs(res)
+      const newDateTime = new Date(newDate.format())
+      editableTask.DateTime = newDateTime
+      this.updateTask(editableTask)
 
     }
   }

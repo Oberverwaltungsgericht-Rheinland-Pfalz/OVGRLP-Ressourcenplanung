@@ -1,6 +1,5 @@
 import Vue from 'vue'
-import Router from 'vue-router'
-import {RouteConfig} from 'vue-router'
+import Router, { RouteConfig } from 'vue-router'
 import Home from './views/Home.vue'
 
 Vue.use(Router)
@@ -9,6 +8,7 @@ export interface MyRouteConfig extends RouteConfig {
   icon: string
 }
 
+/* tslint:disable:ter-indent */
 export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,
@@ -38,25 +38,25 @@ export default new Router({
       path: '/ressources',
       name: 'Verwaltung',
       icon: 'dvr',
-      component: () => import('./views/Ressources.vue')
-    } as MyRouteConfig,
-    {
-      path: '/occupancy',
-      name: 'Scheduler',
-      icon: 'schedule',
-      component: () => import('./views/Occupancy.vue')
-    } as MyRouteConfig,
-    {
-      path: '/supports',
-      name: 'Aufgaben',
-      icon: 'gavel',
-      component: () => import('./views/Supporters.vue')
-    } as MyRouteConfig,
-    {
-      path: '/fetch-data',
-      name: 'fetch-data',
-      icon: 'get_app',
-      component: () => import(/* webpackChunkName: "fetch-data" */ './views/FetchData.vue')
-    } as MyRouteConfig
+        component: () => import('./views/Ressources.vue')
+      } as MyRouteConfig,
+      {
+        path: '/occupancy',
+        name: 'Scheduler',
+        icon: 'schedule',
+        component: () => import('./views/Occupancy.vue')
+      } as MyRouteConfig,
+      {
+        path: '/supports',
+        name: 'Aufgaben',
+        icon: 'gavel',
+        component: () => import('./views/Supporters.vue')
+      } as MyRouteConfig,
+      {
+        path: '/fetch-data',
+        name: 'fetch-data',
+        icon: 'get_app',
+        component: () => import(/* webpackChunkName: "fetch-data" */ './views/FetchData.vue')
+      } as MyRouteConfig
   ]
 })

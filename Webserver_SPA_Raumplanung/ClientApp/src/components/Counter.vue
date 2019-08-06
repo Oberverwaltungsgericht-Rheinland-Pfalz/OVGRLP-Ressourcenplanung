@@ -22,10 +22,10 @@ export default class Counter extends Vue {
   @Action('reset', { namespace })
   private resetCounter: any
 
-  private increment() {
+  private increment () {
     this.incrementCounter()
   }
-  private reset() {
+  private reset () {
     this.resetCounter()
   }
 }

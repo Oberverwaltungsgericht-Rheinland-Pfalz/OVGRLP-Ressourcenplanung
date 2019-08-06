@@ -4,10 +4,11 @@
       <v-spacer/>
       <ressource-management/>
       
-      <v-spacer/>
-      
+      <br/>     
       <gadget-management/>
-      
+      <br/>
+      <supplier-management/>
+
       <v-layout align-space-between justify-center column fill-height>
         <v-flex>
         </v-flex>
@@ -22,10 +23,10 @@
 import { Component, Vue } from 'vue-property-decorator'
 import RessourceManagement from '@/components/RessourceManagement/RessourceMngt.vue'
 import GadgetManagement from '@/components/RessourceManagement/GadgetManagement.vue'
-
+import SupplierManagement from '@/components/RessourceManagement/SupplierManagement.vue'
 
 @Component({
-  components: { RessourceManagement, GadgetManagement }
+  components: { RessourceManagement, GadgetManagement, SupplierManagement }
 })
 export default class Ressources extends Vue {
 

@@ -19,7 +19,7 @@ import MultiDatesDate from '@/components/NewAllocation/MultiDatesDate.vue'
   components: { MultiDates, MultiDatesDate }
 })
 export default class MultiDatesView extends Vue {
-  private date: any = {title: 'Bezeichnung', creator: 'createdby' }
+  private date: any = { title: 'Bezeichnung', creator: 'createdby' }
 }
 </script>
 
