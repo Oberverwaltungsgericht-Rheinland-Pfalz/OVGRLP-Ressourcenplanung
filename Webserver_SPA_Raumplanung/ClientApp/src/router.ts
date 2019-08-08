@@ -20,6 +20,12 @@ export default new Router({
       component: () => import('./views/Calendar.vue')
     } as MyRouteConfig,
     {
+      path: '/new',
+      name: 'Eintrag',
+      icon: 'business',
+      component: () => import('./components/NewAllocation/AllocationForm.vue')
+    } as MyRouteConfig,
+    {
       path: '/multi-select',
       name: 'multiselector',
       icon: 'calendar_today',

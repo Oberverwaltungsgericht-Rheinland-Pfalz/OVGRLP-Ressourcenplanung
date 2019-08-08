@@ -93,50 +93,48 @@
   </v-layout>
 </template>
 
-<script>
+<script lang="ts">
 import dayjs from 'dayjs'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-export default  {
-  props: {
-    initialAppointments: Array,
-    initialPurpose: {
-      type: Object,
-      default: () => ({title: 'Initialer Grund', notes: 'Notizen', description: 'Beschreibung', ressource: 'Ressource'})
-      }
-  },
-  data() {
-    return{
-      purpose : {title: 'Titel', description: 'Beschreibung', notes: 'Notizen', ressource: 'Raum1'},
-      appointments: [],
-      purposeEditable: false,
-      saveable: false
-    }
-  },
-    filters: {
-        toIso(date) {
-            return dayjs(date).format('DD.MM.YYYY')
-        }
-    },
-    methods: {
-      save() {
-          // send save request
-          this.purposeEditable = this.saveable = false
-      }
-    },
-    mounted() {
-        this.appointments = this.initialAppointments
-        this.purpose.title = this.initialPurpose.title
-        this.purpose.notes = this.initialPurpose.notes
-        this.purpose.description = this.initialPurpose.description
-        this.purpose.ressource = this.initialPurpose.ressource
-    }
+export default class MultiDatesDate extends Vue {
+/*  initialPurpose: {
+    default: () => ({ title: 'Initialer Grund', notes: 'Notizen',
+    description: 'Beschreibung', ressource: 'Ressource' })
+*/
+  @Prop(Array) private readonly initialAppointments = []
+  @Prop({
+    default: () => ({
+      title: 'Initialer Grund',
+      notes: 'Notizen',
+      description: 'Beschreibung',
+      ressource: 'Ressource'
+    })
+  })
+  private readonly initialPurpose!: ShortPurpose
+  private purpose: ShortPurpose = { title: 'Titel', description: 'Beschreibung', notes: 'Notizen', ressource: 'Raum1' }
+  private appointments: any[] = []
+  private purposeEditable: boolean = false
+  private saveable: boolean = false
+
+  private save () {
+    // send save request
+    this.purposeEditable = this.saveable = false
+  }
+  private mounted () {
+    this.appointments = this.initialAppointments
+    this.purpose.title = this.initialPurpose.title
+    this.purpose.notes = this.initialPurpose.notes
+    this.purpose.description = this.initialPurpose.description
+    this.purpose.ressource = this.initialPurpose.ressource
+  }
 }
-/* interface ShortPurpose {
-    title: string
-    description: string
-    notes: string
-    ressource: string
-} */
+interface ShortPurpose {
+  title: string
+  description: string
+  notes: string
+  ressource: string
+}
 </script>
 <style lang="stylus" scoped>
 

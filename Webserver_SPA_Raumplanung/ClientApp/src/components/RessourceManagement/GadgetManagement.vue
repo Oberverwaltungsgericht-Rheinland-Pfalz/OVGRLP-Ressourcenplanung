@@ -31,7 +31,7 @@
         <v-flex xs12 md4>
         <v-combobox
           v-model="InRoom"
-          :items="RessourceNames"
+          :items="RessourceNames" outlined
           label="Einem Raum zugeordnet?"
         ></v-combobox>
 <!-- <v-menu offset-y>
@@ -71,7 +71,6 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import Gadgets from '../../models/GadgetModel'
-import { consoleInfo } from 'vuetify/src/util/console'
 import Ressources from '../../models/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
 
@@ -101,31 +100,14 @@ export default class GadgetManagement extends Vue {
   private get items () {
     return Gadgets.all()
   }
-  private add () {
+  private async add () {
         // @ts-ignore
     if (!this.$refs.form.validate()) return
     const data = [
             { Title: this.Title, Gadget: this.InRoom }
     ]
 
-    Gadgets.insert({ data })
-  }
-
-  private mounted () {
-    const data = [
-            { id: Date.now, Title: 't', Gadget: 'Hilfsmittel' }
-    ]
-    Gadgets.insert({ data })
-    const data2 = [
-      {
-        id: Date.now,
-        Title: 'titlee',
-        Type: 'Gerichtssaal',
-        FunctionDescription: 'für verh.',
-        SpecialDescription: 'groß'
-      }
-    ]
-    Ressources.insert({ data: data2 })
+    await Gadgets.insert({ data })
   }
 }
 </script>

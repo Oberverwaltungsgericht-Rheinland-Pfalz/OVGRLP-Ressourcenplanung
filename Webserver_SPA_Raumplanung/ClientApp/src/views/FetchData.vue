@@ -42,12 +42,12 @@ export default class FetchDataView extends Vue {
     { text: 'Summary', value: 'summary' }
   ]
 
-  private created () {
-    this.fetchWeatherForecasts()
+  private async created () {
+    await this.fetchWeatherForecasts()
   }
 
-  private fetchWeatherForecasts () {
-    axios.get<Forecast[]>('api/SampleData/WeatherForecasts')
+  private async fetchWeatherForecasts () {
+    await axios.get<Forecast[]>('api/SampleData/WeatherForecasts')
       .then((response) => {
         this.forecasts = response.data
         this.loading = false

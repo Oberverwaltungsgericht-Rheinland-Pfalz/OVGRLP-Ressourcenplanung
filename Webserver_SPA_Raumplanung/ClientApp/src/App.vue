@@ -39,6 +39,9 @@ import HelloWorld from '@/components/HelloWorld.vue'
 import { Component, Vue } from 'vue-property-decorator'
 import Router from 'vue-router'
 import { MyRouteConfig } from './router'
+import Gadgets from './models/GadgetModel'
+import Ressources from './models/RessourceModel'
+import Suppliers from './models/SupplierModel'
 
 @Component({
   components: { HelloWorld }
@@ -51,7 +54,7 @@ export default class App extends Vue {
   private right: boolean = true
   private title: string = 'ASP.NET Core Vue Starter'
   private items: MyRouteConfig[] = []
-  public created () {
+  public async created () {
     (this.$router as any).options.routes.forEach((route: any) => {
       this.items.push({
                   // name: route.name,
@@ -61,6 +64,22 @@ export default class App extends Vue {
         icon: route.icon
       })
     })
+    // initSampleData
+    const data = [
+            { id: Date.now, Title: 't', Gadget: 'Hilfsmittel' }
+    ]
+    await Gadgets.insert({ data })
+    const data2 = [
+      {
+        id: Date.now,
+        Title: 'titlee',
+        Type: 'Gerichtssaal',
+        FunctionDescription: 'für verh.',
+        SpecialDescription: 'groß'
+      }
+    ]
+    await Ressources.insert({ data: data2 })
+
   }
 }
 </script>

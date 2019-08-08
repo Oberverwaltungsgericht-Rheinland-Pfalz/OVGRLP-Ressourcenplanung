@@ -12,10 +12,10 @@
             <v-container grid-list-xl>
             <v-layout wrap>
                 <v-flex xs12 sm6 md6>
-                <v-text-field v-model="name" label="Bezeichnung"></v-text-field>
+                <v-text-field v-model="namee" type="text" label="Bezeichnung"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                <v-text-field v-model="type" label="Ressourcen-Typ"></v-text-field>
+                <v-text-field v-model="Type" label="Ressourcen-Typ"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
                 <v-text-field v-model="FunctionDescription" label="Funktionsbeschreibung"></v-text-field>
@@ -37,52 +37,48 @@
 </template>
 
 <script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Boolean } from '@vuex-orm/core'
 
-export default {
-  props: {
-    editedItem: Object,
-    formTitle: String,
-    showFormDialog: Boolean,
-    hideButton: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data () {
-    return{
-      name: this.editedItem.name,
-      type: this.editedItem.type,
-      FunctionDescription: this.editedItem.FunctionDescription,
-      SpecialDescription: this.editedItem.SpecialDescription,
-      showDialog: this.showFormDialog
-    }
-  },
-  computed: {
-    formInvalid (): boolean {
-      return !this.name
-    }
-  },
-  watch: {
-    showDialog (val) {
-      if (!val) {
-        this.$emit('close')
-      }
-    }
-  },
-  methods: {
-    close () {
-      this.showDialog = false
-      this.$emit('close')
-    },
-    save () {
-      const updateObject = {
-        name: this.name,
-        type: this.type,
-        FunctionDescription: this.FunctionDescription,
-        SpecialDescription: this.SpecialDescription
-      }
-      this.$emit('save', updateObject)
-    }
+@Component
+export default class RessourceFormDialog extends Vue {
+  @Prop(Object) private readonly editedItem!: PropEditItem
+  @Prop({ default: '' }) private readonly formTitle!: string
+  @Prop(Boolean) private readonly showFormDialog!: boolean
+  @Prop({ default: false }) private readonly hideButton!: boolean
+
+  private Type: string = this.editedItem.type
+  private FunctionDescription: string = this.editedItem.FunctionDescription
+  private namee: string = this.editedItem.name
+  private SpecialDescription: string = this.editedItem.SpecialDescription
+  private showDialog: boolean = this.showFormDialog
+
+  private get formInvalid (): boolean {
+    return !this.namee
   }
+
+  @Watch('showDialog')
+  public showDialogChange (val: boolean) {
+    if (!val) this.$emit('close')
+  }
+  private close (): void {
+    this.showDialog = false
+    this.$emit('close')
+  }
+  private save (): void {
+    const updateObject = {
+      name: this.namee,
+      type: this.Type,
+      FunctionDescription: this.FunctionDescription,
+      SpecialDescription: this.SpecialDescription
+    }
+    this.$emit('save', updateObject)
+  }
+}
+interface PropEditItem {
+  name: string,
+  type: string,
+  FunctionDescription: string,
+  SpecialDescription: string
 }
 </script>
