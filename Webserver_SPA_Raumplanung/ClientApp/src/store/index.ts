@@ -3,6 +3,7 @@ import Vuex, { StoreOptions } from 'vuex'
 import { RootState } from './types'
 import { counter } from './counter/index'
 import { acknowledges } from './Acknowledges/index'
+import { user } from './User/index'
 import VuexORM from '@vuex-orm/core'
 import Gadget from '../models/GadgetModel'
 import Ressource from '../models/RessourceModel'
@@ -10,6 +11,7 @@ import Visibleallocation from '../models/VisibleAllocationModel'
 import SupplierModel from '../models/SupplierModel'
 import AllocationModel from '../models/AllocationModel'
 import AllocationpurposeModel from '../models/AllocationpurposeModel'
+import packageInfo from '../../package.json'
 
 Vue.use(Vuex)
 
@@ -26,11 +28,12 @@ database.register(AllocationpurposeModel)
 
 const store: StoreOptions<RootState> = {
   state: {
-    version: '1.0.0' // a simple property
+    version: packageInfo.version
   },
   modules: {
     counter,
-    acknowledges
+    acknowledges,
+    user
   },
   // Create Vuex Store and register database through Vuex ORM.
   plugins: [VuexORM.install(database)]

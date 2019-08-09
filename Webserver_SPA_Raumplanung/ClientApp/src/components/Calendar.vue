@@ -124,10 +124,10 @@ export default {
         color: 'blue'
       },
       {
-        name: 'Meeting',
+        name: 'IT Meeting',
         details: 'Spending time on how we do not have enough time',
-        start: '2019-08-07 09:00',
-        end: '2019-08-07 10:30',
+        start: `${dayjs().format('YYYY-MM-DD')} 09:00`,
+        end: `${dayjs().format('YYYY-MM-DD')} 19:00`,
         color: 'indigo'
       },
       {

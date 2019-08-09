@@ -15,15 +15,15 @@ export default new Router({
   routes: [
     {
       path: '/calendar',
-      name: 'Kalender',
+      name: 'Planungsübersicht',
       icon: 'business',
       component: () => import('./views/Calendar.vue')
     } as MyRouteConfig,
     {
       path: '/new',
       name: 'Eintrag',
-      icon: 'business',
-      component: () => import('./components/NewAllocation/AllocationForm.vue')
+      icon: 'add',
+      component: () => import('./components/NewAllocation/FormDialog.vue')
     } as MyRouteConfig,
     {
       path: '/multi-select',
@@ -55,14 +55,14 @@ export default new Router({
       {
         path: '/supports',
         name: 'Aufgaben',
-        icon: 'gavel',
+        icon: 'group_work',
         component: () => import('./views/Supporters.vue')
-      } as MyRouteConfig,
-      {
+      } as MyRouteConfig
+ /*     {
         path: '/fetch-data',
         name: 'fetch-data',
         icon: 'get_app',
-        component: () => import(/* webpackChunkName: "fetch-data" */ './views/FetchData.vue')
-      } as MyRouteConfig
+        component: () => import('./views/FetchData.vue')
+} as MyRouteConfig */
   ]
 })

@@ -24,6 +24,7 @@ Vue.use(VuetifyDialog, {
 })
 
 Vue.filter('toLocal', (dateVal: Date) => dayjs(dateVal).format(' DD.MM.YYYY hh:mm'))
+Vue.filter('toLocalDate', (dateVal: Date) => dayjs(dateVal).format(' DD.MM.YYYY'))
 
 new Vue({
   router,

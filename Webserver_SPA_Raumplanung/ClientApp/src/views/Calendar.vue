@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>Planungsübersicht</h1>
     <calendar-component/>
   </div>
 </template>

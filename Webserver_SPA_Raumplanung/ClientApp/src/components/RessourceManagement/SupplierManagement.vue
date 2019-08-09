@@ -89,14 +89,5 @@ export default class GadgetManagement extends Vue {
 
     await Suppliers.insert({ data })
   }
-
-  private async mounted () {
-    const data = [
-            { id: 1, Title: 'Wachtmeister', GroupEmail: 'NJZ.Wachtmeister@ovg.jm.rlp.de' },
-            { id: 2, Title: 'EDV', GroupEmail: 'edv.support@ovg.jm.rlp.de' }
-    ]
-    await Suppliers.insert({ data })
-
-  }
 }
 </script>
