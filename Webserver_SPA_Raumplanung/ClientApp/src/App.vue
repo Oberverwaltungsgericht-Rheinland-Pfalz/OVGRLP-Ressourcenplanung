@@ -96,6 +96,8 @@ import { MyRouteConfig } from './router'
 import Gadgets from './models/GadgetModel'
 import Ressources from './models/RessourceModel'
 import Suppliers from './models/SupplierModel'
+import Allocations from './models/AllocationModel'
+import AllocationPurposes from './models/AllocationpurposeModel'
 import { Getters } from '@vuex-orm/core'
 
 @Component({
@@ -159,6 +161,49 @@ export default class App extends Vue {
             { id: 2, Title: 'EDV', GroupEmail: 'edv.support@ovg.jm.rlp.de' }
     ]
     await Suppliers.insert({ data: gruppen })
+
+    const allocations = [
+      {
+        id: 111,
+        Start: new Date('2019-08-11'),
+        End: new Date('2019-08-11'),
+        IsAllDay: true,
+        Status: 'erledigt',
+        CreatedBy: 'Müller',
+        CreatedAt: '2019-07-03',
+        LastModified: '2019-07-30',
+        LastModifiedBy: 'Müller',
+        ApprovedBy: 'Müller',
+        ApprovedAt: '2019-07-30',
+        ReferencePerson: 'Schmidt',
+        Ressource_id: 1,
+        Purpose_id: 12
+      },
+      {
+        id: 112,
+        Start: new Date('2019-08-12 11:00'),
+        End: new Date('2019-08-14 12:30'),
+        IsAllDay: false,
+        Status: 'erledigt',
+        CreatedBy: 'Müller',
+        CreatedAt: '2019-07-30',
+        LastModified: '2019-07-30',
+        LastModifiedBy: 'Müller',
+        ApprovedBy: 'Müller',
+        ApprovedAt: '2019-07-30',
+        ReferencePerson: 'Schmidt',
+        Ressource_id: 2,
+        Purpose_id: 11
+      }
+    ]
+    await Allocations.insert({ data: allocations })
+
+    const allocationPurposes = [
+      { id: 11, Title: 'VG 1. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '', Gadget_ids: [1] },
+      { id: 12, Title: 'OVG 3. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '10', Gadget_ids: [2] }
+   //   { id: 13, Title: 'ArbG 0. Kammer', Description: 'Verhandlung', Notes: '', ContactPhone: '31', Gadget_ids: [] }
+    ]
+    await AllocationPurposes.insert({ data: allocationPurposes })
   }
 }
 </script>

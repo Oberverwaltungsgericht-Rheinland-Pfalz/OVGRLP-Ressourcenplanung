@@ -47,7 +47,7 @@
           ref="calendar"
           v-model="focus"
           color="primary"
-          :events="events"
+          :events="itemsFormated"
           :event-color="getEventColor"
           :event-margin-bottom="3"
           :now="today"
@@ -98,6 +98,7 @@
 
 <script>
 import dayjs from 'dayjs'
+import Allocations from '../models/AllocationModel'
 
 export default {
   data: () => ({
@@ -160,6 +161,18 @@ export default {
     ]
   }),
   computed: {
+    items () {
+      return Allocations.query().with('Purpose').with('Ressource').get()
+    },
+    itemsFormated () {
+      return this.items.map((v) => {return {
+//        ...v, 
+        start: dayjs(v.Start).format('YYYY-MM-DD hh:mm'), 
+        end: dayjs(v.End).format('YYYY-MM-DD hh:mm'),
+        name: v.Ressource.Title,
+        details: v.Ressource.Title,color: 'success'
+      }})
+    },
     title () {
       const { start, end } = this
       if (!start || !end) {

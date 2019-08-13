@@ -27,12 +27,12 @@
                         <v-icon v-html="'done'"></v-icon> Erledigt
                     </v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="reject(item)">
+                <v-list-item @click="inProgress(item)">
                     <v-list-item-title>
                         <v-icon v-html="'close'"></v-icon> In Arbeit
                     </v-list-item-title>
                 </v-list-item>
-                <v-list-item @click="move(item)">
+                <v-list-item @click="canceled(item)">
                     <v-list-item-title>
                         <v-icon v-html="'create'"></v-icon> Gecancelt
                     </v-list-item-title>
@@ -82,16 +82,19 @@ export default class GadgetList extends Vue {
                 { Title: 'Meeting', Status: 'offen', Ressource: 'Raum1', Gadget: 'Beamer', DateTime: new Date() },
                 { Title: 'Meeting2', Status: 'erledigt', Ressource: 'Raum2', Gadget: 'Monitor', DateTime: new Date() }
   ]
-  private acknowledge () {
-            // change appointment status to accepted
+  private acknowledge (item: any) {
+    // change appointment status to accepted
+    item.Status = 'erledigt'
     return true
   }
-  private reject () {
-            // change appointment status to rejected
+  private inProgress (item: any) {
+    // change appointment status to rejected
+    item.Status = 'wird erledigt'
     return false
   }
-  private move () {
-            // change appointment status to changed and change the date
+  private canceled (item: any) {
+    // change appointment status to changed and change the date
+    item.Status = 'verschoben'
     return false
   }
 }

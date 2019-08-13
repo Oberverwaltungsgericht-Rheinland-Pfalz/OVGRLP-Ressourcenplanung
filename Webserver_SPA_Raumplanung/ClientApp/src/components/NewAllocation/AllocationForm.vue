@@ -16,7 +16,7 @@
       :label="`Wiederkehrender Termin`"
     ></v-switch>
 
-<div v-show="!isRepeating">
+  <div v-show="!isRepeating">
     <label for="meeting-From">Vom:
     <input :value="dateFrom" @input="dateFrom = $event.target.value"
        :type="dateInputType" step="900"
@@ -28,42 +28,42 @@
        :type="dateInputType" @change="dateToChanged = true"
        name="meeting-time" id="meeting-to" step="900"
        :min="today"></label>
+  </div>
 
-</div>
-<div v-show="isRepeating">
+  <div v-show="isRepeating">
     <v-menu
-        ref="showMultipleDatesMenu"
-        v-model="showMultipleDatesMenu"
-        :close-on-content-click="false"
-        :return-value.sync="multipleDates"
-        transition="scale-transition"
-        offset-y
-        full-width
-        min-width="290px"
-      >
-        <template v-slot:activator="{ on }">
-          <v-combobox
-            v-model="multipleDates"
-            multiple
-            chips
-            small-chips
-            label="Gewählte Termine"
-            prepend-icon="event"
-            readonly
-            v-on="on"
-          >
-          <template v-slot:selection="data">
-              <v-chip>{{data.item | toLocalDate}} <v-icon right @click="removeDate(data.item)">close</v-icon></v-chip>
-          </template>
-          </v-combobox>
+      ref="showMultipleDatesMenu"
+      v-model="showMultipleDatesMenu"
+      :close-on-content-click="false"
+      :return-value.sync="multipleDates"
+      transition="scale-transition"
+      offset-y
+      full-width
+      min-width="290px"
+    >
+      <template v-slot:activator="{ on }">
+        <v-combobox
+          v-model="multipleDates"
+          multiple
+          chips
+          small-chips
+          label="Gewählte Termine"
+          prepend-icon="event"
+          readonly
+          v-on="on"
+        >
+        <template v-slot:selection="data">
+            <v-chip>{{data.item | toLocalDate}} <v-icon right @click="removeDate(data.item)">close</v-icon></v-chip>
         </template>
-        <v-date-picker v-model="multipleDates" multiple no-title scrollable>
-          <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="showMultipleDatesMenu = false">Cancel</v-btn>
-          <v-btn text color="primary" @click="$refs.showMultipleDatesMenu.save(multipleDates)">OK</v-btn>
-        </v-date-picker>
-      </v-menu>
-</div>
+        </v-combobox>
+      </template>
+      <v-date-picker v-model="multipleDates" multiple no-title scrollable>
+        <v-spacer></v-spacer>
+        <v-btn text color="primary" @click="showMultipleDatesMenu = false">Cancel</v-btn>
+        <v-btn text color="primary" @click="$refs.showMultipleDatesMenu.save(multipleDates)">OK</v-btn>
+      </v-date-picker>
+    </v-menu>
+  </div>
 
     <v-select
         v-model="selectedRessourceId"
@@ -74,14 +74,14 @@
     />
 
     <div v-for="(group, idx) in GadgetGroups" :key="idx+'group'">
-        <v-select
-          v-model="seltedGadgets"
-          :items="getGadgets(group.id)"
-          :label="'Hilfsmittel der '+ group.Title"
-          item-text="Title"
-          item-value="id"
-          multiple chips persistent-hint
-        />
+      <v-select
+        v-model="seltedGadgets"
+        :items="getGadgets(group.id)"
+        :label="'Hilfsmittel der '+ group.Title"
+        item-text="Title"
+        item-value="id"
+        multiple chips persistent-hint
+      />
     </div>    
 
     <v-text-field
