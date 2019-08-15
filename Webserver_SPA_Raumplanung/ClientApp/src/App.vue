@@ -153,6 +153,13 @@ export default class App extends Vue {
         Type: 'Gemeinschaftsraum',
         FunctionDescription: 'Allgemeiner Raum des NJZ',
         SpecialDescription: '20 Sitzplätze und Beamer'
+      },
+      {
+        id: 3,
+        Title: 'Sitzungssaal A008',
+        Type: 'Gerichtssaal',
+        FunctionDescription: 'Saal des ArbG',
+        SpecialDescription: 'Kleiner Gerichtssaal'
       }
     ]
     await Ressources.insert({ data: ressourcen })

@@ -8,7 +8,7 @@ export default class Allocation extends Model {
 
   // List of all fields (schema) of the post model. `this.attr` is used
   // for the generic field type. The argument is the default value.
-  public static fields () {
+  public static fields (): any {
     return {
       id: this.attr(null),
       Start: this.attr(null),

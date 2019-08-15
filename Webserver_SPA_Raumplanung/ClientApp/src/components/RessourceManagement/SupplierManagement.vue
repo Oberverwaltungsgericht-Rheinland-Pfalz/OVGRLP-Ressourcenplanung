@@ -1,51 +1,52 @@
 <template>
 <v-layout column>
-    <h2>Unterstützergruppenverwaltung</h2>
-    
-    <v-data-table
+  <h2>Unterstützergruppenverwaltung</h2>
+  
+  <v-data-table
     :headers="headers"
-    :items="items">
-  <template v-slot:top>
-    <v-toolbar v-if="!createNew" flat color="white">
-      <v-btn @click="createNew=true" color="primary">Neue Gruppe hinzufügen<v-icon>add</v-icon></v-btn>
-    </v-toolbar>
- <v-card v-if="createNew">
-  <v-card-title class="blue white--text">
-    <span class="headline">Neues Gruppe</span>
-    <v-spacer/>
-    <v-btn @click="createNew=false" rounded><v-icon>close</v-icon></v-btn>
-  </v-card-title>
+    :items="items"
+    >
+    <template v-slot:top>
+      <v-toolbar v-if="!createNew" flat color="white">
+        <v-btn @click="createNew=true" color="primary">Neue Gruppe hinzufügen<v-icon>add</v-icon></v-btn>
+      </v-toolbar>
+      <v-card v-if="createNew">
+        <v-card-title class="blue white--text">
+          <span class="headline">Neue Gruppe</span>
+          <v-spacer/>
+          <v-btn @click="createNew=false" rounded><v-icon>close</v-icon></v-btn>
+        </v-card-title>
 
-  <v-form v-model="valid" ref="form">
-    <v-container grid-list-xl>
-      <v-layout wrap>
-        <v-flex xs12 md5>
-          <v-text-field
-            v-model="Title"
-            :rules="nameRules"
-            label="Bezeichnung*"
-            required
-          ></v-text-field>
-        </v-flex>
+        <v-form v-model="valid" ref="form">
+          <v-container grid-list-xl>
+            <v-layout wrap>
+              <v-flex xs12 md5>
+                <v-text-field
+                  v-model="Title"
+                  :rules="nameRules"
+                  label="Bezeichnung*"
+                  required
+                ></v-text-field>
+              </v-flex>
 
-        <v-flex xs12 md5>
-          <v-text-field
-            v-model="Email"
-            :rules="emailRules"
-            label="Email"
-            required
-          ></v-text-field>
-        </v-flex>
+              <v-flex xs12 md5>
+                <v-text-field
+                  v-model="Email"
+                  :rules="emailRules"
+                  label="Email"
+                  required
+                ></v-text-field>
+              </v-flex>
 
-        <v-flex xs12 md2>
-            <v-btn @click="add"><v-icon>save</v-icon></v-btn>
-        </v-flex>
-      </v-layout>
-    </v-container>
-  </v-form>
-</v-card>
+              <v-flex xs12 md2>
+                  <v-btn @click="add"><v-icon>save</v-icon></v-btn>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-form>
+      </v-card>
     </template>
-    </v-data-table>
+  </v-data-table>
 </v-layout>
 </template>
 

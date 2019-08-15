@@ -12,10 +12,10 @@
             <v-container grid-list-xl>
             <v-layout wrap>
                 <v-flex xs12 sm6 md6>
-                <v-text-field v-model="namee" type="text" label="Bezeichnung"></v-text-field>
+                <v-text-field v-model="lol" type="text" label="Bezeichnung"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                <v-text-field v-model="Type" label="Ressourcen-Typ"></v-text-field>
+                <v-text-field v-model="RessourceType" label="Ressourcen-Typ"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
                 <v-text-field v-model="FunctionDescription" label="Funktionsbeschreibung"></v-text-field>
@@ -42,19 +42,19 @@ import { Boolean } from '@vuex-orm/core'
 
 @Component
 export default class RessourceFormDialog extends Vue {
+  @Prop(Boolean) private readonly showFormDialog!: boolean
   @Prop(Object) private readonly editedItem!: PropEditItem
   @Prop({ default: '' }) private readonly formTitle!: string
-  @Prop(Boolean) private readonly showFormDialog!: boolean
   @Prop({ default: false }) private readonly hideButton!: boolean
 
-  private Type: string = this.editedItem.type
+  private lol: string = this.editedItem.Title
+  private RessourceType: string = this.editedItem.Type
   private FunctionDescription: string = this.editedItem.FunctionDescription
-  private namee: string = this.editedItem.name
   private SpecialDescription: string = this.editedItem.SpecialDescription
   private showDialog: boolean = this.showFormDialog
 
   private get formInvalid (): boolean {
-    return !this.namee
+    return !this.lol
   }
 
   @Watch('showDialog')
@@ -66,9 +66,9 @@ export default class RessourceFormDialog extends Vue {
     this.$emit('close')
   }
   private save (): void {
-    const updateObject = {
-      name: this.namee,
-      type: this.Type,
+    const updateObject: PropEditItem = {
+      Title: this.lol,
+      Type: this.RessourceType,
       FunctionDescription: this.FunctionDescription,
       SpecialDescription: this.SpecialDescription
     }
@@ -76,8 +76,8 @@ export default class RessourceFormDialog extends Vue {
   }
 }
 interface PropEditItem {
-  name: string,
-  type: string,
+  Title: string,
+  Type: string,
   FunctionDescription: string,
   SpecialDescription: string
 }
