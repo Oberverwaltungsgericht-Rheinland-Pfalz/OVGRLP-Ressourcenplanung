@@ -8,6 +8,8 @@ namespace DbRaumplanung.Models
 {
     public class SupplierGroup
     {
+        public SupplierGroup() { }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }

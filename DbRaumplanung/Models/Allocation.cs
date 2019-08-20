@@ -8,6 +8,8 @@ namespace DbRaumplanung.Models
 {
     public class Allocation
     {
+        public Allocation() { }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }

@@ -8,6 +8,8 @@ namespace DbRaumplanung.Models
 {
     public class User
     {
+        public User() { }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }

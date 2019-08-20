@@ -175,26 +175,26 @@ export default class RessourceManagement extends Vue {
   }
 
   private editItem (item: ViewRessource) {
-    this.editedIndex = this.items.indexOf(item)
+//    this.editedIndex = this.items.indexOf(item)
     this.editedItem = Object.assign({}, item)
     this.showEditDialog = true
   }
 
   private async deleteItem (item: ViewRessource) {
-    const index = this.items.indexOf(item)
+//    const index = this.items.indexOf(item)
     const confirmation = await this.$dialog.confirm({
       text: 'Möchten sie diese Ressource wirklich löschen?',
       title: 'Löschen bestätigen',
       persistent: true
     })
-    if (confirmation) this.items.splice(index, 1)
+//  if (confirmation) this.items.splice(index, 1)
 
       // delete from server
   }
 
   private saveNew (event: ViewRessource) {
     // Save to server here
-    this.items.push({ ...this.newItem })
+  //  this.items.push({ ...this.newItem })
     this.showNewForm = false
   }
 
@@ -204,7 +204,7 @@ export default class RessourceManagement extends Vue {
       Object.assign(this.items[this.editedIndex], this.editedItem)
     } else {
       // Save to server here
-      this.items.push(this.editedItem)
+  //    this.items.push(this.editedItem)
     }
     this.showFormDialog = false
     this.showEditDialog = false

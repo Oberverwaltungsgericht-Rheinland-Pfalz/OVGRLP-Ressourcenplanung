@@ -15,7 +15,10 @@ namespace DbRaumplanung.DataAccess
         public DbSet<SupplierGroup> SupplierGroups{ get; set; }
         public DbSet<User> Users { get; set; }
 
-        public RpDbContext(DbContextOptions<RpDbContext> options) : base(options) { }
+        public RpDbContext(DbContextOptions<RpDbContext> options) : base(options) {
+           // options.UseSqlServer(connection, b => b.MigrationsAssembly("AspNetCoreVueStarter"));
+        }
+        public RpDbContext() { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

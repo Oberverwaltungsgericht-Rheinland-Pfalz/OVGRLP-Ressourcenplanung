@@ -19,7 +19,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         public IEnumerable<Allocation> GetAllocations(long ressourceId, DateTime? from, DateTime? to)
         {
-            return _ressourceService.GetAllocations(ressourceId, from, to);
+            return _ressourceService.GetAllocationsThisYear(ressourceId);
         }
         public IEnumerable<Gadget> GetAssignedGadgets(long ressourceId)
         {

@@ -62,8 +62,8 @@
   </v-form>
 </v-card>
 
-    </template>
-    </v-data-table>
+</template>
+</v-data-table>
 </v-layout>
 </template>
 
