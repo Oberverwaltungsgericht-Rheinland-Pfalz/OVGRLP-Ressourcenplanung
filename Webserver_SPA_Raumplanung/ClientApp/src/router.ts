@@ -63,6 +63,12 @@ export default new Router({
         name: 'fetch-data',
         icon: 'get_app',
         component: () => import('./views/FetchData.vue')
-} as MyRouteConfig
+      } as MyRouteConfig,
+      {
+        path: '/dbcontent',
+        name: 'querys',
+        icon: 'database',
+        component: () => import('./views/DbContent.vue')
+      } as MyRouteConfig
   ]
 })

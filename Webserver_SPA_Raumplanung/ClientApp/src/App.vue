@@ -119,7 +119,7 @@ export default class App extends Vue {
   private drawer: boolean = true
   private miniVariant: boolean = false
   private right: boolean = true
-  private title: string = 'ASP.NET Core Vue Starter'
+  private title: string = 'NJZ Raumplanung'
   private items: MyRouteConfig[] = []
 
   public async created () {
@@ -134,12 +134,12 @@ export default class App extends Vue {
       })
     })
     // initSampleData
-    const gadgets = [
-            { id: 1, Title: 'Beamer', Gadget: 'Hilfsmittel', Supplier_id: 1 },
-            { id: 2, Title: 'Visualisierer', Gadget: 'Hilfsmittel', Supplier_id: 2 },
-            { id: 3, Title: 'Monitor', Gadget: 'Ausstattung', Supplier_id: 2 }
+/*    const gadgets = [
+            { id: 31, title: 'Beamer', suppliedBy: 1 },
+            { id: 32, title: 'Visualisierer', suppliedBy: 2 },
+            { id: 33, title: 'Monitor', suppliedBy: 2 }
     ]
-    await Gadgets.insert({ data: gadgets })
+    await Gadgets.insert({ data: gadgets })*/
     const ressourcen = [
       {
         id: 1,

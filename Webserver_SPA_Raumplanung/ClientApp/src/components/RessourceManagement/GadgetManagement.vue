@@ -1,7 +1,6 @@
 <template>
 <v-layout column>
     <h2>Hilfsmittelverwaltung</h2>
-    
     <v-data-table
     :headers="headers"
     :items="items">
@@ -86,8 +85,7 @@ export default class GadgetManagement extends Vue {
 
   private valid: boolean = false
   private headers: object[] = [
-      { text: 'Bezeichnung', value: 'Title' },
-      { text: 'In Raum', value: 'Gadget' },
+      { text: 'Bezeichnung', value: 'title' },
       { text: 'Bearbeiten', value: 'action', sortable: false }
   ]
 

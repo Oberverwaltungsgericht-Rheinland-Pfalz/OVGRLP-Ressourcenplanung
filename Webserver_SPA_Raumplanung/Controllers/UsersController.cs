@@ -10,6 +10,7 @@ using DbRaumplanung.Models;
 
 namespace AspNetCoreVueStarter.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase

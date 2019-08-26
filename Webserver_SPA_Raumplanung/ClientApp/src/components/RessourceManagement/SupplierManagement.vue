@@ -82,7 +82,7 @@ export default class GadgetManagement extends Vue {
     return Suppliers.all()
   }
   private async add () {
-        // @ts-ignore
+    // @ts-ignore
     if (!this.$refs.form.validate()) return
     const data = [
             { Title: this.Title, GroupEmail: this.Email }

@@ -12,6 +12,8 @@ import SupplierModel from '../models/SupplierModel'
 import AllocationModel from '../models/AllocationModel'
 import AllocationpurposeModel from '../models/AllocationpurposeModel'
 import packageInfo from '../../package.json'
+import VuexORMAxios from '@vuex-orm/plugin-axios'  // tslint:disable-line
+// const VuexORMAxios = require('@vuex-orm/plugin-axios')
 
 Vue.use(Vuex)
 
@@ -24,6 +26,17 @@ database.register(AllocationModel)
 database.register(SupplierModel)
 database.register(AllocationpurposeModel)
 
+VuexORM.use(VuexORMAxios, {
+  database,
+  http: {
+    baseURL: 'http://localhost:8080/api/',
+    url: '/',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  }
+})
 // Vuex structure based on https://codeburst.io/vuex-and-typescript-3427ba78cfa8
 
 const store: StoreOptions<RootState> = {

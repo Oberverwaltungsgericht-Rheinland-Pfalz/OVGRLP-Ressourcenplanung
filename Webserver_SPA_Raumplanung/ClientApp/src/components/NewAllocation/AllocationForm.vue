@@ -186,7 +186,7 @@ export default class AllocationForm extends Vue {
   }
 
   private getGadgets (groupId: number) {
-    return Gadgets.query().where('Supplier_id', groupId).get()
+    return Gadgets.query().where('suppliedBy', groupId).get()
   }
 
   private removeDate (item: string) {
