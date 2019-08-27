@@ -140,6 +140,10 @@ export default class App extends Vue {
             { id: 33, title: 'Monitor', suppliedBy: 2 }
     ]
     await Gadgets.insert({ data: gadgets })*/
+    // @ts-ignore
+    Gadgets.$get()
+    // @ts-ignore
+    Suppliers.$get()
     const ressourcen = [
       {
         id: 1,
@@ -163,12 +167,12 @@ export default class App extends Vue {
       }
     ]
     await Ressources.insert({ data: ressourcen })
-    const gruppen = [
+/*    const gruppen = [
             { id: 1, Title: 'Wachtmeister', GroupEmail: 'NJZ.Wachtmeister@ovg.jm.rlp.de' },
             { id: 2, Title: 'EDV', GroupEmail: 'edv.support@ovg.jm.rlp.de' }
     ]
     await Suppliers.insert({ data: gruppen })
-
+*/
     const allocations = [
       {
         id: 111,

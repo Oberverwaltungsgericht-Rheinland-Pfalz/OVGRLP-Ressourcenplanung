@@ -10,9 +10,15 @@ export default class Supplier extends Model {
   public static fields () {
     return {
       id: this.attr(null),
-      Title: this.attr(''),
-      GroupEmail: this.attr(''),
+      title: this.attr(''),
+      groupEmail: this.attr(''),
       Gadgets: this.hasMany(Gadget, 'suppliedBy')
     }
   }
+}
+
+export interface SupplierGroupModel {
+  id: string
+  title: string
+  groupEmail: string
 }

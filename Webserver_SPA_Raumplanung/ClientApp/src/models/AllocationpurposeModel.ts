@@ -4,7 +4,7 @@ import Gadget from './GadgetModel'
 
 export default class Allocationpurpose extends Model {
   // This is the name used as module name of the Vuex Store.
-  public static entity = 'allocationpurpose'
+  public static entity = 'AllocationPurposes'
 
   // List of all fields (schema) of the post model. `this.attr` is used
   // for the generic field type. The argument is the default value.

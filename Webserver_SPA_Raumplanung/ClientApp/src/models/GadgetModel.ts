@@ -14,3 +14,9 @@ export default class Gadget extends Model {
     }
   }
 }
+
+export interface GadgetModel {
+  id: string
+  title: string
+  suppliedBy: string
+}

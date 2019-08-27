@@ -34,16 +34,11 @@
           label="Einem Raum zugeordnet?"
         ></v-combobox>
 <!-- <v-menu offset-y>
-                <template v-slot:activator="{ on }">
-                    <v-btn color="primary" dark v-on="on"><v-icon>arrow_drop_down</v-icon> Im Raum</v-btn>
-                </template>
-                <v-list>
-                    <v-list-item
-                    v-for="(item, index) in RessourceNames"
-                    :key="index"
-                    @click="InRoom = item">
-                    <v-list-item-title>{{ item }}</v-list-item-title>
-                    </v-list-item></v-list></v-menu>-->
+  <template v-slot:activator="{ on }">
+      <v-btn color="primary" dark v-on="on"><v-icon>arrow_drop_down</v-icon> Im Raum</v-btn></template>
+  <v-list><v-list-item v-for="(item, index) in RessourceNames" :key="index" @click="InRoom = item">
+      <v-list-item-title>{{ item }}</v-list-item-title>
+      </v-list-item></v-list></v-menu>-->
         </v-flex>
         <v-flex xs12 md3>
           <v-combobox
@@ -62,6 +57,52 @@
 </v-card>
 
 </template>
+<template v-slot:item.action="{ item }">
+    <v-dialog v-model="isEditable" persistent max-width="600px">
+      <template v-slot:activator="{ on }">
+        <v-btn color="primary" outlined dark v-on="on" @click="editItem(item)"><v-icon class="mr-2">edit</v-icon></v-btn>
+      </template>
+      <v-card>
+        <v-card-title>
+          <span class="headline">Bearbeiten</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field label="Bezeichnung*" v-model="editTitle" required></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-autocomplete
+                  v-model="editRessource"
+                  :items="RessourceNames"
+                  label="In Raum"
+                ></v-autocomplete>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-autocomplete
+                  v-model="editSupplier"
+                  :items="SupplierNames"
+                  label="Unterstützergruppe"
+                ></v-autocomplete>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="blue darken-1" text @click="isEditable = false">Abbrechen</v-btn>
+          <v-btn color="blue darken-1" text @click="saveEditItem">Speichern</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+  <!--<v-icon class="mr-2" @click="editItem(item)">edit</v-icon>-->
+  <v-icon @click="deleteItem(item)">delete</v-icon>
+</template>
+<template v-slot:no-data>
+  <v-btn color="primary">Keine Daten vorhanden</v-btn>
+</template>
 </v-data-table>
 </v-layout>
 </template>
@@ -69,9 +110,9 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import Gadgets from '../../models/GadgetModel'
+import Gadgets, { GadgetModel } from '../../models/GadgetModel'
 import Ressources from '../../models/RessourceModel'
-import Suppliers from '../../models/SupplierModel'
+import Suppliers, { SupplierGroupModel } from '../../models/SupplierModel'
 
 @Component
 export default class GadgetManagement extends Vue {
@@ -82,24 +123,34 @@ export default class GadgetManagement extends Vue {
   private nameRules = [
     (v: string) => !!v || 'Name is required'
   ]
+  private isEditable: boolean = false
+  private editRessource: string = ''
+  private editSupplier: string = ''
+  private editTitle: string = ''
+  private editId: string = ''
 
   private valid: boolean = false
   private headers: object[] = [
       { text: 'Bezeichnung', value: 'title' },
+      { text: 'In Raum', value: 'ressourceId' },
+      { text: 'Unterstützergruppe', value: 'suppliedBy' },
       { text: 'Bearbeiten', value: 'action', sortable: false }
   ]
 
   private get RessourceNames () {
-    return Ressources.all().filter((v: any) => !!v.Title).map((v: any) => v.Title)
+    return Ressources.all().filter((v: any) => !!v.title).map((v: any) => v.title)
+  }
+  private get sn () {
+    return Suppliers.all()
   }
   private get SupplierNames () {
-    return Suppliers.query().where('Title', (v: string) => v.length).get().map((v: any) => v.Title)
+    return Suppliers.query()./*where('title', (v: string) => !!v).*/get().map((v: any) => v.title)
   }
   private get items () {
     return Gadgets.all()
   }
   private async add () {
-        // @ts-ignore
+    // @ts-ignore
     if (!this.$refs.form.validate()) return
     const data = [
             { Title: this.Title, Gadget: this.InRoom }
@@ -107,5 +158,45 @@ export default class GadgetManagement extends Vue {
 
     await Gadgets.insert({ data })
   }
+
+  private editItem (item: GadgetModel) {
+    this.editTitle = item.title
+    if (item.suppliedBy) this.editSupplier = Gadgets.find(item.suppliedBy).title
+    this.editRessource = ''
+    this.editId = item.id
+  }
+  private saveEditItem () {
+    debugger
+    this.isEditable = false
+    let suppliedBy = null
+    if (this.editSupplier) {
+      const supplier = Suppliers.query().where('title', this.editSupplier).first()
+      suppliedBy = {
+        id: supplier && supplier.id,
+        title: supplier && supplier.title,
+        GroupEmail: supplier && supplier.groupEmail
+      }
+    }
+    // @ts-ignore
+    Gadgets.$update({
+      params: { id: this.editId },
+      data: { id: this.editId, title: this.editTitle, suppliedBy: {id: supplier ? .id , title: supplier.title, GroupEmail: supplier.GroupEmail } }
+    })
+  }
+
+  private async deleteItem (item: GadgetModel) {
+    const confirmation = await this.$dialog.confirm({
+      text: 'Möchten sie dieses Hilfsmittel wirklich löschen?',
+      title: 'Löschen bestätigen',
+      persistent: true
+    })
+    // @ts-ignore
+    if (confirmation) Gadgets.$delete({ params: { id: item.id } })
+  }
 }
 </script>
+
+<style lang="stylus" scoped>
+button > span > i.v-icon.mr-2
+  margin-right: 0!important;
+</style>
