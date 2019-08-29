@@ -11,10 +11,10 @@ export default class Allocationpurpose extends Model {
   public static fields () {
     return {
       id: this.attr(null),
-      Title: this.attr(''),
-      Description: this.attr(''),
-      Notes: this.attr(''),
-      ContactPhone: this.attr(''),
+      title: this.attr(''),
+      description: this.attr(''),
+      notes: this.attr(''),
+      contactPhone: this.attr(''),
       Allocations: this.hasMany(Allocation, 'Purpose_id'),
       Gadget_ids: this.attr(null),
       Gadgets: this.hasManyBy(Gadget, 'Gadget_ids')

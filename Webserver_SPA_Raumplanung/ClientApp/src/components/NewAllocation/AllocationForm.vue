@@ -68,7 +68,7 @@
     <v-select
         v-model="selectedRessourceId"
         :items="Rooms"
-        item-text="Title"
+        item-text="name"
         item-value="id"
         label="Raum"
     />
@@ -77,8 +77,8 @@
       <v-select
         v-model="seltedGadgets"
         :items="getGadgets(group.id)"
-        :label="'Hilfsmittel der '+ group.Title"
-        item-text="Title"
+        :label="'Hilfsmittel der '+ group.title"
+        item-text="title"
         item-value="id"
         multiple chips persistent-hint
       />
@@ -120,7 +120,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import Gadgets from '../../models/GadgetModel'
-import Ressources from '../../models/RessourceModel'
+import Ressources, { RessourceModel } from '../../models/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
 import dayjs from 'dayjs'
 
@@ -144,7 +144,8 @@ export default class AllocationForm extends Vue {
   private showMultipleDatesMenu: boolean = false
 
   private get Rooms () {
-    return Ressources.query().where('Title', (v: string) => v.length).get()
+    // @ts-ignore
+    return Ressources.all()
   }
   private get GadgetGroups () {
     return Suppliers.all()

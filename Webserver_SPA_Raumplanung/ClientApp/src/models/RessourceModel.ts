@@ -10,11 +10,18 @@ export default class Ressource extends Model {
   public static fields () {
     return {
       id: this.attr(null),
-      Title: this.attr(''),
-      Type: this.attr(''),
-      FunctionDescription: this.attr(''),
-      SpecialDescription: this.attr(''),
-      Allocations: this.hasMany(AllocationModel, 'ressource_id')
+      name: this.attr(''),
+      type: this.attr('Raum'),
+      functionDescription: this.attr(''),
+      specialDescription: this.attr(''),
+      allocations: this.hasMany(AllocationModel, 'ressource_id')
     }
   }
+}
+export interface RessourceModel {
+  id: number
+  name: string
+  type: string
+  functionDescription: string
+  specialDescription: string
 }

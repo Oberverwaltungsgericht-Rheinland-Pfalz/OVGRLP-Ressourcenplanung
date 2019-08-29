@@ -26,7 +26,7 @@ namespace AspNetCoreVueStarter.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Gadget>>> GetGadgets()
         {
-            return await _context.Gadgets.ToListAsync();
+            return await _context.Gadgets.Include(g => g.SuppliedBy).ToListAsync();
         }
 
         // GET: api/Gadgets/5

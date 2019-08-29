@@ -96,6 +96,7 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names as Fnn, UserData } from './store/User/types'
 import { MyRouteConfig } from './router'
 import Gadgets from './models/GadgetModel'
+import Users from './models/UserData'
 import Ressources from './models/RessourceModel'
 import Suppliers from './models/SupplierModel'
 import Allocations from './models/AllocationModel'
@@ -153,26 +154,26 @@ export default class App extends Vue {
     Allocations.$get()
     // @ts-ignore
     AllocationPurposes.$get()
-    const ressourcen = [
+/*    const ressourcen = [
       {
         id: 1,
-        Title: 'Sitzungssal E022',
-        Type: 'Gerichtssaal',
-        FunctionDescription: 'Saal des OVG',
-        SpecialDescription: 'Großer Gerichtssaal'
+        name: 'Sitzungssal E022',
+        type: 'Gerichtssaal',
+        functionDescription: 'Saal des OVG',
+        specialDescription: 'Großer Gerichtssaal'
       },{
         id: 2,
-        Title: 'Multifunktionsraum',
-        Type: 'Gemeinschaftsraum',
-        FunctionDescription: 'Allgemeiner Raum des NJZ',
-        SpecialDescription: '20 Sitzplätze und Beamer'
+        name: 'Multifunktionsraum',
+        type: 'Gemeinschaftsraum',
+        functionDescription: 'Allgemeiner Raum des NJZ',
+        specialDescription: '20 Sitzplätze und Beamer'
       },
       {
         id: 3,
-        Title: 'Sitzungssaal A008',
-        Type: 'Gerichtssaal',
-        FunctionDescription: 'Saal des ArbG',
-        SpecialDescription: 'Kleiner Gerichtssaal'
+        name: 'Sitzungssaal A008',
+        type: 'Gerichtssaal',
+        functionDescription: 'Saal des ArbG',
+        specialDescription: 'Kleiner Gerichtssaal'
       }
     ]
     await Ressources.insert({ data: ressourcen })
@@ -218,12 +219,13 @@ export default class App extends Vue {
     ]
     await Allocations.insert({ data: allocations })
 
-    const allocationPurposes = [
+/*    const allocationPurposes = [
       { id: 11, Title: 'VG 1. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '', Gadget_ids: [1] },
       { id: 12, Title: 'OVG 3. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '10', Gadget_ids: [2] }
    //   { id: 13, Title: 'ArbG 0. Kammer', Description: 'Verhandlung', Notes: '', ContactPhone: '31', Gadget_ids: [] }
     ]
     await AllocationPurposes.insert({ data: allocationPurposes })
+*/
   }
 }
 </script>
