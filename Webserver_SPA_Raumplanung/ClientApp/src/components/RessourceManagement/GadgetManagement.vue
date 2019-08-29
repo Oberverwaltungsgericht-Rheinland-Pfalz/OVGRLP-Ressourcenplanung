@@ -116,6 +116,19 @@ import Suppliers, { SupplierGroupModel } from '../../models/SupplierModel'
 
 @Component
 export default class GadgetManagement extends Vue {
+
+  private get RessourceNames () {
+    return Ressources.all().filter((v: any) => !!v.title).map((v: any) => v.title)
+  }
+  private get sn () {
+    return Suppliers.all()
+  }
+  private get SupplierNames () {
+    return Suppliers.query()./*where('title', (v: string) => !!v).*/get().map((v: any) => v.title)
+  }
+  private get items () {
+    return Gadgets.all()
+  }
   private createNew: boolean = false
   private Title: string = ''
   private InRoom: string = ''
@@ -136,19 +149,6 @@ export default class GadgetManagement extends Vue {
       { text: 'Unterstützergruppe', value: 'suppliedBy' },
       { text: 'Bearbeiten', value: 'action', sortable: false }
   ]
-
-  private get RessourceNames () {
-    return Ressources.all().filter((v: any) => !!v.title).map((v: any) => v.title)
-  }
-  private get sn () {
-    return Suppliers.all()
-  }
-  private get SupplierNames () {
-    return Suppliers.query()./*where('title', (v: string) => !!v).*/get().map((v: any) => v.title)
-  }
-  private get items () {
-    return Gadgets.all()
-  }
   private async add () {
     // @ts-ignore
     if (!this.$refs.form.validate()) return
@@ -162,11 +162,11 @@ export default class GadgetManagement extends Vue {
   private editItem (item: GadgetModel) {
     this.editTitle = item.title
     if (item.suppliedBy) this.editSupplier = Gadgets.find(item.suppliedBy).title
+    else  this.editSupplier = ''
     this.editRessource = ''
     this.editId = item.id
   }
   private saveEditItem () {
-    debugger
     this.isEditable = false
     let suppliedBy = null
     if (this.editSupplier) {
@@ -180,7 +180,7 @@ export default class GadgetManagement extends Vue {
     // @ts-ignore
     Gadgets.$update({
       params: { id: this.editId },
-      data: { id: this.editId, title: this.editTitle, suppliedBy: {id: supplier ? .id , title: supplier.title, GroupEmail: supplier.GroupEmail } }
+      data: { id: this.editId, title: this.editTitle, suppliedBy }
     })
   }
 

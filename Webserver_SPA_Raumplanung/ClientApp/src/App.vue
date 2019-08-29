@@ -32,6 +32,8 @@
               </v-list-item>
             </v-list>
           </v-menu>
+          &ensp;
+          <new-form-modal/>
         </div>
         <v-spacer></v-spacer>
             <h3>Raumplanung - {{currentPath}}</h3>
@@ -99,9 +101,10 @@ import Suppliers from './models/SupplierModel'
 import Allocations from './models/AllocationModel'
 import AllocationPurposes from './models/AllocationpurposeModel'
 import { Getters } from '@vuex-orm/core'
+import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 
 @Component({
-  components: { HelloWorld }
+  components: { HelloWorld, NewFormModal }
 })
 export default class App extends Vue {
 
@@ -144,6 +147,12 @@ export default class App extends Vue {
     Gadgets.$get()
     // @ts-ignore
     Suppliers.$get()
+    // @ts-ignore
+    Ressources.$get()
+    // @ts-ignore
+    Allocations.$get()
+    // @ts-ignore
+    AllocationPurposes.$get()
     const ressourcen = [
       {
         id: 1,

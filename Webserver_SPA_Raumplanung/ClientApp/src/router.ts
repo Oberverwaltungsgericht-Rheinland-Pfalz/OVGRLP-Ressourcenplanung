@@ -19,13 +19,13 @@ export default new Router({
       icon: 'business',
       component: () => import('./views/Calendar.vue')
     } as MyRouteConfig,
-    {
+/*    {
       path: '/new',
       name: 'Eintrag',
       icon: 'add',
       component: () => import('./components/NewAllocation/FormDialog.vue')
     } as MyRouteConfig,
-    {
+*/  {
       path: '/multi-select',
       name: 'multiselector',
       icon: 'calendar_today',
@@ -45,30 +45,30 @@ export default new Router({
       name: 'Verwaltung',
       icon: 'dvr',
         component: () => import('./views/Ressources.vue')
-      } as MyRouteConfig,
-      {
-        path: '/occupancy',
-        name: 'Scheduler',
-        icon: 'schedule',
-        component: () => import('./views/Occupancy.vue')
-      } as MyRouteConfig,
-      {
-        path: '/supports',
-        name: 'Aufgaben',
-        icon: 'group_work',
-        component: () => import('./views/Supporters.vue')
-      } as MyRouteConfig,
-      {
-        path: '/fetch-data',
-        name: 'fetch-data',
-        icon: 'get_app',
-        component: () => import('./views/FetchData.vue')
-      } as MyRouteConfig,
-      {
-        path: '/dbcontent',
-        name: 'querys',
-        icon: 'database',
-        component: () => import('./views/DbContent.vue')
-      } as MyRouteConfig
+    } as MyRouteConfig,
+    {
+      path: '/occupancy',
+      name: 'Scheduler',
+      icon: 'schedule',
+      component: () => import('./views/Occupancy.vue')
+    } as MyRouteConfig,
+    {
+      path: '/supports',
+      name: 'Aufgaben',
+      icon: 'group_work',
+      component: () => import('./views/Supporters.vue')
+    } as MyRouteConfig,
+/*    {
+      path: '/fetch-data',
+      name: 'fetch-data',
+      icon: 'get_app',
+      component: () => import('./views/FetchData.vue')
+    } as MyRouteConfig,
+*/    {
+      path: '/dbcontent',
+      name: 'querys',
+      icon: 'database',
+      component: () => import('./views/DbContent.vue')
+    } as MyRouteConfig
   ]
 })
