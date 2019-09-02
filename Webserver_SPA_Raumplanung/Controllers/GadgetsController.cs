@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
+using Serilog;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -26,7 +27,9 @@ namespace AspNetCoreVueStarter.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Gadget>>> GetGadgets()
         {
-            return await _context.Gadgets.Include(g => g.SuppliedBy).ToListAsync();
+            var gadgets = await _context.Gadgets.Include(g => g.SuppliedBy).ToListAsync();
+            Log.Information("GetGadgets was executed. {@gadets.Count} were send", gadgets.Count);
+            return gadgets;
         }
 
         // GET: api/Gadgets/5
