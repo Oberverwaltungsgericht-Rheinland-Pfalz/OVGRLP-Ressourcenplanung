@@ -182,7 +182,7 @@ export default class App extends Vue {
             { id: 2, Title: 'EDV', GroupEmail: 'edv.support@ovg.jm.rlp.de' }
     ]
     await Suppliers.insert({ data: gruppen })
-*/
+*
     const allocations = [
       {
         id: 111,
@@ -218,7 +218,7 @@ export default class App extends Vue {
       }
     ]
     await Allocations.insert({ data: allocations })
-
+*/
 /*    const allocationPurposes = [
       { id: 11, Title: 'VG 1. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '', Gadget_ids: [1] },
       { id: 12, Title: 'OVG 3. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '10', Gadget_ids: [2] }

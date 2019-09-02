@@ -50,7 +50,7 @@
 
               <v-flex xs12 md5>
                 <v-text-field
-                  v-model="newItem.SpecialDescription"
+                  v-model="newItem.SpecialsDescription"
                   :rules="nameRules"
                   :label="headers[3].text"
                   required
@@ -78,7 +78,7 @@
         <v-icon @click="deleteItem(item)">delete</v-icon>
       </template>
       <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize">Reset</v-btn>
+        <v-btn color="primary">Neu laden</v-btn>
       </template>
     </v-data-table>
   </v-layout>
@@ -103,10 +103,10 @@ export default class RessourceManagement extends Vue {
 //  private items: ViewRessource[] = []
   private ressourceTypes: string[] = ['Gemeinschaftsraum', 'Gerichtssaal']
   private headers: object[] = [
-    { text: 'Bezeichnung', value: 'Title' },
+    { text: 'Bezeichnung', value: 'Name' },
     { text: 'Ressourcen-Typ', value: 'Type' },
     { text: 'Funktionsbeschreibung', value: 'FunctionDescription' },
-    { text: 'Details', value: 'SpecialDescription' },
+    { text: 'Details', value: 'SpecialsDescription' },
     { text: 'Actions', value: 'action', sortable: false }
   ]
   private newItem: ViewRessource = {
@@ -143,35 +143,8 @@ export default class RessourceManagement extends Vue {
     }
   }
 
-  private created () {
-    this.initialize()
-  }
-
   private get items () {
     return Ressources.all()
-  }
-  private initialize () {
-        // load the ressources from server here
-  /*  this.items.push(...[
-      {
-        Title: 'Multifunktionsraum',
-        Type: 'Gemeinschaftsraum',
-        FunctionDescription: 'Allgemeiner Raum des NJZ',
-        SpecialDescription: '20 Sitzplätze und Beamer'
-      },
-      {
-        Title: 'Sitzungssaal A008',
-        Type: 'Gerichtssaal',
-        FunctionDescription: 'Saal des ArbG',
-        SpecialDescription: 'Kleiner Gerichtssaal'
-      },
-      {
-        Title: 'Sitzungssaal E022',
-        Type: 'Gerichtssaal',
-        FunctionDescription: 'Saal des OVG',
-        SpecialDescription: 'Großer Gerichtssaal'
-      }
-    ]) */
   }
 
   private editItem (item: ViewRessource) {

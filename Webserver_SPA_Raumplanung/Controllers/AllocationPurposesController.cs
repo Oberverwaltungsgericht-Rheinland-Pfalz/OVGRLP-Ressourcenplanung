@@ -22,11 +22,26 @@ namespace AspNetCoreVueStarter.Controllers
             _context = context;
         }
 
+
+
         // GET: api/AllocationPurposes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AllocationPurpose>>> GetAllocationPurposes()
+        public async Task<ActionResult<IEnumerable<object>>> GetAllocationPurposes()
         {
-            return await _context.AllocationPurposes.ToListAsync();
+            //var purposes = await _context.AllocationPurposes.Include(g => g.Allocations).ToListAsync();
+            var p = (from purpose in _context.AllocationPurposes
+          //   where purpose.Allocations.Count > 0
+             select new
+             {
+                 Id = purpose.Id,
+                 Title = purpose.Title,
+                 Description = purpose.Description,
+                 Notes = purpose.Notes,
+                 ContactPhone = purpose.ContactPhone,
+                 Gadgets = purpose.Gadgets.Select(x => x.Id),
+                 Allocations = purpose.Allocations.Select(x => x.Id)
+             }).ToList();
+            return p;
         }
 
         // GET: api/AllocationPurposes/5

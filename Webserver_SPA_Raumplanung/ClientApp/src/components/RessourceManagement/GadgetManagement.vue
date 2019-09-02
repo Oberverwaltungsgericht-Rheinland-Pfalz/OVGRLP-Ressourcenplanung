@@ -33,12 +33,6 @@
           :items="RessourceNames" outlined
           label="Einem Raum zugeordnet?"
         ></v-combobox>
-<!-- <v-menu offset-y>
-  <template v-slot:activator="{ on }">
-      <v-btn color="primary" dark v-on="on"><v-icon>arrow_drop_down</v-icon> Im Raum</v-btn></template>
-  <v-list><v-list-item v-for="(item, index) in RessourceNames" :key="index" @click="InRoom = item">
-      <v-list-item-title>{{ item }}</v-list-item-title>
-      </v-list-item></v-list></v-menu>-->
         </v-flex>
         <v-flex xs12 md3>
           <v-combobox
@@ -97,7 +91,6 @@
       </v-card>
     </v-dialog>
 
-  <!--<v-icon class="mr-2" @click="editItem(item)">edit</v-icon>-->
   <v-icon @click="deleteItem(item)">delete</v-icon>
 </template>
 <template v-slot:no-data>
@@ -140,13 +133,13 @@ export default class GadgetManagement extends Vue {
   private editRessource: string = ''
   private editSupplier: string = ''
   private editTitle: string = ''
-  private editId: string = ''
+  private editId: number = 0
 
   private valid: boolean = false
   private headers: object[] = [
-      { text: 'Bezeichnung', value: 'title' },
-      { text: 'In Raum', value: 'ressourceId' },
-      { text: 'Unterstützergruppe', value: 'suppliedBy' },
+      { text: 'Bezeichnung', value: 'Title' },
+    //  { text: 'In Raum', value: 'ressourceId' },
+      { text: 'Unterstützergruppe', value: 'SuppliedBy' },
       { text: 'Bearbeiten', value: 'action', sortable: false }
   ]
   private async add () {
@@ -160,11 +153,11 @@ export default class GadgetManagement extends Vue {
   }
 
   private editItem (item: GadgetModel) {
-    this.editTitle = item.title
-    if (item.suppliedBy) this.editSupplier = Gadgets.find(item.suppliedBy).title
-    else  this.editSupplier = ''
+    this.editTitle = item.Title
+    if (item.SuppliedBy) this.editSupplier = Gadgets.find(item.SuppliedBy).Title
+    else this.editSupplier = ''
     this.editRessource = ''
-    this.editId = item.id
+    this.editId = item.Id
   }
   private saveEditItem () {
     this.isEditable = false
@@ -172,9 +165,9 @@ export default class GadgetManagement extends Vue {
     if (this.editSupplier) {
       const supplier = Suppliers.query().where('title', this.editSupplier).first()
       suppliedBy = {
-        id: supplier && supplier.id,
-        title: supplier && supplier.title,
-        GroupEmail: supplier && supplier.groupEmail
+        id: supplier && supplier.Id,
+        title: supplier && supplier.Title,
+        GroupEmail: supplier && supplier.GroupEmail
       }
     }
     // @ts-ignore

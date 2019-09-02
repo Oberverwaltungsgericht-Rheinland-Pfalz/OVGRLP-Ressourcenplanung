@@ -24,7 +24,7 @@ namespace AspNetCoreVueStarter
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
                 .CreateLogger();
-
+            
             CreateWebHostBuilder(args).Build().Run();
         }
 

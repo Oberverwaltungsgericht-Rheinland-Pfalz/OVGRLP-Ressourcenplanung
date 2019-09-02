@@ -28,14 +28,14 @@
               <v-list-item @click="type = 'day'">
                 <v-list-item-title>Tag</v-list-item-title>
               </v-list-item>
-              <v-list-item @click="type = 'week'">
+<!--          <v-list-item @click="type = 'week'">
                 <v-list-item-title>Woche</v-list-item-title>
-              </v-list-item>
-              <v-list-item @click="type = 'month'">
-                <v-list-item-title>Monat</v-list-item-title>
               </v-list-item>
               <v-list-item @click="type = '4day'">
                 <v-list-item-title>4 tage</v-list-item-title>
+              </v-list-item>           
+-->           <v-list-item-title>Monat</v-list-item-title>
+                <v-list-item @click="type = 'month'">
               </v-list-item>
             </v-list>
           </v-menu>
@@ -86,7 +86,7 @@
             </v-card-text>
             <v-card-actions>
               <v-btn text color="secondary" @click="selectedOpen = false">
-                Cancel
+                Schließen
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -116,70 +116,34 @@ export default {
     selectedEvent: {},
     selectedElement: null,
     selectedOpen: false,
-    events: [
-      {
-        name: 'Vacation',
-        details: 'Going to the beach!',
-        start: '2019-08-19',
-        end: '2019-08-29',
-        color: 'blue'
-      },
+/*    events: [
       {
         name: 'IT Meeting',
         details: 'Spending time on how we do not have enough time',
         start: `${dayjs().format('YYYY-MM-DD')} 09:00`,
         end: `${dayjs().format('YYYY-MM-DD')} 19:00`,
         color: 'indigo'
-      },
-      {
-        name: '30th Birthday',
-        details: 'Celebrate responsibly',
-        start: '2019-08-03',
-        color: 'teal'
-      },
-      {
-        name: 'New Year',
-        details: 'Eat chocolate until you pass out',
-        start: '2019-01-01',
-        end: '2019-01-02',
-        color: 'green'
-      },
-      {
-        name: 'Conference',
-        details: 'The best time of my life',
-        start: '2019-01-21',
-        end: '2019-01-28',
-        color: 'grey darken-1'
-      },
-      {
-        name: 'Hackathon',
-        details: 'Code like there is no tommorrow',
-        start: '2019-01-30 23:00',
-        end: '2019-02-01 08:00',
-        color: 'black'
       }
-    ]
+    ]*/
   }),
   computed: {
     items () {
       return Allocations.query().with('Purpose').with('Ressource').get()
     },
     itemsFormated () {
-      return this.items.map((v) => {
-        return {
-  //        ...v,
-          start: dayjs(v.Start).format('YYYY-MM-DD hh:mm'),
-          end: dayjs(v.End).format('YYYY-MM-DD hh:mm'),
-          name: v.Ressource.Title,
-          details: v.Ressource.Title,color: 'success'
-        }
-      })
+      return this.items.map((v) => ({
+          start: v.From.substring(0,16).replace("T", " "), // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
+          end: v.To.substring(0,16).replace("T", " "), // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
+          name: (v.Purpose || {}).Title + ' in ' + (v.Ressource || {}).Name,
+          details: `${v.Purpose.Description} von ${new Date(v.From).toLocaleTimeString()} bis ${new Date(v.To).toLocaleTimeString()}`, 
+          color: 'success',
+          id: v.Id
+        })
+      )
     },
     title () {
       const { start, end } = this
-      if (!start || !end) {
-        return ''
-      }
+      if (!start || !end) return dayjs().format('MMMM YYYY')
 
       const startMonth = this.monthFormatter(start)
       const endMonth = this.monthFormatter(end)

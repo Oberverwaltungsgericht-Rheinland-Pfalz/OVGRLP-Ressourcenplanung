@@ -24,9 +24,29 @@ namespace AspNetCoreVueStarter.Controllers
 
         // GET: api/Allocations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Allocation>>> GetAllocations()
+        public async Task<ActionResult<IEnumerable<object>>> GetAllocations()
         {
-            return await _context.Allocations.ToListAsync();
+            //return await _context.Allocations.Include(g => g.Ressource).Include(g => g.Purpose).ToListAsync();
+            var p = (from a in _context.Allocations
+                         //   where purpose.Allocations.Count > 0
+                     select new
+                     {
+                         Id = a.Id,
+                         From = a.From,
+                         To = a.To,
+                         IsAllDay = a.IsAllDay,
+                         Status = a.Status,
+                         Ressource_id = a.Ressource.Id,
+                         Purpose_id = a.Purpose.Id,
+                         CreatedBy = a.CreatedBy,
+                         CreatedAt = a.CreatedAt,
+                         LastModified = a.LastModified,
+                         LastModifiedBy = a.LastModifiedBy.Id,
+                         ApprovedBy = a.ApprovedBy.Id,
+                         ApprovedAt = a.ApprovedAt,
+                         ReferencePerson = a.ReferencePerson.Id
+                     }).ToList();
+            return p;
         }
 
         // GET: api/Allocations/5
@@ -52,6 +72,39 @@ namespace AspNetCoreVueStarter.Controllers
                 return BadRequest();
             }
 
+            _context.Entry(allocation).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AllocationExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // PUT: api/Allocations/Status/5
+        [HttpPut("status/{id}")]
+        public async Task<IActionResult> PutAllocation(long id, int status)
+        {
+            var allocation = await _context.Allocations.FindAsync(id);
+
+            if (allocation == null)
+            {
+                return BadRequest();
+            }
+
+            allocation.Status = (MeetingStatus) status;
             _context.Entry(allocation).State = EntityState.Modified;
 
             try

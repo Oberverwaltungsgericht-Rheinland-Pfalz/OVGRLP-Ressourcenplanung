@@ -21,7 +21,7 @@
                 <v-text-field v-model="FunctionDescription" label="Funktionsbeschreibung"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                <v-text-field v-model="SpecialDescription" label="Details"></v-text-field>
+                <v-text-field v-model="SpecialsDescription" label="Details"></v-text-field>
                 </v-flex>
             </v-layout>
             </v-container>

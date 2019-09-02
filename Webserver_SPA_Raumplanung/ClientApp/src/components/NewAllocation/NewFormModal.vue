@@ -8,6 +8,7 @@
         <v-card-text><AllocationForm/></v-card-text>
         <v-card-actions>
             <div class="flex-grow-1"></div>
+            <v-btn color="green darken-1" text @click="dialog = false"><v-icon>save</v-icon> Anfragen</v-btn>
             <v-btn color="green darken-1" text @click="dialog = false"><v-icon>save</v-icon> Speichern</v-btn>
             <v-btn color="red darken-1" text @click="dialog = false"><v-icon>cancel</v-icon> Abbrechen</v-btn>
         </v-card-actions>

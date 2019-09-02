@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using VueCliMiddleware;
 using Microsoft.OpenApi.Models;
 using System;
+using Newtonsoft.Json.Serialization;
 
 namespace AspNetCoreVueStarter
 {
@@ -24,6 +25,9 @@ namespace AspNetCoreVueStarter
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc()
+               .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+
             services.AddScoped<IGadgetStore, GadgetStore>();
             services.AddScoped<IUserStore, UserStore>();
             services.AddScoped<IAllocationPurposeStore, AllocatoinPurposeStore>();

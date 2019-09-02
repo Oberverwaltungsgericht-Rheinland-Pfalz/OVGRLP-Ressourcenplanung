@@ -10,6 +10,7 @@
         <v-btn @click="zoomViewAllAxisX()">VIEW ALL</v-btn>
         | Or use <b>click+move</b> & <b>mousewheel</b> directly on graph.
         <hr>
+        <div v-show="false">
         <b>START DATE ALL:</b> MOVE 
         <v-btn @click="moveStartDate(-10 * 60)">-10 MIN</v-btn>
         <v-btn @click="moveStartDate(10 * 60)">+10 MIN</v-btn>
@@ -18,37 +19,45 @@
         <b>SLOT:</b>
         <v-btn @click="buildAutoSlot()">BUILD AUTO</v-btn> | 
         <v-btn @click="removeAllSlot()">REMOVE ALL</v-btn> Or <b>double click</b> on slot to remove it. | ADD
-        <v-btn @click="addSlot('A')">A</v-btn>
+        {{data2}}
+<!--        <v-btn @click="addSlot('A')">A</v-btn>
         <v-btn @click="addSlot('B')">B</v-btn>
         <v-btn @click="addSlot('C')">C</v-btn>
         <v-btn @click="addSlot('D')">D</v-btn>
         <v-btn @click="addSlot('E')">E</v-btn>
         <v-btn @click="addSlot('F')">F</v-btn>
         <v-btn @click="addSlot('X')">X</v-btn>
-        <hr>
+-->        <hr></div>
         <div id="selection"></div>
     </div>
 </template>
 
 <script>
+// includes code from d3-gantt-scheduler, @Repository: https://github.com/bertrandg/d3-gantt-scheduler/, @by Author "bertrandg <bertrandgaillard@hotmail.fr> (https://github.com/bertrandg)", @Licensed under ISC License
 import _ from 'lodash'
 import * as d3 from 'd3'
-// includes code from d3-gantt-scheduler, @Repository: https://github.com/bertrandg/d3-gantt-scheduler/, @by Author "bertrandg <bertrandgaillard@hotmail.fr> (https://github.com/bertrandg)", @Licensed under ISC License
+import Ressources from '../models/RessourceModel'
 
 export default {
     data () {
         return {
             scaleX:null, scaleY:null, axisX:null, axisY:null, WIDTH:0, HEIGHT: 500, BORDER: 50, GAP: 60, svg: null, currentSlot: null, elMain: null, dateStartAll: new Date(), elContainer: null,
             elAxisX: null, elAxisY: null,
+            startDate: Date.now(),
             data: [
-                {id: 1, name: 'B', startAfter: 3 * 60, duration: 4 * 60},
-                {id: 4, name: 'C', startAfter: 2 * 60, duration: 3 * 60},
-                {id: 5, name: 'D', startAfter: 7 * 60, duration: 10 * 60},
-                {id: 2, name: 'A', startAfter: 0 * 60, duration: 3 * 60},
-                {id: 3, name: 'A', startAfter: 4 * 60, duration: 2 * 60},
-                {id: 6, name: 'A', startAfter: 8 * 60, duration: 4 * 60},
-                {id: 7, name: 'A', startAfter: 13 * 60, duration: 2 * 60},
+
+                {id: 2, name: 'Raum 1', startAfter: 0 * 60, duration: 3 * 60},
+                {id: 3, name: 'Raum 2', startAfter: 4 * 60, duration: 2 * 60},
+                {id: 6, name: 'Raum 1', startAfter: 8 * 60, duration: 1 * 60},
+                {id: 7, name: 'Raum 1', startAfter: 9 * 60, duration: 2 * 60},
             ]
+        }
+    },
+    computed: {
+        data2 () {
+            let r = Ressources.all().map(v => ({id: v.Id, name: v.Name, startsAfter: 1, duration: 260}))
+            this.data.push(... r)
+            return r
         }
     },
     methods: {

@@ -68,22 +68,22 @@
     <v-select
         v-model="selectedRessourceId"
         :items="Rooms"
-        item-text="name"
-        item-value="id"
+        item-text="Name"
+        item-value="Id"
         label="Raum"
     />
 
     <div v-for="(group, idx) in GadgetGroups" :key="idx+'group'">
       <v-select
         v-model="seltedGadgets"
-        :items="getGadgets(group.id)"
-        :label="'Hilfsmittel der '+ group.title"
-        item-text="title"
-        item-value="id"
+        :items="getGadgets(group.Id)"
+        :label="'Hilfsmittel der '+ group.Title"
+        item-text="Title"
+        item-value="Id"
         multiple chips persistent-hint
       />
     </div>    
-
+{{seltedGadgets}}
     <v-text-field
     v-model="contactPerson"
     label="Ansprechpartner/In"
@@ -193,6 +193,15 @@ export default class AllocationForm extends Vue {
   private removeDate (item: string) {
     const idx = this.multipleDates.findIndex((v) => v === item)
     this.multipleDates.splice(idx, 1)
+  }
+  private clearAll () {
+    this.Title = ''
+    this.Description = ''
+    this.Notes = ''
+    this.telNumber = ''
+    this.contactPerson = ''
+    this.dateFromIntern = new Date(new Date().setHours(8,0,0,0))
+    this.dateToIntern = new Date(new Date().setHours(16,0,0,0))
   }
 }
 </script>

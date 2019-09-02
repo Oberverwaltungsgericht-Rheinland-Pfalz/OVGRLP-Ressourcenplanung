@@ -2,7 +2,7 @@
 <v-layout column>
  <v-data-table
     :headers="headers"
-    :items="list"
+    :items="Requests"
     :search="search"
     sort-by="calories"
     class="elevation-1"
@@ -57,6 +57,7 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/Acknowledges/types'
 import AllocationRequest from '../models/AllocationRequest'
+import Allocations, { AllocationModel } from '../models/AllocationModel'
 const namespace = 'acknowledges'
 
 @Component({
@@ -81,31 +82,36 @@ export default class AcknowledgeList extends Vue {
       { text: 'Bearbeiten', value: 'action', sortable: false },
       { text: 'Bezeichnung', value: 'Title' },
       { text: 'Status' , value: 'Status' },
-      { text: 'Raum', value: 'Description' },
+      { text: 'Raum', value: 'Ressource' },
       { text: 'Datum', value: 'DateTime' }
   ]
 
   public mounted () {
     this.initialize()
   }
-
+  public get Requests () {
+    if (!Allocations.all().length) return []
+    return Allocations.query().withAll().get().map((v: any) => ({
+      Id: v.Id,
+      Title: (v.Purpose || {}).Title,
+      Status: this.$options.filters.status2string(v.Status),
+      Ressource: (v.Ressource || {}).Name,
+      DateTime: v.LastModified}))
+  }
   public initialize () {
     this.loadTasks()
   }
 
-  public acknowledge (task: AllocationRequest) {
-    // change appointment status to accepted
-    const editableTask = { ...task }
-    editableTask.Status = 'Bestätigt'
-    this.updateTask(editableTask)
+  public async acknowledge (task: AllocationModel) {
+    this.saveStatus(task, 1)
   }
-  public reject (task: AllocationRequest) {
-            // change appointment status to rejected
-    const editableTask = { ...task }
-    editableTask.Status = 'Abgelehnt'
-    this.updateTask(editableTask)
+  public reject (task: AllocationModel) {
+    // change appointment status to rejected
+    this.saveStatus(task, 2)
   }
-  public async move (task: AllocationRequest) {
+  public async move (task: AllocationModel) {
+    this.saveStatus(task, 3)
+
     // change appointment status to changed and change the date
     const editableTask = { ...task }
     editableTask.Status = 'Verschoben'
@@ -127,6 +133,23 @@ export default class AcknowledgeList extends Vue {
       this.updateTask(editableTask)
 
     }
+  }
+  public async saveStatus (task: AllocationModel, status: number) {
+    const response = await fetch(`http://localhost:8080/api/Allocations/Status/${task.Id}?status=${status}`, {
+      method: 'PUT', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, cors, *same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    this.$store.dispatch('entities/update', {
+      entity: 'allocations',
+      where: task.Id,
+      data: { Status: status }
+    })
   }
 }
 </script>

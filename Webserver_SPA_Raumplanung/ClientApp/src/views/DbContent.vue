@@ -5,7 +5,7 @@
       <h3>Gadgets</h3>
       <div>{{gadgetItems}}
           <p v-for="(item, idx) in gadgetItems" :key="'gadget'+idx">
-              id: {{item.id}} Title: <input type="text" v-model="item.title"/> 
+              id: {{item.Id}} Title: <input type="text" v-model="item.Title"/> 
               <v-btn @click="updateGadget(item)">Save</v-btn>
               <v-btn @click="deleteGadget(item)">Delete</v-btn>
           </p>
@@ -44,16 +44,17 @@ import Suppliers from '../models/SupplierModel'
 export default class DbContentView extends Vue {
   private gadgetTitle: string = ''
   public mounted () {
-    // @ts-ignore
+/*    // @ts-ignore
     Ressources.$fetch()// .then((e: any) => Ressources.insert(e[0]))
     // @ts-ignore
-    Gadgets.$get()// .then((e: any) => Gadgets.insert(e[0]))
+  //  Gadgets.$get()// .then((e: any) => Gadgets.insert(e[0]))
     // @ts-ignore
     Allocations.$fetch()// .then((e: any) => Allocations.insert(e[0]))
     // @ts-ignore
     AllocationPurposes.$get()
     // @ts-ignore
     Suppliers.$get()
+*/
   }
   private get supplierItems () {
     return Suppliers.all()
@@ -65,27 +66,27 @@ export default class DbContentView extends Vue {
     return Ressources.all()
   }
   private get allocationItems () {
-    return Allocations.all()
+    return Allocations.query().withAll().get()
   }
   private get allocationPurposeItems () {
-    return AllocationPurposes.all()
+    return AllocationPurposes.query().with('Allocations').get()
   }
   private saveGadget () {
-    const data = { title: this.gadgetTitle }
+    const data = { Title: this.gadgetTitle }
     // @ts-ignore
     Gadgets.$create({ data })
   }
   private updateGadget (item: any) {
     // @ts-ignore
     Gadgets.$update({
-      params: { id: item.id },
-      data: { ...item, title: item.title }
+      params: { Id: item.Id },
+      data: { ...item, Title: item.Title }
     })
   }
   private deleteGadget (item: any) {
     // @ts-ignore
     Gadgets.$delete({
-      params: { id: item.id }
+      params: { Id: item.Id }
     })
   }
 }
