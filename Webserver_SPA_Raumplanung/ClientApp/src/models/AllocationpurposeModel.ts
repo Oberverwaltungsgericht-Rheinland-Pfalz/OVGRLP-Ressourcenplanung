@@ -22,7 +22,7 @@ export default class Allocationpurpose extends Model {
     }
   }
 }
-export interface AllocationModel {
+export interface AllocationPurposeModel {
   Id: number
   Title: string
   Description: string

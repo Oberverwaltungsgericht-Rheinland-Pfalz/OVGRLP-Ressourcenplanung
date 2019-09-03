@@ -57,18 +57,18 @@ export default new Router({
       name: 'Aufgaben',
       icon: 'group_work',
       component: () => import('./views/Supporters.vue')
-    } as MyRouteConfig,
+    } as MyRouteConfig
 /*    {
       path: '/fetch-data',
       name: 'fetch-data',
       icon: 'get_app',
       component: () => import('./views/FetchData.vue')
     } as MyRouteConfig,
-*/    {
+    {
       path: '/dbcontent',
       name: 'querys',
       icon: 'database',
       component: () => import('./views/DbContent.vue')
     } as MyRouteConfig
-  ]
+  */ ]
 })

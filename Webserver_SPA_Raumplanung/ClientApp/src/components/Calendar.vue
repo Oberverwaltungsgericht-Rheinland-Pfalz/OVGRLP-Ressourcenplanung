@@ -69,17 +69,17 @@
         >
           <v-card color="grey lighten-4" min-width="350px" flat>
             <v-toolbar :color="selectedEvent.color" dark>
-              <v-btn icon>
+              <!--<v-btn icon>
                 <v-icon>edit</v-icon>
-              </v-btn>
+              </v-btn>-->
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
-              <v-btn icon>
+              <!--<v-btn icon>
                 <v-icon>favorite</v-icon>
               </v-btn>
               <v-btn icon>
                 <v-icon>more_vert</v-icon>
-              </v-btn>
+              </v-btn>-->
             </v-toolbar>
             <v-card-text>
               <span v-html="selectedEvent.details"></span>

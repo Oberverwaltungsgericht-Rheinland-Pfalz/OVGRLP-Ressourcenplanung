@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
+using AspNetCoreVueStarter.ViewModels;
+using AutoMapper;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -16,17 +18,20 @@ namespace AspNetCoreVueStarter.Controllers
     public class AllocationsController : ControllerBase
     {
         private readonly RpDbContext _context;
+        private readonly IMapper _mapper;
 
-        public AllocationsController(RpDbContext context)
+        public AllocationsController(RpDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Allocations
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetAllocations()
         {
-            //return await _context.Allocations.Include(g => g.Ressource).Include(g => g.Purpose).ToListAsync();
+            var all =  await _context.Allocations.Include(g => g.Ressource).Include(g => g.Purpose).Include(g => g.ApprovedBy).Include(g => g.CreatedBy).Include(g => g.LastModifiedBy).Include(g => g.ReferencePerson).ToListAsync();
+           // return all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
             var p = (from a in _context.Allocations
                          //   where purpose.Allocations.Count > 0
                      select new
@@ -128,9 +133,19 @@ namespace AspNetCoreVueStarter.Controllers
 
         // POST: api/Allocations
         [HttpPost]
-        public async Task<ActionResult<Allocation>> PostAllocation(Allocation allocation)
+        public async Task<ActionResult<AllocationViewModel>> PostAllocation(AllocationViewModel allocation)
         {
-            _context.Allocations.Add(allocation);
+            var purpose = await _context.AllocationPurposes.FindAsync(allocation.Purpose_id);
+            var ressource = await _context.Ressources.FindAsync(allocation.Ressource_id);
+            var user = await _context.Users.FindAsync(1L);
+            
+            Allocation all = _mapper.Map<AllocationViewModel, Allocation>(allocation);
+            all.Purpose = purpose;
+            all.Ressource = ressource;
+            all.ApprovedBy = all.CreatedBy = all.LastModifiedBy = all.ReferencePerson = all.ApprovedBy = user;
+
+
+            _context.Allocations.Add(all);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetAllocation", new { id = allocation.Id }, allocation);

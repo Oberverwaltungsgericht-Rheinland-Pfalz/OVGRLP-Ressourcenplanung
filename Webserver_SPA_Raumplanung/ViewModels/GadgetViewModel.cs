@@ -20,6 +20,7 @@ namespace AspNetCoreVueStarter.ViewModels
         {
             CreateMap<Gadget, GadgetViewModel>()
                 .ForMember(dest => dest.SuppliedBy, opt => opt.MapFrom(src => src.SuppliedBy.Id));
+            // todo: reverse mapping
         }
     }
 }

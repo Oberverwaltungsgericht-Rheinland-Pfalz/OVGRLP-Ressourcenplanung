@@ -86,7 +86,7 @@
             multiple chips persistent-hint
           />
         </div>    
-        {{seltedGadgets}}
+        
         <v-text-field
         v-model="contactPerson"
         label="Ansprechpartner/In"
@@ -133,6 +133,9 @@ import Component from 'vue-class-component'
 import Gadgets from '../../models/GadgetModel'
 import Ressources, { RessourceModel } from '../../models/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
+import AllocationPurposes, { AllocationPurposeModel } from '../../models/AllocationpurposeModel'
+import Allocations, { AllocationModel } from '../../models/AllocationModel'
+
 import dayjs from 'dayjs'
 
 @Component
@@ -140,6 +143,7 @@ export default class AllocationForm extends Vue {
   public isWholeDay: boolean = true
   public isRepeating: boolean = false
   public valid: boolean = false
+  public editId: number = 0
   private Title: string = ''
   private Description: string = ''
   private Notes: string = ''
@@ -154,16 +158,35 @@ export default class AllocationForm extends Vue {
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
 
-  private saveDraft () {
-
+  private async saveDraft () {
+    const purposeId = await this.savePurpose()
+    this.saveAllocation(0, purposeId)
     this.close()
+    location.reload()
   }
-  private saveRelease () {
-
+  private async saveRelease () {
+    const purposeId = await this.savePurpose()
+    this.saveAllocation(1, purposeId)
     this.close()
+    location.reload()
+  }
+  private async saveAllocation (status: number, purpose: AllocationPurposeModel) {
+    // @ts-ignore
+    await Allocations.$create({ data: {
+      From: this.dateFrom, To: this.dateTo, IsAllDay: this.isWholeDay, Status: status,
+      Ressource: this.selectedRessourceId, Purpose: purpose, Purpose_id: purpose,
+      Ressource_id: this.selectedRessourceId }
+    })
+  }
+
+  private async savePurpose () {
+    // @ts-ignore
+    const response = await AllocationPurposes.$create({ data: {
+      Title: this.Title, Description: this.Description, Notes: this.Notes, ContactPhone: this.telNumber } })
+    if (response) return response.Id
   }
   private close () {
-
+    this.clearAll()
     this.$emit('close')
   }
 
