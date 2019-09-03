@@ -14,7 +14,7 @@ export default new Router({
   base: process.env.BASE_URL,
   routes: [
     {
-      path: '/calendar',
+      path: '/',
       name: 'Planungsübersicht',
       icon: 'business',
       component: () => import('./views/Calendar.vue')
@@ -25,17 +25,17 @@ export default new Router({
       icon: 'add',
       component: () => import('./components/NewAllocation/FormDialog.vue')
     } as MyRouteConfig,
-*/  {
+  {
       path: '/multi-select',
       name: 'multiselector',
       icon: 'calendar_today',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "MultiDates" */ './views/MutliDates.vue')
-    } as MyRouteConfig,
-    {
-      path: '/acknowledge',
+      component: () => import( './views/MutliDates.vue')
+ //   } as MyRouteConfig,
+*/  {
+    path: '/acknowledge',
       name: 'Bearbeiter',
       icon: 'storage',
       component: () => import('./views/Acknowledge.vue')

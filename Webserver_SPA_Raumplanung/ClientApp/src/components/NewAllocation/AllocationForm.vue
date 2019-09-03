@@ -1,119 +1,130 @@
 <template>
- <v-container>
-    <v-text-field
-        v-model="Title"
-        :counter="15"
-        label="Title"
+  <v-card>
+    <v-card-title class="headline"><slot name="header"></slot></v-card-title>
+    <v-card-text>
+      <v-container>
+        <v-text-field
+            v-model="Title"
+            :counter="15"
+            label="Titel"
+            required
+        ></v-text-field>
+
+        <v-switch
+          v-model="isWholeDay"
+          :label="`Ganztägiges Ereignis`"
+        ></v-switch>
+        <v-switch
+          v-model="isRepeating"
+          :label="`Wiederkehrender Termin`"
+        ></v-switch>
+
+        <div v-show="!isRepeating">
+          <label for="meeting-From">Vom:
+          <input :value="dateFrom" @input="dateFrom = $event.target.value"
+            :type="dateInputType" step="900"
+            id="meeting-from" 
+            name="meeting-time" :min="today"></label>
+
+          <label>Bis:
+          <input :value="dateTo" @input="dateTo = $event.target.value"
+            :type="dateInputType" @change="dateToChanged = true"
+            name="meeting-time" id="meeting-to" step="900"
+            :min="today"></label>
+        </div>
+
+        <div v-show="isRepeating">
+          <v-menu
+            ref="showMultipleDatesMenu"
+            v-model="showMultipleDatesMenu"
+            :close-on-content-click="false"
+            :return-value.sync="multipleDates"
+            transition="scale-transition"
+            offset-y
+            full-width
+            min-width="290px"
+          >
+            <template v-slot:activator="{ on }">
+              <v-combobox
+                v-model="multipleDates"
+                multiple
+                chips
+                small-chips
+                label="Gewählte Termine"
+                prepend-icon="event"
+                readonly
+                v-on="on"
+              >
+              <template v-slot:selection="data">
+                  <v-chip>{{data.item | toLocalDate}} <v-icon right @click="removeDate(data.item)">close</v-icon></v-chip>
+              </template>
+              </v-combobox>
+            </template>
+            <v-date-picker v-model="multipleDates" multiple no-title scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="showMultipleDatesMenu = false">Cancel</v-btn>
+              <v-btn text color="primary" @click="$refs.showMultipleDatesMenu.save(multipleDates)">OK</v-btn>
+            </v-date-picker>
+          </v-menu>
+        </div>
+
+        <v-select
+            v-model="selectedRessourceId"
+            :items="Rooms"
+            item-text="Name"
+            item-value="Id"
+            label="Raum"
+        />
+
+        <div v-for="(group, idx) in GadgetGroups" :key="idx+'group'">
+          <v-select
+            v-model="seltedGadgets"
+            :items="getGadgets(group.Id)"
+            :label="'Hilfsmittel der '+ group.Title"
+            item-text="Title"
+            item-value="Id"
+            multiple chips persistent-hint
+          />
+        </div>    
+        {{seltedGadgets}}
+        <v-text-field
+        v-model="contactPerson"
+        label="Ansprechpartner/In"
         required
-    ></v-text-field>
+        ></v-text-field>
+        <v-text-field
+            v-model="telNumber"
+            type="tel"
+            label="Telefonnummer"
+            required
+        ></v-text-field>
 
-    <v-switch
-      v-model="isWholeDay"
-      :label="`Ganztägiges Ereignis`"
-    ></v-switch>
-    <v-switch
-      v-model="isRepeating"
-      :label="`Wiederkehrender Termin`"
-    ></v-switch>
+        <v-textarea
+            v-model="Description"
+            :label="'Beschreibung'"
+            auto-grow
+            clearable
+            outlined
+            rounded
+        ></v-textarea>
 
-  <div v-show="!isRepeating">
-    <label for="meeting-From">Vom:
-    <input :value="dateFrom" @input="dateFrom = $event.target.value"
-       :type="dateInputType" step="900"
-       id="meeting-from" 
-       name="meeting-time" :min="today"></label>
-
-    <label>Bis:
-    <input :value="dateTo" @input="dateTo = $event.target.value"
-       :type="dateInputType" @change="dateToChanged = true"
-       name="meeting-time" id="meeting-to" step="900"
-       :min="today"></label>
-  </div>
-
-  <div v-show="isRepeating">
-    <v-menu
-      ref="showMultipleDatesMenu"
-      v-model="showMultipleDatesMenu"
-      :close-on-content-click="false"
-      :return-value.sync="multipleDates"
-      transition="scale-transition"
-      offset-y
-      full-width
-      min-width="290px"
-    >
-      <template v-slot:activator="{ on }">
-        <v-combobox
-          v-model="multipleDates"
-          multiple
-          chips
-          small-chips
-          label="Gewählte Termine"
-          prepend-icon="event"
-          readonly
-          v-on="on"
-        >
-        <template v-slot:selection="data">
-            <v-chip>{{data.item | toLocalDate}} <v-icon right @click="removeDate(data.item)">close</v-icon></v-chip>
-        </template>
-        </v-combobox>
-      </template>
-      <v-date-picker v-model="multipleDates" multiple no-title scrollable>
-        <v-spacer></v-spacer>
-        <v-btn text color="primary" @click="showMultipleDatesMenu = false">Cancel</v-btn>
-        <v-btn text color="primary" @click="$refs.showMultipleDatesMenu.save(multipleDates)">OK</v-btn>
-      </v-date-picker>
-    </v-menu>
-  </div>
-
-    <v-select
-        v-model="selectedRessourceId"
-        :items="Rooms"
-        item-text="Name"
-        item-value="Id"
-        label="Raum"
-    />
-
-    <div v-for="(group, idx) in GadgetGroups" :key="idx+'group'">
-      <v-select
-        v-model="seltedGadgets"
-        :items="getGadgets(group.Id)"
-        :label="'Hilfsmittel der '+ group.Title"
-        item-text="Title"
-        item-value="Id"
-        multiple chips persistent-hint
-      />
-    </div>    
-{{seltedGadgets}}
-    <v-text-field
-    v-model="contactPerson"
-    label="Ansprechpartner/In"
-    required
-    ></v-text-field>
-    <v-text-field
-        v-model="telNumber"
-        type="tel"
-        label="Telefonnummer"
-        required
-    ></v-text-field>
-
-    <v-textarea
-        v-model="Description"
-        :label="'Beschreibung'"
-        auto-grow
-        clearable
-        outlined
-        rounded
-    ></v-textarea>
-
-    <v-textarea
-        v-model="Notes"
-        :label="'Notizen'"
-        auto-grow
-        clearable
-        outlined
-        rounded
-    ></v-textarea>
-  </v-container>
+        <v-textarea
+            v-model="Notes"
+            :label="'Notizen'"
+            auto-grow
+            clearable
+            outlined
+            rounded
+        ></v-textarea>
+      </v-container>
+    </v-card-text>
+    <v-card-actions>
+        <div class="flex-grow-1"></div>
+        <v-btn color="green darken-1" text @click="saveDraft"><v-icon>save</v-icon> Anfragen</v-btn>
+        <v-btn color="green darken-1" text @click="saveRelease"><v-icon>save</v-icon> Speichern</v-btn>
+        <v-btn color="red darken-1" text @click="close"><v-icon>cancel</v-icon> Abbrechen</v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -142,6 +153,19 @@ export default class AllocationForm extends Vue {
   private contactPerson: string = ''
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
+
+  private saveDraft () {
+
+    this.close()
+  }
+  private saveRelease () {
+
+    this.close()
+  }
+  private close () {
+
+    this.$emit('close')
+  }
 
   private get Rooms () {
     // @ts-ignore

@@ -1,6 +1,6 @@
 <template>
   <div>
-      <h1>Bald bereit zu stellen von Ihrer Abteilung:</h1>
+      <h1>Bereitzustellen von Ihrer Abteilung:</h1>
       <div>
         <gadget-list/>
       </div>

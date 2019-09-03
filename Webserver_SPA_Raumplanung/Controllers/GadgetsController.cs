@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
 using Serilog;
+using AutoMapper;
+using AspNetCoreVueStarter.ViewModels;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -17,24 +19,28 @@ namespace AspNetCoreVueStarter.Controllers
     public class GadgetsController : ControllerBase
     {
         private readonly RpDbContext _context;
+        private readonly IMapper _mapper;
 
-        public GadgetsController(RpDbContext context)
+        public GadgetsController(RpDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Gadgets
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Gadget>>> GetGadgets()
+        public async Task<ActionResult<IEnumerable<GadgetViewModel>>> GetGadgets()
         {
             var gadgets = await _context.Gadgets.Include(g => g.SuppliedBy).ToListAsync();
+            var gadgetVMS = gadgets.Select<Gadget, GadgetViewModel>((e) => _mapper.Map<Gadget, GadgetViewModel>(e));
+            
             Log.Information("GetGadgets was executed. {@gadets.Count} were send", gadgets.Count);
-            return gadgets;
+            return gadgetVMS.ToList();
         }
 
         // GET: api/Gadgets/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Gadget>> GetGadget(long id)
+        public async Task<ActionResult<GadgetViewModel>> GetGadget(long id)
         {
             var gadget = await _context.Gadgets.FindAsync(id);
 
@@ -43,19 +49,20 @@ namespace AspNetCoreVueStarter.Controllers
                 return NotFound();
             }
 
-            return gadget;
+            return _mapper.Map<Gadget, GadgetViewModel>(gadget);
         }
 
         // PUT: api/Gadgets/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGadget(long id, Gadget gadget)
+        public async Task<IActionResult> PutGadget(long id, GadgetViewModel gadget)
         {
-            if (id != gadget.Id)
+            Gadget gad = await AddGroup(gadget);
+            if (id != gad.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(gadget).State = EntityState.Modified;
+            _context.Entry(gad).State = EntityState.Modified;
 
             try
             {
@@ -78,12 +85,20 @@ namespace AspNetCoreVueStarter.Controllers
 
         // POST: api/Gadgets
         [HttpPost]
-        public async Task<ActionResult<Gadget>> PostGadget(Gadget gadget)
+        public async Task<ActionResult<GadgetViewModel>> PostGadget(GadgetViewModel gadget)
         {
-            _context.Gadgets.Add(gadget);
+            Gadget gad = await AddGroup(gadget);
+            _context.Gadgets.Add(gad);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGadget", new { id = gadget.Id }, gadget);
+            return CreatedAtAction("GetGadget", new { id = gad.Id }, gadget);
+        }
+
+        private async Task<Gadget> AddGroup(GadgetViewModel gadget) {
+            var supplier = await _context.SupplierGroups.FindAsync(gadget.SuppliedBy);
+            Gadget gad = new Gadget() { Title=gadget.Title, SuppliedBy = supplier};
+            if (gadget.Id != 0) gad.Id = gadget.Id;
+            return gad;
         }
 
         // DELETE: api/Gadgets/5

@@ -135,7 +135,7 @@ export default {
           start: v.From.substring(0,16).replace("T", " "), // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
           end: v.To.substring(0,16).replace("T", " "), // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
           name: (v.Purpose || {}).Title + ' in ' + (v.Ressource || {}).Name,
-          details: `${v.Purpose.Description} von ${new Date(v.From).toLocaleTimeString()} bis ${new Date(v.To).toLocaleTimeString()}`, 
+          details: `${(v.Purpose || {}).Description} von ${new Date(v.From).toLocaleTimeString()} bis ${new Date(v.To).toLocaleTimeString()}`, 
           color: 'success',
           id: v.Id
         })

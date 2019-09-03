@@ -10,6 +10,9 @@ using VueCliMiddleware;
 using Microsoft.OpenApi.Models;
 using System;
 using Newtonsoft.Json.Serialization;
+using AutoMapper;
+using DbRaumplanung.Models;
+using AspNetCoreVueStarter.ViewModels;
 
 namespace AspNetCoreVueStarter
 {
@@ -25,6 +28,9 @@ namespace AspNetCoreVueStarter
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(Startup));
+            // Mapper.AssertConfigurationIsValid();
+
             services.AddMvc()
                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
