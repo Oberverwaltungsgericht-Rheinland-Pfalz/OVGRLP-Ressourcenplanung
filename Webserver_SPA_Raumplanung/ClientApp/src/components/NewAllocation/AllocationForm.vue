@@ -120,8 +120,8 @@
     </v-card-text>
     <v-card-actions>
         <div class="flex-grow-1"></div>
-        <v-btn color="green darken-1" text @click="saveDraft"><v-icon>save</v-icon> Anfragen</v-btn>
-        <v-btn color="green darken-1" text @click="saveRelease"><v-icon>save</v-icon> Speichern</v-btn>
+        <v-btn color="green darken-1" text @click="sendAllocation(0)"><v-icon>save</v-icon> Anfragen</v-btn>
+        <v-btn color="green darken-1" text @click="sendAllocation(1)"><v-icon>save</v-icon> Speichern</v-btn>
         <v-btn color="red darken-1" text @click="close"><v-icon>cancel</v-icon> Abbrechen</v-btn>
     </v-card-actions>
   </v-card>
@@ -158,20 +158,28 @@ export default class AllocationForm extends Vue {
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
 
-  private async saveDraft () {
+  private async sendAllocation (status: number) {
+
     const purposeId = await this.savePurpose()
-    this.saveAllocation(0, purposeId)
+    if (this.isRepeating) {
+      this.multipleDates.forEach((e) => {
+        debugger
+        this.saveAllocation(status, purposeId, e)
+      })
+    } else {
+      this.saveAllocation(status, purposeId)
+    }
+
+
     this.close()
   }
-  private async saveRelease () {
-    const purposeId = await this.savePurpose()
-    this.saveAllocation(1, purposeId)
-    this.close()
-  }
-  private async saveAllocation (status: number, purpose: AllocationPurposeModel) {
+
+  private async saveAllocation (status: number, purpose: AllocationPurposeModel, date?: Date) {
+    const from = date ? date : this.dateFrom
+    const to = date ? date : this.dateTo
     // @ts-ignore
     await Allocations.$create({ data: {
-      From: this.dateFrom, To: this.dateTo, IsAllDay: this.isWholeDay, Status: status,
+      From: from, To: to, IsAllDay: this.isWholeDay, Status: status,
       Ressource: this.selectedRessourceId, Purpose: purpose, Purpose_id: purpose,
       Ressource_id: this.selectedRessourceId }
     })
