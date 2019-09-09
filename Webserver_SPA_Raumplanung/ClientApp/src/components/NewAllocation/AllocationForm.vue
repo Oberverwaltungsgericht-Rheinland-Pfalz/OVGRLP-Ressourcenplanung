@@ -83,9 +83,9 @@
             :label="'Hilfsmittel der '+ group.Title"
             item-text="Title"
             item-value="Id"
-            multiple chips persistent-hint
+            multiple chips persistent-hint 
           />
-        </div>    
+        </div>
         
         <v-text-field
         v-model="contactPerson"
@@ -135,8 +135,8 @@ import Ressources, { RessourceModel } from '../../models/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
 import AllocationPurposes, { AllocationPurposeModel } from '../../models/AllocationpurposeModel'
 import Allocations, { AllocationModel } from '../../models/AllocationModel'
-
 import dayjs from 'dayjs'
+import { error } from 'util'
 
 @Component
 export default class AllocationForm extends Vue {
@@ -162,13 +162,11 @@ export default class AllocationForm extends Vue {
     const purposeId = await this.savePurpose()
     this.saveAllocation(0, purposeId)
     this.close()
-    location.reload()
   }
   private async saveRelease () {
     const purposeId = await this.savePurpose()
     this.saveAllocation(1, purposeId)
     this.close()
-    location.reload()
   }
   private async saveAllocation (status: number, purpose: AllocationPurposeModel) {
     // @ts-ignore
@@ -182,8 +180,14 @@ export default class AllocationForm extends Vue {
   private async savePurpose () {
     // @ts-ignore
     const response = await AllocationPurposes.$create({ data: {
-      Title: this.Title, Description: this.Description, Notes: this.Notes, ContactPhone: this.telNumber } })
+      Title: this.Title,
+      Description: this.Description,
+      Notes: this.Notes,
+      ContactPhone: this.telNumber,
+      GadgetIds: [...this.seltedGadgets] }
+    })
     if (response) return response.Id
+    else console.error('Allocation was not saved correctly ' + response)
   }
   private close () {
     this.clearAll()
@@ -234,7 +238,7 @@ export default class AllocationForm extends Vue {
   }
 
   private getGadgets (groupId: number) {
-    return Gadgets.query().where('suppliedBy', groupId).get()
+    return Gadgets.query().where('SuppliedBy', groupId).get()
   }
 
   private removeDate (item: string) {

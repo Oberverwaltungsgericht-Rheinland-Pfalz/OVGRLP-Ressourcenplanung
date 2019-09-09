@@ -17,8 +17,8 @@ export default class Allocationpurpose extends Model {
       Notes: this.attr(''),
       ContactPhone: this.attr(''),
       Allocations: this.hasMany(Allocation, 'Purpose_id', 'Id'),
-      Gadget_ids: this.attr(null),
-      Gadgets: this.hasManyBy(Gadget, 'Gadget_ids', 'Id')
+      GadgetIds: this.attr(null),
+      Gadgets: this.hasManyBy(Gadget, 'GadgetIds', 'Id')
     }
   }
 }

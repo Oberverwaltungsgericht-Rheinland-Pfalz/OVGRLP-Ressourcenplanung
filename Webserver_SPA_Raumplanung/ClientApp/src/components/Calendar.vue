@@ -34,8 +34,8 @@
               <v-list-item @click="type = '4day'">
                 <v-list-item-title>4 tage</v-list-item-title>
               </v-list-item>           
--->           <v-list-item-title>Monat</v-list-item-title>
-                <v-list-item @click="type = 'month'">
+-->           <v-list-item @click="type = 'month'">
+                <v-list-item-title>Monat</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -72,14 +72,14 @@
               <!--<v-btn icon>
                 <v-icon>edit</v-icon>
               </v-btn>-->
-              <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
-              <v-spacer></v-spacer>
               <!--<v-btn icon>
                 <v-icon>favorite</v-icon>
               </v-btn>
               <v-btn icon>
                 <v-icon>more_vert</v-icon>
               </v-btn>-->
+            <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+            <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
               <span v-html="selectedEvent.details"></span>

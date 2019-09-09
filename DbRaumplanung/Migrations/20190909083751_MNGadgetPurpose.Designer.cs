@@ -4,14 +4,16 @@ using DbRaumplanung.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DbRaumplanung.Migrations
 {
     [DbContext(typeof(RpDbContext))]
-    partial class RpDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190909083751_MNGadgetPurpose")]
+    partial class MNGadgetPurpose
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,6 +98,8 @@ namespace DbRaumplanung.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<long?>("AllocationPurposeId");
+
                     b.Property<long?>("RessourceId");
 
                     b.Property<long?>("SuppliedById");
@@ -103,6 +107,8 @@ namespace DbRaumplanung.Migrations
                     b.Property<string>("Title");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AllocationPurposeId");
 
                     b.HasIndex("RessourceId");
 
@@ -121,7 +127,7 @@ namespace DbRaumplanung.Migrations
 
                     b.HasIndex("AllocationPurposeId");
 
-                    b.ToTable("GadgetPurposes");
+                    b.ToTable("GadgetPurpose");
                 });
 
             modelBuilder.Entity("DbRaumplanung.Models.Ressource", b =>
@@ -221,6 +227,10 @@ namespace DbRaumplanung.Migrations
 
             modelBuilder.Entity("DbRaumplanung.Models.Gadget", b =>
                 {
+                    b.HasOne("DbRaumplanung.Models.AllocationPurpose")
+                        .WithMany("Gadgets")
+                        .HasForeignKey("AllocationPurposeId");
+
                     b.HasOne("DbRaumplanung.Models.Ressource")
                         .WithMany("Gadgets")
                         .HasForeignKey("RessourceId");
@@ -233,12 +243,12 @@ namespace DbRaumplanung.Migrations
             modelBuilder.Entity("DbRaumplanung.Models.GadgetPurpose", b =>
                 {
                     b.HasOne("DbRaumplanung.Models.AllocationPurpose", "AllocationPurpose")
-                        .WithMany("Gadgets")
+                        .WithMany()
                         .HasForeignKey("AllocationPurposeId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("DbRaumplanung.Models.Gadget", "Gadget")
-                        .WithMany("AllocationPurposes")
+                        .WithMany()
                         .HasForeignKey("GadgetId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

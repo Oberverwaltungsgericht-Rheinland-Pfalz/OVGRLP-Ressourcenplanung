@@ -23,6 +23,6 @@ namespace DbRaumplanung.Models
         public string Notes { get; set; }
         public string ContactPhone { get; set; }
         public virtual ICollection<Allocation> Allocations { get; set; }
-        public virtual ICollection<Gadget> Gadgets { get; set; }
+        public virtual ICollection<GadgetPurpose> Gadgets { get; set; } = new List<GadgetPurpose>();
     }
 }

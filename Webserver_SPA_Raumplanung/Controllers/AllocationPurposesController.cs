@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
+using AspNetCoreVueStarter.ViewModels;
+using AutoMapper;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -16,13 +18,13 @@ namespace AspNetCoreVueStarter.Controllers
     public class AllocationPurposesController : ControllerBase
     {
         private readonly RpDbContext _context;
+        private readonly IMapper _mapper;
 
-        public AllocationPurposesController(RpDbContext context)
+        public AllocationPurposesController(RpDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
-
-
 
         // GET: api/AllocationPurposes
         [HttpGet]
@@ -38,7 +40,7 @@ namespace AspNetCoreVueStarter.Controllers
                  Description = purpose.Description,
                  Notes = purpose.Notes,
                  ContactPhone = purpose.ContactPhone,
-                 Gadgets = purpose.Gadgets.Select(x => x.Id),
+                 Gadgets = purpose.Gadgets.Select(x => x.GadgetId),
                  Allocations = purpose.Allocations.Select(x => x.Id)
              }).ToList();
             return p;
@@ -46,7 +48,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // GET: api/AllocationPurposes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<AllocationPurpose>> GetAllocationPurpose(long id)
+        public async Task<ActionResult<AllocationPurposeViewModel>> GetAllocationPurpose(long id)
         {
             var allocationPurpose = await _context.AllocationPurposes.FindAsync(id);
 
@@ -54,8 +56,8 @@ namespace AspNetCoreVueStarter.Controllers
             {
                 return NotFound();
             }
-
-            return allocationPurpose;
+            var purposeVM =_mapper.Map<AllocationPurpose, AllocationPurposeViewModel>(allocationPurpose);
+            return purposeVM;
         }
 
         // PUT: api/AllocationPurposes/5
@@ -90,12 +92,29 @@ namespace AspNetCoreVueStarter.Controllers
 
         // POST: api/AllocationPurposes
         [HttpPost]
-        public async Task<ActionResult<AllocationPurpose>> PostAllocationPurpose(AllocationPurpose allocationPurpose)
+        public async Task<ActionResult<AllocationPurpose>> PostAllocationPurpose(AllocationPurposeViewModel allocationPurpose)
         {
-            _context.AllocationPurposes.Add(allocationPurpose);
-            await _context.SaveChangesAsync();
+            var purpose = _mapper.Map<AllocationPurposeViewModel, AllocationPurpose>(allocationPurpose);
 
-            return CreatedAtAction("GetAllocationPurpose", new { id = allocationPurpose.Id }, allocationPurpose);
+            _context.AllocationPurposes.Add(purpose);
+
+            if (allocationPurpose.GadgetIds.Any())
+            {
+                var tasksGadgetIds = allocationPurpose.GadgetIds.Select(e => _context.Gadgets.FindAsync(e));
+                var gadgets = await Task.WhenAll(tasksGadgetIds);
+
+                foreach (var gadget in gadgets)
+                {
+                    var gadgetPurpose = new GadgetPurpose(gadget, purpose);
+                    _context.GadgetPurposes.Add(gadgetPurpose);
+                    purpose.Gadgets.Add(gadgetPurpose);
+                    gadget.AllocationPurposes.Add(gadgetPurpose);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            var returnPurpose = _mapper.Map<AllocationPurpose, AllocationPurposeViewModel>(purpose);
+            return CreatedAtAction("GetAllocationPurpose", new { id = returnPurpose.Id }, returnPurpose);
         }
 
         // DELETE: api/AllocationPurposes/5

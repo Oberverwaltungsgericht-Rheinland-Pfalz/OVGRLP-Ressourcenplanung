@@ -69,10 +69,10 @@ namespace ServiceLayer
             foreach(var gadgetId in allocationPurpose.Gadgets)
             {
                 var gadget = _gadgetStore.GetGadgetById(gadgetId);
-                if (purpose.Gadgets == null || purpose.Gadgets.Count == 0)
-                    purpose.Gadgets = new List<Gadget>() { gadget };
-                else
-                    purpose.Gadgets.Add(gadget);
+                //if (purpose.Gadgets == null || purpose.Gadgets.Count == 0)
+                //    purpose.Gadgets = new List<Gadget>() { gadget };
+                //else
+                //    purpose.Gadgets.Add(gadget);
             }
 
             _allocationPurposeStore.CreateAllocationPurpose(purpose);
