@@ -1,6 +1,5 @@
 <template>
 <v-layout column>
-  <ressource-form-dialog v-if="showEditDialog" hideButton :showFormDialog="showEditDialog" :formTitle="'Ressource bearbeiten'" :editedItem="editedItem" @save="save($event)" @close="showEditDialog = false"/>
     <v-data-table
       :headers="headers"
       :items="items"
@@ -8,71 +7,11 @@
       class="elevation-1"
     >
     <template v-slot:top>
-      <v-toolbar v-if="!showNewForm" flat color="white">
-        <v-btn @click="showNewForm=true" color="primary">Neue Ressource hinzufügen<v-icon>add</v-icon></v-btn>
+      <v-toolbar flat color="white">
+        <v-btn @click="dialog = 1" color="primary">Neue Ressource hinzufügen<v-icon>add</v-icon></v-btn>
       </v-toolbar>
-      <v-card v-if="showNewForm">
-        <v-card-title class="blue white--text">
-          <span class="headline">Neue Ressource</span>
-          <v-spacer/>
-          <v-btn @click="showNewForm=false" rounded><v-icon>close</v-icon></v-btn>
-        </v-card-title>
-
-        <v-form v-model="valid" ref="form">
-          <v-container grid-list-xl>
-            <v-layout wrap>
-              <v-flex xs12 md6>
-                <v-text-field
-                  v-model="newItem.Title"
-                  :rules="nameRules"
-                  :label="headers[0].text"
-                  required
-                ></v-text-field>
-              </v-flex>
-
-              <v-flex xs12 md6>
-                <v-text-field
-                  v-model="newItem.Type"
-                  :rules="nameRules"
-                  :label="headers[1].text"
-                  required
-                ></v-text-field>
-              </v-flex>
-
-              <v-flex xs12 md6>
-                <v-text-field
-                  v-model="newItem.FunctionDescription"
-                  :rules="nameRules"
-                  :label="headers[2].text"
-                  required
-                ></v-text-field>
-              </v-flex>
-
-              <v-flex xs12 md5>
-                <v-text-field
-                  v-model="newItem.SpecialsDescription"
-                  :rules="nameRules"
-                  :label="headers[3].text"
-                  required
-                ></v-text-field>
-              </v-flex>
-
-              <v-flex xs12 md1>
-                  <v-btn @click="saveNew" color="green"><v-icon>save</v-icon></v-btn>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-form>
-      </v-card>
     </template>
 
-<!--      <template v-slot:top>
-        <v-toolbar flat color="white">
-          <v-toolbar-title>Enthaltene Ressourcen</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical/><v-spacer/>
-          <ressource-form-dialog :showFormDialog="showFormDialog" :formTitle="'Ressource erstellen'" :editedItem="editedItem" @save="saveNew($event)" @close="showFormDialog = false"/>
-        </v-toolbar>
-      </template>-->
       <template v-slot:item.action="{ item }">
         <v-icon class="mr-2" @click="editItem(item)">edit</v-icon>
         <v-icon @click="deleteItem(item)">delete</v-icon>
@@ -81,26 +20,58 @@
         <v-btn color="primary">Neu laden</v-btn>
       </template>
     </v-data-table>
+
+    <v-dialog :value="dialog" persistent max-width="800px">
+    <v-card>
+      <v-card-title>
+        <span class="headline">{{ModalTitle}}: {{editTitle}}</span>
+      </v-card-title>
+      <v-card-text>
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field :label="headers[0].text" v-model="editTitle" required></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field :label="headers[1].text" v-model="editType" required></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field :label="headers[2].text" v-model="editDescription" required></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field :label="headers[3].text" v-model="editDetails" required></v-text-field>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions>
+        <div class="flex-grow-1"></div>
+        <v-btn color="green darken-1" text @click="updateItem"><v-icon>save</v-icon> Speichern</v-btn>
+        <v-btn color="orange darken-1" text @click="closeModal"><v-icon>close</v-icon> Abbrechen</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
   </v-layout>
 </template>
 
 <script lang="ts">
-import RessourceFormDialog from './RessourceFormDialog.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import Ressources from '../../models/RessourceModel'
+import Ressources, { RessourceModel } from '../../models/RessourceModel'
 
-@Component({
-  components: { RessourceFormDialog }
-})
+@Component({})
 export default class RessourceManagement extends Vue {
   private showNewForm: boolean = false
+  private dialog: number = 0
+  private editId: number = 0
+  private editTitle: string = ''
+  private editType: string = ''
+  private editDescription: string = ''
+  private editDetails: string = ''
+
   private nameRules = [
     (v: string) => !!v || 'Name is required'
   ]
   private valid: boolean = false
-  private showFormDialog: boolean = false
-  private showEditDialog: boolean = false
-//  private items: ViewRessource[] = []
   private ressourceTypes: string[] = ['Gemeinschaftsraum', 'Gerichtssaal']
   private headers: object[] = [
     { text: 'Bezeichnung', value: 'Name' },
@@ -109,60 +80,70 @@ export default class RessourceManagement extends Vue {
     { text: 'Details', value: 'SpecialsDescription' },
     { text: 'Actions', value: 'action', sortable: false }
   ]
-  private newItem: ViewRessource = {
-    Title: '',
-    Type: '',
-    FunctionDescription: '',
-    SpecialDescription: ''
-  }
   private editedIndex: number = -1
-  private editedItem: ViewRessource = {
-    Title: '',
-    Type: '',
-    FunctionDescription: '',
-    SpecialDescription: ''
+
+  private get ModalTitle () {
+    if (this.dialog === 1) return 'Neue Ressource'
+    if (this.dialog === 2) return 'Bearbeite Ressource'
   }
-  private defaultItem: object = {
-    Title: '',
-    Type: '',
-    FunctionDescription: '',
-    SpecialDescription: ''
+  private async updateItem () {
+    const data = {
+      Id: this.editId,
+      Name: this.editTitle,
+      Type: this.editType,
+      FunctionDescription: this.editDescription,
+      SpecialsDescription: this.editDetails
+    }
+    if (this.dialog === 2) {
+      // @ts-ignore
+      const response = await Ressources.$update({ params: { id: this.editId }, data })
+      await Ressources.update(data)
+    } else {
+      // @ts-ignore
+      await Ressources.$create({ data })
+    }
+    this.closeModal()
   }
 
+  private closeModal () {
+    this.dialog = 0
+    this.editId = 0
+    this.editTitle = ''
+    this.editType = ''
+    this.editDescription = ''
+    this.editDetails = ''
+  }
   private get editDialog (): boolean {
     return this.editedIndex !== -1
-  }
-
-  @Watch('showFormDialog')
-  private onShowFormDialog (val: boolean) {
-    if (!val) {
-      this.$nextTick(() => {
-        this.editedItem = { Title: '', Type: '', FunctionDescription: '', SpecialDescription: '' }
-        this.editedIndex = -1
-      })
-    }
   }
 
   private get items () {
     return Ressources.all()
   }
 
-  private editItem (item: ViewRessource) {
-//    this.editedIndex = this.items.indexOf(item)
-    this.editedItem = Object.assign({}, item)
-    this.showEditDialog = true
+  private editItem (item: RessourceModel) {
+    this.editId = item.Id
+    this.editTitle = item.Name
+    this.editType = item.Type
+    this.editDescription = item.FunctionDescription
+    this.editDetails = item.SpecialsDescription
+    this.dialog = 2
   }
 
-  private async deleteItem (item: ViewRessource) {
-//    const index = this.items.indexOf(item)
+  private async deleteItem (item: RessourceModel) {
     const confirmation = await this.$dialog.confirm({
-      text: 'Möchten sie diese Ressource wirklich löschen?',
+      text: `Möchten sie die Ressource ${item.Name} wirklich löschen?`,
       title: 'Löschen bestätigen',
-      persistent: true
+      persistent: true,
+      actions: [{
+        text: 'Nein', color: 'blue', key: false
+      }, {
+        text: 'Löschen', color: 'red', key: true
+      }]
     })
-//  if (confirmation) this.items.splice(index, 1)
 
-      // delete from server
+    // @ts-ignore
+    if (confirmation === true) Ressources.$delete({ params: { id: item.Id } })
   }
 
   private saveNew (event: ViewRessource) {
@@ -174,13 +155,11 @@ export default class RessourceManagement extends Vue {
   private save (event: any) {
     if (this.editDialog) {
       // Update to server here
-      Object.assign(this.items[this.editedIndex], this.editedItem)
     } else {
       // Save to server here
   //    this.items.push(this.editedItem)
     }
-    this.showFormDialog = false
-    this.showEditDialog = false
+    this.dialog = 0
   }
 }
 
