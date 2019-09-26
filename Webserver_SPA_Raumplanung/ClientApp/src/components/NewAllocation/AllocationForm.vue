@@ -5,13 +5,13 @@
       <v-container>
         <v-text-field
             v-model="Title"
-            :counter="15"
             label="Titel"
             required
         ></v-text-field>
 
         <v-switch
           v-model="isWholeDay"
+          :disabled="this.isRepeating"
           :label="`Ganztägiges Ereignis`"
         ></v-switch>
         <v-switch
@@ -120,8 +120,8 @@
     </v-card-text>
     <v-card-actions>
         <div class="flex-grow-1"></div>
-        <v-btn color="green darken-1" text @click="sendAllocation(0)"><v-icon>save</v-icon> Anfragen</v-btn>
-        <v-btn color="green darken-1" text @click="sendAllocation(1)"><v-icon>save</v-icon> Speichern</v-btn>
+        <v-btn :disabled="formInvalid" color="green darken-1" text @click="sendAllocation(0)"><v-icon>save</v-icon> Anfragen</v-btn>
+        <v-btn :disabled="formInvalid" color="green darken-1" text @click="sendAllocation(1)"><v-icon>save</v-icon> Speichern</v-btn>
         <v-btn color="red darken-1" text @click="close"><v-icon>cancel</v-icon> Abbrechen</v-btn>
     </v-card-actions>
   </v-card>
@@ -140,10 +140,10 @@ import { error } from 'util'
 
 @Component
 export default class AllocationForm extends Vue {
-  public isWholeDay: boolean = true
   public isRepeating: boolean = false
   public valid: boolean = false
   public editId: number = 0
+  public isWholeDayIntern: boolean = true
   private Title: string = ''
   private Description: string = ''
   private Notes: string = ''
@@ -163,25 +163,21 @@ export default class AllocationForm extends Vue {
     const purposeId = await this.savePurpose()
     if (this.isRepeating) {
       this.multipleDates.forEach((e) => {
-        debugger
         this.saveAllocation(status, purposeId, e)
       })
     } else {
       this.saveAllocation(status, purposeId)
     }
-
-
     this.close()
   }
 
-  private async saveAllocation (status: number, purpose: AllocationPurposeModel, date?: Date) {
+  private async saveAllocation (status: number, purpose: AllocationPurposeModel, date?: Date | string) {
     const from = date ? date : this.dateFrom
     const to = date ? date : this.dateTo
     // @ts-ignore
     await Allocations.$create({ data: {
       From: from, To: to, IsAllDay: this.isWholeDay, Status: status,
-      Ressource: this.selectedRessourceId, Purpose: purpose, Purpose_id: purpose,
-      Ressource_id: this.selectedRessourceId }
+      Purpose_id: purpose, Ressource_id: this.selectedRessourceId }
     })
   }
 
@@ -195,11 +191,22 @@ export default class AllocationForm extends Vue {
       GadgetIds: [...this.seltedGadgets] }
     })
     if (response) return response.Id
-    else console.error('Allocation was not saved correctly ' + response)
+    else this.$dialog.message.warning('Allocation was not saved correctly ' + response, { position: 'top-center' })
   }
   private close () {
     this.clearAll()
     this.$emit('close')
+  }
+  public get formInvalid () {
+    let rValue = true
+    if (!this.selectedRessourceId) rValue = false
+    return !rValue
+  }
+  public get isWholeDay () {
+    return this.isRepeating ? true : this.isWholeDayIntern
+  }
+  public set isWholeDay (val) {
+    this.isWholeDayIntern = val
   }
 
   private get Rooms () {
@@ -259,8 +266,11 @@ export default class AllocationForm extends Vue {
     this.Notes = ''
     this.telNumber = ''
     this.contactPerson = ''
+    this.multipleDates = []
+    this.isRepeating = false
     this.dateFromIntern = new Date(new Date().setHours(8,0,0,0))
     this.dateToIntern = new Date(new Date().setHours(16,0,0,0))
+    this.selectedRessourceId = 0
   }
 }
 </script>

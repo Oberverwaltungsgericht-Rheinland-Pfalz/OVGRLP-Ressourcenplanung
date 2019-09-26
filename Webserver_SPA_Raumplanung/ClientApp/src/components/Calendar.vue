@@ -131,15 +131,7 @@ export default {
       return Allocations.query().with('Purpose').with('Ressource').get()
     },
     itemsFormated () {
-      return this.items.map((v) => ({
-          start: v.From.substring(0,16).replace("T", " "), // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
-          end: v.To.substring(0,16).replace("T", " "), // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
-          name: (v.Purpose || {}).Title + ' in ' + (v.Ressource || {}).Name,
-          details: `${(v.Purpose || {}).Description} von ${new Date(v.From).toLocaleTimeString()} bis ${new Date(v.To).toLocaleTimeString()}`, 
-          color: 'success',
-          id: v.Id
-        })
-      )
+      return this.items.map(transfer2Calendar)
     },
     title () {
       const { start, end } = this
@@ -218,5 +210,21 @@ export default {
         : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][d % 10]
     }
   }
+}
+function transfer2Calendar (v) {
+  let rVal = {}
+  if(v.IsAllDay) {
+    rVal.start = v.From.substring(0,10)
+    rVal.details = `${(v.Purpose || {}).Description} ganztägig ${(v.Purpose || {}).Notes}`
+  } else {
+    rVal.start = v.From.substring(0,16).replace("T", " ") // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
+    rVal.end =  v.To.substring(0,16).replace("T", " ") // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
+    rVal.details = `${(v.Purpose || {}).Description} von ${new Date(v.From).toLocaleTimeString()} bis ${new Date(v.To).toLocaleTimeString()}`
+  }
+  rVal.name = (v.Purpose || {}).Title + ' in ' + (v.Ressource || {}).Name,
+  rVal.color = 'success',
+  rVal.id = v.Id
+    
+  return rVal
 }
 </script>

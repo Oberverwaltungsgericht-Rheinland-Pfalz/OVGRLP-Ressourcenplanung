@@ -19,14 +19,8 @@
         <b>SLOT:</b>
         <v-btn @click="buildAutoSlot()">BUILD AUTO</v-btn> | 
         <v-btn @click="removeAllSlot()">REMOVE ALL</v-btn> Or <b>double click</b> on slot to remove it. | ADD
-        {{data2}}
-<!--        <v-btn @click="addSlot('A')">A</v-btn>
-        <v-btn @click="addSlot('B')">B</v-btn>
-        <v-btn @click="addSlot('C')">C</v-btn>
-        <v-btn @click="addSlot('D')">D</v-btn>
-        <v-btn @click="addSlot('E')">E</v-btn>
-        <v-btn @click="addSlot('F')">F</v-btn>
-        <v-btn @click="addSlot('X')">X</v-btn>
+        
+<!--    <v-btn @click="addSlot('A')">A</v-btn><v-btn @click="addSlot('B')">B</v-btn><v-btn @click="addSlot('C')">C</v-btn><v-btn @click="addSlot('D')">D</v-btn><v-btn @click="addSlot('E')">E</v-btn><v-btn @click="addSlot('F')">F</v-btn><v-btn @click="addSlot('X')">X</v-btn>
 -->        <hr></div>
         <div id="selection"></div>
     </div>
@@ -37,6 +31,8 @@
 import _ from 'lodash'
 import * as d3 from 'd3'
 import Ressources from '../models/RessourceModel'
+import Allocations from '../models/AllocationModel'
+import dayjs from 'dayjs'
 
 export default {
     data () {
@@ -45,19 +41,32 @@ export default {
             elAxisX: null, elAxisY: null,
             startDate: Date.now(),
             data: [
-
-                {id: 2, name: 'Raum 1', startAfter: 0 * 60, duration: 3 * 60},
-                {id: 3, name: 'Raum 2', startAfter: 4 * 60, duration: 2 * 60},
-                {id: 6, name: 'Raum 1', startAfter: 8 * 60, duration: 1 * 60},
-                {id: 7, name: 'Raum 1', startAfter: 9 * 60, duration: 2 * 60},
+//                {id: 2, name: 'Raum 1', startAfter: 0 * 60, duration: 3 * 60},
+                {id: 3, name: 'Raum 2', startAfter: 4 * 60, duration: 24 * 36e2},
+//                {id: 6, name: 'Raum 1', startAfter: 7 * 60, duration: 1 * 60},
+//                {id: 7, name: 'Raum 1', startAfter: 9 * 60, duration: 2 * 60},
             ]
         }
     },
     computed: {
         data2 () {
-            let r = Ressources.all().map(v => ({id: v.Id, name: v.Name, startsAfter: 1, duration: 260}))
-            this.data.push(... r)
-            return r
+            let roomNames = Allocations.query().with('Ressource').get()
+            let blocks = roomNames.map(v => {
+                let rValue = {id: v.Id, name: v.Ressource.Name, from: v.From, to: v.To}
+                let today = dayjs(new Date())
+                let start = dayjs(v.From)
+                let diff = start.diff(today, "hour")  // 3600
+                let durationTime = dayjs(v.To).diff(start, "minute") // 60
+
+                rValue.startAfter = diff * 3600
+                if(v.IsAllDay) rValue.duration = 864e2
+                else rValue.duration = durationTime * 60
+                console.log(rValue.duration)
+
+                return rValue
+            })
+
+            return blocks
         }
     },
     methods: {
@@ -672,6 +681,7 @@ export default {
         },
     },
     mounted () {
+        this.data.push(...this.data2)
         this.WIDTH = this.$refs.chartdiv.clientWidth
         this.dateStartAll.setMinutes(this.dateStartAll.getMinutes() + 10)
         this.dateStartAll.setSeconds(0)
