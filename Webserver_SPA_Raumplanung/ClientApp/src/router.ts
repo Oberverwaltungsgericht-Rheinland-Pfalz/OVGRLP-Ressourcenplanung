@@ -42,7 +42,7 @@ export default new Router({
     } as MyRouteConfig,
     {
       path: '/ressources',
-      name: 'Verwaltung',
+      name: 'Administration',
       icon: 'dvr',
         component: () => import('./views/Ressources.vue')
     } as MyRouteConfig,

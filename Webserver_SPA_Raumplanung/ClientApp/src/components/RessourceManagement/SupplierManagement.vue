@@ -1,7 +1,5 @@
 <template>
 <v-layout column>
-  <h2>Unterstützergruppenverwaltung</h2>
-  
   <v-data-table
     :headers="headers"
     :items="items"

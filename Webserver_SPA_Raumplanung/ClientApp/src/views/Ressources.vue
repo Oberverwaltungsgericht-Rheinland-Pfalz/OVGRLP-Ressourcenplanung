@@ -1,21 +1,20 @@
 <template>
-  <div>
-      <h1>Ressourcenverwaltung</h1>
-      <v-spacer/>
-      <ressource-management/>
-      
-      <br/>     
-      <gadget-management/>
-      <br/>
-      <supplier-management/>
+  <div> 
+      <v-tabs v-model="tab" fixed-tabs background-color="white" light>
+        <v-tab>
+          Ressourcen
+        </v-tab>
+        <v-tab>
+          Hilfsmittel
+        </v-tab>
+        <v-tab>
+          Unterstützergruppen
+        </v-tab>
+      </v-tabs>
 
-      <v-layout align-space-between justify-center column fill-height>
-        <v-flex>
-        </v-flex>
-        
-        <v-flex>
-        </v-flex>  
-      </v-layout>
+      <ressource-management v-show="tab===0"/>     
+      <gadget-management v-show="tab===1"/>
+      <supplier-management v-show="tab===2"/>
   </div>
 </template>
 
@@ -29,7 +28,7 @@ import SupplierManagement from '@/components/RessourceManagement/SupplierManagem
   components: { RessourceManagement, GadgetManagement, SupplierManagement }
 })
 export default class Ressources extends Vue {
-
+  public tab: any = null
 
 }
 </script>
