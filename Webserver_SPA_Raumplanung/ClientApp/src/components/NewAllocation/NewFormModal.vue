@@ -1,7 +1,7 @@
 <template>
     <v-dialog v-model="dialog" persistent >
         <template v-slot:activator="{ on }">
-        <v-btn color="primary" dark v-on="on"><v-icon>add</v-icon> Termin anlegen</v-btn>
+        <v-btn color="success" dark v-on="on"><v-icon>add</v-icon> Termin anlegen</v-btn>
         </template>
         <AllocationForm v-on:close="dialog=false">
           <template v-slot:header>

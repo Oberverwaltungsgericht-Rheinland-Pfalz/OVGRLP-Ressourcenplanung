@@ -39,7 +39,7 @@ VuexORM.use(VuexORMAxios, {
 })
 // Vuex structure based on https://codeburst.io/vuex-and-typescript-3427ba78cfa8
 
-const store: StoreOptions<RootState> = {
+export const store: StoreOptions<RootState> = {
   state: {
     version: packageInfo.version
   },

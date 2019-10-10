@@ -3,23 +3,25 @@
     <v-system-bar fixed  app>
       Raumplanung (Version {{$store.state.version}})
     </v-system-bar>
- <!--   <v-navigation-drawer persistent :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher fixed app>
+    <v-navigation-drawer persistent :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher fixed app>
       <v-list>
         <v-list-item value="true" v-for="(item, i) in items" :key="i" :to="item.path">
           <v-list-item-action>
-            <v-icon v-html="item.icon"></v-icon>
+            <v-icon>{{item.icon}}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title v-text="item.name"></v-list-item-title>
+            <v-list-item-title >{{item.name}}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
-    </v-navigation-drawer>-->
+    </v-navigation-drawer>
 
   <v-app-bar app>
     <v-layout justify-space-between wrap align-center>
       <div class="text-center">
-          <v-menu offset-y open-on-hover>
+          <new-form-modal/>
+          &ensp;
+          <v-menu v-if="!drawer" offset-y open-on-hover>
             <template v-slot:activator="{ on }">
               <v-btn color="primary" dark v-on="on">
                 <v-icon>more_vert</v-icon> 
@@ -28,12 +30,10 @@
             </template>
             <v-list>
               <v-list-item v-for="(item, index) in items" :key="index" :to="item.path">
-                <v-list-item-title><v-icon v-html="item.icon"></v-icon> {{ item.name }}</v-list-item-title>
+                <v-list-item-title><v-icon>{{item.icon}}</v-icon> {{ item.name }}</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
-          &ensp;
-          <new-form-modal/>
         </div>
         <v-spacer></v-spacer>
             <h3>Raumplanung - {{currentPath}}</h3>
@@ -68,18 +68,6 @@
     </v-layout>
   </v-app-bar>
 
-  <!--  <v-toolbar app :clipped-left="clipped">
-      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>web</v-icon>
-      </v-btn>
-      <v-toolbar-title v-text="title"></v-toolbar-title>
-      <v-spacer></v-spacer>
-    </v-toolbar>
--->
     <v-content>
       <v-container fluid>
         <router-view/>
@@ -96,7 +84,6 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names as Fnn, UserData } from './store/User/types'
 import { MyRouteConfig } from './router'
 import Gadgets from './models/GadgetModel'
-import Users from './models/UserData'
 import Ressources from './models/RessourceModel'
 import Suppliers from './models/SupplierModel'
 import Allocations from './models/AllocationModel'
@@ -129,13 +116,15 @@ export default class App extends Vue {
   public async created () {
     this.loadUser();
     (this.$router as any).options.routes.forEach((route: any) => {
-      this.items.push({
-                  // name: route.name,
-                  // path: route.path,
-        path: route.path,
-        name: route.name,
-        icon: route.icon
-      })
+      const role: string = this.$store.state.user.role
+      if (role >= route.authLevel) {
+        this.items.push({
+          path: route.path,
+          name: route.name,
+          icon: route.icon,
+          authLevel: route.authLevel
+        })
+      }
     })
     // initSampleData
 /*    const gadgets = [

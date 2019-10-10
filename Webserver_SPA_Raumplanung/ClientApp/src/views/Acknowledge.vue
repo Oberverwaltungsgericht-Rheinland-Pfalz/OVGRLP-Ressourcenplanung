@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Bitte bearbeiten Sie die eingegangenen Terminanfragen</h1>
+    <!--<h1>Bitte bearbeiten Sie die eingegangenen Terminanfragen</h1>-->
     <acknowledge-list/>
   </div>
 </template>

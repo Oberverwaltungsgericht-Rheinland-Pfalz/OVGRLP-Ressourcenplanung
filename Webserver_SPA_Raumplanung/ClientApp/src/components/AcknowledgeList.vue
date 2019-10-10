@@ -1,6 +1,6 @@
 <template>
 <v-layout column>
- <v-data-table
+ <v-data-table v-if="hasItems"
     :headers="headers"
     :items="Requests"
     :search="search"
@@ -45,9 +45,7 @@
     </template>
   </v-data-table>
 
-  <v-divider/>
-  <v-spacer/>
-  <h3 v-if="isEmpty">Es liegen keine zu bearbeitenden Terminanfragen vor</h3>
+  <h3 v-else>Es liegen keine zu bearbeitenden Terminanfragen vor</h3>
   </v-layout>
 </template>
 
@@ -60,13 +58,7 @@ import AllocationRequest from '../models/AllocationRequest'
 import Allocations, { AllocationModel } from '../models/AllocationModel'
 const namespace = 'acknowledges'
 
-@Component({
-  filters: {
-    toLocal (dateVal: Date): string {
-      return dayjs(dateVal).format(' DD.MM.YYYY hh:mm')
-    }
-  }
-})
+@Component
 export default class AcknowledgeList extends Vue {
   @State('tasks', { namespace })
   private list!: AllocationRequest[]
@@ -88,6 +80,10 @@ export default class AcknowledgeList extends Vue {
 
   public mounted () {
     this.initialize()
+  }
+  public get hasItems () {
+    const allocations = Allocations.query().withAll().get()
+    return allocations.length
   }
   public get Requests () {
     if (!Allocations.all().length) return []
@@ -148,7 +144,7 @@ export default class AcknowledgeList extends Vue {
     this.$store.dispatch('entities/update', {
       entity: 'allocations',
       where: task.Id,
-      data: { Status: status }
+      data: { Status: status, LastModified: new Date() }
     })
   }
 }

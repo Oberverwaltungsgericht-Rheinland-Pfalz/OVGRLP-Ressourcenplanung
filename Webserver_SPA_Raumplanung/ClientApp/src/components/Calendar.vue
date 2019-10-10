@@ -215,7 +215,7 @@ function transfer2Calendar (v) {
   let rVal = {}
   if(v.IsAllDay) {
     rVal.start = v.From.substring(0,10)
-    rVal.details = `${(v.Purpose || {}).Description} ganztägig ${(v.Purpose || {}).Notes}`
+    rVal.details = `${(v.Purpose || {}).Description} ganztägig ${(v.Purpose || {}).Notes} || ''`
   } else {
     rVal.start = v.From.substring(0,16).replace("T", " ") // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
     rVal.end =  v.To.substring(0,16).replace("T", " ") // dayjs(v.To).format('YYYY-MM-DD hh:mm'),

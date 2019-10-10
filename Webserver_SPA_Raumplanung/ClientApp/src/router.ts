@@ -1,11 +1,13 @@
 import Vue from 'vue'
 import Router, { RouteConfig } from 'vue-router'
 import Home from './views/Home.vue'
+import store from './store/index'
 
 Vue.use(Router)
 
 export interface MyRouteConfig extends RouteConfig {
-  icon: string
+  icon: string,
+  authLevel: number
 }
 
 /* tslint:disable:ter-indent */
@@ -17,15 +19,10 @@ export default new Router({
       path: '/',
       name: 'Planungsübersicht',
       icon: 'business',
+      authLevel: 0,
       component: () => import('./views/Calendar.vue')
     } as MyRouteConfig,
-/*    {
-      path: '/new',
-      name: 'Eintrag',
-      icon: 'add',
-      component: () => import('./components/NewAllocation/FormDialog.vue')
-    } as MyRouteConfig,
-  {
+/*  {
       path: '/multi-select',
       name: 'multiselector',
       icon: 'calendar_today',
@@ -36,26 +33,40 @@ export default new Router({
  //   } as MyRouteConfig,
 */  {
     path: '/acknowledge',
-      name: 'Bearbeiter',
+      name: 'Anfragenverwaltung',
       icon: 'storage',
+      authLevel: 1,
+      beforeEnter: (to, from, next) => requireAuth(1, to, from, next),
       component: () => import('./views/Acknowledge.vue')
+    } as MyRouteConfig,
+    {
+      path: '/mylist',
+      name: 'Ihre Anfragen',
+      icon: 'calendar_view_day',
+      authLevel: 1,
+      component: () => import('./components/MyList.vue')
     } as MyRouteConfig,
     {
       path: '/ressources',
       name: 'Administration',
       icon: 'dvr',
-        component: () => import('./views/Ressources.vue')
+      authLevel: 2,
+      beforeEnter: (to, from, next) => requireAuth(2, to, from, next),
+      component: () => import('./views/Ressources.vue')
     } as MyRouteConfig,
     {
       path: '/occupancy',
       name: 'Scheduler',
       icon: 'schedule',
+      authLevel: 0,
       component: () => import('./views/Occupancy.vue')
     } as MyRouteConfig,
     {
       path: '/supports',
       name: 'Aufgaben',
       icon: 'group_work',
+      authLevel: 0,
+      beforeEnter: (to, from, next) => requireAuth(0, to, from, next),
       component: () => import('./views/Supporters.vue')
     } as MyRouteConfig
 /*    {
@@ -72,3 +83,14 @@ export default new Router({
     } as MyRouteConfig
   */ ]
 })
+
+function requireAuth (level: number, to, from, next) {
+  const role: number = store.state.user.role
+  if (role >= level) {
+    next()
+  } else {
+    next('/') // from.path
+  }
+}
+
+// const roles = { admin: 2, editor: 1 }

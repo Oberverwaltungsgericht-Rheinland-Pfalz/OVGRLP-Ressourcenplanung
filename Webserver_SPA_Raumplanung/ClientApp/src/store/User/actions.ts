@@ -6,7 +6,7 @@ import { RootState } from '../types'
 const exampleUser: UserData = {
   name: 'Reiner',
   email: 'e@mail.ovg.jm.rlp.de',
-  role: 'admin',
+  role: '2',
   phone: '012345',
   domain: 'OVGVG',
   supplierGroups: [1]

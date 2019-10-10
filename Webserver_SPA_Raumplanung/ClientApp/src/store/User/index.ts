@@ -9,7 +9,7 @@ export const state: UserState = {
   name: '',
   email: '',
   phone: '',
-  role: false,
+  role: 0,
   supplierGroups: false,
   domain: '',
   lastUpdated: false
