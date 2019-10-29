@@ -48,6 +48,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DbRaumplanung\DbRaumplanung.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\ServiceLayer\ServiceLayer.csproj" />
   </ItemGroup>
 

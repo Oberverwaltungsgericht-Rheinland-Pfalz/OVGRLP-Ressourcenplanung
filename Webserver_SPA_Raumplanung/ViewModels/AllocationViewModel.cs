@@ -43,4 +43,19 @@ namespace AspNetCoreVueStarter.ViewModels
             CreateMap<AllocationViewModel, Allocation>();
         }
     }
+
+    public class AllocationFilter
+    {
+        public long UserId { get; set; }
+        public DateTime From { get; set; }
+        public DateTime To { get; set; }
+    }
+
+    public class AllocationRequestEdition
+    {
+        public long Id { get; set; }
+        public int status { get; set; }
+        public DateTime? From { get; set; }
+        public DateTime? To { get; set; }
+    }
 }

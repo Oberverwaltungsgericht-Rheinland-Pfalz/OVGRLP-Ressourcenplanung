@@ -9,6 +9,7 @@ using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
 using AspNetCoreVueStarter.ViewModels;
 using AutoMapper;
+using Infrastructure.Email;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -53,6 +54,34 @@ namespace AspNetCoreVueStarter.Controllers
                      }).ToList();
             return p;
         }
+
+        [HttpGet("filter/{filter}")]
+        public async Task<ActionResult<IEnumerable<object>>> GetAllocations(AllocationFilter filter)
+        {
+            var all = await _context.Allocations.Include(g => g.Ressource).Include(g => g.Purpose).Include(g => g.ApprovedBy).Include(g => g.CreatedBy).Include(g => g.LastModifiedBy).Include(g => g.ReferencePerson).ToListAsync();
+            // return all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
+            var p = (from a in _context.Allocations
+                         //   where purpose.Allocations.Count > 0
+                     select new
+                     {
+                         Id = a.Id,
+                         From = a.From,
+                         To = a.To,
+                         IsAllDay = a.IsAllDay,
+                         Status = a.Status,
+                         Ressource_id = a.Ressource.Id,
+                         Purpose_id = a.Purpose.Id,
+                         CreatedBy = a.CreatedBy,
+                         CreatedAt = a.CreatedAt,
+                         LastModified = a.LastModified,
+                         LastModifiedBy = a.LastModifiedBy.Id,
+                         ApprovedBy = a.ApprovedBy.Id,
+                         ApprovedAt = a.ApprovedAt,
+                         ReferencePerson = a.ReferencePerson.Id
+                     }).ToList();
+            return p;
+        }
+
 
         // GET: api/Allocations/5
         [HttpGet("{id}")]
@@ -110,6 +139,7 @@ namespace AspNetCoreVueStarter.Controllers
             }
 
             allocation.Status = (MeetingStatus) status;
+            allocation.LastModified = DateTime.Now;
             _context.Entry(allocation).State = EntityState.Modified;
 
             try
@@ -119,6 +149,57 @@ namespace AspNetCoreVueStarter.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!AllocationExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // PUT: api/Allocations/EditRequest
+        [HttpPut("{editedRequest}")]
+        public async Task<ActionResult<Boolean>> EditRequest(AllocationRequestEdition editedRequest)
+        {
+            var allocation = await _context.Allocations.FindAsync(editedRequest.Id);
+
+            if (allocation == null)
+            {
+                return BadRequest();
+            }
+
+            allocation.Status = (MeetingStatus)editedRequest.status;
+            allocation.LastModified = DateTime.Now;
+            allocation.ApprovedAt = DateTime.Now;
+            if((MeetingStatus) editedRequest.status == MeetingStatus.Moved)
+            {
+                EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde gelöscht");
+
+                allocation.From = editedRequest.From.GetValueOrDefault();
+                allocation.To = editedRequest.To.GetValueOrDefault();
+            }
+              else if((MeetingStatus)editedRequest.status == MeetingStatus.Approved)
+            {
+                EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde genehmigt");
+            }
+              else if ((MeetingStatus)editedRequest.status == MeetingStatus.Clarification)
+            {
+                EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde abgelehnt");
+            }
+
+            _context.Entry(allocation).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AllocationExists(editedRequest.Id))
                 {
                     return NotFound();
                 }
@@ -142,6 +223,8 @@ namespace AspNetCoreVueStarter.Controllers
             Allocation all = _mapper.Map<AllocationViewModel, Allocation>(allocation);
             all.Purpose = purpose;
             all.Ressource = ressource;
+            all.LastModified = DateTime.Now;
+            all.CreatedAt = DateTime.Now;
             all.ApprovedBy = all.CreatedBy = all.LastModifiedBy = all.ReferencePerson = all.ApprovedBy = user;
 
 
@@ -155,7 +238,7 @@ namespace AspNetCoreVueStarter.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Allocation>> DeleteAllocation(long id)
         {
-            var allocation = await _context.Allocations.FindAsync(id);
+            var allocation = await _context.Allocations.Include(o => o.Purpose).Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == id);
             if (allocation == null)
             {
                 return NotFound();
@@ -164,6 +247,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.Allocations.Remove(allocation);
             await _context.SaveChangesAsync();
 
+            EmailTrigger.SendEmail("Ihr Termin wurde gelöscht", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde gelöscht");
             return allocation;
         }
 

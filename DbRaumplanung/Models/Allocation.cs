@@ -40,16 +40,19 @@ namespace DbRaumplanung.Models
     public enum MeetingStatus
     {
         [EnumMember(Value = "Draft")]
-        Draft,
+        Draft = -1,
 
         [EnumMember(Value = "Pending")]
-        Pending,
+        Pending = 0 ,
 
         [EnumMember(Value = "Acknowledged")]
-        Approved,
+        Approved = 1,
 
         [EnumMember(Value = "Clarification")]
-        Clarification,
+        Clarification = 2 ,
+
+        [EnumMember(Value = "MovedAcknowledge")]
+        Moved = 3,
 
         [EnumMember(Value = "Hidden")]
         Hidden,

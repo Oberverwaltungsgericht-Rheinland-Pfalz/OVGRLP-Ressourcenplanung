@@ -10,6 +10,9 @@ using DbRaumplanung.Models;
 using Serilog;
 using AutoMapper;
 using AspNetCoreVueStarter.ViewModels;
+using System.Net;
+using System.Net.Mail;
+using Infrastructure.Email;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -61,7 +64,7 @@ namespace AspNetCoreVueStarter.Controllers
             {
                 return BadRequest();
             }
-
+            
             _context.Entry(gad).State = EntityState.Modified;
 
             try
@@ -91,6 +94,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.Gadgets.Add(gad);
             await _context.SaveChangesAsync();
 
+            EmailTrigger.SendEmail("Hilfsmittel erzeugt", $"{gadget.Title} wurde erstellt");
             return CreatedAtAction("GetGadget", new { id = gad.Id }, gadget);
         }
 

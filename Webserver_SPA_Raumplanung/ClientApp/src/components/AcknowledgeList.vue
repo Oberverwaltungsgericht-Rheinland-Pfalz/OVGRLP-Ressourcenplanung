@@ -131,20 +131,22 @@ export default class AcknowledgeList extends Vue {
     }
   }
   public async saveStatus (task: AllocationModel, status: number) {
-    const response = await fetch(`http://localhost:8080/api/Allocations/Status/${task.Id}?status=${status}`, {
+    const editedRequest = { Id: task.Id, status, From: task.From, To: task.To }
+    const response = await fetch(`http://localhost:8080/api/Allocations/EditRequest`, {
       method: 'PUT', // *GET, POST, PUT, DELETE, etc.
       mode: 'cors', // no-cors, cors, *same-origin
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
       credentials: 'same-origin', // include, *same-origin, omit
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify(editedRequest)
     })
 
     this.$store.dispatch('entities/update', {
       entity: 'allocations',
       where: task.Id,
-      data: { Status: status, LastModified: new Date() }
+      data: { Status: status, LastModified: new Date(), From: task.From, To: task.To }
     })
   }
 }
