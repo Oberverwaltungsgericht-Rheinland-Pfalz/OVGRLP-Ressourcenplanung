@@ -10,17 +10,18 @@ using DbRaumplanung.Models;
 using AspNetCoreVueStarter.ViewModels;
 using AutoMapper;
 using Infrastructure.Email;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Principal;
+using AspNetCoreVueStarter.Filter;
 
 namespace AspNetCoreVueStarter.Controllers
 {
+    [Authorize]
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class AllocationsController : ControllerBase
+    public class AllocationsController : BaseController
     {
-        private readonly RpDbContext _context;
-        private readonly IMapper _mapper;
-
         public AllocationsController(RpDbContext context, IMapper mapper)
         {
             _context = context;
@@ -29,8 +30,11 @@ namespace AspNetCoreVueStarter.Controllers
 
         // GET: api/Allocations
         [HttpGet]
+        [AuthorizeAd("Editor")]
         public async Task<ActionResult<IEnumerable<object>>> GetAllocations()
         {
+            var user = RequestSender;
+
             var all =  await _context.Allocations.Include(g => g.Ressource).Include(g => g.Purpose).Include(g => g.ApprovedBy).Include(g => g.CreatedBy).Include(g => g.LastModifiedBy).Include(g => g.ReferencePerson).ToListAsync();
            // return all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
             var p = (from a in _context.Allocations

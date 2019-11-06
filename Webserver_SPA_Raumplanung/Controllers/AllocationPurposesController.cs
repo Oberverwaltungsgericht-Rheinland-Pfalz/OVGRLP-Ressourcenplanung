@@ -31,7 +31,7 @@ namespace AspNetCoreVueStarter.Controllers
         public async Task<ActionResult<IEnumerable<object>>> GetAllocationPurposes()
         {
             //var purposes = await _context.AllocationPurposes.Include(g => g.Allocations).ToListAsync();
-            var p = (from purpose in _context.AllocationPurposes
+            var p = await (from purpose in _context.AllocationPurposes
           //   where purpose.Allocations.Count > 0
              select new
              {
@@ -42,7 +42,7 @@ namespace AspNetCoreVueStarter.Controllers
                  ContactPhone = purpose.ContactPhone,
                  Gadgets = purpose.Gadgets.Select(x => x.GadgetId),
                  Allocations = purpose.Allocations.Select(x => x.Id)
-             }).ToList();
+             }).ToListAsync();
             return p;
         }
 

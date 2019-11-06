@@ -13,14 +13,14 @@ namespace DbRaumplanung.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
-
+        // public string ActiveDirectoryID { get; set; }  // hinzufügen
         [Required]
         public string Name { get; set; }
-
+        //public string Organisation { get; set; } // hinzufügen
         [Required]
         public string Email { get; set; }
-        public string Mobile { get; set; }
-        public string Phone { get; set; }
+        public string Mobile { get; set; }  // löschen
+        public string Phone { get; set; }  // löschen
 
         public virtual ICollection<SupplierGroup> SupplierGroups { get; set; }
     }

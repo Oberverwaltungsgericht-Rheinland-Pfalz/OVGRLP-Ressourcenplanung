@@ -13,6 +13,7 @@ using Newtonsoft.Json.Serialization;
 using AutoMapper;
 using DbRaumplanung.Models;
 using AspNetCoreVueStarter.ViewModels;
+using Microsoft.AspNetCore.Server.IISIntegration;
 
 namespace AspNetCoreVueStarter
 {
@@ -30,6 +31,7 @@ namespace AspNetCoreVueStarter
         {
             services.AddAutoMapper(typeof(Startup));
             // Mapper.AssertConfigurationIsValid();
+            services.AddHttpContextAccessor();
 
             services.AddMvc()
                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
@@ -40,6 +42,8 @@ namespace AspNetCoreVueStarter
             services.AddScoped<IAllocationStore, AllocationStore>();
             services.AddScoped<IRessourceStore, RessourceStore>();
             services.AddScoped<ISupplierGroupStore, SupplierGroupStore>();
+            //services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+            //    .AddNegotiate();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -91,6 +95,7 @@ namespace AspNetCoreVueStarter
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+            app.UseAuthentication();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

@@ -44,7 +44,7 @@ export default class AcknowledgeList extends Vue {
       { text: 'Status' , value: 'Status' },
       { text: 'Raum', value: 'Ressource' },
       { text: 'Ab', value: 'From' },
-      { text: 'Datum', value: 'DateTime' }
+      { text: 'Zuletzt geändert', value: 'DateTime' }
   ]
   public get hasItems () {
     const allocations = Allocations.query().withAll().get()
