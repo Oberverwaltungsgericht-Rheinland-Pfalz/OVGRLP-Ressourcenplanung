@@ -7,21 +7,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
+using AspNetCoreVueStarter.Filter;
+using AutoMapper;
 
 namespace AspNetCoreVueStarter.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class RessourcesController : ControllerBase
+    [AuthorizeAd("Reader")]
+    public class RessourcesController : BaseController
     {
-        private readonly RpDbContext _context;
 
-        public RessourcesController(RpDbContext context)
+        public RessourcesController(RpDbContext context, IMapper mapper) : base(context, mapper)
         {
-            _context = context;
         }
-
         // GET: api/Ressources
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Ressource>>> GetRessources()
@@ -45,6 +45,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // PUT: api/Ressources/5
         [HttpPut("{id}")]
+        [AuthorizeAd("Admin")]
         public async Task<IActionResult> PutRessource(long id, Ressource ressource)
         {
             if (id != ressource.Id)
@@ -75,6 +76,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // POST: api/Ressources
         [HttpPost]
+        [AuthorizeAd("Admin")]
         public async Task<ActionResult<Ressource>> PostRessource(Ressource ressource)
         {
             _context.Ressources.Add(ressource);
@@ -85,6 +87,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // DELETE: api/Ressources/5
         [HttpDelete("{id}")]
+        [AuthorizeAd("Admin")]
         public async Task<ActionResult<Ressource>> DeleteRessource(long id)
         {
             var ressource = await _context.Ressources.FindAsync(id);

@@ -7,19 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
+using AspNetCoreVueStarter.Filter;
+using AutoMapper;
 
 namespace AspNetCoreVueStarter.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class SupplierGroupsController : ControllerBase
+    [AuthorizeAd("Reader")]
+    public class SupplierGroupsController : BaseController
     {
-        private readonly RpDbContext _context;
-
-        public SupplierGroupsController(RpDbContext context)
+        public SupplierGroupsController(RpDbContext context, IMapper mapper) : base(context, mapper)
         {
-            _context = context;
         }
 
         // GET: api/SupplierGroups
@@ -45,6 +45,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // PUT: api/SupplierGroups/5
         [HttpPut("{id}")]
+        [AuthorizeAd("Admin")]
         public async Task<IActionResult> PutSupplierGroup(long id, SupplierGroup supplierGroup)
         {
             if (id != supplierGroup.Id)
@@ -75,6 +76,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // POST: api/SupplierGroups
         [HttpPost]
+        [AuthorizeAd("Admin")]
         public async Task<ActionResult<SupplierGroup>> PostSupplierGroup(SupplierGroup supplierGroup)
         {
             _context.SupplierGroups.Add(supplierGroup);
@@ -85,6 +87,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // DELETE: api/SupplierGroups/5
         [HttpDelete("{id}")]
+        [AuthorizeAd("Admin")]
         public async Task<ActionResult<SupplierGroup>> DeleteSupplierGroup(long id)
         {
             var supplierGroup = await _context.SupplierGroups.FindAsync(id);

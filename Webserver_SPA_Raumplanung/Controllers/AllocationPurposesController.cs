@@ -1,53 +1,50 @@
-﻿using System;
+﻿using AspNetCoreVueStarter.Filter;
+using AspNetCoreVueStarter.ViewModels;
+using AutoMapper;
+using DbRaumplanung.DataAccess;
+using DbRaumplanung.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DbRaumplanung.DataAccess;
-using DbRaumplanung.Models;
-using AspNetCoreVueStarter.ViewModels;
-using AutoMapper;
 
 namespace AspNetCoreVueStarter.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class AllocationPurposesController : ControllerBase
+    [AuthorizeAd("Reader")]
+    public class AllocationPurposesController : BaseController
     {
-        private readonly RpDbContext _context;
-        private readonly IMapper _mapper;
-
-        public AllocationPurposesController(RpDbContext context, IMapper mapper)
+        public AllocationPurposesController(RpDbContext context, IMapper mapper) : base(context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
         }
 
         // GET: api/AllocationPurposes
         [HttpGet]
+        [AuthorizeAd("Reader")]
         public async Task<ActionResult<IEnumerable<object>>> GetAllocationPurposes()
         {
             //var purposes = await _context.AllocationPurposes.Include(g => g.Allocations).ToListAsync();
             var p = await (from purpose in _context.AllocationPurposes
-          //   where purpose.Allocations.Count > 0
-             select new
-             {
-                 Id = purpose.Id,
-                 Title = purpose.Title,
-                 Description = purpose.Description,
-                 Notes = purpose.Notes,
-                 ContactPhone = purpose.ContactPhone,
-                 Gadgets = purpose.Gadgets.Select(x => x.GadgetId),
-                 Allocations = purpose.Allocations.Select(x => x.Id)
-             }).ToListAsync();
+                               //   where purpose.Allocations.Count > 0
+                           select new
+                           {
+                               Id = purpose.Id,
+                               Title = purpose.Title,
+                               Description = purpose.Description,
+                               Notes = purpose.Notes,
+                               ContactPhone = purpose.ContactPhone,
+                               Gadgets = purpose.Gadgets.Select(x => x.GadgetId),
+                               Allocations = purpose.Allocations.Select(x => x.Id)
+                           }).ToListAsync();
             return p;
         }
 
         // GET: api/AllocationPurposes/5
         [HttpGet("{id}")]
+        [AuthorizeAd("Reader")]
         public async Task<ActionResult<AllocationPurposeViewModel>> GetAllocationPurpose(long id)
         {
             var allocationPurpose = await _context.AllocationPurposes.FindAsync(id);
@@ -56,12 +53,13 @@ namespace AspNetCoreVueStarter.Controllers
             {
                 return NotFound();
             }
-            var purposeVM =_mapper.Map<AllocationPurpose, AllocationPurposeViewModel>(allocationPurpose);
+            var purposeVM = _mapper.Map<AllocationPurpose, AllocationPurposeViewModel>(allocationPurpose);
             return purposeVM;
         }
 
         // PUT: api/AllocationPurposes/5
         [HttpPut("{id}")]
+        [AuthorizeAd("Reader")]
         public async Task<IActionResult> PutAllocationPurpose(long id, AllocationPurpose allocationPurpose)
         {
             if (id != allocationPurpose.Id)

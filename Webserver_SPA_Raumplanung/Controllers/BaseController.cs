@@ -17,8 +17,14 @@ namespace AspNetCoreVueStarter.Controllers
     {
         protected RpDbContext _context;
         protected IMapper _mapper;
+        public int highestRole = -1;
+        protected BaseController(RpDbContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
 
-        protected User RequestSender
+    protected User RequestSender
         {
             get
             {

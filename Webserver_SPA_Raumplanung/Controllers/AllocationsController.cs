@@ -20,17 +20,15 @@ namespace AspNetCoreVueStarter.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
+    [AuthorizeAd("Reader")]
     public class AllocationsController : BaseController
     {
-        public AllocationsController(RpDbContext context, IMapper mapper)
+        public AllocationsController(RpDbContext context, IMapper mapper) : base(context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
         }
 
         // GET: api/Allocations
         [HttpGet]
-        [AuthorizeAd("Editor")]
         public async Task<ActionResult<IEnumerable<object>>> GetAllocations()
         {
             var user = RequestSender;

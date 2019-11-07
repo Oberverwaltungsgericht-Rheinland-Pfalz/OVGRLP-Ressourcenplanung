@@ -7,19 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
+using AspNetCoreVueStarter.Filter;
+using AutoMapper;
 
 namespace AspNetCoreVueStarter.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    [AuthorizeAd("Reader")]
+    public class UsersController : BaseController
     {
-        private readonly RpDbContext _context;
-
-        public UsersController(RpDbContext context)
+        public UsersController(RpDbContext context, IMapper mapper) : base(context, mapper)
         {
-            _context = context;
         }
 
         // GET: api/Users
@@ -43,8 +43,9 @@ namespace AspNetCoreVueStarter.Controllers
             return user;
         }
 
-        // PUT: api/Users/5
-        [HttpPut("{id}")]
+        // - PUT: api/Users/5
+        //[HttpPut("{id}")]
+        [NonAction]
         public async Task<IActionResult> PutUser(long id, User user)
         {
             if (id != user.Id)
@@ -73,8 +74,9 @@ namespace AspNetCoreVueStarter.Controllers
             return NoContent();
         }
 
-        // POST: api/Users
-        [HttpPost]
+        // - POST: api/Users
+        // [HttpPost]
+        [NonAction]
         public async Task<ActionResult<User>> PostUser(User user)
         {
             _context.Users.Add(user);
@@ -83,8 +85,9 @@ namespace AspNetCoreVueStarter.Controllers
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
+        // - DELETE: api/Users/5
+        // [HttpDelete("{id}")]
+        [NonAction]
         public async Task<ActionResult<User>> DeleteUser(long id)
         {
             var user = await _context.Users.FindAsync(id);

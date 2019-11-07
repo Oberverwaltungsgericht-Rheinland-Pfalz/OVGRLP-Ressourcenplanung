@@ -13,21 +13,18 @@ using AspNetCoreVueStarter.ViewModels;
 using System.Net;
 using System.Net.Mail;
 using Infrastructure.Email;
+using AspNetCoreVueStarter.Filter;
 
 namespace AspNetCoreVueStarter.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class GadgetsController : ControllerBase
+    [AuthorizeAd("Reader")]
+    public class GadgetsController : BaseController
     {
-        private readonly RpDbContext _context;
-        private readonly IMapper _mapper;
-
-        public GadgetsController(RpDbContext context, IMapper mapper)
+        public GadgetsController(RpDbContext context, IMapper mapper) : base(context, mapper)
         {
-            _context = context;
-            _mapper = mapper;
         }
 
         // GET: api/Gadgets
@@ -57,6 +54,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // PUT: api/Gadgets/5
         [HttpPut("{id}")]
+        [AuthorizeAd("Admin")]
         public async Task<IActionResult> PutGadget(long id, GadgetViewModel gadget)
         {
             Gadget gad = await AddGroup(gadget);
@@ -88,6 +86,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // POST: api/Gadgets
         [HttpPost]
+        [AuthorizeAd("Admin")]
         public async Task<ActionResult<GadgetViewModel>> PostGadget(GadgetViewModel gadget)
         {
             Gadget gad = await AddGroup(gadget);
@@ -107,6 +106,7 @@ namespace AspNetCoreVueStarter.Controllers
 
         // DELETE: api/Gadgets/5
         [HttpDelete("{id}")]
+        [AuthorizeAd("Admin")]
         public async Task<ActionResult<Gadget>> DeleteGadget(long id)
         {
             var gadget = await _context.Gadgets.FindAsync(id);

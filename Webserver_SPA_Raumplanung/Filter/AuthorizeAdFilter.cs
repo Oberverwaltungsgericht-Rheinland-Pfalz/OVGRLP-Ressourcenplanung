@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.DirectoryServices;
-using System.Runtime.Serialization;
-using System.Security.Principal;
+﻿using AspNetCoreVueStarter.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Collections.Generic;
+using System.Security.Principal;
 
 namespace AspNetCoreVueStarter.Filter
 {
-    public class AuthorizeAdActionFilter : IAuthorizationFilter
+    public class AuthorizeAdActionFilter : ActionFilterAttribute
     {
         private readonly string _permission;
         readonly IDictionary<string, string> RightRoles = new Dictionary<string, string>() { { "Reader", "OVGVG\\NJZ Alle" }, { "Editor", "OVGVG\\NJZ IT" }, { "Admin", "OVGVG\\Dashboard_Admins" } };
@@ -21,13 +17,14 @@ namespace AspNetCoreVueStarter.Filter
             _permission = permission;
         }
 
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
             var requiredRole = RightRoles[_permission];
             var requiredLevel = Roles[requiredRole];
             var user = context.HttpContext.User;
             var identity = (WindowsIdentity)user.Identity;
             var groups = new List<string>();
+            var baseController = (BaseController)context.Controller;
 
             foreach (var group in identity.Groups)
             {
@@ -35,13 +32,20 @@ namespace AspNetCoreVueStarter.Filter
                 if (Roles.ContainsKey(groupTitle))
                 {
                     groups.Add(groupTitle);
-                    if (Roles[groupTitle] >= requiredLevel)
-                        return;
+                    var groupLevel = Roles[groupTitle];
+
+                    if (groupLevel > baseController.highestRole) 
+                        baseController.highestRole = groupLevel;  
                 }
             }
-            context.Result = new UnauthorizedResult();
+
+            if (baseController.highestRole >= requiredLevel)
+                return;
+            else
+                context.Result = new UnauthorizedResult();
         }
     }
+
     public class AuthorizeAdAttribute : TypeFilterAttribute
     {
         public AuthorizeAdAttribute(string permission)
