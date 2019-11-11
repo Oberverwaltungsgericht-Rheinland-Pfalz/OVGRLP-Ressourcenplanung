@@ -3,6 +3,7 @@ using AspNetCoreVueStarter.ViewModels;
 using AutoMapper;
 using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
+using Infrastructure.Email;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -23,7 +24,6 @@ namespace AspNetCoreVueStarter.Controllers
 
         // GET: api/AllocationPurposes
         [HttpGet]
-        [AuthorizeAd("Reader")]
         public async Task<ActionResult<IEnumerable<object>>> GetAllocationPurposes()
         {
             //var purposes = await _context.AllocationPurposes.Include(g => g.Allocations).ToListAsync();
@@ -44,7 +44,6 @@ namespace AspNetCoreVueStarter.Controllers
 
         // GET: api/AllocationPurposes/5
         [HttpGet("{id}")]
-        [AuthorizeAd("Reader")]
         public async Task<ActionResult<AllocationPurposeViewModel>> GetAllocationPurpose(long id)
         {
             var allocationPurpose = await _context.AllocationPurposes.FindAsync(id);

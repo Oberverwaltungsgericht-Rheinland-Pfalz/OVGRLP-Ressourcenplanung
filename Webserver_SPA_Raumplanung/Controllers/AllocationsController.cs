@@ -1,18 +1,16 @@
-﻿using System;
+﻿using AspNetCoreVueStarter.Filter;
+using AspNetCoreVueStarter.ViewModels;
+using AutoMapper;
+using DbRaumplanung.DataAccess;
+using DbRaumplanung.Models;
+using Infrastructure.Email;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DbRaumplanung.DataAccess;
-using DbRaumplanung.Models;
-using AspNetCoreVueStarter.ViewModels;
-using AutoMapper;
-using Infrastructure.Email;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Principal;
-using AspNetCoreVueStarter.Filter;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -33,8 +31,8 @@ namespace AspNetCoreVueStarter.Controllers
         {
             var user = RequestSender;
 
-            var all =  await _context.Allocations.Include(g => g.Ressource).Include(g => g.Purpose).Include(g => g.ApprovedBy).Include(g => g.CreatedBy).Include(g => g.LastModifiedBy).Include(g => g.ReferencePerson).ToListAsync();
-           // return all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
+            var all = await _context.Allocations.Include(g => g.Ressource).Include(g => g.Purpose).Include(g => g.ApprovedBy).Include(g => g.CreatedBy).Include(g => g.LastModifiedBy).Include(g => g.ReferencePerson).ToListAsync();
+            // return all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
             var p = (from a in _context.Allocations
                          //   where purpose.Allocations.Count > 0
                      select new
@@ -108,6 +106,8 @@ namespace AspNetCoreVueStarter.Controllers
                 return BadRequest();
             }
 
+            allocation.LastModified = DateTime.Now;
+            allocation.LastModifiedBy = base.RequestSender;
             _context.Entry(allocation).State = EntityState.Modified;
 
             try
@@ -140,8 +140,9 @@ namespace AspNetCoreVueStarter.Controllers
                 return BadRequest();
             }
 
-            allocation.Status = (MeetingStatus) status;
+            allocation.Status = (MeetingStatus)status;
             allocation.LastModified = DateTime.Now;
+            allocation.LastModifiedBy = base.RequestSender;
             _context.Entry(allocation).State = EntityState.Modified;
 
             try
@@ -176,21 +177,23 @@ namespace AspNetCoreVueStarter.Controllers
 
             allocation.Status = (MeetingStatus)editedRequest.status;
             allocation.LastModified = DateTime.Now;
+            allocation.LastModifiedBy = base.RequestSender;
             allocation.ApprovedAt = DateTime.Now;
-            if((MeetingStatus) editedRequest.status == MeetingStatus.Moved)
+            allocation.ApprovedBy = base.RequestSender;
+            if ((MeetingStatus)editedRequest.status == MeetingStatus.Moved)
             {
-                EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde gelöscht");
+                EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde verschoben von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
 
                 allocation.From = editedRequest.From.GetValueOrDefault();
                 allocation.To = editedRequest.To.GetValueOrDefault();
             }
-              else if((MeetingStatus)editedRequest.status == MeetingStatus.Approved)
+            else if ((MeetingStatus)editedRequest.status == MeetingStatus.Approved)
             {
-                EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde genehmigt");
+                EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde genehmigt von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
             }
-              else if ((MeetingStatus)editedRequest.status == MeetingStatus.Clarification)
+            else if ((MeetingStatus)editedRequest.status == MeetingStatus.Clarification)
             {
-                EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde abgelehnt");
+                EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde abgelehnt", recipient: base.RequestSender.Email);
             }
 
             _context.Entry(allocation).State = EntityState.Modified;
@@ -221,14 +224,26 @@ namespace AspNetCoreVueStarter.Controllers
             var purpose = await _context.AllocationPurposes.FindAsync(allocation.Purpose_id);
             var ressource = await _context.Ressources.FindAsync(allocation.Ressource_id);
             var user = await _context.Users.FindAsync(1L);
-            
+
             Allocation all = _mapper.Map<AllocationViewModel, Allocation>(allocation);
             all.Purpose = purpose;
             all.Ressource = ressource;
             all.LastModified = DateTime.Now;
+            all.LastModifiedBy = base.RequestSender;
             all.CreatedAt = DateTime.Now;
-            all.ApprovedBy = all.CreatedBy = all.LastModifiedBy = all.ReferencePerson = all.ApprovedBy = user;
+            all.CreatedBy = base.RequestSender;
+            all.ReferencePerson = base.RequestSender;
 
+            if (all.Status >= MeetingStatus.Approved && base.highestRole >= 10)
+            {
+                all.Status = allocation.Status;
+                EmailTrigger.SendEmail("Buchung wurde erstellt", $"Ihre Buchungsanfrage {purpose.Title} der Ressource {all.Ressource.Name} vom {all.From} bis {all.To} wurde vorgenommen", recipient: base.RequestSender.Email);
+            }
+            else
+            {
+                all.Status = MeetingStatus.Pending;
+                EmailTrigger.SendEmail("Anfrage wurde erstellt", $"Ihre Buchungsanfrage {purpose.Title} der Ressource {all.Ressource.Name} vom {all.From} bis {all.To} wurde gestellt", recipient: base.RequestSender.Email);
+            }
 
             _context.Allocations.Add(all);
             await _context.SaveChangesAsync();
@@ -249,7 +264,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.Allocations.Remove(allocation);
             await _context.SaveChangesAsync();
 
-            EmailTrigger.SendEmail("Ihr Termin wurde gelöscht", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde gelöscht");
+            EmailTrigger.SendEmail("Ihr Termin wurde gelöscht", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde gelöscht", recipient: base.RequestSender.Email);
             return allocation;
         }
 

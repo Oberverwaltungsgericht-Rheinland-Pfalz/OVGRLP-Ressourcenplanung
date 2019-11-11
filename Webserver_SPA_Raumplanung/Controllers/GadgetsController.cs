@@ -93,7 +93,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.Gadgets.Add(gad);
             await _context.SaveChangesAsync();
 
-            EmailTrigger.SendEmail("Hilfsmittel erzeugt", $"{gadget.Title} wurde erstellt");
+            EmailTrigger.SendEmail("Hilfsmittel erzeugt", $"{gadget.Title} wurde erstellt", recipient: base.RequestSender.Email);
             return CreatedAtAction("GetGadget", new { id = gad.Id }, gadget);
         }
 
