@@ -32,7 +32,7 @@ namespace AspNetCoreVueStarter.Controllers
                 var identity = (WindowsIdentity) requester.Identity;
                 string domainId = identity.User.Value;
 
-                var user = _context.Users.FirstOrDefault(p => p.Name == domainId);  //todo: change name to adId
+                var user = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == domainId);
                 if (user == null)
                 {
                     var newUser = GetADUser(identity);
@@ -67,8 +67,8 @@ namespace AspNetCoreVueStarter.Controllers
             {
                 Email = mail,
                 Name = name,
-//                Organisation = company,
-//                ActiveDirectoryID = activeDirectoryID
+                Organisation = company,
+                ActiveDirectoryID = activeDirectoryID
             };
         }
     }

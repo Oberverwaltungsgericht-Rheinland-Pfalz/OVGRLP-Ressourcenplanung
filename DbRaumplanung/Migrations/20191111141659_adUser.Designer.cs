@@ -4,14 +4,16 @@ using DbRaumplanung.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DbRaumplanung.Migrations
 {
     [DbContext(typeof(RpDbContext))]
-    partial class RpDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191111141659_adUser")]
+    partial class adUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,8 +189,6 @@ namespace DbRaumplanung.Migrations
                     b.Property<string>("Organisation");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Email");
 
                     b.ToTable("Users");
                 });

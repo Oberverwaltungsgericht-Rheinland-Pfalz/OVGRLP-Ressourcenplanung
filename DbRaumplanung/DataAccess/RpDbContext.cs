@@ -32,6 +32,7 @@ namespace DbRaumplanung.DataAccess
 
             modelBuilder.Entity<Ressource>().HasIndex(e => e.Name);
             modelBuilder.Entity<SupplierGroup>().HasIndex(e => e.Title);
+            modelBuilder.Entity<User>().HasIndex(e => e.Email);
 
             modelBuilder.Entity<GadgetPurpose>()
             .HasKey(t => new { t.GadgetId, t.AllocationPurposeId });
