@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint --fix"
   },
   "dependencies": {
+    "@vuex-orm/core": "^0.34.0",
     "@vuex-orm/plugin-axios": "^0.5.1",
     "d3": "^5.11.0",
     "lodash": "^4.17.15",
@@ -21,7 +22,7 @@
     "vue-router": "^3.0.6",
     "vuetify": "^2.0.2",
     "vuetify-dialog": "^1.0.0-alpha.1",
-    "vuex": "^3.1.0",
+    "vuex": "^3.1.2",
     "vuex-class": "^0.3.2"
   },
   "devDependencies": {
