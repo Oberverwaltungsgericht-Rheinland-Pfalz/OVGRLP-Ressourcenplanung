@@ -6,6 +6,7 @@ using DbRaumplanung.Models;
 using Infrastructure.Email;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -84,6 +85,7 @@ namespace AspNetCoreVueStarter.Controllers
                 }
             }
 
+            Log.Information("Allocation Purpose {@purpose.IdTitle} was updated by {@User.email}", allocationPurpose.Id + allocationPurpose.Title, base.RequestSender.Email);
             return NoContent();
         }
 
@@ -111,6 +113,8 @@ namespace AspNetCoreVueStarter.Controllers
 
             await _context.SaveChangesAsync();
             var returnPurpose = _mapper.Map<AllocationPurpose, AllocationPurposeViewModel>(purpose);
+
+            Log.Information("Allocation Purpose {@purpose.IdTitle} was created by {@User.email}", allocationPurpose.Id + allocationPurpose.Title, base.RequestSender.Email);
             return CreatedAtAction("GetAllocationPurpose", new { id = returnPurpose.Id }, returnPurpose);
         }
 
@@ -127,6 +131,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.AllocationPurposes.Remove(allocationPurpose);
             await _context.SaveChangesAsync();
 
+            Log.Information("Allocation Purpose {@purpose.IdTitle} was deleted by {@User.email}", allocationPurpose.Id + allocationPurpose.Title, base.RequestSender.Email);
             return allocationPurpose;
         }
 

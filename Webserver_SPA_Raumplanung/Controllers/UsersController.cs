@@ -9,6 +9,7 @@ using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
 using AspNetCoreVueStarter.Filter;
 using AutoMapper;
+using AspNetCoreVueStarter.ViewModels;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -30,7 +31,7 @@ namespace AspNetCoreVueStarter.Controllers
         }
 
         // GET: api/Users/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:long}")]
         public async Task<ActionResult<User>> GetUser(long id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -40,6 +41,15 @@ namespace AspNetCoreVueStarter.Controllers
                 return NotFound();
             }
 
+            return user;
+        }
+
+        // GET: api/Users/me
+        [HttpGet("me")]
+        public async Task<ActionResult<User>> GetCurrentUser()
+        {
+            var user = _mapper.Map<User, UserViewModel>(RequestSender);
+            
             return user;
         }
 

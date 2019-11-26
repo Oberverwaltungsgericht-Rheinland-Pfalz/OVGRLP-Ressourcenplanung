@@ -19,6 +19,9 @@ namespace AspNetCoreVueStarter
 {
     public class Startup
     {
+        public static Role Reader;
+        public static Role Editor;
+        public static Role Admin;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -79,11 +82,14 @@ namespace AspNetCoreVueStarter
                     }
                 });
             });
-            
+         Reader = new Role() { Level = 0, Name = "Reader", AdDescription = Configuration["Auth:Reader"] };
+         Editor = new Role() { Level = 10, Name = "Editor", AdDescription = Configuration["Auth:Editor"] };
+         Admin = new Role() { Level = 100, Name = "Admin", AdDescription = Configuration["Auth:Admin"] };
+
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {

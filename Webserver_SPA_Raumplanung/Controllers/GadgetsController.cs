@@ -81,6 +81,7 @@ namespace AspNetCoreVueStarter.Controllers
                 }
             }
 
+            Log.Information("Gadget {@gadets.IdTitle} was updated by {@User.email}", gadget.Id + gadget.Title, base.RequestSender.Email);
             return NoContent();
         }
 
@@ -94,6 +95,7 @@ namespace AspNetCoreVueStarter.Controllers
             await _context.SaveChangesAsync();
 
             EmailTrigger.SendEmail("Hilfsmittel erzeugt", $"{gadget.Title} wurde erstellt", recipient: base.RequestSender.Email);
+            Log.Information("Gadget {@gadets.IdTitle} was inserted by {@User.email}", gadget.Id + gadget.Title, base.RequestSender.Email);
             return CreatedAtAction("GetGadget", new { id = gad.Id }, gadget);
         }
 
@@ -118,6 +120,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.Gadgets.Remove(gadget);
             await _context.SaveChangesAsync();
 
+            Log.Information("Gadget {@gadets.IdTitle} was deleted by {@User.email}", gadget.Id + gadget.Title, base.RequestSender.Email);
             return gadget;
         }
 

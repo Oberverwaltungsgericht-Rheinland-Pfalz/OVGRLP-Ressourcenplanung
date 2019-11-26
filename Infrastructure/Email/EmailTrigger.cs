@@ -7,7 +7,7 @@ namespace Infrastructure.Email
 {
     public static class EmailTrigger
     {
-        public static void SendEmail(string subject, string body, string recipient = "reiner.bamberger@ovg.jm.rlp.de")
+        public static void SendEmail(string subject, string body, string recipient)
         {
             SmtpClient smtp = new SmtpClient("outlook.jmrlp.de");
             smtp.EnableSsl = false;

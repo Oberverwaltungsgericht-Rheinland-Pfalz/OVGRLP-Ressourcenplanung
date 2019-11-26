@@ -4,6 +4,7 @@ using System.DirectoryServices;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using AspNetCoreVueStarter.ViewModels;
 using AutoMapper;
 using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
@@ -17,17 +18,29 @@ namespace AspNetCoreVueStarter.Controllers
     {
         protected RpDbContext _context;
         protected IMapper _mapper;
-        public int highestRole = -1;
+        //public int highestRole = -1;
         protected BaseController(RpDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
-
-    protected User RequestSender
+        private User _userInst = null;
+        private UserViewModel _userVMinst = null;
+        public UserViewModel RequestSenderVM
         {
             get
             {
+                if (_userVMinst == null)
+                    _userVMinst = _mapper.Map<User, UserViewModel>(RequestSender);
+                return _userVMinst;
+            }
+        }
+        protected User RequestSender
+        {
+            get
+            {
+                if (_userInst != null) return _userInst;
+
                 var requester = this.HttpContext.User;
                 var identity = (WindowsIdentity) requester.Identity;
                 string domainId = identity.User.Value;
@@ -38,10 +51,14 @@ namespace AspNetCoreVueStarter.Controllers
                     var newUser = GetADUser(identity);
                     _context.Users.Add(newUser);
                     _context.SaveChanges();
-                    return newUser;
+                    _userInst = newUser;
                 }
-
-                return user;
+                else
+                {
+                    _userInst = user;
+                }
+                
+                return _userInst;
             }
         }
 

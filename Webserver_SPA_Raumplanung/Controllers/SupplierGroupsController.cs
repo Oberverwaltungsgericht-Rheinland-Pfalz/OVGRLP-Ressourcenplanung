@@ -9,6 +9,7 @@ using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
 using AspNetCoreVueStarter.Filter;
 using AutoMapper;
+using Serilog;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -71,6 +72,7 @@ namespace AspNetCoreVueStarter.Controllers
                 }
             }
 
+            Log.Information("Supplier Group {@group.IdTitle} was updated by {@User.email}", supplierGroup.Id + supplierGroup.Title, base.RequestSender.Email);
             return NoContent();
         }
 
@@ -82,6 +84,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.SupplierGroups.Add(supplierGroup);
             await _context.SaveChangesAsync();
 
+            Log.Information("Supplier Group {@group.IdTitle} was inserted by {@User.email}", supplierGroup.Id + supplierGroup.Title, base.RequestSender.Email);
             return CreatedAtAction("GetSupplierGroup", new { id = supplierGroup.Id }, supplierGroup);
         }
 
@@ -99,6 +102,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.SupplierGroups.Remove(supplierGroup);
             await _context.SaveChangesAsync();
 
+            Log.Information("Supplier Group {@group.IdTitle} was deleted by {@User.email}", supplierGroup.Id + supplierGroup.Title, base.RequestSender.Email);
             return supplierGroup;
         }
 

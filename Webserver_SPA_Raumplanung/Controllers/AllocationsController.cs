@@ -7,6 +7,7 @@ using Infrastructure.Email;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +53,7 @@ namespace AspNetCoreVueStarter.Controllers
                          ApprovedAt = a.ApprovedAt,
                          ReferencePerson = a.ReferencePerson.Id
                      }).ToList();
+
             return p;
         }
 
@@ -126,6 +128,7 @@ namespace AspNetCoreVueStarter.Controllers
                 }
             }
 
+            Log.Information("Allocation {@allocation.Id} was updated by {@User.email}", allocation.Id, base.RequestSender.Email);
             return NoContent();
         }
 
@@ -161,6 +164,7 @@ namespace AspNetCoreVueStarter.Controllers
                 }
             }
 
+            Log.Information("Allocation {@allocation.Id} status was updated to {@status} by {@User.email}", allocation.Id, status, base.RequestSender.Email);
             return NoContent();
         }
 
@@ -214,6 +218,7 @@ namespace AspNetCoreVueStarter.Controllers
                 }
             }
 
+            // todo: logging
             return NoContent();
         }
 
@@ -234,7 +239,7 @@ namespace AspNetCoreVueStarter.Controllers
             all.CreatedBy = base.RequestSender;
             all.ReferencePerson = base.RequestSender;
 
-            if (all.Status >= MeetingStatus.Approved && base.highestRole >= 10)
+            if (all.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)))
             {
                 all.Status = allocation.Status;
                 EmailTrigger.SendEmail("Buchung wurde erstellt", $"Ihre Buchungsanfrage {purpose.Title} der Ressource {all.Ressource.Name} vom {all.From} bis {all.To} wurde vorgenommen", recipient: base.RequestSender.Email);
@@ -248,6 +253,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.Allocations.Add(all);
             await _context.SaveChangesAsync();
 
+            Log.Information("Allocation {@allocation.Id} was created by {@User.email}", allocation.Id, base.RequestSender.Email);
             return CreatedAtAction("GetAllocation", new { id = allocation.Id }, allocation);
         }
 
@@ -265,6 +271,7 @@ namespace AspNetCoreVueStarter.Controllers
             await _context.SaveChangesAsync();
 
             EmailTrigger.SendEmail("Ihr Termin wurde gelöscht", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde gelöscht", recipient: base.RequestSender.Email);
+            Log.Information("Allocation {@allocation.Id} was deleted by {@User.email}", allocation.Id, base.RequestSender.Email);
             return allocation;
         }
 

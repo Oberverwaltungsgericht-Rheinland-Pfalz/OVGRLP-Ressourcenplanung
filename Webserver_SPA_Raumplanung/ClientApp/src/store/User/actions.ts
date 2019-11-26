@@ -13,12 +13,17 @@ const exampleUser: UserData = {
 }
 
 export const actions: ActionTree<UserState, RootState> = {
-  [Names.a.loadUser] ({ commit }): any {
-
-    // todo: load from server
-    const user: UserData = exampleUser
-
-    commit(Names.m.setUser, user)
+  async [Names.a.loadUser] ({ commit }): Promise<any> {
+    const response = fetch(`/api/Users/me`, {
+      method: 'GET', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, cors, *same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'Content-Type': 'application/json'
+      }})
+    console.dir(response)
+    commit(Names.m.setUser, response)
   },
   [Names.a.reloadUser] ({ commit }, task): any {
     // todo: load from server

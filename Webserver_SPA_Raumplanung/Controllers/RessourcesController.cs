@@ -9,6 +9,7 @@ using DbRaumplanung.DataAccess;
 using DbRaumplanung.Models;
 using AspNetCoreVueStarter.Filter;
 using AutoMapper;
+using Serilog;
 
 namespace AspNetCoreVueStarter.Controllers
 {
@@ -71,6 +72,7 @@ namespace AspNetCoreVueStarter.Controllers
                 }
             }
 
+            Log.Information("Ressource {@ressource.IdTitle} was updated by {@User.email}", ressource.Id + ressource.Name, base.RequestSender.Email);
             return NoContent();
         }
 
@@ -82,6 +84,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.Ressources.Add(ressource);
             await _context.SaveChangesAsync();
 
+            Log.Information("Ressource {@ressource.IdTitle} was inserted by {@User.email}", ressource.Id + ressource.Name, base.RequestSender.Email);
             return CreatedAtAction("GetRessource", new { id = ressource.Id }, ressource);
         }
 
@@ -99,6 +102,7 @@ namespace AspNetCoreVueStarter.Controllers
             _context.Ressources.Remove(ressource);
             await _context.SaveChangesAsync();
 
+            Log.Information("Ressource {@ressource.IdTitle} was deleted by {@User.email}", ressource.Id + ressource.Name, base.RequestSender.Email);
             return ressource;
         }
 

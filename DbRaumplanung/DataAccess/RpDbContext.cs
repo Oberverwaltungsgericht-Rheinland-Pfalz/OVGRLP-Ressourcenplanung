@@ -6,8 +6,6 @@ using DbRaumplanung.Models;
 using System.Diagnostics;
 // add a reference to System.ComponentModel.DataAnnotations DLL
 using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
-using System;
 
 namespace DbRaumplanung.DataAccess
 {

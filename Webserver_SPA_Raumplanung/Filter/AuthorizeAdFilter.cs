@@ -1,6 +1,9 @@
 ﻿using AspNetCoreVueStarter.Controllers;
+using AspNetCoreVueStarter.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Security.Principal;
 
@@ -8,38 +11,41 @@ namespace AspNetCoreVueStarter.Filter
 {
     public class AuthorizeAdActionFilter : ActionFilterAttribute
     {
-        private readonly string _permission;
-        readonly IDictionary<string, string> RightRoles = new Dictionary<string, string>() { { "Reader", "OVGVG\\NJZ Alle" }, { "Editor", "OVGVG\\NJZ IT" }, { "Admin", "OVGVG\\Dashboard_Admins" } };
-        readonly IDictionary<string, int> Roles = new Dictionary<string, int>() { { "OVGVG\\NJZ Alle", 0 }, { "OVGVG\\NJZ IT", 10 }, { "OVGVG\\Dashboard_Admins", 100 } };
-
-        public AuthorizeAdActionFilter(string permission)
+        private readonly IConfiguration _configuration;
+        //private static List<Role> rolesInst = null;
+        public static List<Role> Roles
         {
+            get =>
+                new List<Role>() { Startup.Reader, Startup.Editor, Startup.Admin };
+            } 
+       private readonly string _permission;
+        //readonly IDictionary<string, string> RightRoles = new Dictionary<string, string>() { { "Reader", "OVGVG\\NJZ Alle" }, { "Editor", "OVGVG\\NJZ IT" }, { "Admin", "OVGVG\\Dashboard_Admins" } };
+        //readonly IDictionary<string, int> Roles = new Dictionary<string, int>() { { "OVGVG\\NJZ Alle", 0 }, { "OVGVG\\NJZ IT", 10 }, { "OVGVG\\Dashboard_Admins", 100 } };
+
+        public AuthorizeAdActionFilter(string permission, IConfiguration configuration)
+        {
+            _configuration = configuration;
             _permission = permission;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var requiredRole = RightRoles[_permission];
-            var requiredLevel = Roles[requiredRole];
+            var requiredRole = Roles.Find(e=> e.Name.Equals(_permission));
             var user = context.HttpContext.User;
             var identity = (WindowsIdentity)user.Identity;
-            var groups = new List<string>();
             var baseController = (BaseController)context.Controller;
 
             foreach (var group in identity.Groups)
             {
                 string groupTitle = group.Translate(typeof(NTAccount)).ToString();
-                if (Roles.ContainsKey(groupTitle))
+                var role = Roles.Find(e => e.AdDescription.Equals(groupTitle));
+                if (role != null)
                 {
-                    groups.Add(groupTitle);
-                    var groupLevel = Roles[groupTitle];
-
-                    if (groupLevel > baseController.highestRole) 
-                        baseController.highestRole = groupLevel;  
+                    baseController.RequestSenderVM.Roles.Add(role);
                 }
             }
 
-            if (baseController.highestRole >= requiredLevel)
+            if (baseController.RequestSenderVM.Roles.Exists(e => e.HasRole(requiredRole)))
                 return;
             else
                 context.Result = new UnauthorizedResult();
@@ -54,5 +60,4 @@ namespace AspNetCoreVueStarter.Filter
             Arguments = new object[] { permission };
         }
     }
-
 }
