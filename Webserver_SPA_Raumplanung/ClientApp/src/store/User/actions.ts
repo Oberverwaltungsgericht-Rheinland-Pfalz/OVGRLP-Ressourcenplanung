@@ -7,8 +7,7 @@ const exampleUser: UserData = {
   name: 'Reiner',
   email: 'e@mail.ovg.jm.rlp.de',
   role: '2',
-  phone: '012345',
-  domain: 'OVGVG',
+  organisation: 'OVGVG',
   supplierGroups: [1]
 }
 

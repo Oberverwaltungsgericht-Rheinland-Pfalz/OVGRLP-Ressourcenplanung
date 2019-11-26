@@ -3,13 +3,12 @@ import { UserState, UserData, Names } from './types'
 import { stat } from 'fs'
 
 export const mutations: MutationTree<UserState> = {
-  [Names.m.clearUser] (state) {
+  [Names.m.clearUser] (state: any) {
     state.name = ''
     state.email = ''
-    state.phone = ''
     state.role = false
     state.supplierGroups = false
-    state.domain = ''
+    state.organisation = ''
     state.lastUpdated = new Date()
   },
   [Names.m.setUser] (state: any, userPayload: any) {

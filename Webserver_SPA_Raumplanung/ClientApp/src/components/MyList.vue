@@ -58,6 +58,7 @@ export default class AcknowledgeList extends Vue {
       Id: v.Id,
       Title: (v.Purpose || {}).Title,
       PurposeId: v.Purpose_id,
+      // @ts-ignore
       Status: this.$options.filters.status2string(v.Status),
       Ressource: (v.Ressource || {}).Name,
       From: v.From,

@@ -90,6 +90,7 @@ export default class AcknowledgeList extends Vue {
     return Allocations.query().withAll().get().map((v: any) => ({
       Id: v.Id,
       Title: (v.Purpose || {}).Title,
+    // @ts-ignore
       Status: this.$options.filters.status2string(v.Status),
       Ressource: (v.Ressource || {}).Name,
       DateTime: v.LastModified}))
@@ -109,8 +110,8 @@ export default class AcknowledgeList extends Vue {
     this.saveStatus(task, 3)
 
     // change appointment status to changed and change the date
-    const editableTask = { ...task }
-    editableTask.Status = 'Verschoben'
+    const editableTask = { ...task, DateTime: new Date() }
+    editableTask.Status = 3
 
     const res = await this.$dialog.prompt({
       text: 'Datum setzen',

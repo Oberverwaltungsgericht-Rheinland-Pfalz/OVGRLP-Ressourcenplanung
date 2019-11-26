@@ -30,8 +30,8 @@ export default new Router({
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import( './views/MutliDates.vue')
- //   } as MyRouteConfig,
-*/  {
+ //   } as MyRouteConfig, */
+  {
     path: '/acknowledge',
       name: 'Anfragenverwaltung',
       icon: 'storage',
@@ -84,7 +84,8 @@ export default new Router({
   */ ]
 })
 
-function requireAuth (level: number, to, from, next) {
+function requireAuth (level: number, to: any, from: any, next: any) {
+  // @ts-ignore
   const role: number = store.state.user.role
   if (role >= level) {
     next()

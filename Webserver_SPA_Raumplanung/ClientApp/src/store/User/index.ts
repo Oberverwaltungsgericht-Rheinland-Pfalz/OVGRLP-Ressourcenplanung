@@ -8,10 +8,9 @@ import { RootState } from '../types'
 export const state: UserState = {
   name: '',
   email: '',
-  phone: '',
   role: 0,
   supplierGroups: false,
-  domain: '',
+  organisation: '',
   lastUpdated: false
 }
 

@@ -12,6 +12,7 @@ import SupplierModel from '../models/SupplierModel'
 import AllocationModel from '../models/AllocationModel'
 import AllocationpurposeModel from '../models/AllocationpurposeModel'
 import packageInfo from '../../package.json'
+// @ts-ignore
 import VuexORMAxios from '@vuex-orm/plugin-axios'  // tslint:disable-line
 // const VuexORMAxios = require('@vuex-orm/plugin-axios')
 

@@ -41,10 +41,7 @@ export default {
             elAxisX: null, elAxisY: null,
             startDate: Date.now(),
             data: [
-//                {id: 2, name: 'Raum 1', startAfter: 0 * 60, duration: 3 * 60},
-                {id: 3, name: 'Raum 2', startAfter: 4 * 60, duration: 24 * 36e2},
-//                {id: 6, name: 'Raum 1', startAfter: 7 * 60, duration: 1 * 60},
-//                {id: 7, name: 'Raum 1', startAfter: 9 * 60, duration: 2 * 60},
+                {id: 3, name: 'Raum 2', startAfter: 4 * 60, duration: 24 * 36e2}
             ]
         }
     },
@@ -371,16 +368,16 @@ export default {
             }
             // UPDATE DURATION
             function dragRightProgress(slot) {
-                const moveX = d3.event.x - startDragMouseX;
-                const currSlotWidthPixelX = self.scaleX(getDatePlusDuration(self.getStart(slot), startDragDuration));
+                const moveX = d3.event.x - startDragMouseX
+                const currSlotWidthPixelX = self.scaleX(getDatePlusDuration(self.getStart(slot), startDragDuration))
                 
-                const tempEndDate = self.scaleX.invert(currSlotWidthPixelX + moveX);
-                let tempDuration = (tempEndDate.getTime() - self.getStart(slot).getTime()) / 1000;
-                tempDuration = Math.round(tempDuration / self.GAP) * self.GAP;
+                const tempEndDate = self.scaleX.invert(currSlotWidthPixelX + moveX)
+                let tempDuration = (tempEndDate.getTime() - self.getStart(slot).getTime()) / 1000
+                tempDuration = Math.round(tempDuration / self.GAP) * self.GAP
 
-                const newValue = self.calculateNewValue(slot, self.getStart(slot), tempDuration, 'right');
-                slot.startAfter = newValue.startAfter;
-                slot.duration = newValue.duration;
+                const newValue = self.calculateNewValue(slot, self.getStart(slot), tempDuration, 'right')
+                slot.startAfter = newValue.startAfter
+                slot.duration = newValue.duration
 
                 // change rect.zone width
                 d3.select(this.parentNode)
@@ -390,39 +387,38 @@ export default {
                 // change rect.handlerRight x
                 d3.select(this.parentNode)
                     .select('.handlerRight')
-                    .attr('x', (self.scaleX(self.getEnd(slot)) - self.scaleX(self.getStart(slot))) - 5);
+                    .attr('x', (self.scaleX(self.getEnd(slot)) - self.scaleX(self.getStart(slot))) - 5)
                     
                 self.selectSlot(slot.id);
             }
             function dragRightEnd(slot) {
                 startDragMouseX = null;
-                startDragDuration = null;
+                startDragDuration = null
             }
         }, // end updateData()
         getEnd (slot) {
-            return getDatePlusDuration(this.getStart(slot), slot.duration);
+            return getDatePlusDuration(this.getStart(slot), slot.duration)
         },
         getStart (slot) {
-            return getDatePlusDuration(this.dateStartAll, slot.startAfter);
+            return getDatePlusDuration(this.dateStartAll, slot.startAfter)
         },
         buildDom () {
             const self = this
             this.scaleX = d3.scaleTime()
                 .range([0, this.WIDTH-this.BORDER*2])
-                .domain([this.dateStartAll, getDatePlusDuration(this.dateStartAll, 15*60)]);
+                .domain([this.dateStartAll, getDatePlusDuration(this.dateStartAll, 15*60)])
             
             this.scaleY = d3.scalePoint()
                 .range([this.HEIGHT-this.BORDER*2, 0])
                 .padding(.5)
-                .domain( this.getUniqList() );
+                .domain( this.getUniqList() )
             
-            
-            this.axisX = d3.axisBottom(this.scaleX).tickSizeInner(-this.HEIGHT+this.BORDER*2);
-            this.axisY = d3.axisLeft(this.scaleY).tickSizeInner(- this.WIDTH+this.BORDER*2);
+            this.axisX = d3.axisBottom(this.scaleX).tickSizeInner(-this.HEIGHT+this.BORDER*2)
+            this.axisY = d3.axisLeft(this.scaleY).tickSizeInner(- this.WIDTH+this.BORDER*2)
 
             this.svg = d3.select('#chart').append('svg')
                 .attr('width',  this.WIDTH)
-                .attr('height', this.HEIGHT);
+                .attr('height', this.HEIGHT)
 
             this.svg.append('defs')
                 .append('clipPath')
@@ -430,23 +426,23 @@ export default {
                 .append('rect')
                     .attr('width', this.WIDTH-this.BORDER*2)
                     .attr('height', this.HEIGHT-this.BORDER*2)
-                    .style('fill', 'red');
+                    .style('fill', 'red')
 
             this.elMain = this.svg.append('g')
                 .attr('class', 'main')
                 .attr('transform', 'translate(' + this.BORDER + ',' + this.BORDER + ')')
                 .call(d3.zoom()
                     .on('zoom', scrollZoom))
-                .on("dblclick.zoom", null);
+                .on("dblclick.zoom", null)
 
             this.elAxisX = this.elMain.append('g')
                 .attr('class', 'axis axis--x')
                 .attr('transform', 'translate(0,' + ( this.HEIGHT-this.BORDER*2) + ')')
-                .call(this.axisX);
+                .call(this.axisX)
             
             this.elAxisY = this.elMain.append('g')
                 .attr('class', 'axis axis--y')
-                .call(this.axisY);
+                .call(this.axisY)
 
             let elDragZone = this.elMain.append('rect')
                 .attr('class', 'drag-zone')
@@ -454,11 +450,11 @@ export default {
                 .attr('height', this.HEIGHT-this.BORDER*2)
                 .attr('clip-path', 'url(#clip)')
                 .call(d3.drag()
-                    .on('drag', dragProgress));
+                    .on('drag', dragProgress))
 
             this.elContainer = this.elMain.append('g')
                 .attr('class', 'container')
-                .attr('clip-path', 'url(#clip)');
+                .attr('clip-path', 'url(#clip)')
                 
             let elDateStartAll = this.elMain.append('line')
                 .attr('class', 'dateStartAll')
@@ -466,25 +462,25 @@ export default {
                 .attr('x1', this.scaleX(this.dateStartAll))
                 .attr('y1', this.scaleY.range()[0])
                 .attr('x2', this.scaleX(this.dateStartAll))
-                .attr('y2', this.scaleY.range()[1]);
+                .attr('y2', this.scaleY.range()[1])
 
-            let startZoomK = 1;
+            let startZoomK = 1
 
             function dragProgress() {
-                const [start, end] = self.scaleX.domain();
-                const newStart = self.scaleX.invert(-d3.event.dx);
-                let duration = getDurationBetween(start, newStart);
+                const [start, end] = self.scaleX.domain()
+                const newStart = self.scaleX.invert(-d3.event.dx)
+                let duration = getDurationBetween(start, newStart)
                 
-                self.updateAxisX(getDatePlusDuration(start, duration), getDatePlusDuration(end, duration), 0);
+                self.updateAxisX(getDatePlusDuration(start, duration), getDatePlusDuration(end, duration), 0)
             }
             function scrollZoom() {
                 if(d3.event.transform.k > startZoomK) {
-                    self.zoomAxisX('in');
+                    self.zoomAxisX('in')
                 }
                 else if(d3.event.transform.k < startZoomK) {
-                    self.zoomAxisX('out');
+                    self.zoomAxisX('out')
                 }
-                startZoomK = d3.event.transform.k;
+                startZoomK = d3.event.transform.k
             }
         }, // end buildDom()
         calculateNewValue (slot, tempStart, tempDuration, action) {
@@ -495,45 +491,45 @@ export default {
 
             // Make sure GAP as minimum
             if(newValue.duration < this.GAP) {
-                newValue.duration = this.GAP;
+                newValue.duration = this.GAP
             }
 
-            let startMin = 0;
-            let endMax = null;
+            let startMin = 0
+            let endMax = null
 
             // Check if intersection
-            const commonSlots = this.data.filter(d => d.name === slot.name && d.id !== slot.id);
+            const commonSlots = this.data.filter(d => d.name === slot.name && d.id !== slot.id)
             if(commonSlots.length > 0) {
                 const orderedCommonSlots = commonSlots
                     .map(s => ({start: s.startAfter, end: s.startAfter+s.duration, duration: s.duration, id: s.id}))
-                    .sort((a, b) => a.start < b.start ? -1 : 1);
+                    .sort((a, b) => a.start < b.start ? -1 : 1)
                 
                 // DETERMINE IF SLOT IS:
-                const tabSlotFirst = orderedCommonSlots[0];
-                const tabSlotLast = orderedCommonSlots[orderedCommonSlots.length-1];
+                const tabSlotFirst = orderedCommonSlots[0]
+                const tabSlotLast = orderedCommonSlots[orderedCommonSlots.length-1]
                 
                 // BEFORE ALL SLOTS > endMax = startFirst - GAP
                 if(slot.startAfter + slot.duration <= tabSlotFirst.start - this.GAP) {
-                    endMax = tabSlotFirst.start - this.GAP;
+                    endMax = tabSlotFirst.start - this.GAP
                     // console.log('BEFORE ALL > endMax = ', endMax);
                 }
                 // AFTER ALL SLOTS > startMin = endLast + GAP
                 else if(slot.startAfter >= tabSlotLast.start + tabSlotLast.duration + this.GAP) {
-                    startMin = tabSlotLast.start + tabSlotLast.duration + this.GAP;
+                    startMin = tabSlotLast.start + tabSlotLast.duration + this.GAP
                     // console.log('AFTER ALL > startMin = ', startMin);
                 }
                 // BETWEEN 2 > startMin = endA + GAP && endMax = startB - GAP
                 else {
                     for(let i = 0; i < orderedCommonSlots.length; i++) {
-                        const tabSlotA = orderedCommonSlots[i];
-                        const tabSlotB = orderedCommonSlots[i+1];
+                        const tabSlotA = orderedCommonSlots[i]
+                        const tabSlotB = orderedCommonSlots[i+1]
 
                         if(slot.startAfter >= tabSlotA.start + tabSlotA.duration + this.GAP) {
-                            startMin = tabSlotA.start + tabSlotA.duration + this.GAP;
+                            startMin = tabSlotA.start + tabSlotA.duration + this.GAP
                             
                             if(tabSlotB && slot.startAfter + slot.duration <= tabSlotB.start - this.GAP) {
-                                endMax = tabSlotB.start - this.GAP;
-                                break;
+                                endMax = tabSlotB.start - this.GAP
+                                break
                             }
                         }
                     }
@@ -543,47 +539,46 @@ export default {
 
             if(action === 'move') {
                 if(newValue.startAfter < startMin) {
-                    newValue.startAfter = startMin;
+                    newValue.startAfter = startMin
                 }
                 if(endMax && newValue.startAfter + newValue.duration > endMax) {
-                    newValue.startAfter = endMax - newValue.duration;
+                    newValue.startAfter = endMax - newValue.duration
                 }
             }
             else if(action === 'left') {
                 if(newValue.startAfter < startMin) {
-                    newValue.startAfter = startMin;
+                    newValue.startAfter = startMin
 
                     // Be sure to keep current end
-                    const currEnd = slot.startAfter + slot.duration;
-                    newValue.duration = currEnd - newValue.startAfter;
+                    const currEnd = slot.startAfter + slot.duration
+                    newValue.duration = currEnd - newValue.startAfter
                 }
                 else if(newValue.startAfter >= slot.startAfter + slot.duration) {
-                    newValue.startAfter = slot.startAfter + slot.duration - this.GAP;
+                    newValue.startAfter = slot.startAfter + slot.duration - this.GAP
                 }
             }
             else if(action === 'right') {
                 if(endMax && newValue.startAfter + newValue.duration > endMax) {
-                    newValue.duration = endMax - newValue.startAfter;
+                    newValue.duration = endMax - newValue.startAfter
                 }
-
             }
 
-            return newValue;
+            return newValue
         },
         selectSlot (id) {
-            const slot = this.data.find(s => s.id == id);
+            const slot = this.data.find(s => s.id == id)
 
             // Unselect all slot
             this.elContainer.selectAll('.slot')
                 .select('.zone')
-                .classed('active', false);
+                .classed('active', false)
                 
             if(slot) {
-                this.currentSlot = slot;
+                this.currentSlot = slot
 
                 this.elContainer.selectAll(`.slot[uniqid='id${ slot.id }']`)
                     .select('.zone')
-                    .classed('active', true);
+                    .classed('active', true)
                 
                 document.getElementById('selection').innerHTML = `
                     <div style="background: grey;">
@@ -592,103 +587,103 @@ export default {
                         END: ${ formatDate(this.getEnd(this.currentSlot)) }
                         <button onClick="removeSlot(${ this.currentSlot.id })">REMOVE</button>
                         </h3>
-                    </div>`;
+                    </div>`
             }
             else {
-                this.currentSlot = null;
+                this.currentSlot = null
 
-                document.getElementById('selection').innerHTML = ``;
+                document.getElementById('selection').innerHTML = ``
             }
         },
         removeSlot(id) {
             let idx = this.data.findIndex((s)=> s.id === id)
             this.data.splice(idx, 1)
-            this.updateData();
-            this.updateAxisY();
+            this.updateData()
+            this.updateAxisY()
 
             if(this.currentSlot && this.currentSlot.id === id) {
-                this.selectSlot(-1);
+                this.selectSlot(-1)
             }
         },
         addSlot (name) {
-            const newId = (_.max(_.map(this.data, 'id')) || 1) + 1;
-            const newData = {id: newId, name, startAfter: 0, duration: 1*60};
+            const newId = (_.max(_.map(this.data, 'id')) || 1) + 1
+            const newData = {id: newId, name, startAfter: 0, duration: 1*60}
             
-            const commonSlots = this.data.filter(s => s.name === name);
+            const commonSlots = this.data.filter(s => s.name === name)
             if(commonSlots.length > 0) {
-                const maxSlotEnd = _.max(_.map(commonSlots, d => d.startAfter + d.duration));
-                newData.startAfter = maxSlotEnd + this.GAP;
+              const maxSlotEnd = _.max(_.map(commonSlots, d => d.startAfter + d.duration))
+              newData.startAfter = maxSlotEnd + this.GAP
             }
 
-            this.data.push(newData);
-            this.updateData();
+            this.data.push(newData)
+            this.updateData()
             
             // update selected slot
-            this.selectSlot(newData.id);
+            this.selectSlot(newData.id)
             
             // make sure new one is visible
-            const [start, end] = this.scaleX.domain();
-            const newOneStart = this.getStart(newData);
-            const newOneEnd = this.getEnd(newData);
+            const [start, end] = this.scaleX.domain()
+            const newOneStart = this.getStart(newData)
+            const newOneEnd = this.getEnd(newData)
             
             if(isDateBeforeOther(newOneStart, start) || isDateAfterOther(newOneEnd, end)) {
-                this.zoomViewAllAxisX(0);
+                this.zoomViewAllAxisX(0)
             }
-            this.updateAxisY();
+            this.updateAxisY()
         },
         removeAllSlot() {
-            this.data = [];
+          this.data = []
 
-            this.updateData();
-            this.selectSlot(-1);
-            this.updateAxisY();
+          this.updateData()
+          this.selectSlot(-1)
+          this.updateAxisY()
         },
         buildAutoSlot () {
-            const list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'X'];
+            const list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'X']
 
-            const tempData = [];
+            const tempData = []
             list.forEach((name, i) => {
                 tempData.push({
                     id: i+1,
                     name: name,
-                    startAfter: i*this.GAP*2,
+                    startAfter: i * this.GAP * 2,
                     duration: this.GAP
-                });
-            });
+                })
+            })
 
-            this.data = tempData;
+            this.data = tempData
 
-            this.updateData();
-            this.selectSlot(-1);
-            this.zoomViewAllAxisX(0);
-            this.updateAxisY();
+            this.updateData()
+            this.selectSlot(-1)
+            this.zoomViewAllAxisX(0)
+            this.updateAxisY()
         },
         moveAxisX(dir) {
-            const [start, end] = this.scaleX.domain();
-            const newStart = this.scaleX.invert(this.WIDTH*.2);
-            let duration = getDurationBetween(start, newStart);
-            duration = (dir === 'left') ? -duration : duration;
+            const [start, end] = this.scaleX.domain()
+            const newStart = this.scaleX.invert(this.WIDTH*.2)
+            let duration = getDurationBetween(start, newStart)
+            duration = (dir === 'left') ? -duration : duration
             
-            this.updateAxisX(getDatePlusDuration(start, duration), getDatePlusDuration(end, duration));
+            this.updateAxisX(getDatePlusDuration(start, duration), getDatePlusDuration(end, duration))
         },
         getUniqList() {
-            return _.uniq(_.map(this.data, 'name')).sort().reverse();
+            return _.uniq(_.map(this.data, 'name')).sort().reverse()
         },
         getSlotHeight() {
-            const l = this.getUniqList().length;
+            const l = this.getUniqList().length
             
-            return Math.ceil((this.HEIGHT - 2*this.BORDER) / l) - (l>10 ? 0 : 4);
+            return Math.ceil((this.HEIGHT - 2 * this.BORDER) / l) - (l > 10 ? 0 : 4)
         },
     },
     mounted () {
-        this.data.push(...this.data2)
-        this.WIDTH = this.$refs.chartdiv.clientWidth
-        this.dateStartAll.setMinutes(this.dateStartAll.getMinutes() + 10)
-        this.dateStartAll.setSeconds(0)
-        this.dateStartAll.setMilliseconds(0)
+      this.data.push(...this.data2)
+      this.WIDTH = this.$refs.chartdiv.clientWidth
+      this.dateStartAll.setMinutes(this.dateStartAll.getMinutes() + 10)
+      this.dateStartAll.setSeconds(0)
+      this.dateStartAll.setMilliseconds(0)
 
-        this.buildDom()
-        this.updateData()
+      this.buildDom()
+      this.updateData()
     },
     filters: {
         formatDate (d) {
@@ -696,29 +691,29 @@ export default {
         }
     }
 }
-function getDatePlusDuration(date, duration) {
-    return new Date(date.getTime() + duration * 1000);
+function getDatePlusDuration (date, duration) {
+  return new Date(date.getTime() + duration * 1000)
 }
-function getDurationBetween(dateA, dateB) {
-    return (dateB.getTime() - dateA.getTime()) / 1000;
+function getDurationBetween (dateA, dateB) {
+  return (dateB.getTime() - dateA.getTime()) / 1000
 }
-function formatDate(d) {
-    let h = d.getHours();
-    let m = d.getMinutes();
-    let s = d.getSeconds();
-    
-    if(h < 10) h = "0" + h;
-    if(m < 10) m = "0" + m;
-    if(s < 10) s = "0" + s;
-    
-    return `${ h }:${ m }:${ s }+${ d.getMilliseconds() }`;
+function formatDate (d) {
+  let h = d.getHours()
+  let m = d.getMinutes()
+  let s = d.getSeconds()
+
+  if (h < 10) h = '0' + h
+  if (m < 10) m = '0' + m
+  if (s < 10) s = '0' + s
+
+  return `${ h }:${ m }:${ s }+${ d.getMilliseconds() }`
 }
-function isDateAfterOther(dateA, dateB, gap = 0) {
-    return dateA.getTime() + gap * 1000 > dateB.getTime();
+function isDateAfterOther (dateA, dateB, gap = 0) {
+  return dateA.getTime() + gap * 1000 > dateB.getTime()
 }
 
-function isDateBeforeOther(dateA, dateB, gap = 0) {
-    return dateA.getTime() + gap * 1000 < dateB.getTime();
+function isDateBeforeOther (dateA, dateB, gap = 0) {
+  return dateA.getTime() + gap * 1000 < dateB.getTime()
 }
 </script>
 
