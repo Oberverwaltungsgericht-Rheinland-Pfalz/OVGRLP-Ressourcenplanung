@@ -7,15 +7,16 @@
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
-    <Authors>Software Ateliers</Authors>
-    <Company>Software Ateliers</Company>
-    <Description>ASP.NET Core + Vue.js starter project</Description>
-    <Copyright>MIT 2019 Software Ateliers</Copyright>
+    <Authors>Devteam OVG</Authors>
+    <Company>Oberverwaltungsgericht Rheinland-Pfalz</Company>
+    <Description>Raumplanung</Description>
+    <Copyright>2019 Oberverwaltungsgericht Rheinland-Pfalz</Copyright>
     <AssemblyName>AspNetCoreVueStarter</AssemblyName>
     <RootNamespace>AspNetCoreVueStarter</RootNamespace>
-    <Version>1.0.5</Version>
-    <AssemblyVersion>1.0.5.0</AssemblyVersion>
-    <FileVersion>1.0.5.0</FileVersion>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.19481</AssemblyVersion>
+    <FileVersion>1.0.0.19481</FileVersion>
+    <Product>Raumplanung</Product>
   </PropertyGroup>
 
   <ItemGroup>
