@@ -2,10 +2,10 @@
 module.exports = {
   devServer: {
     proxy: {
-      "/apix": {
+      "^/localhost:8080/api": {
         changeOrigin: true,
         secure: false,
-        target: "http://localhost:65163"
+        target: "http://localhost:65163",
       },
     },
   },

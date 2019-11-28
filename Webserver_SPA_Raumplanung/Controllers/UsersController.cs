@@ -48,9 +48,9 @@ namespace AspNetCoreVueStarter.Controllers
         [HttpGet("me")]
         public async Task<ActionResult<User>> GetCurrentUser()
         {
-            var user = _mapper.Map<User, UserViewModel>(RequestSender);
+            //var user = _mapper.Map<User, UserViewModel>();
             
-            return user;
+            return RequestSenderVM;
         }
 
         // - PUT: api/Users/5

@@ -30,7 +30,7 @@ database.register(AllocationpurposeModel)
 VuexORM.use(VuexORMAxios, {
   database,
   http: {
-    baseURL: 'http://localhost:65163/api/',
+    baseURL: './api/',
     url: '/',
     headers: {
       'Accept': 'application/json',

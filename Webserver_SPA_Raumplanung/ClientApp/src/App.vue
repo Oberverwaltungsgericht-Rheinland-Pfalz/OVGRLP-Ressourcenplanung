@@ -52,13 +52,10 @@
                 <v-list-item-title><v-icon>email</v-icon> {{ userData.email }}</v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <v-list-item-title><v-icon>phone</v-icon> {{ userData.phone }}</v-list-item-title>
+                <v-list-item-title><v-icon></v-icon>Rolle: {{ userData.roleNames }}</v-list-item-title>
               </v-list-item>
               <v-list-item>
-                <v-list-item-title><v-icon></v-icon>Rolle: {{ userData.role }}</v-list-item-title>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title><v-icon></v-icon>Domain: {{ userData.domain}}</v-list-item-title>
+                <v-list-item-title><v-icon></v-icon>Organisation: {{ userData.organisation}}</v-list-item-title>
               </v-list-item>
               <v-list-item>
                 <v-list-item-title><v-icon></v-icon>Unterstützergruppe: {{ userData.supplierGroups}}</v-list-item-title>
@@ -114,10 +111,9 @@ export default class App extends Vue {
   private items: MyRouteConfig[] = []
 
   public async created () {
-    this.loadUser();
+    await this.loadUser();
     (this.$router as any).options.routes.forEach((route: any) => {
-      const role: string = this.$store.state.user.role
-      if (role >= route.authLevel) {
+      if (this.$store.state.user.role >= route.authLevel) {
         this.items.push({
           path: route.path,
           name: route.name,

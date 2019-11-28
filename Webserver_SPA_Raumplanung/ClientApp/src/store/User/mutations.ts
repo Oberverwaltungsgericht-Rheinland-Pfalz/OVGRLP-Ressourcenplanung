@@ -12,11 +12,16 @@ export const mutations: MutationTree<UserState> = {
     state.lastUpdated = new Date()
   },
   [Names.m.setUser] (state: any, userPayload: any) {
-    for (const key in userPayload) {
-      if (userPayload.hasOwnProperty(key)) state[key] = userPayload[key]
-    }
-
+    state.name = userPayload.Name
+    state.email = userPayload.Email
+    state.role = Math.max(...userPayload.Roles.map((e: any) => e.Level))
+    state.roleNames = userPayload.Roles.reduce(((last: string, e: any) => last + e.Name + ' '), '')
+    state.supplierGroups = userPayload.SupplierGroups
+    state.organisation = userPayload.Organisation
     state.lastUpdated = new Date()
+    /* for (const key in userPayload) {
+      if (userPayload.hasOwnProperty(key)) state[key] = userPayload[key]
+    } */
   }
 }
 

@@ -35,23 +35,23 @@ export default new Router({
     path: '/acknowledge',
       name: 'Anfragenverwaltung',
       icon: 'storage',
-      authLevel: 1,
-      beforeEnter: (to, from, next) => requireAuth(1, to, from, next),
+      authLevel: 10,
+      beforeEnter: (to, from, next) => requireAuth(10, to, from, next),
       component: () => import('./views/Acknowledge.vue')
     } as MyRouteConfig,
     {
       path: '/mylist',
       name: 'Ihre Anfragen',
       icon: 'calendar_view_day',
-      authLevel: 1,
+      authLevel: 0,
       component: () => import('./components/MyList.vue')
     } as MyRouteConfig,
     {
       path: '/ressources',
       name: 'Administration',
       icon: 'dvr',
-      authLevel: 2,
-      beforeEnter: (to, from, next) => requireAuth(2, to, from, next),
+      authLevel: 100,
+      beforeEnter: (to, from, next) => requireAuth(100, to, from, next),
       component: () => import('./views/Ressources.vue')
     } as MyRouteConfig,
     {
@@ -94,4 +94,4 @@ function requireAuth (level: number, to: any, from: any, next: any) {
   }
 }
 
-// const roles = { admin: 2, editor: 1 }
+// const roles = { admin: 100, editor: 10 }
