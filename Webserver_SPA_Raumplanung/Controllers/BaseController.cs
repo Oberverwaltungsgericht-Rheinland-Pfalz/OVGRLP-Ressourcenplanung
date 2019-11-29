@@ -65,6 +65,9 @@ namespace AspNetCoreVueStarter.Controllers
 
         private User GetADUser(WindowsIdentity identity)
         {
+#if DEBUG
+            return new User() {Email="reiner.bamberger@ovg.jm.rlp.de", Name="Reiner Dev", ActiveDirectoryID= "S-1-5-21-1547318483-4257608284-3234191442-35147", Id=-1,Organisation="OVG Rlp", SupplierGroups= new List<SupplierGroup>()};
+#endif
             var activeDirectoryID = identity.User.Value;
             var user = new DirectoryEntry($"LDAP://<SID={activeDirectoryID}>");
 

@@ -238,6 +238,7 @@ namespace AspNetCoreVueStarter.Controllers
             all.CreatedAt = DateTime.Now;
             all.CreatedBy = base.RequestSender;
             all.ReferencePerson = base.RequestSender;
+            all.ApprovedBy = base.RequestSender;
 
             if (all.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)))
             {

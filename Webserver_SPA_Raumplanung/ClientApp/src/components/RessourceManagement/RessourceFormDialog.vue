@@ -15,7 +15,7 @@
                 <v-text-field v-model="lol" type="text" label="Bezeichnung"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                <v-text-field v-model="RessourceType" label="Ressourcen-Typ"></v-text-field>
+                <v-text-field v-model="RessourceType" disabled="true" value="Raum" label="Ressourcen-Typ"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
                 <v-text-field v-model="FunctionDescription" label="Funktionsbeschreibung"></v-text-field>

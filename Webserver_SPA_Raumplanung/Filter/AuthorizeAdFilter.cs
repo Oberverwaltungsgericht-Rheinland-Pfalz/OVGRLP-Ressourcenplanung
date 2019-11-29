@@ -30,6 +30,9 @@ namespace AspNetCoreVueStarter.Filter
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+#if DEBUG
+            return;
+#endif
             var requiredRole = Roles.Find(e=> e.Name.Equals(_permission));
             var user = context.HttpContext.User;
             var identity = (WindowsIdentity)user.Identity;
