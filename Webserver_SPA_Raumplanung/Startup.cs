@@ -50,7 +50,7 @@ namespace AspNetCoreVueStarter
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            // In production, the React files will be served from this directory
+            // In production, the Vue files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
@@ -82,6 +82,7 @@ namespace AspNetCoreVueStarter
                     }
                 });
             });
+            //besser: mit konfiguratiosklasse
          Reader = new Role() { Level = 0, Name = "Reader", AdDescription = Configuration["Auth:Reader"] };
          Editor = new Role() { Level = 10, Name = "Editor", AdDescription = Configuration["Auth:Editor"] };
          Admin = new Role() { Level = 100, Name = "Admin", AdDescription = Configuration["Auth:Admin"] };
@@ -93,7 +94,7 @@ namespace AspNetCoreVueStarter
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
             }
             else
             {
@@ -129,10 +130,10 @@ namespace AspNetCoreVueStarter
                 if (env.IsDevelopment())
                 {
                     // run npm process with client app
-                    spa.UseVueCli(npmScript: "serve", port: 8080, regex: "Compiled ");
+                   // spa.UseVueCli(npmScript: "serve", port: 8080, regex: "Compiled ");
                     // if you just prefer to proxy requests from client app, use proxy to SPA dev server instead:
                     // app should be already running before starting a .NET client
-                    // spa.UseProxyToSpaDevelopmentServer("http://localhost:8080"); // your Vue app port
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:8080"); // your Vue app port
                 }
             });
         }
