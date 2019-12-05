@@ -40,7 +40,7 @@
             <v-spacer></v-spacer>
           <v-menu offset-y>
             <template v-slot:activator="{ on }">
-              <v-avatar align-self-end color="red" v-on="on">
+              <v-avatar align-self-end color="red" v-on="on" class="action-avatar">
                 <span class="white--text headline">{{userData.name[0]}}</span>
               </v-avatar>
             </template>
@@ -214,3 +214,9 @@ export default class App extends Vue {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+.action-avatar
+  cursor pointer
+
+</style>
