@@ -1,9 +1,11 @@
 <template>
 <v-layout column>
+  {{Requestsx}}
  <v-data-table v-if="hasItems"
     :headers="headers"
     :items="Requests"
     :search="search"
+    :disable-pagination="true" hide-default-footer
     sort-by="calories"
     class="elevation-1"
   >
