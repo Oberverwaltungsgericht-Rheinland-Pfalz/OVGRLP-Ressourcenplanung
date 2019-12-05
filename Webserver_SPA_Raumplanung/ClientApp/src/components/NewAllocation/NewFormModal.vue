@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="dialog" persistent >
+    <v-dialog v-model="dialog" >
         <template v-slot:activator="{ on }">
         <v-btn color="success" dark v-on="on"><v-icon>add</v-icon> Termin anlegen</v-btn>
         </template>
