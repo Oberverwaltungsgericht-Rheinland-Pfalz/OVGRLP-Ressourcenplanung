@@ -14,6 +14,7 @@ using AutoMapper;
 using DbRaumplanung.Models;
 using AspNetCoreVueStarter.ViewModels;
 using Microsoft.AspNetCore.Server.IISIntegration;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace AspNetCoreVueStarter
 {
@@ -94,7 +95,12 @@ namespace AspNetCoreVueStarter
         {
             if (env.IsDevelopment())
             {
-                //app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();
+                app.UseCors(policy => policy
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("http://localhost:8080")
+                    .AllowCredentials());
             }
             else
             {
@@ -115,7 +121,7 @@ namespace AspNetCoreVueStarter
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
-
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

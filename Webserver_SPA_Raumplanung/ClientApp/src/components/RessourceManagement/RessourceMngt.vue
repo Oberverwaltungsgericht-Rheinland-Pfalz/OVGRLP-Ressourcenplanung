@@ -5,6 +5,7 @@
       :items="items"
       sort-by="calories"
       class="elevation-1"
+      hide-default-footer
     >
     <template v-slot:top>
       <v-toolbar flat color="white">

@@ -1,6 +1,6 @@
 // vue.config.js
 module.exports = {
-  devServer: {
+/*  devServer: {
     proxy: {
       "/api": {
         changeOrigin: true,
@@ -9,7 +9,7 @@ module.exports = {
       },
     },
   },
-
+*/
   pwa: {
     name: "Raumplanung",
   },
