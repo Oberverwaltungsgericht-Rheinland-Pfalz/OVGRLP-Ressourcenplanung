@@ -45,7 +45,7 @@ namespace AspNetCoreVueStarter.Controllers
                          Status = a.Status,
                          Ressource_id = a.Ressource.Id,
                          Purpose_id = a.Purpose.Id,
-                         CreatedBy = a.CreatedBy,
+                         CreatedBy = a.CreatedBy.Id,
                          CreatedAt = a.CreatedAt,
                          LastModified = a.LastModified,
                          LastModifiedBy = a.LastModifiedBy.Id,

@@ -6,6 +6,7 @@ import { UserState } from './types'
 import { RootState } from '../types'
 
 export const state: UserState = {
+  id: 0,
   name: '',
   email: '',
   role: 0,

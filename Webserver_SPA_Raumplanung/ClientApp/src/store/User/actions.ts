@@ -13,7 +13,7 @@ export const actions: ActionTree<UserState, RootState> = {
       headers: {
         'Content-Type': 'application/json'
       }})
-    let responseObj = await response.json()
+    const responseObj = await response.json()
     commit(Names.m.setUser, responseObj)
   },
   async [Names.a.reloadUser] ({ commit, dispatch }): Promise<any> {
