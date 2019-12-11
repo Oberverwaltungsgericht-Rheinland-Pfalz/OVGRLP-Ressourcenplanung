@@ -23,6 +23,8 @@ namespace AspNetCoreVueStarter.ViewModels
                 .ForMember(dest => dest.SupportGroupIds, opt => opt.MapFrom(src => src.SupplierGroups.Select(e => e.Id)));
 
             CreateMap<UserViewModel, User>();
+            CreateMap<User, ContactUser>()
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Name));
         }
     }
 
@@ -36,5 +38,13 @@ namespace AspNetCoreVueStarter.ViewModels
         {
             return role.Level >= Level;
         }
+    }
+
+    public class ContactUser
+    {
+        public long Id { get; set; }
+        public string Title { get; set; }
+        public string Email { get; set; }
+        public string Organisation { get; set; }
     }
 }

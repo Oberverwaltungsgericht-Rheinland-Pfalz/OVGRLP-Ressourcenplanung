@@ -91,14 +91,12 @@ export default class SupplierManagement extends Vue {
     this.dialog = 2
   }
   private async updateItem () {
-    const data = { Id: this.editId, Title: this.editTitle, GroupEmail: this.editEmail }
+    const gadget = { Id: this.editId, Title: this.editTitle, GroupEmail: this.editEmail }
     if (this.dialog === 2) {
-      // @ts-ignore
-      const response = await Suppliers.$update({ params: { id: this.editId }, data })
-      await Suppliers.update(data)
+      const response = await Suppliers.api().put(`SupplierGroups/${this.editId}`, gadget)
+      await Suppliers.update(gadget)
     } else {
-      // @ts-ignore
-      await Suppliers.$create({ data })
+      await Suppliers.api().post('suppliers', gadget)
     }
     this.closeModal()
   }
@@ -114,8 +112,7 @@ export default class SupplierManagement extends Vue {
       }]
     })
 
-    // @ts-ignore
-    if (confirmation === true) Suppliers.$delete({ params: { id: item.Id } })
+    if (confirmation === true) Suppliers.api().delete(`suppliers/${item.Id}`, { delete: item.Id })
   }
 }
 </script>

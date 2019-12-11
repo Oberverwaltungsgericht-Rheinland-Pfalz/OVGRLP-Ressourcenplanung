@@ -17,7 +17,10 @@
         <v-text-field v-model="search" append-icon="search" label="Filter" single-line hide-details/>
       </v-toolbar>
     </template>
+    <template v-slot:item.From="{ item }">{{item.From | simpleDateTime}}</template>
+    <template v-slot:item.To="{ item }">{{item.To | simpleDateTime}}</template>
     <template v-slot:item.DateTime="{ item }">{{item.DateTime | toLocal}}</template>
+    <template v-slot:item.CreateDate="{ item }">{{item.CreateDate | toLocal}}</template>
     <template v-slot:item.action="{ item }">
         <v-menu bottom offset-y eager>
             <template v-slot:activator="{ on }">
@@ -57,19 +60,40 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/Acknowledges/types'
 import AllocationRequest from '../models/AllocationRequest'
+import UserData, { ContactUser } from '../models/UserData'
 import Allocations, { AllocationModel } from '../models/AllocationModel'
+import AllocationsPurpose, { AllocationPurposeModel } from '../models/AllocationpurposeModel'
 const namespace = 'acknowledges'
 
-@Component
+@Component({
+  filters: {
+    contactTitle (user: ContactUser): string {
+      if (user && 'Title' in user && user.Title) return user.Title
+      return ''
+    },
+    simpleDateTime (date: string): string {
+      if (/00:00:00$/.test(date)) {
+        return `${date[8]}${date[9]}.${date[5]}${date[6]}.${date[0]}${date[1]}${date[2]}${date[3]}`
+      } else {
+        const splitDate = date.split('T')
+        const day = splitDate[0].split('-').reverse().join('.')
+        const time = splitDate[1].substring(0, 5)
+        return `${time} ${day}`
+      }
+    }
+  }
+})
 export default class AcknowledgeList extends Vue {
   @State('tasks', { namespace })
   private list!: AllocationRequest[]
+  @State('ContactUsers', { namespace: 'user' })
+  private ContactUsers!: ContactUser[]
   @Getter('isEmpty', { namespace })
   private isEmpty!: boolean
-  @Action(Fnn.a.loadTasks, { namespace })
-  private loadTasks: any
-  @Action(Fnn.a.updateTask, { namespace })
-  private updateTask: any
+  @Mutation('addContactUser', { namespace: 'user' })
+  private addContactUser: any
+  @Mutation('reserveContactUser', { namespace: 'user' })
+  private reserveContactUser: any
 
   private search: string = ''
   private headers: object[] = [
@@ -77,28 +101,56 @@ export default class AcknowledgeList extends Vue {
       { text: 'Bezeichnung', value: 'Title' },
       { text: 'Status' , value: 'Status' },
       { text: 'Raum', value: 'Ressource' },
-      { text: 'Datum', value: 'DateTime' }
+      { text: 'Von', value: 'From' },
+      { text: 'Bis', value: 'To' },
+      { text: 'Ansprechpartner', value: 'Contact' },
+      { text: 'Anfragedatum', value: 'CreateDate' },
+      { text: 'Letzte Veränderung', value: 'DateTime' }
   ]
 
-  public mounted () {
-    this.initialize()
-  }
   public get hasItems () {
     const allocations = Allocations.query().withAll().get()
     return allocations.length
   }
+  public get Requestsx () {
+    if (!Allocations.all().length) return []
+    return AllocationsPurpose.query().withAll().get()
+  }
+  public get UnAcknowledgedAllocations (): Allocations[] {
+    return Allocations.query().withAll().where('Status', (v: AllocationModel) => v.Status !== 1).get()
+  }
   public get Requests () {
     if (!Allocations.all().length) return []
-    return Allocations.query().withAll().get().map((v: any) => ({
+    this.fillContactUsers()
+    return this.UnAcknowledgedAllocations.map((v: any) => ({
       Id: v.Id,
       Title: (v.Purpose || {}).Title,
+      CreateDate: v.CreatedAt,
     // @ts-ignore
       Status: this.$options.filters.status2string(v.Status),
+      Contact: (this.ContactUsers.find((w: ContactUser) => w.Id === v.ReferencePerson) || { Title: '' }).Title,
       Ressource: (v.Ressource || {}).Name,
+      From: v.From,
+      To: v.To,
       DateTime: v.LastModified}))
   }
-  public initialize () {
-    this.loadTasks()
+  public async fillContactUsers () {
+    const referencePersons = this.UnAcknowledgedAllocations.map((v: any) => v.ReferencePerson)
+    const referencePersonsUnique = [...new Set(referencePersons)]
+
+    const requestFunc = async (id: number) => {
+      const tmpUser = this.ContactUsers.find((v: ContactUser) => v.Id === id)
+      if (tmpUser) return tmpUser
+
+      this.reserveContactUser(id)
+      const response = await fetch(`/api/Users/Name/${id}`, {
+        method: 'GET', mode: 'cors', cache: 'no-cache', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      const newContact = await response.json()
+      this.addContactUser(newContact)
+    }
+    referencePersonsUnique.forEach(requestFunc)
   }
 
   public async acknowledge (task: AllocationModel) {
@@ -135,7 +187,7 @@ export default class AcknowledgeList extends Vue {
   }
   public async saveStatus (task: AllocationModel, status: number) {
     const editedRequest = { Id: task.Id, status, From: task.From, To: task.To }
-    const response = await fetch(`http://localhost:8080/api/Allocations/EditRequest`, {
+    const response = await fetch(`/api/Allocations/EditRequest`, {
       method: 'PUT', // *GET, POST, PUT, DELETE, etc.
       mode: 'cors', // no-cors, cors, *same-origin
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -160,4 +212,3 @@ export default class AcknowledgeList extends Vue {
   background-color lightgrey
 
 </style>
-

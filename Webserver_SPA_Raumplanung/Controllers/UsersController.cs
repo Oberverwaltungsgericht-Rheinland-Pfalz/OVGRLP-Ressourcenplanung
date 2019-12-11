@@ -44,6 +44,21 @@ namespace AspNetCoreVueStarter.Controllers
             return user;
         }
 
+        // GET: api/Users/Name/5
+        [HttpGet("Name/{id:long}")]
+        public async Task<ActionResult<ContactUser>> GetUserName(long id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userVM = _mapper.Map<User, ContactUser>(user);
+            return userVM;
+        }
+
         // GET: api/Users/me
         [HttpGet("me")]
         public async Task<ActionResult<User>> GetCurrentUser()

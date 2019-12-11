@@ -96,12 +96,10 @@ export default class RessourceManagement extends Vue {
       SpecialsDescription: this.editDetails
     }
     if (this.dialog === 2) {
-      // @ts-ignore
-      const response = await Ressources.$update({ params: { id: this.editId }, data })
+      const response = await Ressources.api().put(`ressources/${this.editId}`, data)
       await Ressources.update(data)
     } else {
-      // @ts-ignore
-      await Ressources.$create({ data })
+      await Ressources.api().post('ressources', data)
     }
     this.closeModal()
   }
@@ -143,8 +141,7 @@ export default class RessourceManagement extends Vue {
       }]
     })
 
-    // @ts-ignore
-    if (confirmation === true) Ressources.$delete({ params: { id: item.Id } })
+    if (confirmation === true) Ressources.api().delete(`ressources/${item.Id}`, { delete: item.Id })
   }
 
   private saveNew (event: ViewRessource) {

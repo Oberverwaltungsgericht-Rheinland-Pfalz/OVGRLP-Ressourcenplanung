@@ -65,7 +65,9 @@ namespace AspNetCoreVueStarter.Controllers
 
         private User GetADUser(WindowsIdentity identity)
         {
-            var activeDirectoryID = identity.User.Value;
+            return GetADUserById(identity.User.Value);
+        }
+        public User GetADUserById(string activeDirectoryID) {
             var user = new DirectoryEntry($"LDAP://<SID={activeDirectoryID}>");
 
             //Ask for only the attributes you want to read.

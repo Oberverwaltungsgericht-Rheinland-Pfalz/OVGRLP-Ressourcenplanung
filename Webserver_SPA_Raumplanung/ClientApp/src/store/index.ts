@@ -4,7 +4,6 @@ import { RootState } from './types'
 import { counter } from './counter/index'
 import { acknowledges } from './Acknowledges/index'
 import { user } from './User/index'
-import VuexORM from '@vuex-orm/core'
 import Gadget from '../models/GadgetModel'
 import Ressource from '../models/RessourceModel'
 import Visibleallocation from '../models/VisibleAllocationModel'
@@ -12,9 +11,9 @@ import SupplierModel from '../models/SupplierModel'
 import AllocationModel from '../models/AllocationModel'
 import AllocationpurposeModel from '../models/AllocationpurposeModel'
 import packageInfo from '../../package.json'
-// @ts-ignore
-import VuexORMAxios from '@vuex-orm/plugin-axios'  // tslint:disable-line
-// const VuexORMAxios = require('@vuex-orm/plugin-axios')
+import axios from 'axios'
+import VuexORM from '@vuex-orm/core'
+import VuexORMAxios from '@vuex-orm/plugin-axios'
 
 Vue.use(Vuex)
 
@@ -28,15 +27,12 @@ database.register(SupplierModel)
 database.register(AllocationpurposeModel)
 
 VuexORM.use(VuexORMAxios, {
-  database,
-  http: {
-    baseURL: './api/',
-    url: '/',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    }
-  }
+  axios,
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  baseURL: './api/'
 })
 // Vuex structure based on https://codeburst.io/vuex-and-typescript-3427ba78cfa8
 

@@ -1,73 +1,112 @@
 <template>
   <v-app>
-    <v-system-bar fixed  app>
-      Raumplanung (Version {{$store.state.version}})
+    <v-system-bar fixed app>
+      Raumplanung (Version {{ $store.state.version }})
     </v-system-bar>
-    <v-navigation-drawer persistent :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher fixed app>
+    <v-navigation-drawer
+      persistent
+      :mini-variant="miniVariant"
+      :clipped="clipped"
+      v-model="drawer"
+      enable-resize-watcher
+      fixed
+      app
+    >
       <v-list>
-        <v-list-item value="true" v-for="(item, i) in items" :key="i" :to="item.path">
+        <v-list-item
+          value="true"
+          v-for="(item, i) in items"
+          :key="i"
+          :to="item.path"
+        >
           <v-list-item-action>
-            <v-icon>{{item.icon}}</v-icon>
+            <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title >{{item.name}}</v-list-item-title>
+            <v-list-item-title>{{ item.name }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
-  <v-app-bar app>
-    <v-layout justify-space-between wrap align-center>
-      <div class="text-center">
-          <new-form-modal/>
+    <v-app-bar app>
+      <v-layout justify-space-between wrap align-center>
+        <div class="text-center">
+          <new-form-modal />
           &ensp;
           <v-menu v-if="!drawer" offset-y open-on-hover>
             <template v-slot:activator="{ on }">
               <v-btn color="primary" dark v-on="on">
-                <v-icon>more_vert</v-icon> 
+                <v-icon>more_vert</v-icon>
                 Navigation
               </v-btn>
             </template>
             <v-list>
-              <v-list-item v-for="(item, index) in items" :key="index" :to="item.path">
-                <v-list-item-title><v-icon>{{item.icon}}</v-icon> {{ item.name }}</v-list-item-title>
+              <v-list-item
+                v-for="(item, index) in items"
+                :key="index"
+                :to="item.path"
+              >
+                <v-list-item-title
+                  ><v-icon>{{ item.icon }}</v-icon>
+                  {{ item.name }}</v-list-item-title
+                >
               </v-list-item>
             </v-list>
           </v-menu>
         </div>
         <v-spacer></v-spacer>
-            <h3>Raumplanung - {{currentPath}}</h3>
-            <v-spacer></v-spacer>
-          <v-menu offset-y>
-            <template v-slot:activator="{ on }">
-              <v-avatar align-self-end color="red" v-on="on" class="action-avatar">
-                <span class="white--text headline">{{userData.name[0]}}</span>
-              </v-avatar>
-            </template>
-            <v-list>
-              <v-list-item>
-                <v-list-item-title><v-icon>supervisor_account</v-icon> {{ userData.name }}</v-list-item-title>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title><v-icon>email</v-icon> {{ userData.email }}</v-list-item-title>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title><v-icon></v-icon>Rolle: {{ userData.roleNames }}</v-list-item-title>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title><v-icon></v-icon>Organisation: {{ userData.organisation}}</v-list-item-title>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-title><v-icon></v-icon>Unterstützergruppe: {{ userData.supplierGroups}}</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-    </v-layout>
-  </v-app-bar>
+        <h3>Raumplanung - {{ currentPath }}</h3>
+        <v-spacer></v-spacer>
+        <v-menu offset-y>
+          <template v-slot:activator="{ on }">
+            <v-avatar
+              align-self-end
+              color="red"
+              v-on="on"
+              class="action-avatar"
+            >
+              <span class="white--text headline">{{ userData.name[0] }}</span>
+            </v-avatar>
+          </template>
+          <v-list>
+            <v-list-item>
+              <v-list-item-title
+                ><v-icon>supervisor_account</v-icon>
+                {{ userData.name }}</v-list-item-title
+              >
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title
+                ><v-icon>email</v-icon> {{ userData.email }}</v-list-item-title
+              >
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title
+                ><v-icon></v-icon>Rolle:
+                {{ userData.roleNames }}</v-list-item-title
+              >
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title
+                ><v-icon></v-icon>Organisation:
+                {{ userData.organisation }}</v-list-item-title
+              >
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-title
+                ><v-icon></v-icon>Unterstützergruppe:
+                {{ userData.supplierGroups }}</v-list-item-title
+              >
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-layout>
+    </v-app-bar>
 
     <v-content>
       <v-container fluid>
-        <router-view/>
+        <router-view />
       </v-container>
     </v-content>
   </v-app>
@@ -92,7 +131,6 @@ import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
   components: { HelloWorld, NewFormModal }
 })
 export default class App extends Vue {
-
   public get currentPath () {
     return this.$route.name
   }
@@ -123,23 +161,21 @@ export default class App extends Vue {
       }
     })
     // initSampleData
-/*    const gadgets = [
+    /*    const gadgets = [
             { id: 31, title: 'Beamer', suppliedBy: 1 },
             { id: 32, title: 'Visualisierer', suppliedBy: 2 },
             { id: 33, title: 'Monitor', suppliedBy: 2 }
     ]
     await Gadgets.insert({ data: gadgets })*/
-    // @ts-ignore
-    Gadgets.$get()
-    // @ts-ignore
-    Suppliers.$get()
-    // @ts-ignore
-    Ressources.$get()
-    // @ts-ignore
-    Allocations.$get()
-    // @ts-ignore
-    AllocationPurposes.$get()
-/*    const ressourcen = [
+
+    Gadgets.api().get('gadgets')
+    Suppliers.api().get('SupplierGroups')
+    Ressources.api().get('ressources')
+    Allocations.api().get('allocations')
+
+    const allpResp = await AllocationPurposes.api().get('allocationpurposes')
+    console.dir(allpResp)
+    /*    const ressourcen = [
       {
         id: 1,
         name: 'Sitzungssal E022',
@@ -204,7 +240,7 @@ export default class App extends Vue {
     ]
     await Allocations.insert({ data: allocations })
 */
-/*    const allocationPurposes = [
+    /*    const allocationPurposes = [
       { id: 11, Title: 'VG 1. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '', Gadget_ids: [1] },
       { id: 12, Title: 'OVG 3. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '10', Gadget_ids: [2] }
    //   { id: 13, Title: 'ArbG 0. Kammer', Description: 'Verhandlung', Notes: '', ContactPhone: '31', Gadget_ids: [] }
@@ -218,5 +254,4 @@ export default class App extends Vue {
 <style lang="stylus" scoped>
 .action-avatar
   cursor pointer
-
 </style>
