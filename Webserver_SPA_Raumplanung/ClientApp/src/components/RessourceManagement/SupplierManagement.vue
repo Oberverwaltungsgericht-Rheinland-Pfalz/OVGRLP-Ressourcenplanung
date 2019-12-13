@@ -16,7 +16,7 @@
     </template>
   </v-data-table>
 
-<v-dialog :value="dialog" persistent max-width="600px">
+<v-dialog :value="dialog" persistent max-width="600px" scrollable>
     <v-card>
       <v-card-title>
         <span class="headline">{{ModalTitle}}: {{editTitle}}</span>
@@ -99,7 +99,7 @@ export default class SupplierManagement extends Vue {
       const response = await Suppliers.api().put(`SupplierGroups/${this.editId}`, gadget)
       await Suppliers.update(gadget)
     } else {
-      await Suppliers.api().post('suppliers', gadget)
+      await Suppliers.api().post('SupplierGroups', gadget)
     }
     this.closeModal()
   }
@@ -115,7 +115,7 @@ export default class SupplierManagement extends Vue {
       }]
     })
 
-    if (confirmation === true) Suppliers.api().delete(`suppliers/${item.Id}`, { delete: item.Id })
+    if (confirmation === true) Suppliers.api().delete(`SupplierGroups/${item.Id}`, { delete: item.Id })
   }
 }
 </script>

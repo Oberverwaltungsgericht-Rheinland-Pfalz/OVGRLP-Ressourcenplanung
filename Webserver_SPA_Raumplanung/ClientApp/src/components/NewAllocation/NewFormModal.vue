@@ -1,14 +1,13 @@
 <template>
-    <v-dialog v-model="dialog" >
-        <template v-slot:activator="{ on }">
-        <v-btn color="success" dark v-on="on"><v-icon>add</v-icon> Termin anlegen</v-btn>
-        </template>
-        <AllocationForm v-on:close="dialog=false">
-          <template v-slot:header>
-            {{title}}
-          </template>
-        </AllocationForm>
-    </v-dialog>
+  <v-dialog v-model="dialog" scrollable>
+    <template v-slot:activator="{ on }">
+      <v-btn color="success" dark v-on="on"><v-icon>add</v-icon> Termin anlegen</v-btn>
+    </template>
+
+    <AllocationForm v-on:close="dialog=false">
+    </AllocationForm>
+
+  </v-dialog>
 </template>
 
 <script lang="ts">

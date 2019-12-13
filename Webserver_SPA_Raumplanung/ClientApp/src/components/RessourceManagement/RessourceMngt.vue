@@ -22,7 +22,7 @@
       </template>
     </v-data-table>
 
-    <v-dialog :value="dialog" persistent max-width="800px">
+    <v-dialog :value="dialog" persistent max-width="800px" scrollable>
     <v-card>
       <v-card-title>
         <span class="headline">{{ModalTitle}}: {{editTitle}}</span>

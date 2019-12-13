@@ -1,6 +1,7 @@
 <template>
   <v-card>
-    <v-card-title class="headline"><slot name="header"></slot></v-card-title>
+    <v-card-title v-if="permissionToEdit" class="headline">Termin eintragen</v-card-title>
+    <v-card-title v-else class="headline">Neue Terminanfrage stellen</v-card-title>
     <v-card-text>
       <v-container>
         <v-text-field
@@ -20,7 +21,7 @@
             bis: <input v-model="timeTo" type="time"/>
           </v-col>
         </v-row>
-        <v-switch
+        <v-switch style="margin:0"
           v-model="isRepeating"
           :label="`Wiederkehrender Termin`"
         ></v-switch>
@@ -125,8 +126,8 @@
     </v-card-text>
     <v-card-actions>
         <div class="flex-grow-1"></div>
-        <v-btn :disabled="formInvalid" color="green darken-1" text @click="sendAllocation(0)"><v-icon>save</v-icon> Anfragen</v-btn>
-        <v-btn :disabled="formInvalid" color="green darken-1" text @click="sendAllocation(1)"><v-icon>save</v-icon> Speichern</v-btn>
+        <v-btn v-if="permissionToEdit" :disabled="formInvalid" color="green darken-1" text @click="sendAllocation(1)"><v-icon>save</v-icon> Speichern</v-btn>
+        <v-btn v-else :disabled="formInvalid" color="green darken-1" text @click="sendAllocation(0)"><v-icon>save</v-icon> Anfragen</v-btn>
         <v-btn color="red darken-1" text @click="close"><v-icon>cancel</v-icon> Abbrechen</v-btn>
     </v-card-actions>
   </v-card>
@@ -164,9 +165,14 @@ export default class AllocationForm extends Vue {
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
 
+  private get permissionToEdit (): boolean {
+    return this.$store.state.user.role >= 10
+  }
+
   private async sendAllocation (status: number) {
 
     const purposeId = await this.savePurpose()
+    console.log('purposeid ' + purposeId)
     if (this.isRepeating) {
       this.multipleDates.forEach((e) => {
         this.saveAllocation(status, purposeId, e)
