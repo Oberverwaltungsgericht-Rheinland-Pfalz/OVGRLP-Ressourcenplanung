@@ -8,12 +8,18 @@
             label="Titel"
             required
         ></v-text-field>
-
-        <v-switch
-          v-model="isWholeDay"
-          :disabled="this.isRepeating"
-          :label="`Ganztägiges Ereignis`"
-        ></v-switch>
+        <v-row>
+          <v-col cols="2">
+            <v-switch style="margin:0"
+              v-model="isWholeDay"
+              :label="`Ganztägiges Ereignis`"
+            ></v-switch>
+          </v-col>
+          <v-col v-if="!isWholeDay && isRepeating" cols="6" id="repeatingTime">
+            Jeweils von: <input v-model="timeFrom" type="time"/>
+            bis: <input v-model="timeTo" type="time"/>
+          </v-col>
+        </v-row>
         <v-switch
           v-model="isRepeating"
           :label="`Wiederkehrender Termin`"
@@ -41,7 +47,6 @@
             :return-value.sync="multipleDates"
             transition="scale-transition"
             offset-y
-            full-width
             min-width="290px"
           >
             <template v-slot:activator="{ on }">
@@ -136,18 +141,19 @@ import Suppliers from '../../models/SupplierModel'
 import AllocationPurposes, { AllocationPurposeModel } from '../../models/AllocationpurposeModel'
 import Allocations, { AllocationModel } from '../../models/AllocationModel'
 import dayjs from 'dayjs'
-import { error } from 'util'
 
 @Component
 export default class AllocationForm extends Vue {
   public isRepeating: boolean = false
   public valid: boolean = false
   public editId: number = 0
-  public isWholeDayIntern: boolean = true
+  public isWholeDay: boolean = true
   private Title: string = ''
   private Description: string = ''
   private Notes: string = ''
   private Email: string = ''
+  private timeFrom: string = '08:00'
+  private timeTo: string = '17:00'
   private dateFromIntern: Date = new Date(new Date().setHours(8,0,0,0))
   private dateToIntern: Date = new Date(new Date().setHours(16,0,0,0))
   private dateToChanged: boolean = false
@@ -171,27 +177,42 @@ export default class AllocationForm extends Vue {
     this.close()
   }
 
-  private async saveAllocation (status: number, purpose: AllocationPurposeModel, date?: Date | string) {
-    const from = date ? date : this.dateFrom
-    const to = date ? date : this.dateTo
-    // @ts-ignore
-    await Allocations.$create({ data: {
+  private async saveAllocation (status: number, purpose: AllocationPurposeModel, date?: string) {
+    let from = this.dateFrom
+    let to = this.dateTo
+    if (date) {
+      from = date
+      to = date
+
+      if (!this.isWholeDay) {
+        from = `${date}T${this.timeFrom}`
+        to = `${date}T${this.timeTo}`
+      }
+    }
+
+    await Allocations.api().post('allocations', {
       From: from, To: to, IsAllDay: this.isWholeDay, Status: status,
       Purpose_id: purpose, Ressource_id: this.selectedRessourceId }
-    })
+    )
   }
 
   private async savePurpose () {
-    // @ts-ignore
-    const response = await AllocationPurposes.$create({ data: {
+    const response = await AllocationPurposes.api().post('allocationPurposes', {
       Title: this.Title,
       Description: this.Description,
       Notes: this.Notes,
       ContactPhone: this.telNumber,
       GadgetIds: [...this.seltedGadgets] }
-    })
-    if (response) return response.Id
-    else this.$dialog.message.warning('Allocation was not saved correctly ' + response, { position: 'top-center' })
+    )
+    if (response && response !== null && response.entities !== null) {
+      const entity = response.entities.AllocationPurposes.pop()
+      if (entity === null) {
+        return this.$dialog.message.warning(
+          'AllocationPurpose was not saved correctly ' + response, { position: 'top-center' }
+          )
+      }
+      return (entity as any).Id
+    } else this.$dialog.message.warning('AllocationPurpose was not saved correctly ' + response, { position: 'top-center' })
   }
   private close () {
     this.clearAll()
@@ -202,15 +223,8 @@ export default class AllocationForm extends Vue {
     if (!this.selectedRessourceId) rValue = false
     return !rValue
   }
-  public get isWholeDay () {
-    return this.isRepeating ? true : this.isWholeDayIntern
-  }
-  public set isWholeDay (val) {
-    this.isWholeDayIntern = val
-  }
 
   private get Rooms () {
-    // @ts-ignore
     return Ressources.all()
   }
   private get GadgetGroups () {
@@ -270,7 +284,14 @@ export default class AllocationForm extends Vue {
     this.isRepeating = false
     this.dateFromIntern = new Date(new Date().setHours(8,0,0,0))
     this.dateToIntern = new Date(new Date().setHours(16,0,0,0))
+    this.timeFrom = '08:00'
+    this.timeTo = '17:00'
     this.selectedRessourceId = 0
   }
 }
 </script>
+
+<style lang="stylus">
+#repeatingTime input[type="time"]
+  border-bottom 1px solid darkgray
+</style>
