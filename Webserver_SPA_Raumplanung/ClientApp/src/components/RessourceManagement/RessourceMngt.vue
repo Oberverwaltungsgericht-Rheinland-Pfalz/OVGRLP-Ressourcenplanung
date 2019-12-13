@@ -31,10 +31,10 @@
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-text-field :label="headers[0].text" v-model="editTitle" required></v-text-field>
+              <v-text-field :label="headers[0].text + '*'" v-model="editTitle" required></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field :label="headers[1].text" v-model="editType" required></v-text-field>
+              <v-text-field :label="headers[1].text + '*'" v-model="editType" required></v-text-field>
             </v-col>
             <v-col cols="12">
               <v-text-field :label="headers[2].text" v-model="editDescription" required></v-text-field>
@@ -47,7 +47,7 @@
       </v-card-text>
       <v-card-actions>
         <div class="flex-grow-1"></div>
-        <v-btn color="green darken-1" text @click="updateItem"><v-icon>save</v-icon> Speichern</v-btn>
+        <v-btn color="green darken-1" :disabled="invalidForm" text @click="updateItem"><v-icon>save</v-icon> Speichern</v-btn>
         <v-btn color="orange darken-1" text @click="closeModal"><v-icon>close</v-icon> Abbrechen</v-btn>
       </v-card-actions>
     </v-card>
@@ -111,6 +111,9 @@ export default class RessourceManagement extends Vue {
     this.editType = ''
     this.editDescription = ''
     this.editDetails = ''
+  }
+  private get invalidForm (): boolean {
+    return !this.editTitle || !this.editType
   }
   private get editDialog (): boolean {
     return this.editedIndex !== -1

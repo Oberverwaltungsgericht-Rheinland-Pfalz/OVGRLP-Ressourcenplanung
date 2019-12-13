@@ -35,7 +35,7 @@
       </v-card-text>
       <v-card-actions>
         <div class="flex-grow-1"></div>
-        <v-btn color="green darken-1" text @click="updateItem"><v-icon>save</v-icon> Speichern</v-btn>
+        <v-btn color="green darken-1" text :disabled="invalidForm" @click="updateItem"><v-icon>save</v-icon> Speichern</v-btn>
         <v-btn color="orange darken-1" text @click="closeModal"><v-icon>close</v-icon> Abbrechen</v-btn>
       </v-card-actions>
     </v-card>
@@ -77,6 +77,9 @@ export default class SupplierManagement extends Vue {
   }
   private get items () {
     return Suppliers.all()
+  }
+  private get invalidForm (): boolean {
+    return !this.editTitle || !this.editEmail
   }
   private closeModal () {
     this.dialog = 0

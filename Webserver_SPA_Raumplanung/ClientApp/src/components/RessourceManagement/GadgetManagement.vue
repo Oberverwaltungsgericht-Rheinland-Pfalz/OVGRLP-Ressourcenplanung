@@ -45,7 +45,7 @@
       </v-card-text>
       <v-card-actions>
         <div class="flex-grow-1"></div>
-        <v-btn color="green darken-1" text @click="updateItem"><v-icon>save</v-icon> Speichern</v-btn>
+        <v-btn color="green darken-1" :disabled="invalidForm" @click="updateItem"><v-icon>save</v-icon> Speichern</v-btn>
         <v-btn color="orange darken-1" text @click="closeModal"><v-icon>close</v-icon> Abbrechen</v-btn>
       </v-card-actions>
     </v-card>
@@ -98,6 +98,9 @@ export default class SupplierManagement extends Vue {
     Suppliers.all().forEach((e: any) => suppNames[e.Id] = e.Title)
     return Gadgets.all().map((v: any) => ({ ...v, supplierTitle: suppNames[v.SuppliedBy] }))
   }
+  private get invalidForm (): boolean {
+    return !this.editTitle || !this.editSupplier
+  }
   private closeModal () {
     this.dialog = 0
     this.editId = 0
@@ -118,7 +121,7 @@ export default class SupplierManagement extends Vue {
     } else {
       const group = Suppliers.find(this.editSupplier)
 
-      await Gadgets.api().post('gadgets', { data: { Title: this.editTitle, SuppliedBy: this.editSupplier } })
+      await Gadgets.api().post('gadgets', data)
     }
     this.closeModal()
   }
