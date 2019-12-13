@@ -1,8 +1,9 @@
-import UserData from '../../models/UserData'
+import UserData, { ContactUser } from '../../models/UserData'
 export { UserData }
 
 export interface UserState extends UserData {
-  lastUpdated: Date | boolean
+  lastUpdated: Date | boolean,
+  ContactUsers: ContactUser[]
 }
 
 // action & mutation names:
@@ -13,6 +14,8 @@ export const Names = {
   },
   m: {
     setUser: 'setUser',
-    clearUser: 'clearUser'
+    clearUser: 'clearUser',
+    addContactUser: 'addContactUser',
+    reserveContactUser: 'reserveContactUser'
   }
 }

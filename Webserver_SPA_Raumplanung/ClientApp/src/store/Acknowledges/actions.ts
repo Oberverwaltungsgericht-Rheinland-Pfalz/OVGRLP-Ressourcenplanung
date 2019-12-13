@@ -9,14 +9,14 @@ const exampleTasks: AllocationRequest[] = [
 ]
 
 export const actions: ActionTree<AcknowledgeState, RootState> = {
-  [Names.a.loadTasks] ({ commit }): any {
+/*  [Names.a.loadTasks] ({ commit }): any {
 
     // todo: load from server
     const tasks: AllocationRequest[] = exampleTasks
 
     commit(Names.m.loadTasks, tasks)
   },
-  [Names.a.updateTask] ({ commit }, task): any {
+*/  [Names.a.updateTask] ({ commit }, task): any {
     // todo: send updated task to server, update state
 
     commit(Names.m.updateTask, task)

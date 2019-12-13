@@ -43,19 +43,6 @@ import Suppliers from '../models/SupplierModel'
 })
 export default class DbContentView extends Vue {
   private gadgetTitle: string = ''
-  public mounted () {
-/*    // @ts-ignore
-    Ressources.$fetch()// .then((e: any) => Ressources.insert(e[0]))
-    // @ts-ignore
-  //  Gadgets.$get()// .then((e: any) => Gadgets.insert(e[0]))
-    // @ts-ignore
-    Allocations.$fetch()// .then((e: any) => Allocations.insert(e[0]))
-    // @ts-ignore
-    AllocationPurposes.$get()
-    // @ts-ignore
-    Suppliers.$get()
-*/
-  }
   private get supplierItems () {
     return Suppliers.all()
   }

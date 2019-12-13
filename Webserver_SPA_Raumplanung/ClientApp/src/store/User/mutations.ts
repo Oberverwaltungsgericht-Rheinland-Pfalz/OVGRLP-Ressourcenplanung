@@ -1,6 +1,7 @@
 import { MutationTree } from 'vuex'
 import { UserState, UserData, Names } from './types'
 import { stat } from 'fs'
+import { ContactUser } from '@/models/UserData'
 
 export const mutations: MutationTree<UserState> = {
   [Names.m.clearUser] (state: any) {
@@ -24,6 +25,15 @@ export const mutations: MutationTree<UserState> = {
     /* for (const key in userPayload) {
       if (userPayload.hasOwnProperty(key)) state[key] = userPayload[key]
     } */
+  },
+  [Names.m.addContactUser] (state: UserState, userPayload: ContactUser) {
+    const entryIdx = state.ContactUsers.findIndex((s) => s.Id === userPayload.Id)
+    state.ContactUsers.splice(entryIdx,1, userPayload)
+  },
+  [Names.m.reserveContactUser] (state: UserState, id: number) {
+    const hasEntry = state.ContactUsers.find((s) => s.Id === id && s.Title)
+    if (hasEntry) return
+    state.ContactUsers.push({ Id: id, Title: '', Email: '', Organisation: '' })
   }
 }
 

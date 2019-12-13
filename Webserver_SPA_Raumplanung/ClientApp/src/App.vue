@@ -160,13 +160,6 @@ export default class App extends Vue {
         })
       }
     })
-    // initSampleData
-    /*    const gadgets = [
-            { id: 31, title: 'Beamer', suppliedBy: 1 },
-            { id: 32, title: 'Visualisierer', suppliedBy: 2 },
-            { id: 33, title: 'Monitor', suppliedBy: 2 }
-    ]
-    await Gadgets.insert({ data: gadgets })*/
 
     Gadgets.api().get('gadgets')
     Suppliers.api().get('SupplierGroups')
@@ -175,78 +168,6 @@ export default class App extends Vue {
 
     const allpResp = await AllocationPurposes.api().get('allocationpurposes')
     console.dir(allpResp)
-    /*    const ressourcen = [
-      {
-        id: 1,
-        name: 'Sitzungssal E022',
-        type: 'Gerichtssaal',
-        functionDescription: 'Saal des OVG',
-        specialDescription: 'Großer Gerichtssaal'
-      },{
-        id: 2,
-        name: 'Multifunktionsraum',
-        type: 'Gemeinschaftsraum',
-        functionDescription: 'Allgemeiner Raum des NJZ',
-        specialDescription: '20 Sitzplätze und Beamer'
-      },
-      {
-        id: 3,
-        name: 'Sitzungssaal A008',
-        type: 'Gerichtssaal',
-        functionDescription: 'Saal des ArbG',
-        specialDescription: 'Kleiner Gerichtssaal'
-      }
-    ]
-    await Ressources.insert({ data: ressourcen })
-/*    const gruppen = [
-            { id: 1, Title: 'Wachtmeister', GroupEmail: 'NJZ.Wachtmeister@ovg.jm.rlp.de' },
-            { id: 2, Title: 'EDV', GroupEmail: 'edv.support@ovg.jm.rlp.de' }
-    ]
-    await Suppliers.insert({ data: gruppen })
-*
-    const allocations = [
-      {
-        id: 111,
-        Start: new Date('2019-08-11'),
-        End: new Date('2019-08-11'),
-        IsAllDay: true,
-        Status: 'erledigt',
-        CreatedBy: 'Müller',
-        CreatedAt: '2019-07-03',
-        LastModified: '2019-07-30',
-        LastModifiedBy: 'Müller',
-        ApprovedBy: 'Müller',
-        ApprovedAt: '2019-07-30',
-        ReferencePerson: 'Schmidt',
-        Ressource_id: 1,
-        Purpose_id: 12
-      },
-      {
-        id: 112,
-        Start: new Date('2019-08-12 11:00'),
-        End: new Date('2019-08-14 12:30'),
-        IsAllDay: false,
-        Status: 'erledigt',
-        CreatedBy: 'Müller',
-        CreatedAt: '2019-07-30',
-        LastModified: '2019-07-30',
-        LastModifiedBy: 'Müller',
-        ApprovedBy: 'Müller',
-        ApprovedAt: '2019-07-30',
-        ReferencePerson: 'Schmidt',
-        Ressource_id: 2,
-        Purpose_id: 11
-      }
-    ]
-    await Allocations.insert({ data: allocations })
-*/
-    /*    const allocationPurposes = [
-      { id: 11, Title: 'VG 1. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '', Gadget_ids: [1] },
-      { id: 12, Title: 'OVG 3. Kammer', Description: 'Verhandlungstag', Notes: '', ContactPhone: '10', Gadget_ids: [2] }
-   //   { id: 13, Title: 'ArbG 0. Kammer', Description: 'Verhandlung', Notes: '', ContactPhone: '31', Gadget_ids: [] }
-    ]
-    await AllocationPurposes.insert({ data: allocationPurposes })
-*/
   }
 }
 </script>

@@ -237,10 +237,19 @@ namespace AspNetCoreVueStarter.Controllers
             all.LastModifiedBy = base.RequestSender;
             all.CreatedAt = DateTime.Now;
             all.CreatedBy = base.RequestSender;
-            all.ReferencePerson = base.RequestSender;
             all.ApprovedBy = base.RequestSender;
 
-            if (all.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)))
+            if(allocation.ReferencePerson_id == 0)
+            {
+                all.ReferencePerson =  base.RequestSender;
+            }
+            else
+            {
+                var referencePerson = await _context.Users.FindAsync(allocation.ReferencePerson_id);
+                all.ReferencePerson = referencePerson;
+            }
+
+                if (all.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)))
             {
                 all.Status = allocation.Status;
                 EmailTrigger.SendEmail("Buchung wurde erstellt", $"Ihre Buchungsanfrage {purpose.Title} der Ressource {all.Ressource.Name} vom {all.From} bis {all.To} wurde vorgenommen", recipient: base.RequestSender.Email);
