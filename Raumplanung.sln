@@ -9,7 +9,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbRaumplanung", "DbRaumplan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreVueStarter", "Webserver_SPA_Raumplanung\AspNetCoreVueStarter.csproj", "{1523BAF5-8A3D-4C09-91C6-007A090AA998}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{17F9D787-B339-4290-9E10-0672426C3623}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{17F9D787-B339-4290-9E10-0672426C3623}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raumplanung.ServiceLayer", "Raumplanung.ServiceLayer\Raumplanung.ServiceLayer.csproj", "{9B40007E-9D9E-4DFB-A3F8-CCCEB844B467}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raumplanung.Infrastructure", "Raumplanung.Infrastructure\Raumplanung.Infrastructure.csproj", "{6CB88CAB-9482-4B56-AF71-9B5BC4FC4CD6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raumplanung.DbAccess", "Raumplanung.DbAccess\Raumplanung.DbAccess.csproj", "{0BE4EA80-B100-4509-AB56-1240F92693CC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raumplanung.WebApp", "Raumplanung.WebApp\Raumplanung.WebApp.csproj", "{02A184DB-7365-48AB-B79F-2567270F9B01}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +41,22 @@ Global
 		{17F9D787-B339-4290-9E10-0672426C3623}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17F9D787-B339-4290-9E10-0672426C3623}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17F9D787-B339-4290-9E10-0672426C3623}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B40007E-9D9E-4DFB-A3F8-CCCEB844B467}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B40007E-9D9E-4DFB-A3F8-CCCEB844B467}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B40007E-9D9E-4DFB-A3F8-CCCEB844B467}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B40007E-9D9E-4DFB-A3F8-CCCEB844B467}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CB88CAB-9482-4B56-AF71-9B5BC4FC4CD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CB88CAB-9482-4B56-AF71-9B5BC4FC4CD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CB88CAB-9482-4B56-AF71-9B5BC4FC4CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CB88CAB-9482-4B56-AF71-9B5BC4FC4CD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BE4EA80-B100-4509-AB56-1240F92693CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BE4EA80-B100-4509-AB56-1240F92693CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BE4EA80-B100-4509-AB56-1240F92693CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BE4EA80-B100-4509-AB56-1240F92693CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02A184DB-7365-48AB-B79F-2567270F9B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02A184DB-7365-48AB-B79F-2567270F9B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02A184DB-7365-48AB-B79F-2567270F9B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02A184DB-7365-48AB-B79F-2567270F9B01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
