@@ -1,5 +1,8 @@
 // vue.config.js
 module.exports = {
+  devServer: {
+    port: 5002,
+  },
 /*  devServer: {
     proxy: {
       "/api": {
