@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Raumplanung.Data.DataAccess;
-using Raumplanung.Data.Models;
+using Raumplanung.Infrastructure.Models;
 using Raumplanung.WebApi.ViewModels;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860

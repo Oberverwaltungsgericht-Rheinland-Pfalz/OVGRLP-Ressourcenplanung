@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Raumplanung.Data.Models;
+using Raumplanung.Infrastructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

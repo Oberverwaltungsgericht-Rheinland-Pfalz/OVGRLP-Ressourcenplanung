@@ -9,7 +9,7 @@ using AutoMapper;
 using Serilog;
 using Raumplanung.WebApi.Filter;
 using Raumplanung.Data.DataAccess;
-using Raumplanung.Data.Models;
+using Raumplanung.Infrastructure.Models;
 
 namespace Raumplanung.WebApi.Controllers
 {

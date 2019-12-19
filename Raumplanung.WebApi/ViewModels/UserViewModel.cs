@@ -6,7 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using Raumplanung.Data.Models;
+using Raumplanung.Infrastructure.Models;
 
 namespace Raumplanung.WebApi.ViewModels
 {

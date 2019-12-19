@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Raumplanung.Data.DataAccess;
-using Raumplanung.Data.Models;
+using Raumplanung.Infrastructure.Models;
 using Raumplanung.WebApi.Filter;
 using Raumplanung.WebApi.ViewModels;
 using Serilog;

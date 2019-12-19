@@ -11,9 +11,9 @@ using System.Net;
 using System.Net.Mail;
 using Raumplanung.WebApi.Filter;
 using Raumplanung.Data.DataAccess;
-using Raumplanung.Data.Models;
-using Raumplanung.WebApi.ViewModels;
+using Raumplanung.Infrastructure.Models;
 using Raumplanung.Infrastructure.Email;
+using Raumplanung.WebApi.ViewModels;
 
 namespace Raumplanung.WebApi.Controllers
 {

@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Raumplanung.WebApi.Filter;
-using Raumplanung.Data.DataAccess;
-using Raumplanung.Data.Models;
 using Raumplanung.WebApi.ViewModels;
+using Raumplanung.Data.DataAccess;
+using Raumplanung.Infrastructure.Models;
 
 namespace Raumplanung.WebApi.Controllers
 {

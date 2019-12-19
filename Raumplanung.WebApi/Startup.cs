@@ -5,15 +5,18 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Raumplanung.Data.DataAccess;
+using Raumplanung.Infrastructure.Contracts.Stores;
 using Raumplanung.WebApi.ViewModels;
 
 namespace Raumplanung.WebApi
@@ -35,15 +38,17 @@ namespace Raumplanung.WebApi
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddAutoMapper(typeof(Startup));
-      // Mapper.AssertConfigurationIsValid();
       services.AddHttpContextAccessor();
 
-      services.AddMvc(
-        option => option.EnableEndpointRouting = false)
-        .AddNewtonsoftJson(
-          options => options.SerializerSettings.ContractResolver = new DefaultContractResolver()
-        )
-        .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+      services.AddControllers();
+      services.AddMvc(options => options.EnableEndpointRouting = false)
+        .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+        .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+
+      services.AddSpaStaticFiles(configuration =>
+      {
+        configuration.RootPath = "../Raumplanung.VueWebApp/dist";
+      });
 
       services.AddScoped<IGadgetStore, GadgetStore>();
       services.AddScoped<IUserStore, UserStore>();
@@ -51,22 +56,11 @@ namespace Raumplanung.WebApi
       services.AddScoped<IAllocationStore, AllocationStore>();
       services.AddScoped<IRessourceStore, RessourceStore>();
       services.AddScoped<ISupplierGroupStore, SupplierGroupStore>();
-      //services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
-      //    .AddNegotiate();
-
-      // In production, the Vue files will be served from this directory
-      /*
-      services.AddSpaStaticFiles(configuration =>
-      {
-        configuration.RootPath = "ClientApp/dist";
-      });
-      */
 
       services.AddDbContext<RpDbContext>(
         options =>
         {
           options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-          // options.UseSqlServer(connection, b => b.MigrationsAssembly("AspNetCoreVueStarter"));
         });
 
       // Register the Swagger generator, defining 1 or more Swagger documents
@@ -89,6 +83,7 @@ namespace Raumplanung.WebApi
           }
         });
       });
+
       //besser: mit konfiguratiosklasse
       Reader = new Role() { Level = 0, Name = "Reader", AdDescription = Configuration["Auth:Reader"] };
       Editor = new Role() { Level = 10, Name = "Editor", AdDescription = Configuration["Auth:Editor"] };
@@ -98,57 +93,35 @@ namespace Raumplanung.WebApi
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-      if (env.IsDevelopment())
-      {
-        app.UseDeveloperExceptionPage();
-        app.UseCors(policy => policy
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .WithOrigins("http://localhost:8080")
-            .AllowCredentials());
-      }
-      else
-      {
-        app.UseExceptionHandler("/Error");
-        app.UseHsts();
-        app.UseHttpsRedirection();
-      }
       app.UseAuthentication();
-
-      // Enable middleware to serve generated Swagger as a JSON endpoint.
-      app.UseSwagger();
-      // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-      // specifying the Swagger JSON endpoint.
-      app.UseSwaggerUI(c =>
-      {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-      });
-
       app.UseStaticFiles();
-      //app.UseSpaStaticFiles();
+      app.UseSpaStaticFiles();
 
       app.UseMvc(routes =>
       {
         routes.MapRoute(
-            name: "default",
-            template: "{controller}/{action=Index}/{id?}");
+          name: "default",
+          template: "{controller}/{action=Index}/{id?}");
       });
 
-      /*
-      app.UseSpa(spa =>
+      if (env.IsDevelopment())
       {
-        spa.Options.SourcePath = "ClientApp";
-
-        if (env.IsDevelopment())
+        app.UseDeveloperExceptionPage();
+        app.UseCors(policy => policy
+          .AllowAnyHeader()
+          .AllowAnyMethod()
+          .WithOrigins()
+          .AllowCredentials());
+        app.UseSpa(spa =>
         {
-          // run npm process with client app
-          // spa.UseVueCli(npmScript: "serve", port: 8080, regex: "Compiled ");
-          // if you just prefer to proxy requests from client app, use proxy to SPA dev server instead:
-          // app should be already running before starting a .NET client
-          spa.UseProxyToSpaDevelopmentServer("http://localhost:8080"); // your Vue app port
-        }
-      });
-      */
+          //spa.UseProxyToSpaDevelopmentServer("http://localhost:5002");
+        });
+      }
+      else
+      {
+        app.UseHsts();
+        app.UseHttpsRedirection();
+      }
     }
   }
 }
