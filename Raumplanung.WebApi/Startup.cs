@@ -45,11 +45,6 @@ namespace Raumplanung.WebApi
         .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
         .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
-      services.AddSpaStaticFiles(configuration =>
-      {
-        configuration.RootPath = "../Raumplanung.VueWebApp/dist";
-      });
-
       services.AddScoped<IGadgetStore, GadgetStore>();
       services.AddScoped<IUserStore, UserStore>();
       services.AddScoped<IAllocationPurposeStore, AllocatoinPurposeStore>();
@@ -95,7 +90,6 @@ namespace Raumplanung.WebApi
     {
       app.UseAuthentication();
       app.UseStaticFiles();
-      app.UseSpaStaticFiles();
 
       app.UseMvc(routes =>
       {
@@ -112,10 +106,6 @@ namespace Raumplanung.WebApi
           .AllowAnyMethod()
           .WithOrigins()
           .AllowCredentials());
-        app.UseSpa(spa =>
-        {
-          //spa.UseProxyToSpaDevelopmentServer("http://localhost:5002");
-        });
       }
       else
       {
