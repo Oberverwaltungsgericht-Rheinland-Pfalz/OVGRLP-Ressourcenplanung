@@ -34,7 +34,8 @@
               <v-text-field :label="headers[0].text + '*'" v-model="editTitle" required></v-text-field>
             </v-col>
             <v-col cols="12">
-              <v-text-field :label="headers[1].text + '*'" v-model="editType" required></v-text-field>
+              <!--<v-text-field :label="headers[1].text + '*'" v-model="editType" required></v-text-field>-->
+              <v-combobox v-model="editType" :items="typeItems" :label="headers[1].text+'*'" required></v-combobox>
             </v-col>
             <v-col cols="12">
               <v-text-field :label="headers[2].text" v-model="editDescription" required></v-text-field>
@@ -83,6 +84,9 @@ export default class RessourceManagement extends Vue {
   ]
   private editedIndex: number = -1
 
+  private get typeItems () {
+    return Ressources.query().all().map((e: any) => e.Type)
+  }
   private get ModalTitle () {
     if (this.dialog === 1) return 'Neue Ressource'
     if (this.dialog === 2) return 'Bearbeite Ressource'
