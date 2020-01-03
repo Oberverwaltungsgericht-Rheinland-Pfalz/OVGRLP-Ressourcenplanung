@@ -14,31 +14,7 @@
           </v-btn>
           <v-toolbar-title>{{ title }}</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-menu bottom right>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                outlined
-                v-on="on"
-              >
-                <span>{{ typeToLabel[type] }}</span>
-                <v-icon right>arrow_drop_down</v-icon>
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item @click="type = 'day'">
-                <v-list-item-title>Tag</v-list-item-title>
-              </v-list-item>
-<!--          <v-list-item @click="type = 'week'">
-                <v-list-item-title>Woche</v-list-item-title>
-              </v-list-item>
-              <v-list-item @click="type = '4day'">
-                <v-list-item-title>4 tage</v-list-item-title>
-              </v-list-item>           
--->           <v-list-item @click="type = 'month'">
-                <v-list-item-title>Monat</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+          <v-switch v-model="viewType" inset :label="typeToLabel[type]"></v-switch>
         </v-toolbar>
       </v-sheet>
 
@@ -101,9 +77,9 @@ import Allocations from '../models/AllocationModel'
 
 export default {
   data: () => ({
+    viewType: true,
     today: dayjs().format('YYYY-MM-DD'),
     focus: dayjs().format('YYYY-MM-DD'),
-    type: 'month',
     typeToLabel: {
       'month': 'Monat',
       'week': 'Woche',
@@ -126,6 +102,14 @@ export default {
     ]*/
   }),
   computed: {
+    type: {
+      get(){
+        return this.viewType ? 'month' : 'day'
+      },
+      set(v){
+        this.viewType = v
+      }
+    },
     items () {
       return Allocations.query().with('Purpose').with('Ressource').get()
     },
