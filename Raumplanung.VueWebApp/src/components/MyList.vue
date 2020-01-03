@@ -10,8 +10,9 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title>Wartende Anfragen</v-toolbar-title>
+          <v-toolbar-title>Von Ihnen gestellte Anfragen</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
+          <label><input type="checkbox" v-model="hideOld"/> vergangene Termine ausblenden</label>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -46,6 +47,7 @@ const namespace = 'acknowledges'
 @Component
 export default class AcknowledgeList extends Vue {
   private search: string = ''
+  private hideOld: boolean = true
   private headers: object[] = [
     { text: 'Bearbeiten', value: 'action', sortable: false },
     { text: 'Bezeichnung', value: 'Title' },
@@ -64,7 +66,9 @@ export default class AcknowledgeList extends Vue {
     const allocations = Allocations.query()
       .withAll()
       .where('CreatedBy', this.$store.state.user.id)
-      .get()
+      .where((a: any) => {
+        return !this.hideOld || Date.parse(a.To) > Date.now()
+      }).get()
     if (!allocations.length) return []
     
     return allocations.map((v: any) => ({

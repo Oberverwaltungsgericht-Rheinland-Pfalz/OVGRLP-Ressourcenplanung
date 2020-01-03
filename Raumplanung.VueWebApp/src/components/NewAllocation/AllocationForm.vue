@@ -66,7 +66,7 @@
               </template>
               </v-combobox>
             </template>
-            <v-date-picker v-model="multipleDates" multiple no-title scrollable>
+            <v-date-picker v-model="multipleDates" locale="de" multiple no-title scrollable>
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="showMultipleDatesMenu = false">Cancel</v-btn>
               <v-btn text color="primary" @click="$refs.showMultipleDatesMenu.save(multipleDates)">OK</v-btn>
@@ -93,6 +93,7 @@
           />
         </div>
         
+        <!-- Todo: Autocomplete mit Namenseingabe und GET Webservice, welcher von AD gespeist wird
         <v-text-field
         v-model="contactPerson"
         label="Ansprechpartner/In"
@@ -104,7 +105,7 @@
             label="Telefonnummer"
             required
         ></v-text-field>
-
+        -->
         <v-textarea
             v-model="Description"
             :label="'Beschreibung'"
@@ -161,7 +162,7 @@ export default class AllocationForm extends Vue {
   private selectedRessourceId: number = 0
   private seltedGadgets: number[] = []
   private telNumber: string = ''
-  private contactPerson: string = ''
+  private contactPerson: number = 0
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
 
@@ -285,7 +286,7 @@ export default class AllocationForm extends Vue {
     this.Description = ''
     this.Notes = ''
     this.telNumber = ''
-    this.contactPerson = ''
+    this.contactPerson = 0
     this.multipleDates = []
     this.isRepeating = false
     this.dateFromIntern = new Date(new Date().setHours(8,0,0,0))

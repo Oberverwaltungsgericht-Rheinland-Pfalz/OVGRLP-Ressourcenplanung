@@ -34,7 +34,7 @@ export interface AllocationModel {
   Id: number
   From: string
   To: string
-  IsAllDay: string
+  IsAllDay: boolean
   Status: number
   CreatedBy: string
   CreatedAt: string

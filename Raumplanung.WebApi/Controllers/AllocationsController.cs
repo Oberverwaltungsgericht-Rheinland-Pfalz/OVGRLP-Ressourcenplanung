@@ -171,7 +171,7 @@ namespace Raumplanung.WebApi.Controllers
     [HttpPut("{editedRequest}")]
     public async Task<ActionResult<Boolean>> EditRequest(AllocationRequestEdition editedRequest)
     {
-      var allocation = await _context.Allocations.FindAsync(editedRequest.Id);
+      var allocation = await _context.Allocations.Include(o => o.Purpose).Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
 
       if (allocation == null)
       {
@@ -237,6 +237,11 @@ namespace Raumplanung.WebApi.Controllers
       all.CreatedAt = DateTime.Now;
       all.CreatedBy = base.RequestSender;
       all.ApprovedBy = base.RequestSender;
+      if (all.IsAllDay)
+      {
+        all.From = all.From.Date + new TimeSpan(0, 0, 0);
+        all.To = all.To.Date + new TimeSpan(23, 59, 00);
+      }
 
       if (allocation.ReferencePerson_id == 0)
       {

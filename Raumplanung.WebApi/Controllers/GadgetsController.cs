@@ -96,7 +96,8 @@ namespace Raumplanung.WebApi.Controllers
 
       EmailTrigger.SendEmail("Hilfsmittel erzeugt", $"{gadget.Title} wurde erstellt", recipient: base.RequestSender.Email);
       Log.Information("Gadget {@gadets.IdTitle} was inserted by {@User.email}", gadget.Id + gadget.Title, base.RequestSender.Email);
-      return CreatedAtAction("GetGadget", new { id = gad.Id }, gadget);
+      var returnGadget = _mapper.Map<Gadget, GadgetViewModel>(gad);
+      return CreatedAtAction("GetGadget", new { id = gad.Id }, returnGadget);
     }
 
     private async Task<Gadget> AddGroup(GadgetViewModel gadget)
