@@ -3,8 +3,8 @@
     <v-slide-y-transition mode="out-in">
       <v-layout column>
         <h1>Counter</h1>
-        <p> With Vuex</p>
-        <multi-dates/>
+        <p>With Vuex</p>
+        <multi-dates />
       </v-layout>
     </v-slide-y-transition>
   </v-container>
@@ -19,5 +19,3 @@ import MultiDates from '@/components/Counter.vue'
 })
 export default class CounterView extends Vue {}
 </script>
-
-

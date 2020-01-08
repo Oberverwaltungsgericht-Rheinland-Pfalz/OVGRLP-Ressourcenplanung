@@ -1,5 +1,5 @@
 // vue.config.js
-const Agent = require('agentkeepalive');
+const Agent = require('agentkeepalive')
 
 module.exports = {
   devServer: {
@@ -21,13 +21,13 @@ module.exports = {
           freeSocketTimeout: 30000
         }),
         onProxyRes: proxyRes => {
-          let key = 'www-authenticate';
-          proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',');
+          const key = 'www-authenticate'
+          proxyRes.headers[key] = proxyRes.headers[key] && proxyRes.headers[key].split(',')
         }
       }
     }
   },
-/*  devServer: {
+  /*  devServer: {
     proxy: {
       "/api": {
         changeOrigin: true,
@@ -38,7 +38,7 @@ module.exports = {
   },
 */
   pwa: {
-    name: "Raumplanung",
-  },
-};  // Now any call to (assuming your dev server is at localhost:8080)
-     //http://localhost:8080/gists will be redirected to https://api.github.com/gists.
+    name: 'Raumplanung'
+  }
+} // Now any call to (assuming your dev server is at localhost:8080)
+// http://localhost:8080/gists will be redirected to https://api.github.com/gists.

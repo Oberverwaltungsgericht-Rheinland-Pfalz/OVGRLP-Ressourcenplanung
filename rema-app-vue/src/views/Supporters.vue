@@ -1,9 +1,9 @@
 <template>
   <div>
-      <h1>Bereitzustellen von Ihrer Abteilung:</h1>
-      <div>
-        <gadget-list/>
-      </div>
+    <h1>Bereitzustellen von Ihrer Abteilung:</h1>
+    <div>
+      <gadget-list />
+    </div>
   </div>
 </template>
 
@@ -16,5 +16,3 @@ import GadgetList from '@/components/GadgetList.vue'
 })
 export default class Supporters extends Vue {}
 </script>
-
-

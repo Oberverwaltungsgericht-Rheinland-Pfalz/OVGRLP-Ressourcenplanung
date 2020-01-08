@@ -1,16 +1,22 @@
 <template>
   <article>
-      <h3>Querys</h3>
+    <h3>Querys</h3>
     <div>
       <h3>Gadgets</h3>
-      <div>{{gadgetItems}}
-          <p v-for="(item, idx) in gadgetItems" :key="'gadget'+idx">
-              id: {{item.Id}} Title: <input type="text" v-model="item.Title"/> 
-              <v-btn @click="updateGadget(item)">Save</v-btn>
-              <v-btn @click="deleteGadget(item)">Delete</v-btn>
-          </p>
+      <div>
+        {{gadgetItems}}
+        <p v-for="(item, idx) in gadgetItems" :key="'gadget'+idx">
+          id: {{item.Id}} Title:
+          <input type="text" v-model="item.Title" />
+          <v-btn @click="updateGadget(item)">Save</v-btn>
+          <v-btn @click="deleteGadget(item)">Delete</v-btn>
+        </p>
       </div>
-      <div>Title: <input type="text" v-model="gadgetTitle"/> <v-btn @click="saveGadget">Create</v-btn></div>
+      <div>
+        Title:
+        <input type="text" v-model="gadgetTitle" />
+        <v-btn @click="saveGadget">Create</v-btn>
+      </div>
     </div>
     <div>
       <h3>Ressources</h3>
@@ -39,10 +45,9 @@ import Allocations from '../models/AllocationModel'
 import AllocationPurposes from '../models/AllocationpurposeModel'
 import Suppliers from '../models/SupplierModel'
 
-@Component({
-})
+@Component({})
 export default class DbContentView extends Vue {
-  private gadgetTitle: string = ''
+  private gadgetTitle: string = '';
   private get supplierItems () {
     return Suppliers.all()
   }
@@ -53,10 +58,14 @@ export default class DbContentView extends Vue {
     return Ressources.all()
   }
   private get allocationItems () {
-    return Allocations.query().withAll().get()
+    return Allocations.query()
+      .withAll()
+      .get()
   }
   private get allocationPurposeItems () {
-    return AllocationPurposes.query().with('Allocations').get()
+    return AllocationPurposes.query()
+      .with('Allocations')
+      .get()
   }
   private saveGadget () {
     const data = { Title: this.gadgetTitle }
@@ -80,10 +89,13 @@ export default class DbContentView extends Vue {
 </script>
 
 <style lang="stylus" scoped>
-input
-  border 1px solid darkgrey
-  margin 0 .5em
-  padding 0 .5em
-button
-  margin 0 .5em
+input {
+  border: 1px solid darkgrey;
+  margin: 0 0.5em;
+  padding: 0 0.5em;
+}
+
+button {
+  margin: 0 0.5em;
+}
 </style>

@@ -3,9 +3,7 @@
     <v-flex>
       <v-sheet height="64">
         <v-toolbar flat color="white">
-          <v-btn outlined class="mr-4" @click="setToday">
-            Heute
-          </v-btn>
+          <v-btn outlined class="mr-4" @click="setToday">Heute</v-btn>
           <v-btn fab text small @click="prev">
             <v-icon small>arrow_back_ios</v-icon>
           </v-btn>
@@ -53,16 +51,14 @@
               <v-btn icon>
                 <v-icon>more_vert</v-icon>
               </v-btn>-->
-            <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
-            <v-spacer></v-spacer>
+              <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+              <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
               <span v-html="selectedEvent.details"></span>
             </v-card-text>
             <v-card-actions>
-              <v-btn text color="secondary" @click="selectedOpen = false">
-                Schließen
-              </v-btn>
+              <v-btn text color="secondary" @click="selectedOpen = false">Schließen</v-btn>
             </v-card-actions>
           </v-card>
         </v-menu>
@@ -81,17 +77,17 @@ export default {
     today: dayjs().format('YYYY-MM-DD'),
     focus: dayjs().format('YYYY-MM-DD'),
     typeToLabel: {
-      'month': 'Monat',
-      'week': 'Woche',
-      'day': 'Tag',
+      month: 'Monat',
+      week: 'Woche',
+      day: 'Tag',
       '4day': '4 Tage'
     },
     start: null,
     end: null,
     selectedEvent: {},
     selectedElement: null,
-    selectedOpen: false,
-/*    events: [
+    selectedOpen: false
+    /*    events: [
       {
         name: 'IT Meeting',
         details: 'Spending time on how we do not have enough time',
@@ -99,19 +95,22 @@ export default {
         end: `${dayjs().format('YYYY-MM-DD')} 19:00`,
         color: 'indigo'
       }
-    ]*/
+    ] */
   }),
   computed: {
     type: {
-      get(){
+      get () {
         return this.viewType ? 'month' : 'day'
       },
-      set(v){
+      set (v) {
         this.viewType = v
       }
     },
     items () {
-      return Allocations.query().with('Purpose').with('Ressource').get()
+      return Allocations.query()
+        .with('Purpose')
+        .with('Ressource')
+        .get()
     },
     itemsFormated () {
       return this.items.map(transfer2Calendar)
@@ -144,7 +143,8 @@ export default {
     },
     monthFormatter () {
       return this.$refs.calendar.getFormatter({
-        timeZone: 'UTC', month: 'long'
+        timeZone: 'UTC',
+        month: 'long'
       })
     }
   },
@@ -169,7 +169,7 @@ export default {
       const open = () => {
         this.selectedEvent = event
         this.selectedElement = nativeEvent.target
-        setTimeout(() => this.selectedOpen = true, 10)
+        setTimeout(() => (this.selectedOpen = true), 10)
       }
 
       if (this.selectedOpen) {
@@ -196,18 +196,22 @@ export default {
 }
 function transfer2Calendar (v) {
   let rVal = {}
-  if(v.IsAllDay) {
-    rVal.start = v.From.substring(0,10)
-    rVal.details = `${(v.Purpose || {}).Description} ganztägig ${(v.Purpose || {}).Notes} || ''`
+  if (v.IsAllDay) {
+    rVal.start = v.From.substring(0, 10)
+    rVal.details = `${(v.Purpose || {}).Description} ganztägig ${
+      (v.Purpose || {}).Notes
+    } || ''`
   } else {
-    rVal.start = v.From.substring(0,16).replace("T", " ") // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
-    rVal.end =  v.To.substring(0,16).replace("T", " ") // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
-    rVal.details = `${(v.Purpose || {}).Description} von ${new Date(v.From).toLocaleTimeString()} bis ${new Date(v.To).toLocaleTimeString()}`
+    rVal.start = v.From.substring(0, 16).replace('T', ' ') // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
+    rVal.end = v.To.substring(0, 16).replace('T', ' ') // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
+    rVal.details = `${(v.Purpose || {}).Description} von ${new Date(
+      v.From
+    ).toLocaleTimeString()} bis ${new Date(v.To).toLocaleTimeString()}`
   }
-  rVal.name = (v.Purpose || {}).Title + ' in ' + (v.Ressource || {}).Name,
-  rVal.color = 'success',
+  rVal.name = (v.Purpose || {}).Title + ' in ' + (v.Ressource || {}).Name
+  rVal.color = 'success'
   rVal.id = v.Id
-    
+
   return rVal
 }
 </script>

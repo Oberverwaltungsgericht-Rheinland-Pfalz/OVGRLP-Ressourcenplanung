@@ -1,6 +1,6 @@
 <template>
   <div>
-    <calendar-component/>
+    <calendar-component />
   </div>
 </template>
 
@@ -8,11 +8,8 @@
 import { Component, Vue } from 'vue-property-decorator'
 import CalendarComponent from '@/components/Calendar.vue'
 
-
 @Component({
   components: { CalendarComponent }
 })
 export default class Calendar extends Vue {}
 </script>
-
-

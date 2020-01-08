@@ -12,7 +12,8 @@ export const actions: ActionTree<UserState, RootState> = {
       credentials: 'same-origin', // include, *same-origin, omit
       headers: {
         'Content-Type': 'application/json'
-      }})
+      }
+    })
     const responseObj = await response.json()
     commit(Names.m.setUser, responseObj)
   },

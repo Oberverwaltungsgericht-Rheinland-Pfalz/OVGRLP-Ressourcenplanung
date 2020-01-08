@@ -1,8 +1,8 @@
 <template>
-    <div>
-        <h1>Belegung</h1>
-        <scheduler/>
-    </div>
+  <div>
+    <h1>Belegung</h1>
+    <scheduler />
+  </div>
 </template>
 
 <script lang="ts">
@@ -12,6 +12,5 @@ import Scheduler from '@/components/RessourceScheduler.vue'
 @Component({
   components: { Scheduler }
 })
-export default class Occupancy extends Vue {
-}
+export default class Occupancy extends Vue {}
 </script>

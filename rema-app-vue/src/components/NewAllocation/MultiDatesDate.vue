@@ -1,5 +1,5 @@
 <template>
-    <v-layout flex justify-left>
+  <v-layout flex justify-left>
     <v-flex xs12 sm8>
       <v-card>
         <v-card-title class="cyan darken-1">
@@ -28,7 +28,9 @@
 
             <v-list-item-content>
               <v-list-item-title v-if="!purposeEditable">{{purpose.description}}</v-list-item-title>
-              <v-list-item-title v-else><input class="optionated-input" type="text" v-model="purpose.description"/></v-list-item-title>
+              <v-list-item-title v-else>
+                <input class="optionated-input" type="text" v-model="purpose.description" />
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
 
@@ -41,7 +43,9 @@
 
             <v-list-item-content>
               <v-list-item-title v-if="!purposeEditable">{{purpose.notes}}</v-list-item-title>
-              <v-list-item-title v-else><input class="optionated-input" type="text" v-model="purpose.notes"/></v-list-item-title>
+              <v-list-item-title v-else>
+                <input class="optionated-input" type="text" v-model="purpose.notes" />
+              </v-list-item-title>
             </v-list-item-content>
 
             <v-list-item-action>
@@ -58,7 +62,9 @@
 
             <v-list-item-content>
               <v-list-item-title v-if="!purposeEditable">{{purpose.ressource}}</v-list-item-title>
-              <v-list-item-title v-else><input class="optionated-input" type="text" v-model="purpose.ressource"/></v-list-item-title>
+              <v-list-item-title v-else>
+                <input class="optionated-input" type="text" v-model="purpose.ressource" />
+              </v-list-item-title>
             </v-list-item-content>
 
             <v-list-item-action>
@@ -68,13 +74,12 @@
         </v-list>
       </v-card>
     </v-flex>
-    <v-flex  xs12 sm4>
+    <v-flex xs12 sm4>
       <v-card>
         <v-list subheader>
           <v-subheader>Gewünschte Termine</v-subheader>
 
-          <v-list-item
-            v-for="(item, idx) in appointments" :key="`${item}+${idx}`">
+          <v-list-item v-for="(item, idx) in appointments" :key="`${item}+${idx}`">
             <v-list-item-avatar>
               <v-list-item-action-text>{{idx}}</v-list-item-action-text>
             </v-list-item-avatar>
@@ -89,7 +94,7 @@
           </v-list-item>
         </v-list>
       </v-card>
-      </v-flex>
+    </v-flex>
   </v-layout>
 </template>
 
@@ -98,11 +103,11 @@ import dayjs from 'dayjs'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 export default class MultiDatesDate extends Vue {
-/*  initialPurpose: {
+  /*  initialPurpose: {
     default: () => ({ title: 'Initialer Grund', notes: 'Notizen',
     description: 'Beschreibung', ressource: 'Ressource' })
 */
-  @Prop(Array) private readonly initialAppointments = []
+  @Prop(Array) private readonly initialAppointments = [];
   @Prop({
     default: () => ({
       title: 'Initialer Grund',
@@ -111,11 +116,16 @@ export default class MultiDatesDate extends Vue {
       ressource: 'Ressource'
     })
   })
-  private readonly initialPurpose!: ShortPurpose
-  private purpose: ShortPurpose = { title: 'Titel', description: 'Beschreibung', notes: 'Notizen', ressource: 'Raum1' }
-  private appointments: any[] = []
-  private purposeEditable: boolean = false
-  private saveable: boolean = false
+  private readonly initialPurpose!: ShortPurpose;
+  private purpose: ShortPurpose = {
+    title: 'Titel',
+    description: 'Beschreibung',
+    notes: 'Notizen',
+    ressource: 'Raum1'
+  };
+  private appointments: any[] = [];
+  private purposeEditable: boolean = false;
+  private saveable: boolean = false;
 
   private save () {
     // send save request
@@ -130,16 +140,16 @@ export default class MultiDatesDate extends Vue {
   }
 }
 interface ShortPurpose {
-  title: string
-  description: string
-  notes: string
-  ressource: string
+  title: string;
+  description: string;
+  notes: string;
+  ressource: string;
 }
 </script>
 <style lang="stylus" scoped>
-
-.optionated-input
-  box-shadow: inset 1px 0px 2px 0px black
-  padding 2px 
-  width 100%
+.optionated-input {
+  box-shadow: inset 1px 0px 2px 0px black;
+  padding: 2px;
+  width: 100%;
+}
 </style>

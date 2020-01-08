@@ -49,6 +49,4 @@ export const store: StoreOptions<RootState> = {
   plugins: [VuexORM.install(database)]
 }
 
-
-
 export default new Vuex.Store<RootState>(store)

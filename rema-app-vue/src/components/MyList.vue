@@ -12,7 +12,9 @@
         <v-toolbar flat color="white">
           <v-toolbar-title>Von Ihnen gestellte Anfragen</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <label><input type="checkbox" v-model="hideOld"/> vergangene Termine ausblenden</label>
+          <label>
+            <input type="checkbox" v-model="hideOld" /> vergangene Termine ausblenden
+          </label>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -46,8 +48,8 @@ const namespace = 'acknowledges'
 
 @Component
 export default class AcknowledgeList extends Vue {
-  private search: string = ''
-  private hideOld: boolean = true
+  private search: string = '';
+  private hideOld: boolean = true;
   private headers: object[] = [
     { text: 'Bearbeiten', value: 'action', sortable: false },
     { text: 'Bezeichnung', value: 'Title' },
@@ -55,7 +57,7 @@ export default class AcknowledgeList extends Vue {
     { text: 'Raum', value: 'Ressource' },
     { text: 'Ab', value: 'From' },
     { text: 'Zuletzt geändert', value: 'DateTime' }
-  ]
+  ];
   public get hasItems () {
     const allocations = Allocations.query()
       .withAll()
@@ -68,9 +70,10 @@ export default class AcknowledgeList extends Vue {
       .where('CreatedBy', this.$store.state.user.id)
       .where((a: any) => {
         return !this.hideOld || Date.parse(a.To) > Date.now()
-      }).get()
+      })
+      .get()
     if (!allocations.length) return []
-    
+
     return allocations.map((v: any) => ({
       Id: v.Id,
       Title: (v.Purpose || {}).Title,
@@ -105,13 +108,19 @@ export default class AcknowledgeList extends Vue {
     if (confirmation !== true) return
 
     const isLastAllocation = this.isLastAllocation(item.PurposeId)
-    const responseDeleteAllocation = await Allocations.api().delete(`allocations/${item.Id}`, {
-      delete: item.Id
-    })
+    const responseDeleteAllocation = await Allocations.api().delete(
+      `allocations/${item.Id}`,
+      {
+        delete: item.Id
+      }
+    )
     if (isLastAllocation) {
-      const responseDeletePurpose = await AllocationPurposes.api().delete(`allocationpurposes/${item.PurposeId}`, {
-        delete: item.PurposeId
-      })
+      const responseDeletePurpose = await AllocationPurposes.api().delete(
+        `allocationpurposes/${item.PurposeId}`,
+        {
+          delete: item.PurposeId
+        }
+      )
     }
   }
   private isLastAllocation (purposeID: number): boolean {
@@ -124,13 +133,13 @@ export default class AcknowledgeList extends Vue {
 }
 
 interface VisibleAllocation {
-  Id: number
-  Title: string
-  Status: string
-  Ressource: string
-  From: string
-  PurposeId: number
-  DateTime: string
+  Id: number;
+  Title: string;
+  Status: string;
+  Ressource: string;
+  From: string;
+  PurposeId: number;
+  DateTime: string;
 }
 </script>
 
@@ -139,4 +148,3 @@ interface VisibleAllocation {
   background-color: lightgrey;
 }
 </style>
-

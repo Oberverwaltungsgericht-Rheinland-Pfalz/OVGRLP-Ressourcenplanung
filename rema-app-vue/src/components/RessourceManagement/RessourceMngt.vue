@@ -1,17 +1,21 @@
 <template>
-<v-layout column>
+  <v-layout column>
     <v-data-table
       :headers="headers"
       :items="items"
       sort-by="calories"
       class="elevation-1"
-      :disable-pagination="true" hide-default-footer
+      :disable-pagination="true"
+      hide-default-footer
     >
-    <template v-slot:top>
-      <v-toolbar flat color="white">
-        <v-btn @click="dialog = 1" color="primary">Neue Ressource hinzufügen<v-icon>add</v-icon></v-btn>
-      </v-toolbar>
-    </template>
+      <template v-slot:top>
+        <v-toolbar flat color="white">
+          <v-btn @click="dialog = 1" color="primary">
+            Neue Ressource hinzufügen
+            <v-icon>add</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </template>
 
       <template v-slot:item.action="{ item }">
         <v-icon class="mr-2" @click="editItem(item)">edit</v-icon>
@@ -23,36 +27,45 @@
     </v-data-table>
 
     <v-dialog :value="dialog" persistent max-width="800px" scrollable>
-    <v-card>
-      <v-card-title>
-        <span class="headline">{{ModalTitle}}: {{editTitle}}</span>
-      </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-row>
-            <v-col cols="12">
-              <v-text-field :label="headers[0].text + '*'" v-model="editTitle" required></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <!--<v-text-field :label="headers[1].text + '*'" v-model="editType" required></v-text-field>-->
-              <v-combobox v-model="editType" :items="typeItems" :label="headers[1].text+'*'" required></v-combobox>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field :label="headers[2].text" v-model="editDescription" required></v-text-field>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field :label="headers[3].text" v-model="editDetails" required></v-text-field>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions>
-        <div class="flex-grow-1"></div>
-        <v-btn color="green darken-1" :disabled="invalidForm" text @click="updateItem"><v-icon>save</v-icon> Speichern</v-btn>
-        <v-btn color="orange darken-1" text @click="closeModal"><v-icon>close</v-icon> Abbrechen</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{ModalTitle}}: {{editTitle}}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field :label="headers[0].text + '*'" v-model="editTitle" required></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <!--<v-text-field :label="headers[1].text + '*'" v-model="editType" required></v-text-field>-->
+                <v-combobox
+                  v-model="editType"
+                  :items="typeItems"
+                  :label="headers[1].text+'*'"
+                  required
+                ></v-combobox>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field :label="headers[2].text" v-model="editDescription" required></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field :label="headers[3].text" v-model="editDetails" required></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="green darken-1" :disabled="invalidForm" text @click="updateItem">
+            <v-icon>save</v-icon>Speichern
+          </v-btn>
+          <v-btn color="orange darken-1" text @click="closeModal">
+            <v-icon>close</v-icon>Abbrechen
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-layout>
 </template>
 
@@ -62,30 +75,30 @@ import Ressources, { RessourceModel } from '../../models/RessourceModel'
 
 @Component({})
 export default class RessourceManagement extends Vue {
-  private showNewForm: boolean = false
-  private dialog: number = 0
-  private editId: number = 0
-  private editTitle: string = ''
-  private editType: string = ''
-  private editDescription: string = ''
-  private editDetails: string = ''
+  private showNewForm: boolean = false;
+  private dialog: number = 0;
+  private editId: number = 0;
+  private editTitle: string = '';
+  private editType: string = '';
+  private editDescription: string = '';
+  private editDetails: string = '';
 
-  private nameRules = [
-    (v: string) => !!v || 'Name is required'
-  ]
-  private valid: boolean = false
-  private ressourceTypes: string[] = ['Gemeinschaftsraum', 'Gerichtssaal']
+  private nameRules = [(v: string) => !!v || 'Name is required'];
+  private valid: boolean = false;
+  private ressourceTypes: string[] = ['Gemeinschaftsraum', 'Gerichtssaal'];
   private headers: object[] = [
     { text: 'Bezeichnung', value: 'Name' },
     { text: 'Ressourcen-Typ', value: 'Type' },
     { text: 'Funktionsbeschreibung', value: 'FunctionDescription' },
     { text: 'Details', value: 'SpecialsDescription' },
     { text: 'Actions', value: 'action', sortable: false }
-  ]
-  private editedIndex: number = -1
+  ];
+  private editedIndex: number = -1;
 
   private get typeItems () {
-    return Ressources.query().all().map((e: any) => e.Type)
+    return Ressources.query()
+      .all()
+      .map((e: any) => e.Type)
   }
   private get ModalTitle () {
     if (this.dialog === 1) return 'Neue Ressource'
@@ -100,7 +113,10 @@ export default class RessourceManagement extends Vue {
       SpecialsDescription: this.editDetails
     }
     if (this.dialog === 2) {
-      const response = await Ressources.api().put(`ressources/${this.editId}`, data)
+      const response = await Ressources.api().put(
+        `ressources/${this.editId}`,
+        data
+      )
       await Ressources.update(data)
     } else {
       await Ressources.api().post('ressources', data)
@@ -141,19 +157,26 @@ export default class RessourceManagement extends Vue {
       text: `Möchten sie die Ressource ${item.Name} wirklich löschen?`,
       title: 'Löschen bestätigen',
       persistent: true,
-      actions: [{
-        text: 'Nein', color: 'blue', key: false
-      }, {
-        text: 'Löschen', color: 'red', key: true
-      }]
+      actions: [
+        {
+          text: 'Nein',
+          color: 'blue',
+          key: false
+        },
+        {
+          text: 'Löschen',
+          color: 'red',
+          key: true
+        }
+      ]
     })
 
-    if (confirmation === true) Ressources.api().delete(`ressources/${item.Id}`, { delete: item.Id })
+    if (confirmation === true) { Ressources.api().delete(`ressources/${item.Id}`, { delete: item.Id }) }
   }
 
   private saveNew (event: ViewRessource) {
     // Save to server here
-  //  this.items.push({ ...this.newItem })
+    //  this.items.push({ ...this.newItem })
     this.showNewForm = false
   }
 
@@ -162,16 +185,16 @@ export default class RessourceManagement extends Vue {
       // Update to server here
     } else {
       // Save to server here
-  //    this.items.push(this.editedItem)
+      //    this.items.push(this.editedItem)
     }
     this.dialog = 0
   }
 }
 
 interface ViewRessource {
-  Title: string
-  Type: string
-  FunctionDescription: string
-  SpecialDescription: string
+  Title: string;
+  Type: string;
+  FunctionDescription: string;
+  SpecialDescription: string;
 }
 </script>

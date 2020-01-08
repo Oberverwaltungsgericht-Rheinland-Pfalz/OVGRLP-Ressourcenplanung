@@ -32,13 +32,11 @@
     <v-app-bar app>
       <v-layout justify-space-between wrap align-center>
         <div class="text-center">
-          <new-form-modal />
-          &ensp;
+          <new-form-modal />&ensp;
           <v-menu v-if="!drawer" offset-y open-on-hover>
             <template v-slot:activator="{ on }">
               <v-btn color="primary" dark v-on="on">
-                <v-icon>more_vert</v-icon>
-                Navigation
+                <v-icon>more_vert</v-icon>Navigation
               </v-btn>
             </template>
             <v-list>
@@ -47,10 +45,10 @@
                 :key="index"
                 :to="item.path"
               >
-                <v-list-item-title
-                  ><v-icon>{{ item.icon }}</v-icon>
-                  {{ item.name }}</v-list-item-title
-                >
+                <v-list-item-title>
+                  <v-icon>{{ item.icon }}</v-icon>
+                  {{ item.name }}
+                </v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -71,33 +69,37 @@
           </template>
           <v-list>
             <v-list-item>
-              <v-list-item-title
-                ><v-icon>supervisor_account</v-icon>
-                {{ userData.name }}</v-list-item-title
-              >
+              <v-list-item-title>
+                <v-icon>supervisor_account</v-icon>
+                {{ userData.name }}
+              </v-list-item-title>
             </v-list-item>
             <v-list-item>
-              <v-list-item-title
-                ><v-icon>email</v-icon> {{ userData.email }}</v-list-item-title
-              >
+              <v-list-item-title>
+                <v-icon>email</v-icon>
+                {{ userData.email }}
+              </v-list-item-title>
             </v-list-item>
             <v-list-item>
-              <v-list-item-title
-                ><v-icon></v-icon>Rolle:
-                {{ userData.roleNames }}</v-list-item-title
-              >
+              <v-list-item-title>
+                <v-icon></v-icon>
+                Rolle:
+                {{ userData.roleNames }}
+              </v-list-item-title>
             </v-list-item>
             <v-list-item>
-              <v-list-item-title
-                ><v-icon></v-icon>Organisation:
-                {{ userData.organisation }}</v-list-item-title
-              >
+              <v-list-item-title>
+                <v-icon></v-icon>
+                Organisation:
+                {{ userData.organisation }}
+              </v-list-item-title>
             </v-list-item>
             <v-list-item>
-              <v-list-item-title
-                ><v-icon></v-icon>Unterstützergruppe:
-                {{ userData.supplierGroups }}</v-list-item-title
-              >
+              <v-list-item-title>
+                <v-icon></v-icon>
+                Unterstützergruppe:
+                {{ userData.supplierGroups }}
+              </v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -113,7 +115,6 @@
 </template>
 
 <script lang="ts">
-import HelloWorld from '@/components/HelloWorld.vue'
 import { Component, Vue } from 'vue-property-decorator'
 import Router from 'vue-router'
 import { State, Action, Getter, Mutation } from 'vuex-class'
@@ -128,7 +129,7 @@ import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 
 @Component({
-  components: { HelloWorld, NewFormModal }
+  components: { NewFormModal }
 })
 export default class App extends Vue {
   public get currentPath () {
@@ -149,8 +150,8 @@ export default class App extends Vue {
   private items: MyRouteConfig[] = []
 
   public async created () {
-    await this.loadUser();
-    (this.$router as any).options.routes.forEach((route: any) => {
+    await this.loadUser()
+    ;(this.$router as any).options.routes.forEach((route: any) => {
       if (this.$store.state.user.role >= route.authLevel) {
         this.items.push({
           path: route.path,
@@ -167,12 +168,12 @@ export default class App extends Vue {
     Allocations.api().get('allocations')
 
     const allpResp = await AllocationPurposes.api().get('allocationpurposes')
-    console.dir(allpResp)
   }
 }
 </script>
 
 <style lang="stylus" scoped>
-.action-avatar
-  cursor pointer
+.action-avatar {
+  cursor: pointer;
+}
 </style>

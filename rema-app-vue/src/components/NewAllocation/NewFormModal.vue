@@ -1,12 +1,12 @@
 <template>
   <v-dialog v-model="dialog" scrollable>
     <template v-slot:activator="{ on }">
-      <v-btn color="success" dark v-on="on"><v-icon>add</v-icon> Termin anlegen</v-btn>
+      <v-btn color="success" dark v-on="on">
+        <v-icon>add</v-icon>Termin anlegen
+      </v-btn>
     </template>
 
-    <AllocationForm v-on:close="dialog=false">
-    </AllocationForm>
-
+    <AllocationForm v-on:close="dialog=false"></AllocationForm>
   </v-dialog>
 </template>
 
@@ -18,7 +18,7 @@ import AllocationForm from './AllocationForm.vue'
   components: { AllocationForm }
 })
 export default class NewFormModal extends Vue {
-  public dialog: boolean = false
+  public dialog: boolean = false;
   public get title () {
     return 'Neue Terminanfrage stellen / Termin eintragen'
   }

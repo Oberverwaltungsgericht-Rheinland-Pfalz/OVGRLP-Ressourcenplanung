@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--<h1>Bitte bearbeiten Sie die eingegangenen Terminanfragen</h1>-->
-    <acknowledge-list/>
+    <acknowledge-list />
   </div>
 </template>
 
@@ -14,5 +14,3 @@ import AcknowledgeList from '@/components/AcknowledgeList.vue'
 })
 export default class Acknowledge extends Vue {}
 </script>
-
-

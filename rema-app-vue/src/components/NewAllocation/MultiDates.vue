@@ -1,15 +1,15 @@
 <template>
-   <v-container fluid>
+  <v-container fluid>
     <v-slide-y-transition mode="out-in">
       <v-layout column>
-        <input type="number" v-model="year"/>
-        <v-spacer/>
+        <input type="number" v-model="year" />
+        <v-spacer />
         <YearCalendar
-        lang="de"
-        v-model="year"
-        :activeDates.sync="activeDates"
-        @toggleDate="toggleDate"
-        :showYearSelector="false"
+          lang="de"
+          v-model="year"
+          :activeDates.sync="activeDates"
+          @toggleDate="toggleDate"
+          :showYearSelector="false"
         ></YearCalendar>
       </v-layout>
     </v-slide-y-transition>
@@ -26,11 +26,8 @@ const namespace: string = 'MultiDates'
   components: { YearCalendar }
 })
 export default class RessourceMaintenance extends Vue {
-  private year: number = new Date().getFullYear()
-  private activeDates: any = [
-        { date: '2019-02-13' },
-        { date: '2019-02-16' }
-  ]
+  private year: number = new Date().getFullYear();
+  private activeDates: any = [{ date: '2019-02-13' }, { date: '2019-02-16' }];
   private async toggleDate (d: any) {
     const res = await this.$dialog.prompt({
       text: 'Your name',

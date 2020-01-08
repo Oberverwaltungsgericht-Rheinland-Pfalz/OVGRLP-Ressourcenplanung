@@ -1,43 +1,62 @@
 <template>
   <v-card>
-    <v-card-title v-if="permissionToEdit" class="headline">Termin eintragen</v-card-title>
-    <v-card-title v-else class="headline">Neue Terminanfrage stellen</v-card-title>
+    <v-card-title v-if="permissionToEdit" class="headline"
+      >Termin eintragen</v-card-title
+    >
+    <v-card-title v-else class="headline"
+      >Neue Terminanfrage stellen</v-card-title
+    >
     <v-card-text>
       <v-container>
-        <v-text-field
-            v-model="Title"
-            label="Titel"
-            required
-        ></v-text-field>
+        <v-text-field v-model="Title" label="Titel" required></v-text-field>
         <v-row>
           <v-col cols="2">
-            <v-switch style="margin:0"
+            <v-switch
+              style="margin:0"
               v-model="isWholeDay"
               :label="`Ganztägiges Ereignis`"
             ></v-switch>
           </v-col>
           <v-col v-if="!isWholeDay && isRepeating" cols="6" id="repeatingTime">
-            Jeweils von: <input v-model="timeFrom" type="time"/>
-            bis: <input v-model="timeTo" type="time"/>
+            Jeweils von:
+            <input v-model="timeFrom" type="time" />
+            bis:
+            <input v-model="timeTo" type="time" />
           </v-col>
         </v-row>
-        <v-switch style="margin:0"
+        <v-switch
+          style="margin:0"
           v-model="isRepeating"
           :label="`Wiederkehrender Termin`"
         ></v-switch>
 
         <div v-show="!isRepeating">
-          <label for="meeting-From">Vom:
-          <input :value="dateFrom" @input="dateFrom = $event.target.value"
-            :type="dateInputType" step="900"
-            id="meeting-from" 
-            name="meeting-time" :min="today"></label>
+          <label for="meeting-From">
+            Vom:
+            <input
+              :value="dateFrom"
+              @input="dateFrom = $event.target.value"
+              :type="dateInputType"
+              step="900"
+              id="meeting-from"
+              name="meeting-time"
+              :min="today"
+            />
+          </label>
 
-          <label>Bis:
-          <input :value="dateTo" @input="dateTo = $event.target.value"
-            :type="dateInputType" @change="dateToChanged = true"
-            name="meeting-time" id="meeting-to" step="900"
-            :min="today"></label>
+          <label>
+            Bis:
+            <input
+              :value="dateTo"
+              @input="dateTo = $event.target.value"
+              :type="dateInputType"
+              @change="dateToChanged = true"
+              name="meeting-time"
+              id="meeting-to"
+              step="900"
+              :min="today"
+            />
+          </label>
         </div>
 
         <div v-show="isRepeating">
@@ -61,38 +80,56 @@
                 readonly
                 v-on="on"
               >
-              <template v-slot:selection="data">
-                  <v-chip>{{data.item | toLocalDate}} <v-icon right @click="removeDate(data.item)">close</v-icon></v-chip>
-              </template>
+                <template v-slot:selection="data">
+                  <v-chip>
+                    {{ data.item | toLocalDate }}
+                    <v-icon right @click="removeDate(data.item)">close</v-icon>
+                  </v-chip>
+                </template>
               </v-combobox>
             </template>
-            <v-date-picker v-model="multipleDates" locale="de" multiple no-title scrollable>
+            <v-date-picker
+              v-model="multipleDates"
+              locale="de"
+              multiple
+              no-title
+              scrollable
+            >
               <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="showMultipleDatesMenu = false">Cancel</v-btn>
-              <v-btn text color="primary" @click="$refs.showMultipleDatesMenu.save(multipleDates)">OK</v-btn>
+              <v-btn text color="primary" @click="showMultipleDatesMenu = false"
+                >Cancel</v-btn
+              >
+              <v-btn
+                text
+                color="primary"
+                @click="$refs.showMultipleDatesMenu.save(multipleDates)"
+                >OK</v-btn
+              >
             </v-date-picker>
           </v-menu>
         </div>
 
         <v-select
-            v-model="selectedRessourceId"
-            :items="Rooms"
-            item-text="Name"
-            item-value="Id"
-            label="Raum"
+          v-model="selectedRessourceId"
+          :items="Rooms"
+          item-text="Name"
+          item-value="Id"
+          label="Raum"
         />
 
-        <div v-for="(group, idx) in GadgetGroups" :key="idx+'group'">
+        <div v-for="(group, idx) in GadgetGroups" :key="idx + 'group'">
           <v-select
             v-model="seltedGadgets"
             :items="getGadgets(group.Id)"
-            :label="'Hilfsmittel der '+ group.Title"
+            :label="'Hilfsmittel der ' + group.Title"
             item-text="Title"
             item-value="Id"
-            multiple chips persistent-hint 
+            multiple
+            chips
+            persistent-hint
           />
         </div>
-        
+
         <!-- Todo: Autocomplete mit Namenseingabe und GET Webservice, welcher von AD gespeist wird
         <v-text-field
         v-model="contactPerson"
@@ -107,29 +144,47 @@
         ></v-text-field>
         -->
         <v-textarea
-            v-model="Description"
-            :label="'Beschreibung'"
-            auto-grow
-            clearable
-            outlined
-            rounded
+          v-model="Description"
+          :label="'Beschreibung'"
+          auto-grow
+          clearable
+          outlined
+          rounded
         ></v-textarea>
 
         <v-textarea
-            v-model="Notes"
-            :label="'Notizen'"
-            auto-grow
-            clearable
-            outlined
-            rounded
+          v-model="Notes"
+          :label="'Notizen'"
+          auto-grow
+          clearable
+          outlined
+          rounded
         ></v-textarea>
       </v-container>
     </v-card-text>
     <v-card-actions>
-        <div class="flex-grow-1"></div>
-        <v-btn v-if="permissionToEdit" :disabled="formInvalid" color="green darken-1" text @click="sendAllocation(1)"><v-icon>save</v-icon> Speichern</v-btn>
-        <v-btn v-else :disabled="formInvalid" color="green darken-1" text @click="sendAllocation(0)"><v-icon>save</v-icon> Anfragen</v-btn>
-        <v-btn color="red darken-1" text @click="close"><v-icon>cancel</v-icon> Abbrechen</v-btn>
+      <div class="flex-grow-1"></div>
+      <v-btn
+        v-if="permissionToEdit"
+        :disabled="formInvalid"
+        color="green darken-1"
+        text
+        @click="sendAllocation(1)"
+      >
+        <v-icon>save</v-icon>Speichern
+      </v-btn>
+      <v-btn
+        v-else
+        :disabled="formInvalid"
+        color="green darken-1"
+        text
+        @click="sendAllocation(0)"
+      >
+        <v-icon>save</v-icon>Anfragen
+      </v-btn>
+      <v-btn color="red darken-1" text @click="close">
+        <v-icon>cancel</v-icon>Abbrechen
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -140,7 +195,9 @@ import Component from 'vue-class-component'
 import Gadgets from '../../models/GadgetModel'
 import Ressources, { RessourceModel } from '../../models/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
-import AllocationPurposes, { AllocationPurposeModel } from '../../models/AllocationpurposeModel'
+import AllocationPurposes, {
+  AllocationPurposeModel
+} from '../../models/AllocationpurposeModel'
 import Allocations, { AllocationModel } from '../../models/AllocationModel'
 import dayjs from 'dayjs'
 
@@ -156,8 +213,8 @@ export default class AllocationForm extends Vue {
   private Email: string = ''
   private timeFrom: string = '08:00'
   private timeTo: string = '17:00'
-  private dateFromIntern: Date = new Date(new Date().setHours(8,0,0,0))
-  private dateToIntern: Date = new Date(new Date().setHours(16,0,0,0))
+  private dateFromIntern: Date = new Date(new Date().setHours(8, 0, 0, 0))
+  private dateToIntern: Date = new Date(new Date().setHours(16, 0, 0, 0))
   private dateToChanged: boolean = false
   private selectedRessourceId: number = 0
   private seltedGadgets: number[] = []
@@ -171,11 +228,9 @@ export default class AllocationForm extends Vue {
   }
 
   private async sendAllocation (status: number) {
-
     const purposeId = await this.savePurpose()
-    console.log('purposeid ' + purposeId)
     if (this.isRepeating) {
-      this.multipleDates.forEach((e) => {
+      this.multipleDates.forEach(e => {
         this.saveAllocation(status, purposeId, e)
       })
     } else {
@@ -184,7 +239,11 @@ export default class AllocationForm extends Vue {
     this.close()
   }
 
-  private async saveAllocation (status: number, purpose: AllocationPurposeModel, date?: string) {
+  private async saveAllocation (
+    status: number,
+    purpose: AllocationPurposeModel,
+    date?: string
+  ) {
     let from = this.dateFrom
     let to = this.dateTo
     if (date) {
@@ -198,9 +257,13 @@ export default class AllocationForm extends Vue {
     }
 
     await Allocations.api().post('allocations', {
-      From: from, To: to, IsAllDay: this.isWholeDay, Status: status,
-      Purpose_id: purpose, Ressource_id: this.selectedRessourceId }
-    )
+      From: from,
+      To: to,
+      IsAllDay: this.isWholeDay,
+      Status: status,
+      Purpose_id: purpose,
+      Ressource_id: this.selectedRessourceId
+    })
   }
 
   private async savePurpose () {
@@ -209,17 +272,23 @@ export default class AllocationForm extends Vue {
       Description: this.Description,
       Notes: this.Notes,
       ContactPhone: this.telNumber,
-      GadgetIds: [...this.seltedGadgets] }
-    )
+      GadgetIds: [...this.seltedGadgets]
+    })
     if (response && response !== null && response.entities !== null) {
       const entity = response.entities.AllocationPurposes.pop()
       if (entity === null) {
         return this.$dialog.message.warning(
-          'AllocationPurpose was not saved correctly ' + response, { position: 'top-center' }
-          )
+          'AllocationPurpose was not saved correctly ' + response,
+          { position: 'top-center' }
+        )
       }
       return (entity as any).Id
-    } else this.$dialog.message.warning('AllocationPurpose was not saved correctly ' + response, { position: 'top-center' })
+    } else {
+      this.$dialog.message.warning(
+        'AllocationPurpose was not saved correctly ' + response,
+        { position: 'top-center' }
+      )
+    }
   }
   private close () {
     this.clearAll()
@@ -274,11 +343,13 @@ export default class AllocationForm extends Vue {
   }
 
   private getGadgets (groupId: number) {
-    return Gadgets.query().where('SuppliedBy', groupId).get()
+    return Gadgets.query()
+      .where('SuppliedBy', groupId)
+      .get()
   }
 
   private removeDate (item: string) {
-    const idx = this.multipleDates.findIndex((v) => v === item)
+    const idx = this.multipleDates.findIndex(v => v === item)
     this.multipleDates.splice(idx, 1)
   }
   private clearAll () {
@@ -289,8 +360,8 @@ export default class AllocationForm extends Vue {
     this.contactPerson = 0
     this.multipleDates = []
     this.isRepeating = false
-    this.dateFromIntern = new Date(new Date().setHours(8,0,0,0))
-    this.dateToIntern = new Date(new Date().setHours(16,0,0,0))
+    this.dateFromIntern = new Date(new Date().setHours(8, 0, 0, 0))
+    this.dateToIntern = new Date(new Date().setHours(16, 0, 0, 0))
     this.timeFrom = '08:00'
     this.timeTo = '17:00'
     this.selectedRessourceId = 0
@@ -299,6 +370,7 @@ export default class AllocationForm extends Vue {
 </script>
 
 <style lang="stylus">
-#repeatingTime input[type="time"]
-  border-bottom 1px solid darkgray
+#repeatingTime input[type="time"] {
+  border-bottom: 1px solid darkgray;
+}
 </style>
