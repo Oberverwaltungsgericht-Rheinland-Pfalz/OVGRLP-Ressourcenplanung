@@ -79,6 +79,12 @@ namespace Raumplanung.WebApi.Controllers
       //If you omit this, it will end up getting every attribute with a value,
       //which is unnecessary.
       user.RefreshCache(new[] { "givenName", "sn", "mail", "displayName", "company", "name" });
+      /*
+      foreach(System.DirectoryServices.PropertyValueCollection p in user.Properties) {
+        Debug.WriteLine(p.PropertyName);
+        Debug.WriteLine(p.Value);
+      }
+      */
 
       var firstName = user.Properties["givenName"].Value;
       var lastName = user.Properties["sn"].Value;

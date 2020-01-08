@@ -3,35 +3,33 @@
     <div id="chart" ref="chartdiv"></div>
     <b>TIMELINE:</b> MOVE
     <v-btn @click="moveAxisX('left')">LEFT</v-btn>
-    <v-btn @click="moveAxisX('right')">RIGHT</v-btn>
-    | ZOOM IN/OUT
+    <v-btn @click="moveAxisX('right')">RIGHT</v-btn>| ZOOM IN/OUT
     <v-btn @click="zoomAxisX('in')">IN</v-btn>
     <v-btn @click="zoomAxisX('out')">OUT</v-btn>
-    <v-btn @click="zoomViewAllAxisX()">VIEW ALL</v-btn>
-    | Or use <b>click+move</b> & <b>mousewheel</b> directly on graph.
+    <v-btn @click="zoomViewAllAxisX()">VIEW ALL</v-btn>| Or use
+    <b>click+move</b> & <b>mousewheel</b> directly on graph.
     <hr />
     <div v-show="false">
       <b>START DATE ALL:</b> MOVE
       <v-btn @click="moveStartDate(-10 * 60)">-10 MIN</v-btn>
-      <v-btn @click="moveStartDate(10 * 60)">+10 MIN</v-btn>
-      | current = <span>{{ dateStartAll || formatDate }}</span>
+      <v-btn @click="moveStartDate(10 * 60)">+10 MIN</v-btn>| current =
+      <span>{{ dateStartAll || formatDate }}</span>
       <hr />
       <b>SLOT:</b>
-      <v-btn @click="buildAutoSlot()">BUILD AUTO</v-btn> |
-      <v-btn @click="removeAllSlot()">REMOVE ALL</v-btn> Or
-      <b>double click</b> on slot to remove it. | ADD
-
-      <!--    <v-btn @click="addSlot('A')">A</v-btn><v-btn @click="addSlot('B')">B</v-btn><v-btn @click="addSlot('C')">C</v-btn><v-btn @click="addSlot('D')">D</v-btn><v-btn @click="addSlot('E')">E</v-btn><v-btn @click="addSlot('F')">F</v-btn><v-btn @click="addSlot('X')">X</v-btn>
--->
+      <v-btn @click="buildAutoSlot()">BUILD AUTO</v-btn>|
+      <v-btn @click="removeAllSlot()">REMOVE ALL</v-btn>Or
+      <b>double click</b>
+      on slot to remove it. | ADD
+      <!--    <v-btn @click='addSlot ('A')'>A</v-btn><v-btn @click='addSlot ('B')'>B</v-btn><v-btn @click='addSlot ('C')'>C</v-btn><v-btn @click='addSlot ('D')'>D</v-btn><v-btn @click='addSlot ('E')'>E</v-btn><v-btn @click='addSlot ('F')'>F</v-btn><v-btn @click='addSlot ('X')'>X</v-btn>
+      -->
       <hr />
     </div>
-
     <div id="selection"></div>
   </div>
 </template>
 
 <script>
-// includes code from d3-gantt-scheduler, @Repository: https://github.com/bertrandg/d3-gantt-scheduler/, @by Author "bertrandg <bertrandgaillard@hotmail.fr> (https://github.com/bertrandg)", @Licensed under ISC License
+// includes code from d3-gantt-scheduler, @Repository: https://github.com/bertrandg/d3-gantt-scheduler/, @by Author 'bertrandg <bertrandgaillard@hotmail.fr>  (https://github.com/bertrandg)', @Licensed under ISC License
 import _ from 'lodash'
 import * as d3 from 'd3'
 import Ressources from '../models/RessourceModel'
@@ -66,16 +64,16 @@ export default {
         .with('Ressource')
         .get()
       let blocks = roomNames.map(v => {
-        let rValue = {
+        const rValue = {
           id: v.Id,
           name: v.Ressource.Name,
           from: v.From,
           to: v.To
         }
-        let today = dayjs(new Date())
-        let start = dayjs(v.From)
-        let diff = start.diff(today, 'hour') // 3600
-        let durationTime = dayjs(v.To).diff(start, 'minute') // 60
+        const today = dayjs(new Date())
+        const start = dayjs(v.From)
+        const diff = start.diff(today, 'hour') // 3600
+        const durationTime = dayjs(v.To).diff(start, 'minute') // 60
 
         rValue.startAfter = diff * 3600
         if (v.IsAllDay) rValue.duration = 864e2
@@ -83,7 +81,6 @@ export default {
 
         return rValue
       })
-
       return blocks
     }
   },
@@ -162,7 +159,7 @@ export default {
         .attr(
           'transform',
           d =>
-            `translate(${this.scaleX(this.getStart(d))}, ${this.scaleY(
+            `translate (${this.scaleX(this.getStart(d))}, ${this.scaleY(
               d.name
             )})`
         )
@@ -206,7 +203,7 @@ export default {
         .attr(
           'transform',
           d =>
-            `translate(${this.scaleX(this.getStart(d))}, ${this.scaleY(
+            `translate (${this.scaleX(this.getStart(d))}, ${this.scaleY(
               d.name
             )})`
         )
@@ -258,7 +255,7 @@ export default {
         .attr(
           'transform',
           d =>
-            `translate(${this.scaleX(this.getStart(d))}, ${this.scaleY(
+            `translate (${this.scaleX(this.getStart(d))}, ${this.scaleY(
               d.name
             )})`
         )
@@ -301,7 +298,7 @@ export default {
         .attr(
           'transform',
           d =>
-            `translate(${self.scaleX(self.getStart(d))}, ${self.scaleY(
+            `translate (${self.scaleX(self.getStart(d))}, ${self.scaleY(
               d.name
             )})`
         )
@@ -317,7 +314,7 @@ export default {
         )
         .attr('height', slotHeight)
         .attr('cursor', 'move')
-        .style('fill', d => 'rgba(156,200,176,1)')
+        .style('fill', d => 'rgba (156,200,176,1)')
         .on('dblclick', zoneDblClick)
         .call(
           d3
@@ -401,7 +398,7 @@ export default {
         // change g.slot translation
         d3.select(this.parentNode).attr(
           'transform',
-          `translate(${self.scaleX(self.getStart(slot))}, ${self.scaleY(
+          `translate (${self.scaleX(self.getStart(slot))}, ${self.scaleY(
             slot.name
           )})`
         )
@@ -412,9 +409,6 @@ export default {
       function dragZoneEnd (slot) {
         startDragMouseX = null
       }
-
-      /// ////////////////////////////////////////
-      /// ////////////////////////////////////////
 
       function dragLeftStart (slot) {
         if (d3.event.sourceEvent.screenX) {
@@ -466,7 +460,7 @@ export default {
         // change g.slot translation
         d3.select(this.parentNode).attr(
           'transform',
-          `translate(${self.scaleX(self.getStart(slot))}, ${self.scaleY(
+          `translate (${self.scaleX(self.getStart(slot))}, ${self.scaleY(
             slot.name
           )})`
         )
@@ -496,9 +490,6 @@ export default {
         startDragDuration = null
         startDragDate = null
       }
-
-      /// ////////////////////////////////////////
-      /// ////////////////////////////////////////
 
       function dragRightStart (slot) {
         startDragMouseX = d3.mouse(this)[0]
@@ -599,7 +590,10 @@ export default {
       this.elMain = this.svg
         .append('g')
         .attr('class', 'main')
-        .attr('transform', 'translate(' + this.BORDER + ',' + this.BORDER + ')')
+        .attr(
+          'transform',
+          'translate (' + this.BORDER + ',' + this.BORDER + ')'
+        )
         .call(d3.zoom().on('zoom', scrollZoom))
         .on('dblclick.zoom', null)
 
@@ -608,7 +602,7 @@ export default {
         .attr('class', 'axis axis--x')
         .attr(
           'transform',
-          'translate(0,' + (this.HEIGHT - this.BORDER * 2) + ')'
+          'translate (0,' + (this.HEIGHT - this.BORDER * 2) + ')'
         )
         .call(this.axisX)
 
@@ -622,18 +616,18 @@ export default {
         .attr('class', 'drag-zone')
         .attr('width', this.WIDTH - this.BORDER * 2)
         .attr('height', this.HEIGHT - this.BORDER * 2)
-        .attr('clip-path', 'url(#clip)')
+        .attr('clip-path', 'url (#clip)')
         .call(d3.drag().on('drag', dragProgress))
 
       this.elContainer = this.elMain
         .append('g')
         .attr('class', 'container')
-        .attr('clip-path', 'url(#clip)')
+        .attr('clip-path', 'url (#clip)')
 
       let elDateStartAll = this.elMain
         .append('line')
         .attr('class', 'dateStartAll')
-        .attr('clip-path', 'url(#clip)')
+        .attr('clip-path', 'url (#clip)')
         .attr('x1', this.scaleX(this.dateStartAll))
         .attr('y1', this.scaleY.range()[0])
         .attr('x2', this.scaleX(this.dateStartAll))
@@ -644,7 +638,7 @@ export default {
       function dragProgress () {
         const [start, end] = self.scaleX.domain()
         const newStart = self.scaleX.invert(-d3.event.dx)
-        let duration = getDurationBetween(start, newStart)
+        const duration = getDurationBetween(start, newStart)
 
         self.updateAxisX(
           getDatePlusDuration(start, duration),
@@ -696,16 +690,14 @@ export default {
         // BEFORE ALL SLOTS > endMax = startFirst - GAP
         if (slot.startAfter + slot.duration <= tabSlotFirst.start - this.GAP) {
           endMax = tabSlotFirst.start - this.GAP
-          // console.log('BEFORE ALL > endMax = ', endMax);
+          // console.log ('BEFORE ALL > endMax = ', endMax)
         } else if (
-          // AFTER ALL SLOTS > startMin = endLast + GAP
           slot.startAfter >=
           tabSlotLast.start + tabSlotLast.duration + this.GAP
         ) {
           startMin = tabSlotLast.start + tabSlotLast.duration + this.GAP
-          // console.log('AFTER ALL > startMin = ', startMin);
+          // console.log ('AFTER ALL > startMin = ', startMin)
         } else {
-          // BETWEEN 2 > startMin = endA + GAP && endMax = startB - GAP
           for (let i = 0; i < orderedCommonSlots.length; i++) {
             const tabSlotA = orderedCommonSlots[i]
             const tabSlotB = orderedCommonSlots[i + 1]
@@ -725,7 +717,7 @@ export default {
               }
             }
           }
-          // console.log('BETWEEN 2 SLOTS > startMin = ', startMin, ' > endMax = ', endMax);
+          // console.log ('BETWEEN 2 SLOTS > startMin = ', startMin, ' > endMax = ', endMax)
         }
       }
 
@@ -772,17 +764,19 @@ export default {
           .classed('active', true)
 
         document.getElementById('selection').innerHTML = `
-          <div style="background: grey;">
-              <h3>
-                NAME: ${this.currentSlot.name} (id=${this.currentSlot.id})<br>
-                START: ${formatDate(this.getStart(this.currentSlot))}<br>
-                END: ${formatDate(this.getEnd(this.currentSlot))}
-                <button 
-                  onClick="removeSlot(${this.currentSlot.id})">
-                  REMOVE
-                </button>
-              </h3>
-          </div>`
+                    <div style='background: grey'>
+                        <h3>NAME: ${this.currentSlot.name}  (id=${
+  this.currentSlot.id
+})<br>
+                        START: ${formatDate(
+    this.getStart(this.currentSlot)
+  )}<br>
+                        END: ${formatDate(this.getEnd(this.currentSlot))}
+                        <button onClick='removeSlot (${
+  this.currentSlot.id
+})'>REMOVE</button>
+                        </h3>
+                    </div>`
       } else {
         this.currentSlot = null
 
@@ -790,7 +784,7 @@ export default {
       }
     },
     removeSlot (id) {
-      let idx = this.data.findIndex(s => s.id === id)
+      const idx = this.data.findIndex(s => s.id === id)
       this.data.splice(idx, 1)
       this.updateData()
       this.updateAxisY()
@@ -861,7 +855,7 @@ export default {
       list.forEach((name, i) => {
         tempData.push({
           id: i + 1,
-          name: name,
+          name,
           startAfter: i * this.GAP * 2,
           duration: this.GAP
         })
@@ -928,19 +922,26 @@ function isDateBeforeOther (dateA, dateB, gap = 0) {
 </script>
 
 <style lang="stylus">
-.ressource-scheduler
-    .tick line
-      opacity: 0.2
+.ressource-scheduler {
+  .tick line {
+    opacity: 0.2
+  }
 
-    .dateStartAll
-      stroke: green
+  .dateStartAll {
+    stroke: green
+  }
 
-    .zone.active
-      stroke: blue
-      stroke-width: 3px
+  .zone.active {
+    stroke: blue
+    stroke-width: 3px
+  }
 
-    .drag-zone
-      opacity: 0
-    #chart
-      min-width: 250px
+  .drag-zone {
+    opacity: 0
+  }
+
+  #chart {
+    min-width: 250px
+  }
+}
 </style>

@@ -135,14 +135,13 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/User/types'
 import AllocationRequest from '../models/AllocationRequest'
 import AllocationRequestView from '../models/AllocationRequestView'
 import UserData, { ContactUser } from '../models/UserData'
-import Allocation, { AllocationModel } from '../models/AllocationModel'
+import Allocations, { AllocationModel } from '../models/AllocationModel'
 import AllocationsPurpose, {
   AllocationPurposeModel
 } from '../models/AllocationpurposeModel'
@@ -175,17 +174,17 @@ export default class AcknowledgeView extends Vue {
     this.$emit('input', false)
     // this.viewAllocation = {} as AllocationRequestView
   }
-  public get UnAcknowledgedAllocations (): Allocation[] {
-    return Allocation.query()
+  public get UnAcknowledgedAllocations (): Allocations[] {
+    return Allocations.query()
       .withAll()
       .get()
   }
 
-  public get possibleCollisions (): Allocation[] {
+  public get possibleCollisions (): Allocations[] {
     const start = Date.parse(this.viewAllocation.From)
     const end = Date.parse(this.viewAllocation.To)
     const id = this.viewAllocation.Id
-    const rValues = Allocation.query()
+    const rValues = Allocations.query()
       .withAll()
       .where('Status', (s: number) => s !== 2)
       // @ts-ignore
@@ -248,7 +247,7 @@ export default class AcknowledgeView extends Vue {
       },
       body: JSON.stringify(editedRequest)
     })
-    Allocation.update({
+    Allocations.update({
       where: task.Id,
       data: { From: task.From, To: task.To, Status: status }
     })

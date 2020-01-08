@@ -266,9 +266,10 @@ namespace Raumplanung.WebApi.Controllers
 
       _context.Allocations.Add(all);
       await _context.SaveChangesAsync();
+      var returnAllocation = _mapper.Map<Allocation, AllocationViewModel>(all);
 
       Log.Information("Allocation {@allocation.Id} was created by {@User.email}", allocation.Id, base.RequestSender.Email);
-      return CreatedAtAction("GetAllocation", new { id = allocation.Id }, allocation);
+      return CreatedAtAction("GetAllocation", new { id = allocation.Id }, returnAllocation);
     }
 
     // DELETE: api/Allocations/5

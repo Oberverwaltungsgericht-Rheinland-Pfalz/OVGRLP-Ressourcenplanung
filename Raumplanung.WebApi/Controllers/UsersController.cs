@@ -66,6 +66,15 @@ namespace Raumplanung.WebApi.Controllers
       return RequestSenderVM;
     }
 
+    // GET: api/Users/contact/?namepart=NAMEPART
+    [HttpGet("contact")]
+    public ActionResult<ContactUser> GetContactUser(string namepart)
+    {
+      // lookup ldap for user
+      // return list of users as contactUser
+      return null;
+    }
+
     // - PUT: api/Users/5
     //[HttpPut("{id}")]
     [NonAction]

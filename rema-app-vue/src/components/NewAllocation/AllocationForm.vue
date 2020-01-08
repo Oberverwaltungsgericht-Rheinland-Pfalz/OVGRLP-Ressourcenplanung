@@ -1,11 +1,11 @@
 <template>
   <v-card>
-    <v-card-title v-if="permissionToEdit" class="headline"
-      >Termin eintragen</v-card-title
-    >
-    <v-card-title v-else class="headline"
-      >Neue Terminanfrage stellen</v-card-title
-    >
+    <v-card-title v-if="permissionToEdit" class="headline">
+      Termin eintragen
+    </v-card-title>
+    <v-card-title v-else class="headline">
+      Neue Terminanfrage stellen
+    </v-card-title>
     <v-card-text>
       <v-container>
         <v-text-field v-model="Title" label="Titel" required></v-text-field>
@@ -18,9 +18,7 @@
             ></v-switch>
           </v-col>
           <v-col v-if="!isWholeDay && isRepeating" cols="6" id="repeatingTime">
-            Jeweils von:
-            <input v-model="timeFrom" type="time" />
-            bis:
+            Jeweils von: <input v-model="timeFrom" type="time" /> bis:
             <input v-model="timeTo" type="time" />
           </v-col>
         </v-row>
@@ -31,8 +29,8 @@
         ></v-switch>
 
         <div v-show="!isRepeating">
-          <label for="meeting-From">
-            Vom:
+          <label for="meeting-From"
+            >Vom:
             <input
               :value="dateFrom"
               @input="dateFrom = $event.target.value"
@@ -41,11 +39,10 @@
               id="meeting-from"
               name="meeting-time"
               :min="today"
-            />
-          </label>
+          /></label>
 
-          <label>
-            Bis:
+          <label
+            >Bis:
             <input
               :value="dateTo"
               @input="dateTo = $event.target.value"
@@ -55,8 +52,7 @@
               id="meeting-to"
               step="900"
               :min="today"
-            />
-          </label>
+          /></label>
         </div>
 
         <div v-show="isRepeating">
@@ -81,10 +77,12 @@
                 v-on="on"
               >
                 <template v-slot:selection="data">
-                  <v-chip>
-                    {{ data.item | toLocalDate }}
-                    <v-icon right @click="removeDate(data.item)">close</v-icon>
-                  </v-chip>
+                  <v-chip
+                    >{{ data.item | toLocalDate }}
+                    <v-icon right @click="removeDate(data.item)"
+                      >close</v-icon
+                    ></v-chip
+                  >
                 </template>
               </v-combobox>
             </template>
@@ -130,19 +128,27 @@
           />
         </div>
 
-        <!-- Todo: Autocomplete mit Namenseingabe und GET Webservice, welcher von AD gespeist wird
-        <v-text-field
+        <!-- Todo: Autocomplete mit Namenseingabe und GET Webservice, welcher von AD gespeist wird-->
+        <v-combobox
+          v-model="contactPerson2"
+          :search-input.sync="contactPerson"
+          :items="contactPersons"
+          label="Ansprechpartner/In"
+          required
+        ></v-combobox>
+        {{ contactPerson }}{{ contactPerson2 }}
+        <!--<v-text-field
         v-model="contactPerson"
         label="Ansprechpartner/In"
         required
-        ></v-text-field>
+        ></v-text-field>-->
         <v-text-field
-            v-model="telNumber"
-            type="tel"
-            label="Telefonnummer"
-            required
+          v-model="telNumber"
+          type="tel"
+          label="Telefonnummer"
+          required
         ></v-text-field>
-        -->
+
         <v-textarea
           v-model="Description"
           :label="'Beschreibung'"
@@ -170,21 +176,19 @@
         color="green darken-1"
         text
         @click="sendAllocation(1)"
+        ><v-icon>save</v-icon> Speichern</v-btn
       >
-        <v-icon>save</v-icon>Speichern
-      </v-btn>
       <v-btn
         v-else
         :disabled="formInvalid"
         color="green darken-1"
         text
         @click="sendAllocation(0)"
+        ><v-icon>save</v-icon> Anfragen</v-btn
       >
-        <v-icon>save</v-icon>Anfragen
-      </v-btn>
-      <v-btn color="red darken-1" text @click="close">
-        <v-icon>cancel</v-icon>Abbrechen
-      </v-btn>
+      <v-btn color="red darken-1" text @click="close"
+        ><v-icon>cancel</v-icon> Abbrechen</v-btn
+      >
     </v-card-actions>
   </v-card>
 </template>
@@ -223,12 +227,16 @@ export default class AllocationForm extends Vue {
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
 
+  private contactPersons: string[] = ['']
+  private contactPerson2: string = ''
+
   private get permissionToEdit (): boolean {
     return this.$store.state.user.role >= 10
   }
 
   private async sendAllocation (status: number) {
     const purposeId = await this.savePurpose()
+    console.log('purposeid ' + purposeId)
     if (this.isRepeating) {
       this.multipleDates.forEach(e => {
         this.saveAllocation(status, purposeId, e)
@@ -370,7 +378,6 @@ export default class AllocationForm extends Vue {
 </script>
 
 <style lang="stylus">
-#repeatingTime input[type="time"] {
-  border-bottom: 1px solid darkgray;
-}
+#repeatingTime input[type="time"]
+  border-bottom 1px solid darkgray
 </style>
