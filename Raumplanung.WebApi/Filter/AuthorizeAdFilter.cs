@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using System.Security.Principal;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Raumplanung.WebApi.Controllers;
 using Raumplanung.WebApi.ViewModels;
-using System.Collections.Generic;
-using System.Security.Principal;
 
 namespace Raumplanung.WebApi.Filter
 {

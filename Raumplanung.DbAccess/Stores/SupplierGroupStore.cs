@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Raumplanung.Infrastructure.Contracts.Stores;
+﻿using Raumplanung.Infrastructure.Contracts.Stores;
 using Raumplanung.Infrastructure.Models;
 
 namespace Raumplanung.Data.DataAccess

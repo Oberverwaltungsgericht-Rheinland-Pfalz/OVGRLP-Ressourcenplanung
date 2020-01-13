@@ -1,9 +1,8 @@
-﻿using Raumplanung.Infrastructure.Contracts.Stores;
+﻿using System;
+using System.Collections.Generic;
+using Raumplanung.Infrastructure.Contracts.Stores;
 using Raumplanung.Infrastructure.Models;
 using Raumplanung.Infrastructure.Requests;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ServiceLayer
 {

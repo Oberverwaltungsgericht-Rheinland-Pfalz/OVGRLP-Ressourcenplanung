@@ -1,6 +1,6 @@
-﻿using Raumplanung.Infrastructure.Models;
+﻿using System.Collections.Generic;
+using Raumplanung.Infrastructure.Models;
 using Raumplanung.Infrastructure.Requests;
-using System.Collections.Generic;
 
 namespace Raumplanung.Infrastructure.Contracts.Services
 {

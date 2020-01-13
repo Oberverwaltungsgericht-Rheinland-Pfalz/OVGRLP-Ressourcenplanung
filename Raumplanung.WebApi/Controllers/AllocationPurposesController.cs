@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Raumplanung.Data.DataAccess;
@@ -6,9 +9,6 @@ using Raumplanung.Infrastructure.Models;
 using Raumplanung.WebApi.Filter;
 using Raumplanung.WebApi.ViewModels;
 using Serilog;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Raumplanung.WebApi.Controllers
 {

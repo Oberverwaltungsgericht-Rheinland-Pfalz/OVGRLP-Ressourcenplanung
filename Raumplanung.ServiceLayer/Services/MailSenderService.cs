@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net.Mail;
-
-namespace ServiceLayer.Services
+﻿namespace ServiceLayer.Services
 {
   public class MailSenderService
   {
