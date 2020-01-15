@@ -12,7 +12,7 @@ using Serilog;
 namespace Rema.WebApi.Controllers
 {
   [Produces("application/json")]
-  [Route("api/[controller]")]
+  [Route("[controller]")]
   [ApiController]
   [AuthorizeAd("Reader")]
   public class SupplierGroupsController : BaseController

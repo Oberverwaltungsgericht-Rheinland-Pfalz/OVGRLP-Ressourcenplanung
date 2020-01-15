@@ -17,7 +17,7 @@ namespace Rema.WebApi.Controllers
 {
   [Authorize]
   [Produces("application/json")]
-  [Route("api/[controller]")]
+  [Route("[controller]")]
   [ApiController]
   [AuthorizeAd("Reader")]
   public class AllocationsController : BaseController
