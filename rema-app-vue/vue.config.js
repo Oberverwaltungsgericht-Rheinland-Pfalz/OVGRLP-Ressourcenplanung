@@ -9,7 +9,7 @@ module.exports = {
         target: 'http://localhost:52575',
         changeOrigin: true,
         pathRewrite: {
-          '^/api': 'api'
+          '^/api': ''
         },
         logLevel: 'debug',
         agent: new Agent({
