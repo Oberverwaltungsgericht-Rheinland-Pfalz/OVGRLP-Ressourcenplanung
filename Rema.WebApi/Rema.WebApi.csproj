@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.2.0.19513</Version>
+    <Version>0.8.0.20034</Version>
     <AssemblyName>Rema.WebApi</AssemblyName>
   </PropertyGroup>
 
