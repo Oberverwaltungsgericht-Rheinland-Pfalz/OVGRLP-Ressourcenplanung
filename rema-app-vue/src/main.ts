@@ -1,3 +1,4 @@
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import Vue from 'vue'
 import './plugins/axios'
 import App from './App.vue'
@@ -13,7 +14,9 @@ import 'vuetify/dist/vuetify.min.css'
 import 'dayjs/locale/de' // load on demand
 
 dayjs.locale('de')
-Vue.use(Vuetify)
+Vue.use(Vuetify, {
+  iconfont: 'md'
+})
 
 Vue.config.productionTip = false
 
