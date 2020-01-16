@@ -52,13 +52,4 @@ namespace Rema.WebApi.Filter
         context.Result = new UnauthorizedResult();
     }
   }
-
-  public class AuthorizeAdAttribute : TypeFilterAttribute
-  {
-    public AuthorizeAdAttribute(string permission)
-        : base(typeof(AuthorizeAdActionFilter))
-    {
-      Arguments = new object[] { permission };
-    }
-  }
 }
