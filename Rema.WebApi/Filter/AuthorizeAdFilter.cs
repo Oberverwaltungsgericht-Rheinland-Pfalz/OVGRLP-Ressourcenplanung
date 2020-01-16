@@ -12,7 +12,6 @@ namespace Rema.WebApi.Filter
   {
     private readonly IConfiguration _configuration;
 
-    //private static List<Role> rolesInst = null;
     public static List<Role> Roles
     {
       get =>
@@ -20,8 +19,6 @@ namespace Rema.WebApi.Filter
     }
 
     private readonly string _permission;
-    //readonly IDictionary<string, string> RightRoles = new Dictionary<string, string>() { { "Reader", "OVGVG\\NJZ Alle" }, { "Editor", "OVGVG\\NJZ IT" }, { "Admin", "OVGVG\\Dashboard_Admins" } };
-    //readonly IDictionary<string, int> Roles = new Dictionary<string, int>() { { "OVGVG\\NJZ Alle", 0 }, { "OVGVG\\NJZ IT", 10 }, { "OVGVG\\Dashboard_Admins", 100 } };
 
     public AuthorizeAdActionFilter(string permission, IConfiguration configuration)
     {
