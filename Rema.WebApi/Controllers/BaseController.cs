@@ -1,11 +1,14 @@
-﻿using System.DirectoryServices;
+﻿using System;
+using System.DirectoryServices;
 using System.Linq;
 using System.Security.Principal;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Rema.DbAccess;
 using Rema.Infrastructure.Models;
 using Rema.WebApi.ViewModels;
+using Serilog;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,16 +26,16 @@ namespace Rema.WebApi.Controllers
       _mapper = mapper;
     }
 
-    private User _userInst = null;
-    private UserViewModel _userVMinst = null;
+    private User _user = null;
+    private UserViewModel _userViewModel = null;
 
     public UserViewModel RequestSenderVM
     {
       get
       {
-        if (_userVMinst == null)
-          _userVMinst = _mapper.Map<User, UserViewModel>(RequestSender);
-        return _userVMinst;
+        if (_userViewModel == null)
+          _userViewModel = _mapper.Map<User, UserViewModel>(RequestSender);
+        return _userViewModel;
       }
     }
 
@@ -40,35 +43,48 @@ namespace Rema.WebApi.Controllers
     {
       get
       {
-        if (_userInst != null) return _userInst;
+        if (_user != null) return _user;
 
-        var requester = this.HttpContext.User;
-        var identity = (WindowsIdentity)requester.Identity;
-        string domainId = identity.User.Value;
+        _user = GetUserFromHttpContext(this.HttpContext);
 
-        var user = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == domainId);
-        if (user == null)
-        {
-          var newUser = GetADUser(identity);
-          _context.Users.Add(newUser);
-          _context.SaveChanges();
-          _userInst = newUser;
-        }
-        else
-        {
-          _userInst = user;
-        }
+        SaveUser(_user);
 
-        return _userInst;
+        return _user;
       }
     }
 
-    private User GetADUser(WindowsIdentity identity)
+    private void SaveUser(User user)
     {
-      return GetADUserById(identity.User.Value);
+      try
+      {
+        var dbUser = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == user.ActiveDirectoryID);
+
+        if(dbUser == null)
+        {
+          _context.Users.Add(user);
+        }
+        else
+        {
+          user.Id = dbUser.Id;
+          _context.Entry(dbUser).CurrentValues.SetValues(user);
+        }
+        _context.SaveChanges();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "An error occured while storing the user the database.");
+      }
     }
 
-    public User GetADUserById(string activeDirectoryID)
+    private User GetUserFromHttpContext(HttpContext context)
+    {
+      var requester = this.HttpContext.User;
+      var identity = (WindowsIdentity)requester.Identity;
+
+      return GetUserByActiveDirectoryId(identity.User.Value);
+    }
+
+    public User GetUserByActiveDirectoryId(string activeDirectoryID)
     {
       var user = new DirectoryEntry($"LDAP://<SID={activeDirectoryID}>");
 
