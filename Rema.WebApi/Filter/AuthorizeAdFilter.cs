@@ -11,18 +11,14 @@ namespace Rema.WebApi.Filter
   public class AuthorizeAdActionFilter : ActionFilterAttribute
   {
     private readonly IConfiguration _configuration;
+    private readonly string _permission;
 
-    //private static List<Role> rolesInst = null;
     public static List<Role> Roles
     {
       get =>
           new List<Role>() { Startup.Reader, Startup.Editor, Startup.Admin };
     }
-
-    private readonly string _permission;
-    //readonly IDictionary<string, string> RightRoles = new Dictionary<string, string>() { { "Reader", "OVGVG\\NJZ Alle" }, { "Editor", "OVGVG\\NJZ IT" }, { "Admin", "OVGVG\\Dashboard_Admins" } };
-    //readonly IDictionary<string, int> Roles = new Dictionary<string, int>() { { "OVGVG\\NJZ Alle", 0 }, { "OVGVG\\NJZ IT", 10 }, { "OVGVG\\Dashboard_Admins", 100 } };
-
+    
     public AuthorizeAdActionFilter(string permission, IConfiguration configuration)
     {
       _configuration = configuration;
@@ -50,15 +46,6 @@ namespace Rema.WebApi.Filter
         return;
       else
         context.Result = new UnauthorizedResult();
-    }
-  }
-
-  public class AuthorizeAdAttribute : TypeFilterAttribute
-  {
-    public AuthorizeAdAttribute(string permission)
-        : base(typeof(AuthorizeAdActionFilter))
-    {
-      Arguments = new object[] { permission };
     }
   }
 }
