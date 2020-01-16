@@ -11,15 +11,14 @@ namespace Rema.WebApi.Filter
   public class AuthorizeAdActionFilter : ActionFilterAttribute
   {
     private readonly IConfiguration _configuration;
+    private readonly string _permission;
 
     public static List<Role> Roles
     {
       get =>
           new List<Role>() { Startup.Reader, Startup.Editor, Startup.Admin };
     }
-
-    private readonly string _permission;
-
+    
     public AuthorizeAdActionFilter(string permission, IConfiguration configuration)
     {
       _configuration = configuration;
