@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Events;
 
 namespace Rema.WebApi
 {
@@ -19,6 +20,7 @@ namespace Rema.WebApi
     {
       Log.Logger = new LoggerConfiguration()
         .ReadFrom.Configuration(Configuration)
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
         .CreateLogger();
 
       CreateHostBuilder(args).Build().Run();
