@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -22,121 +23,179 @@ namespace Rema.WebApi.Controllers
     {
     }
 
-    // GET: api/AllocationPurposes
+    // GET: allocationpurposes
     [HttpGet]
     public async Task<ActionResult<IEnumerable<object>>> GetAllocationPurposes()
     {
-      //var purposes = await _context.AllocationPurposes.Include(g => g.Allocations).ToListAsync();
-      var p = await (from purpose in _context.AllocationPurposes
-                       //   where purpose.Allocations.Count > 0
-                     select new
-                     {
-                       Id = purpose.Id,
-                       Title = purpose.Title,
-                       Description = purpose.Description,
-                       Notes = purpose.Notes,
-                       ContactPhone = purpose.ContactPhone,
-                       Gadgets = purpose.Gadgets.Select(x => x.GadgetId),
-                       Allocations = purpose.Allocations.Select(x => x.Id)
-                     }).ToListAsync();
-      return p;
+      Log.Information("GET: allocationpurposes");
+
+      try
+      {
+        return await (from purpose in _context.AllocationPurposes
+                      select new
+                      {
+                        Id = purpose.Id,
+                        Title = purpose.Title,
+                        Description = purpose.Description,
+                        Notes = purpose.Notes,
+                        ContactPhone = purpose.ContactPhone,
+                        Gadgets = purpose.Gadgets.Select(x => x.GadgetId),
+                        Allocations = purpose.Allocations.Select(x => x.Id)
+                      }).ToListAsync();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting allocationpurposes");
+        return NotFound();
+      }
     }
 
-    // GET: api/AllocationPurposes/5
+    // GET: allocationpurposes/5
     [HttpGet("{id}")]
     public async Task<ActionResult<AllocationPurposeViewModel>> GetAllocationPurpose(long id)
     {
-      var allocationPurpose = await _context.AllocationPurposes.FindAsync(id);
+      Log.Information("GET: allocationpurposes/{id}", id);
 
-      if (allocationPurpose == null)
+      try
       {
+        var allocationPurpose = await _context.AllocationPurposes.FindAsync(id);
+
+        if (allocationPurpose == null)
+        {
+          return NotFound();
+        }
+
+        var purposeVM = _mapper.Map<AllocationPurpose, AllocationPurposeViewModel>(allocationPurpose);
+        return purposeVM;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting allocationpurpose");
         return NotFound();
       }
-      var purposeVM = _mapper.Map<AllocationPurpose, AllocationPurposeViewModel>(allocationPurpose);
-      return purposeVM;
     }
 
-    // PUT: api/AllocationPurposes/5
+    // PUT: allocationpurposes/5
     [HttpPut("{id}")]
     [AuthorizeAd("Reader")]
     public async Task<IActionResult> PutAllocationPurpose(long id, AllocationPurpose allocationPurpose)
     {
+      Log.Information("PUT allocationpurposes({id}: {allocationPurpose}", id, allocationPurpose);
+
       if (id != allocationPurpose.Id)
       {
         return BadRequest();
       }
 
-      _context.Entry(allocationPurpose).State = EntityState.Modified;
+      try
+      {
+        _context.Entry(allocationPurpose).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while save allocationpurpose");
+        return NotFound();
+      }
+
+      return Ok();
+    }
+
+    // POST: allocationpurposes
+    [HttpPost]
+    public async Task<ActionResult<AllocationPurpose>> PostAllocationPurpose(AllocationPurposeViewModel allocationPurpose)
+    {
+      Log.Information("POST allocationpurposes: {allocationPurpose}", allocationPurpose);
+      AllocationPurpose purpose;
+
+      try
+      {
+        purpose = _mapper.Map<AllocationPurposeViewModel, AllocationPurpose>(allocationPurpose);
+      }
+      catch (Exception mapEx)
+      {
+        Log.Error(mapEx, "error while map allocationpurpose");
+        return BadRequest();
+      }
+
+      try
+      {
+        _context.AllocationPurposes.Add(purpose);
+      }
+      catch (Exception saveEx)
+      {
+        Log.Error(saveEx, "error while save allocationpurpose");
+        return NotFound();
+      }
+
+      try
+      {
+        if (allocationPurpose.GadgetIds.Any())
+        {
+          var tasksGadgetIds = allocationPurpose.GadgetIds.Select(e => _context.Gadgets.FindAsync(e).AsTask());
+          var gadgets = await Task.WhenAll(tasksGadgetIds);
+
+          foreach (var gadget in gadgets)
+          {
+            var gadgetPurpose = new GadgetPurpose(gadget, purpose);
+            _context.GadgetPurposes.Add(gadgetPurpose);
+            purpose.Gadgets.Add(gadgetPurpose);
+            gadget.AllocationPurposes.Add(gadgetPurpose);
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting gadgets for allocationpurpose");
+        return NotFound();
+      }
 
       try
       {
         await _context.SaveChangesAsync();
       }
-      catch (DbUpdateConcurrencyException)
+      catch (Exception ex)
       {
-        if (!AllocationPurposeExists(id))
-        {
-          return NotFound();
-        }
-        else
-        {
-          throw;
-        }
+        Log.Error(ex, "error while save allocationpurpose");
+        return NotFound();
       }
 
-      Log.Information("Allocation Purpose {@purpose.IdTitle} was updated by {@User.email}", allocationPurpose.Id + allocationPurpose.Title, base.RequestSender.Email);
-      return NoContent();
-    }
-
-    // POST: api/AllocationPurposes
-    [HttpPost]
-    public async Task<ActionResult<AllocationPurpose>> PostAllocationPurpose(AllocationPurposeViewModel allocationPurpose)
-    {
-      var purpose = _mapper.Map<AllocationPurposeViewModel, AllocationPurpose>(allocationPurpose);
-
-      _context.AllocationPurposes.Add(purpose);
-
-      if (allocationPurpose.GadgetIds.Any())
+      try
       {
-        var tasksGadgetIds = allocationPurpose.GadgetIds.Select(e => _context.Gadgets.FindAsync(e).AsTask());
-        var gadgets = await Task.WhenAll(tasksGadgetIds);
-
-        foreach (var gadget in gadgets)
-        {
-          var gadgetPurpose = new GadgetPurpose(gadget, purpose);
-          _context.GadgetPurposes.Add(gadgetPurpose);
-          purpose.Gadgets.Add(gadgetPurpose);
-          gadget.AllocationPurposes.Add(gadgetPurpose);
-        }
+        var returnPurpose = _mapper.Map<AllocationPurpose, AllocationPurposeViewModel>(purpose);
+        return CreatedAtAction("GetAllocationPurpose", new { id = returnPurpose.Id }, returnPurpose);
       }
-
-      await _context.SaveChangesAsync();
-      var returnPurpose = _mapper.Map<AllocationPurpose, AllocationPurposeViewModel>(purpose);
-
-      Log.Information("Allocation Purpose {@purpose.IdTitle} was created by {@User.email}", allocationPurpose.Id + allocationPurpose.Title, base.RequestSender.Email);
-      return CreatedAtAction("GetAllocationPurpose", new { id = returnPurpose.Id }, returnPurpose);
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while map save allocationpurpose");
+        return Conflict();
+      }
     }
 
-    // DELETE: api/AllocationPurposes/5
+    // DELETE: allocationpurposes/5
     [HttpDelete("{id}")]
-    public async Task<ActionResult<AllocationPurpose>> DeleteAllocationPurpose(long id)
+    public async Task<IActionResult> DeleteAllocationPurpose(long id)
     {
+      Log.Information("DELETE allocationpurposes/{id}", id);
+
       var allocationPurpose = await _context.AllocationPurposes.FindAsync(id);
       if (allocationPurpose == null)
       {
         return NotFound();
       }
 
-      _context.AllocationPurposes.Remove(allocationPurpose);
-      await _context.SaveChangesAsync();
+      try
+      {
+        _context.AllocationPurposes.Remove(allocationPurpose);
+        await _context.SaveChangesAsync();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while delete allocationpurpose");
+        return Conflict();
+      }
 
-      Log.Information("Allocation Purpose {@purpose.IdTitle} was deleted by {@User.email}", allocationPurpose.Id + allocationPurpose.Title, base.RequestSender.Email);
-      return allocationPurpose;
-    }
-
-    private bool AllocationPurposeExists(long id)
-    {
-      return _context.AllocationPurposes.Any(e => e.Id == id);
+      return Ok();
     }
   }
 }
