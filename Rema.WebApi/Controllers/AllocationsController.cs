@@ -26,273 +26,461 @@ namespace Rema.WebApi.Controllers
     {
     }
 
-    // GET: api/Allocations
+    // GET: allocations
     [HttpGet]
     public async Task<ActionResult<IEnumerable<object>>> GetAllocations()
     {
-      var user = RequestSender;
+      Log.Information("GET allocations");
 
-      var all = await _context.Allocations.Include(g => g.Ressource).Include(g => g.Purpose).Include(g => g.ApprovedBy).Include(g => g.CreatedBy).Include(g => g.LastModifiedBy).Include(g => g.ReferencePerson).ToListAsync();
-      // return all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
-      var p = (from a in _context.Allocations
-                 //   where purpose.Allocations.Count > 0
-               select new
-               {
-                 Id = a.Id,
-                 From = a.From,
-                 To = a.To,
-                 IsAllDay = a.IsAllDay,
-                 Status = a.Status,
-                 Ressource_id = a.Ressource.Id,
-                 Purpose_id = a.Purpose.Id,
-                 CreatedBy = a.CreatedBy.Id,
-                 CreatedAt = a.CreatedAt,
-                 LastModified = a.LastModified,
-                 LastModifiedBy = a.LastModifiedBy.Id,
-                 ApprovedBy = a.ApprovedBy.Id,
-                 ApprovedAt = a.ApprovedAt,
-                 ReferencePerson = a.ReferencePerson.Id
-               }).ToList();
+      List<Allocation> allocations;
 
-      return p;
+      try
+      {
+        allocations = await _context.Allocations
+          .Include(g => g.Ressource)
+          .Include(g => g.Purpose)
+          .Include(g => g.ApprovedBy)
+          .Include(g => g.CreatedBy)
+          .Include(g => g.LastModifiedBy)
+          .Include(g => g.ReferencePerson)
+          .ToListAsync();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting allocations");
+        return NotFound();
+      }
+
+      try
+      {
+        //var allMapped = all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
+        var p = (from a in _context.Allocations
+                 select new
+                 {
+                   Id = a.Id,
+                   From = a.From,
+                   To = a.To,
+                   IsAllDay = a.IsAllDay,
+                   Status = a.Status,
+                   Ressource_id = a.Ressource.Id,
+                   Purpose_id = a.Purpose.Id,
+                   CreatedBy = a.CreatedBy.Id,
+                   CreatedAt = a.CreatedAt,
+                   LastModified = a.LastModified,
+                   LastModifiedBy = a.LastModifiedBy.Id,
+                   ApprovedBy = a.ApprovedBy.Id,
+                   ApprovedAt = a.ApprovedAt,
+                   ReferencePerson = a.ReferencePerson.Id
+                 }).ToList();
+
+        return Ok(p);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while mapping allocations");
+        return NotFound();
+      }
+    }
+
+    // GET: allocations/5
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Allocation>> GetAllocation(long id)
+    {
+      Log.Information("GET allocation/{id}", id);
+
+      try
+      {
+        var allocation = await _context.Allocations.FindAsync(id);
+        if (allocation == null)
+        {
+          return NotFound();
+        }
+        return Ok(allocation);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting allocation");
+        return NotFound();
+      }
+    }
+
+    // PUT: allocations/5
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutAllocation(long id, Allocation allocation)
+    {
+      Log.Information("PUT allocations/{id}: {allocation}", id, allocation);
+
+      if (id != allocation.Id)
+      {
+        Log.Error("allocation not mached the id");
+        return BadRequest();
+      }
+
+      try
+      {
+        allocation.LastModified = DateTime.Now;
+        allocation.LastModifiedBy = base.RequestSender;
+        _context.Entry(allocation).State = EntityState.Modified;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while set modified values for allocation");
+        return Conflict();
+      }
+
+      try
+      {
+        await _context.SaveChangesAsync();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while save allocation");
+        return Conflict();
+      }
+
+      return Ok();
+    }
+
+    // POST: allocations
+    [HttpPost]
+    public async Task<ActionResult<AllocationViewModel>> PostAllocation(AllocationViewModel allocationVM)
+    {
+      Log.Information("POST allocation: {allocation}", allocationVM);
+
+      Allocation allocation;
+
+      try
+      {
+        allocation = _mapper.Map<AllocationViewModel, Allocation>(allocationVM);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while mapping allocation");
+        return BadRequest();
+      }
+
+      try
+      {
+        allocation.Purpose = await _context.AllocationPurposes.FindAsync(allocationVM.Purpose_id);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting purpose");
+      }
+
+      try
+      {
+        allocation.Ressource = await _context.Ressources.FindAsync(allocationVM.Ressource_id);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting ressource");
+      }
+
+      try
+      {
+        allocation.LastModified = DateTime.Now;
+        allocation.LastModifiedBy = base.RequestSender;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while setting modified informations");
+      }
+
+      try
+      {
+        allocation.CreatedAt = DateTime.Now;
+        allocation.CreatedBy = base.RequestSender;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while setting created informations");
+      }
+
+      try
+      {
+        allocation.ApprovedBy = base.RequestSender;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while setting approved information");
+      }
+
+      try
+      {
+        if (allocation.IsAllDay)
+        {
+          allocation.From = allocation.From.Date + new TimeSpan(0, 0, 0);
+          allocation.To = allocation.To.Date + new TimeSpan(23, 59, 00);
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while set correct times for all day");
+      }
+
+      try
+      {
+        if (allocationVM.ReferencePerson_id == 0)
+        {
+          allocation.ReferencePerson = base.RequestSender;
+        }
+        else
+        {
+          var referencePerson = await _context.Users.FindAsync(allocationVM.ReferencePerson_id);
+          allocation.ReferencePerson = referencePerson;
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while setting referencePerson");
+      }
+
+      try
+      {
+        _context.Allocations.Add(allocation);
+        await _context.SaveChangesAsync();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while saving the new allocation");
+        return Conflict();
+      }
+
+      try
+      {
+        if (allocation.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)))
+        {
+          allocation.Status = allocationVM.Status;
+          EmailTrigger.SendEmail(
+            "Buchung wurde erstellt",
+            $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} " +
+            $"vom {allocation.From} bis {allocation.To} wurde vorgenommen",
+            recipient: base.RequestSender.Email);
+        }
+        else
+        {
+          allocation.Status = MeetingStatus.Pending;
+          EmailTrigger.SendEmail(
+            "Anfrage wurde erstellt",
+            $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} " +
+            $"vom {allocation.From} bis {allocation.To} wurde gestellt", recipient: base.RequestSender.Email);
+        }
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while processing mails");
+      }
+
+      try
+      {
+        var returnAllocation = _mapper.Map<Allocation, AllocationViewModel>(allocation);
+        return CreatedAtAction("GetAllocation", new { id = allocation.Id }, returnAllocation);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while mapping save allocation to result");
+      }
+
+      return Ok();
+    }
+
+    // DELETE: allocations/5
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<Allocation>> DeleteAllocation(long id)
+    {
+      Allocation allocation;
+
+      Log.Information("DELETE allocations/{id}", id);
+
+      try
+      {
+        allocation = await _context.Allocations
+          .Include(o => o.Purpose)
+          .Include(o => o.Ressource)
+          .FirstOrDefaultAsync(i => i.Id == id);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting allocation");
+        return NotFound();
+      }
+
+      if (allocation == null)
+      {
+        return NotFound();
+      }
+
+      try
+      {
+        _context.Allocations.Remove(allocation);
+        await _context.SaveChangesAsync();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while deleting allocation");
+      }
+
+      return Ok();
     }
 
     [HttpGet("filter/{filter}")]
     public async Task<ActionResult<IEnumerable<object>>> GetAllocations(AllocationFilter filter)
     {
-      var all = await _context.Allocations.Include(g => g.Ressource).Include(g => g.Purpose).Include(g => g.ApprovedBy).Include(g => g.CreatedBy).Include(g => g.LastModifiedBy).Include(g => g.ReferencePerson).ToListAsync();
-      // return all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
-      var p = (from a in _context.Allocations
-                 //   where purpose.Allocations.Count > 0
-               select new
-               {
-                 Id = a.Id,
-                 From = a.From,
-                 To = a.To,
-                 IsAllDay = a.IsAllDay,
-                 Status = a.Status,
-                 Ressource_id = a.Ressource.Id,
-                 Purpose_id = a.Purpose.Id,
-                 CreatedBy = a.CreatedBy,
-                 CreatedAt = a.CreatedAt,
-                 LastModified = a.LastModified,
-                 LastModifiedBy = a.LastModifiedBy.Id,
-                 ApprovedBy = a.ApprovedBy.Id,
-                 ApprovedAt = a.ApprovedAt,
-                 ReferencePerson = a.ReferencePerson.Id
-               }).ToList();
-      return p;
-    }
+      //TODO: Aktuell wird hier garnicht gefiltert
 
-    // GET: api/Allocations/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Allocation>> GetAllocation(long id)
-    {
-      var allocation = await _context.Allocations.FindAsync(id);
-
-      if (allocation == null)
-      {
-        return NotFound();
-      }
-
-      return allocation;
-    }
-
-    // PUT: api/Allocations/5
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutAllocation(long id, Allocation allocation)
-    {
-      if (id != allocation.Id)
-      {
-        return BadRequest();
-      }
-
-      allocation.LastModified = DateTime.Now;
-      allocation.LastModifiedBy = base.RequestSender;
-      _context.Entry(allocation).State = EntityState.Modified;
-
+      Log.Information("GET allocations/filter/{filter}", filter);
+      
       try
       {
-        await _context.SaveChangesAsync();
-      }
-      catch (DbUpdateConcurrencyException)
-      {
-        if (!AllocationExists(id))
-        {
-          return NotFound();
-        }
-        else
-        {
-          throw;
-        }
-      }
+        var all = await _context.Allocations
+          .Include(g => g.Ressource)
+          .Include(g => g.Purpose)
+          .Include(g => g.ApprovedBy)
+          .Include(g => g.CreatedBy)
+          .Include(g => g.LastModifiedBy)
+          .Include(g => g.ReferencePerson)
+          .ToListAsync();
 
-      Log.Information("Allocation {@allocation.Id} was updated by {@User.email}", allocation.Id, base.RequestSender.Email);
-      return NoContent();
+        // return all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
+        var p = (from a in _context.Allocations
+                 select new
+                 {
+                   Id = a.Id,
+                   From = a.From,
+                   To = a.To,
+                   IsAllDay = a.IsAllDay,
+                   Status = a.Status,
+                   Ressource_id = a.Ressource.Id,
+                   Purpose_id = a.Purpose.Id,
+                   CreatedBy = a.CreatedBy,
+                   CreatedAt = a.CreatedAt,
+                   LastModified = a.LastModified,
+                   LastModifiedBy = a.LastModifiedBy.Id,
+                   ApprovedBy = a.ApprovedBy.Id,
+                   ApprovedAt = a.ApprovedAt,
+                   ReferencePerson = a.ReferencePerson.Id
+                 }).ToList();
+        return Ok(p);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting filtered allocation");
+        return NotFound();
+      }
     }
 
-    // PUT: api/Allocations/Status/5
+    // PUT: allocations/status/5
     [HttpPut("status/{id}")]
     public async Task<IActionResult> PutAllocation(long id, int status)
     {
-      var allocation = await _context.Allocations.FindAsync(id);
+      Log.Information("PUT allocations/status/{id}: {status}", id, status);
 
-      if (allocation == null)
-      {
-        return BadRequest();
-      }
-
-      allocation.Status = (MeetingStatus)status;
-      allocation.LastModified = DateTime.Now;
-      allocation.LastModifiedBy = base.RequestSender;
-      _context.Entry(allocation).State = EntityState.Modified;
-
+      Allocation allocation;
+            
       try
       {
-        await _context.SaveChangesAsync();
+        allocation = await _context.Allocations.FindAsync(id);
       }
-      catch (DbUpdateConcurrencyException)
+      catch(Exception ex)
       {
-        if (!AllocationExists(id))
-        {
-          return NotFound();
-        }
-        else
-        {
-          throw;
-        }
+        Log.Error(ex, "error while getting allocation");
+        return NotFound();
       }
-
-      Log.Information("Allocation {@allocation.Id} status was updated to {@status} by {@User.email}", allocation.Id, status, base.RequestSender.Email);
-      return NoContent();
-    }
-
-    // PUT: api/Allocations/EditRequest
-    [HttpPut("{editedRequest}")]
-    public async Task<ActionResult<Boolean>> EditRequest(AllocationRequestEdition editedRequest)
-    {
-      var allocation = await _context.Allocations.Include(o => o.Purpose).Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
-
-      if (allocation == null)
-      {
-        return BadRequest();
-      }
-
-      allocation.Status = (MeetingStatus)editedRequest.status;
-      allocation.LastModified = DateTime.Now;
-      allocation.LastModifiedBy = base.RequestSender;
-      allocation.ApprovedAt = DateTime.Now;
-      allocation.ApprovedBy = base.RequestSender;
-      if ((MeetingStatus)editedRequest.status == MeetingStatus.Moved)
-      {
-        EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde verschoben von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
-
-        allocation.From = editedRequest.From.GetValueOrDefault();
-        allocation.To = editedRequest.To.GetValueOrDefault();
-      }
-      else if ((MeetingStatus)editedRequest.status == MeetingStatus.Approved)
-      {
-        EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde genehmigt von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
-      }
-      else if ((MeetingStatus)editedRequest.status == MeetingStatus.Clarification)
-      {
-        EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde abgelehnt", recipient: base.RequestSender.Email);
-      }
-
-      _context.Entry(allocation).State = EntityState.Modified;
-
-      try
-      {
-        await _context.SaveChangesAsync();
-      }
-      catch (DbUpdateConcurrencyException)
-      {
-        if (!AllocationExists(editedRequest.Id))
-        {
-          return NotFound();
-        }
-        else
-        {
-          throw;
-        }
-      }
-
-      // todo: logging
-      return NoContent();
-    }
-
-    // POST: api/Allocations
-    [HttpPost]
-    public async Task<ActionResult<AllocationViewModel>> PostAllocation(AllocationViewModel allocation)
-    {
-      var purpose = await _context.AllocationPurposes.FindAsync(allocation.Purpose_id);
-      var ressource = await _context.Ressources.FindAsync(allocation.Ressource_id);
-      var user = await _context.Users.FindAsync(1L);
-
-      Allocation all = _mapper.Map<AllocationViewModel, Allocation>(allocation);
-      all.Purpose = purpose;
-      all.Ressource = ressource;
-      all.LastModified = DateTime.Now;
-      all.LastModifiedBy = base.RequestSender;
-      all.CreatedAt = DateTime.Now;
-      all.CreatedBy = base.RequestSender;
-      all.ApprovedBy = base.RequestSender;
-      if (all.IsAllDay)
-      {
-        all.From = all.From.Date + new TimeSpan(0, 0, 0);
-        all.To = all.To.Date + new TimeSpan(23, 59, 00);
-      }
-
-      if (allocation.ReferencePerson_id == 0)
-      {
-        all.ReferencePerson = base.RequestSender;
-      }
-      else
-      {
-        var referencePerson = await _context.Users.FindAsync(allocation.ReferencePerson_id);
-        all.ReferencePerson = referencePerson;
-      }
-
-      if (all.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)))
-      {
-        all.Status = allocation.Status;
-        EmailTrigger.SendEmail("Buchung wurde erstellt", $"Ihre Buchungsanfrage {purpose.Title} der Ressource {all.Ressource.Name} vom {all.From} bis {all.To} wurde vorgenommen", recipient: base.RequestSender.Email);
-      }
-      else
-      {
-        all.Status = MeetingStatus.Pending;
-        EmailTrigger.SendEmail("Anfrage wurde erstellt", $"Ihre Buchungsanfrage {purpose.Title} der Ressource {all.Ressource.Name} vom {all.From} bis {all.To} wurde gestellt", recipient: base.RequestSender.Email);
-      }
-
-      _context.Allocations.Add(all);
-      await _context.SaveChangesAsync();
-      var returnAllocation = _mapper.Map<Allocation, AllocationViewModel>(all);
-
-      Log.Information("Allocation {@allocation.Id} was created by {@User.email}", allocation.Id, base.RequestSender.Email);
-      return CreatedAtAction("GetAllocation", new { id = allocation.Id }, returnAllocation);
-    }
-
-    // DELETE: api/Allocations/5
-    [HttpDelete("{id}")]
-    public async Task<ActionResult<Allocation>> DeleteAllocation(long id)
-    {
-      var allocation = await _context.Allocations.Include(o => o.Purpose).Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == id);
+      
       if (allocation == null)
       {
         return NotFound();
       }
 
-      _context.Allocations.Remove(allocation);
-      await _context.SaveChangesAsync();
+      try
+      { 
+        allocation.Status = (MeetingStatus)status;
+        allocation.LastModified = DateTime.Now;
+        allocation.LastModifiedBy = base.RequestSender;
+        _context.Entry(allocation).State = EntityState.Modified;
 
-      EmailTrigger.SendEmail("Ihr Termin wurde gelöscht", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde gelöscht", recipient: base.RequestSender.Email);
-      Log.Information("Allocation {@allocation.Id} was deleted by {@User.email}", allocation.Id, base.RequestSender.Email);
-      return allocation;
+        await _context.SaveChangesAsync();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while changing status and save allocation");
+        return Conflict();
+      }
+
+      return Ok();
     }
 
-    private bool AllocationExists(long id)
+    // PUT: allocations/editrequest
+    [HttpPut("{editedRequest}")]
+    public async Task<ActionResult<Boolean>> EditRequest(AllocationRequestEdition editedRequest)
     {
-      return _context.Allocations.Any(e => e.Id == id);
+      Log.Information("PUT allocations/editrequest: {editRequest}", editedRequest);
+
+      Allocation allocation;
+
+      try
+      {
+        allocation = await _context.Allocations
+          .Include(o => o.Purpose)
+          .Include(o => o.Ressource)
+          .FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting allocation");
+        return NotFound();
+      }
+
+      if (allocation == null)
+      {
+        return NotFound();
+      }
+
+      try
+      {
+        allocation.Status = (MeetingStatus)editedRequest.status;
+        allocation.LastModified = DateTime.Now;
+        allocation.LastModifiedBy = base.RequestSender;
+        allocation.ApprovedAt = DateTime.Now;
+        allocation.ApprovedBy = base.RequestSender;
+
+        if ((MeetingStatus)editedRequest.status == MeetingStatus.Moved)
+        {
+          allocation.From = editedRequest.From.GetValueOrDefault();
+          allocation.To = editedRequest.To.GetValueOrDefault();
+        }
+          _context.Entry(allocation).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while editing and saving allocation");
+        return Conflict();
+      }
+
+      try
+      {
+        if ((MeetingStatus)editedRequest.status == MeetingStatus.Moved)
+        {
+          EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde verschoben von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
+        }
+        else if ((MeetingStatus)editedRequest.status == MeetingStatus.Approved)
+        {
+          EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde genehmigt von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
+        }
+        else if ((MeetingStatus)editedRequest.status == MeetingStatus.Clarification)
+        {
+          EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde abgelehnt", recipient: base.RequestSender.Email);
+        }
+      }
+
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while processing mails");
+      }
+
+      return Ok();
     }
   }
 }
