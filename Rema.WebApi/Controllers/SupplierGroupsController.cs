@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -21,92 +22,124 @@ namespace Rema.WebApi.Controllers
     {
     }
 
-    // GET: api/SupplierGroups
+    // GET: suppliergroups
     [HttpGet]
     public async Task<ActionResult<IEnumerable<SupplierGroup>>> GetSupplierGroups()
     {
-      return await _context.SupplierGroups.ToListAsync();
+      Log.Information("GET suppliergroups");
+
+      try
+      {
+        return await _context.SupplierGroups.ToListAsync();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting suppliergroups");
+        return NotFound();
+      }
     }
 
-    // GET: api/SupplierGroups/5
+    // GET: suppliergroups/5
     [HttpGet("{id}")]
     public async Task<ActionResult<SupplierGroup>> GetSupplierGroup(long id)
     {
-      var supplierGroup = await _context.SupplierGroups.FindAsync(id);
+      Log.Information("GET suppliergroups/{id}", id);
 
-      if (supplierGroup == null)
+      try
       {
+        var supplierGroup = await _context.SupplierGroups.FindAsync(id);
+        if (supplierGroup == null)
+        {
+          return NotFound();
+        }
+        return supplierGroup;
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting suppliergroup");
         return NotFound();
       }
-
-      return supplierGroup;
     }
 
-    // PUT: api/SupplierGroups/5
+    // PUT: suppliergroups/5
     [HttpPut("{id}")]
     [AuthorizeAd("Admin")]
     public async Task<IActionResult> PutSupplierGroup(long id, SupplierGroup supplierGroup)
     {
+      Log.Information("PUT suppliergroups/{id}: {supplierGroup}", id, supplierGroup);
+
       if (id != supplierGroup.Id)
       {
         return BadRequest();
       }
 
-      _context.Entry(supplierGroup).State = EntityState.Modified;
-
       try
-      {
+      { 
+        _context.Entry(supplierGroup).State = EntityState.Modified;
         await _context.SaveChangesAsync();
+        return NoContent();
       }
-      catch (DbUpdateConcurrencyException)
+      catch (Exception ex)
       {
-        if (!SupplierGroupExists(id))
-        {
-          return NotFound();
-        }
-        else
-        {
-          throw;
-        }
+        Log.Error(ex, "error while saving changed suppliergroup");
+        return Conflict();
       }
-
-      Log.Information("Supplier Group {@group.IdTitle} was updated by {@User.email}", supplierGroup.Id + supplierGroup.Title, base.RequestSender.Email);
-      return NoContent();
     }
 
-    // POST: api/SupplierGroups
+    // POST: suppliergroups
     [HttpPost]
     [AuthorizeAd("Admin")]
     public async Task<ActionResult<SupplierGroup>> PostSupplierGroup(SupplierGroup supplierGroup)
     {
-      _context.SupplierGroups.Add(supplierGroup);
-      await _context.SaveChangesAsync();
+      Log.Information("POST suppliergroups: {supplierGroup}", supplierGroup);
 
-      Log.Information("Supplier Group {@group.IdTitle} was inserted by {@User.email}", supplierGroup.Id + supplierGroup.Title, base.RequestSender.Email);
-      return CreatedAtAction("GetSupplierGroup", new { id = supplierGroup.Id }, supplierGroup);
+      try
+      {
+        _context.SupplierGroups.Add(supplierGroup);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction("GetSupplierGroup", new { id = supplierGroup.Id }, supplierGroup);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while saving new suppliergroup");
+        return Conflict();
+      }
     }
 
-    // DELETE: api/SupplierGroups/5
+    // DELETE: suppliergroups/5
     [HttpDelete("{id}")]
     [AuthorizeAd("Admin")]
     public async Task<ActionResult<SupplierGroup>> DeleteSupplierGroup(long id)
     {
-      var supplierGroup = await _context.SupplierGroups.FindAsync(id);
-      if (supplierGroup == null)
+      Log.Information("DELETE suppliergroup/{id}", id);
+
+      SupplierGroup supplierGroup;
+
+      try
       {
+        supplierGroup = await _context.SupplierGroups.FindAsync(id);
+        if (supplierGroup == null)
+        {
+          return NotFound();
+        }
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting suppliergroup");
         return NotFound();
       }
 
-      _context.SupplierGroups.Remove(supplierGroup);
-      await _context.SaveChangesAsync();
-
-      Log.Information("Supplier Group {@group.IdTitle} was deleted by {@User.email}", supplierGroup.Id + supplierGroup.Title, base.RequestSender.Email);
-      return supplierGroup;
-    }
-
-    private bool SupplierGroupExists(long id)
-    {
-      return _context.SupplierGroups.Any(e => e.Id == id);
+      try
+      {
+        _context.SupplierGroups.Remove(supplierGroup);
+        await _context.SaveChangesAsync();
+        return NoContent();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while remoning suppliergrup");
+        return Conflict();
+      }
     }
   }
 }
