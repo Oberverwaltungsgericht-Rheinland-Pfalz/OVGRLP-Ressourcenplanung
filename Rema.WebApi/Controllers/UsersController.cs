@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,6 +9,7 @@ using Rema.DbAccess;
 using Rema.Infrastructure.Models;
 using Rema.WebApi.Filter;
 using Rema.WebApi.ViewModels;
+using Serilog;
 
 namespace Rema.WebApi.Controllers
 {
@@ -21,120 +23,179 @@ namespace Rema.WebApi.Controllers
     {
     }
 
-    // GET: api/Users
+    // GET: users
     [HttpGet]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
-      return await _context.Users.ToListAsync();
+      Log.Information("GET users");
+      try
+      {
+        return await _context.Users.ToListAsync();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting users");
+        return NotFound();
+      }
     }
 
-    // GET: api/Users/5
-    [HttpGet("{id:long}")]
+    // GET: users/5
+    [HttpGet("{id}")]
     public async Task<ActionResult<User>> GetUser(long id)
     {
-      var user = await _context.Users.FindAsync(id);
+      Log.Information("GET users/{id}", id);
 
-      if (user == null)
+      try
       {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+          return NotFound();
+        }
+        return user;
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting user");
         return NotFound();
       }
-
-      return user;
     }
 
-    // GET: api/Users/Name/5
-    [HttpGet("Name/{id:long}")]
+    // GET: users/name/5
+    [HttpGet("name/{id}")]
     public async Task<ActionResult<ContactUser>> GetUserName(long id)
     {
-      var user = await _context.Users.FindAsync(id);
+      Log.Information("GET users/name/{id}", id);
 
-      if (user == null)
+      User user;
+      try
       {
+        user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+          return NotFound();
+        }
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting user");
         return NotFound();
       }
 
-      var userVM = _mapper.Map<User, ContactUser>(user);
-      return userVM;
+      try
+      {
+        var userVM = _mapper.Map<User, ContactUser>(user);
+        return userVM;
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while mapping user");
+        return Conflict();
+      }
     }
 
-    // GET: api/Users/me
+    // GET: users/me
     [HttpGet("me")]
     public ActionResult<UserViewModel> GetCurrentUser()
     {
-      return RequestSenderVM;
+      Log.Information("GET users/me");
+      try
+      {
+        return RequestSenderVM;
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting current user");
+        return NotFound();
+      }
     }
 
-    // GET: api/Users/contact/?namepart=NAMEPART
+    // GET: users/contact/?namepart=NAMEPART
     [HttpGet("contact")]
     public ActionResult<ContactUser> GetContactUser(string namepart)
     {
+      Log.Information("GET users/contact/?namepart=NAMEPART: {namepart}", namepart);
       // lookup ldap for user
       // return list of users as contactUser
       return null;
     }
 
-    // - PUT: api/Users/5
-    //[HttpPut("{id}")]
-    [NonAction]
+    // PUT: users/5
+    [HttpPut("{id}")]
     public async Task<IActionResult> PutUser(long id, User user)
     {
+      Log.Information("PUT users/{id}: {user}", id, user);
+
       if (id != user.Id)
       {
         return BadRequest();
       }
 
-      _context.Entry(user).State = EntityState.Modified;
+      try
+      {
+        _context.Entry(user).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+        return NoContent();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while saving changed user");
+        return Conflict();
+      }
+    }
+
+    // POST: users
+    [HttpPost]
+    public async Task<ActionResult<User>> PostUser(User user)
+    {
+      Log.Information("POST users: {user}", user);
+      
+      try
+      {
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction("GetUser", new { id = user.Id }, user);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while saving new user");
+        return Conflict();
+      }
+    }
+
+    // DELETE: users/5
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<User>> DeleteUser(long id)
+    {
+      Log.Information("DELETE users/{id}", id);
+
+      User user;
 
       try
       {
-        await _context.SaveChangesAsync();
-      }
-      catch (DbUpdateConcurrencyException)
-      {
-        if (!UserExists(id))
+        user = await _context.Users.FindAsync(id);
+        if (user == null)
         {
           return NotFound();
         }
-        else
-        {
-          throw;
-        }
       }
-
-      return NoContent();
-    }
-
-    // - POST: api/Users
-    // [HttpPost]
-    [NonAction]
-    public async Task<ActionResult<User>> PostUser(User user)
-    {
-      _context.Users.Add(user);
-      await _context.SaveChangesAsync();
-
-      return CreatedAtAction("GetUser", new { id = user.Id }, user);
-    }
-
-    // - DELETE: api/Users/5
-    // [HttpDelete("{id}")]
-    [NonAction]
-    public async Task<ActionResult<User>> DeleteUser(long id)
-    {
-      var user = await _context.Users.FindAsync(id);
-      if (user == null)
+      catch(Exception ex)
       {
+        Log.Error(ex, "error while getting user");
         return NotFound();
       }
 
-      _context.Users.Remove(user);
-      await _context.SaveChangesAsync();
-
-      return user;
-    }
-
-    private bool UserExists(long id)
-    {
-      return _context.Users.Any(e => e.Id == id);
+      try
+      {
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
+        return NoContent();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while removing user");
+        return Conflict();
+      }
     }
   }
 }
