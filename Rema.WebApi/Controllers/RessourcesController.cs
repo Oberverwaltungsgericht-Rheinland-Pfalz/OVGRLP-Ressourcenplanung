@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -21,92 +22,120 @@ namespace Rema.WebApi.Controllers
     {
     }
 
-    // GET: api/Ressources
+    // GET: ressources
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Ressource>>> GetRessources()
     {
-      return await _context.Ressources.ToListAsync();
+      Log.Information("GET ressources");
+      try
+      {
+        return await _context.Ressources.ToListAsync();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting ressources");
+        return Conflict();
+      }
     }
 
-    // GET: api/Ressources/5
+    // GET: ressources/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Ressource>> GetRessource(long id)
     {
-      var ressource = await _context.Ressources.FindAsync(id);
-
-      if (ressource == null)
+      try
       {
+        var ressource = await _context.Ressources.FindAsync(id);
+        if (ressource == null)
+        {
+          return NotFound();
+        }
+        return Ok(ressource);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting ressource");
         return NotFound();
       }
-
-      return ressource;
     }
 
-    // PUT: api/Ressources/5
+    // PUT: ressources/5
     [HttpPut("{id}")]
     [AuthorizeAd("Admin")]
     public async Task<IActionResult> PutRessource(long id, Ressource ressource)
     {
+      Log.Information("PUT ressource/{id}: {ressource}", id, ressource);
       if (id != ressource.Id)
       {
         return BadRequest();
       }
 
-      _context.Entry(ressource).State = EntityState.Modified;
-
       try
       {
+        _context.Entry(ressource).State = EntityState.Modified;
         await _context.SaveChangesAsync();
+        return NoContent();
       }
-      catch (DbUpdateConcurrencyException)
+      catch (Exception ex)
       {
-        if (!RessourceExists(id))
-        {
-          return NotFound();
-        }
-        else
-        {
-          throw;
-        }
+        Log.Error(ex, "error while saving changed ressource");
+        return Conflict();
       }
-
-      Log.Information("Ressource {@ressource.IdTitle} was updated by {@User.email}", ressource.Id + ressource.Name, base.RequestSender.Email);
-      return NoContent();
     }
 
-    // POST: api/Ressources
+    // POST: ressources
     [HttpPost]
     [AuthorizeAd("Admin")]
     public async Task<ActionResult<Ressource>> PostRessource(Ressource ressource)
     {
-      _context.Ressources.Add(ressource);
-      await _context.SaveChangesAsync();
+      Log.Information("POST ressources: {ressource}", ressource);
 
-      Log.Information("Ressource {@ressource.IdTitle} was inserted by {@User.email}", ressource.Id + ressource.Name, base.RequestSender.Email);
-      return CreatedAtAction("GetRessource", new { id = ressource.Id }, ressource);
+      try
+      {
+        _context.Ressources.Add(ressource);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction("GetRessource", new { id = ressource.Id }, ressource);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while saving new ressource");
+        return Conflict();
+      }
     }
 
-    // DELETE: api/Ressources/5
+    // DELETE: ressources/5
     [HttpDelete("{id}")]
     [AuthorizeAd("Admin")]
     public async Task<ActionResult<Ressource>> DeleteRessource(long id)
     {
-      var ressource = await _context.Ressources.FindAsync(id);
-      if (ressource == null)
+      Log.Information("DELETE ressources/{id}", id);
+
+      Ressource ressource;
+
+      try
       {
+        ressource = await _context.Ressources.FindAsync(id);
+        if (ressource == null)
+        {
+          return NotFound();
+        }
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting ressource");
         return NotFound();
       }
 
-      _context.Ressources.Remove(ressource);
-      await _context.SaveChangesAsync();
-
-      Log.Information("Ressource {@ressource.IdTitle} was deleted by {@User.email}", ressource.Id + ressource.Name, base.RequestSender.Email);
-      return ressource;
-    }
-
-    private bool RessourceExists(long id)
-    {
-      return _context.Ressources.Any(e => e.Id == id);
+      try
+      {
+        _context.Ressources.Remove(ressource);
+        await _context.SaveChangesAsync();
+        return NoContent();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while removing ressource");
+        return Conflict();
+      }
     }
   }
 }

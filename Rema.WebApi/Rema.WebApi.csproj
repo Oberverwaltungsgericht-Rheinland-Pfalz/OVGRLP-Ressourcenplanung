@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>0.8.0.20034</Version>
+    <Version>0.8.1.20043</Version>
     <AssemblyName>Rema.WebApi</AssemblyName>
   </PropertyGroup>
 
@@ -32,6 +32,8 @@
     <ProjectReference Include="..\Rema.Infrastructure\Rema.Infrastructure.csproj" />
     <ProjectReference Include="..\Rema.ServiceLayer\Rema.ServiceLayer.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 
 </Project>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -23,108 +24,171 @@ namespace Rema.WebApi.Controllers
     {
     }
 
-    // GET: api/Gadgets
+    // GET: gadgets
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GadgetViewModel>>> GetGadgets()
     {
-      var gadgets = await _context.Gadgets.Include(g => g.SuppliedBy).ToListAsync();
-      var gadgetVMS = gadgets.Select<Gadget, GadgetViewModel>((e) => _mapper.Map<Gadget, GadgetViewModel>(e));
+      Log.Information("GET gadgets");
 
-      Log.Information("GetGadgets was executed. {@gadets.Count} were send", gadgets.Count);
-      return gadgetVMS.ToList();
+      try
+      {
+        var gadgets = await _context.Gadgets.Include(g => g.SuppliedBy).ToListAsync();
+        var gadgetVMs = gadgets.Select<Gadget, GadgetViewModel>((e) => _mapper.Map<Gadget, GadgetViewModel>(e)).ToList();
+        return Ok(gadgetVMs);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting gadgets");
+        return NotFound();
+      }
     }
 
-    // GET: api/Gadgets/5
+    // GET: gadgets/5
     [HttpGet("{id}")]
     public async Task<ActionResult<GadgetViewModel>> GetGadget(long id)
     {
-      var gadget = await _context.Gadgets.FindAsync(id);
+      Log.Information("GET gadgets/{id}", id);
 
-      if (gadget == null)
+      try
       {
+        var gadget = await _context.Gadgets.FindAsync(id);
+
+        if (gadget == null)
+          return NotFound();
+
+        return Ok(_mapper.Map<Gadget, GadgetViewModel>(gadget));
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting gedget");
         return NotFound();
       }
-
-      return _mapper.Map<Gadget, GadgetViewModel>(gadget);
     }
 
-    // PUT: api/Gadgets/5
+    // POST: gadgets
+    [HttpPost]
+    [AuthorizeAd("Admin")]
+    public async Task<ActionResult<GadgetViewModel>> PostGadget(GadgetViewModel gadgetVM)
+    {
+      Log.Information("POST gadgets: {gadget}", gadgetVM);
+
+      Gadget gadget;
+
+      try
+      { 
+        gadget = new Gadget()
+        {
+          Id = gadgetVM.Id,
+          Title = gadgetVM.Title,
+          SuppliedBy = await _context.SupplierGroups.FindAsync(gadgetVM.SuppliedBy)
+        };
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while mapping gadget");
+        return Conflict();
+      }
+
+      try
+      {
+        _context.Gadgets.Add(gadget);
+        await _context.SaveChangesAsync();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "wrror while saving gadget");
+        return Conflict();
+      }
+
+      try
+      {
+        var returnGadget = _mapper.Map<Gadget, GadgetViewModel>(gadget);
+        return CreatedAtAction("GetGadget", new { id = gadget.Id }, returnGadget);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while mapping return gadget");
+        return Conflict();
+      }
+    }
+
+    // PUT: gadgets/5
     [HttpPut("{id}")]
     [AuthorizeAd("Admin")]
-    public async Task<IActionResult> PutGadget(long id, GadgetViewModel gadget)
+    public async Task<IActionResult> PutGadget(long id, GadgetViewModel gadgetVM)
     {
-      Gadget gad = await AddGroup(gadget);
-      if (id != gad.Id)
+      Log.Information("PUT gadgets/{id}: {gadget}", id, gadgetVM);
+
+      if(id != gadgetVM.Id)
       {
         return BadRequest();
       }
 
-      _context.Entry(gad).State = EntityState.Modified;
+      Gadget gadget;
 
       try
       {
+        gadget = new Gadget()
+        {
+          Id = gadgetVM.Id,
+          Title = gadgetVM.Title,
+          SuppliedBy = await _context.SupplierGroups.FindAsync(gadgetVM.SuppliedBy)
+        };
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while mapping gadget");
+        return Conflict();
+      }
+
+      try
+      {
+        _context.Entry(gadget).State = EntityState.Modified;
         await _context.SaveChangesAsync();
       }
-      catch (DbUpdateConcurrencyException)
+      catch (Exception ex)
       {
-        if (!GadgetExists(id))
-        {
-          return NotFound();
-        }
-        else
-        {
-          throw;
-        }
+        Log.Error(ex, "error while saving gadget");
+        return Conflict();
       }
 
-      Log.Information("Gadget {@gadets.IdTitle} was updated by {@User.email}", gadget.Id + gadget.Title, base.RequestSender.Email);
-      return NoContent();
+      return Ok();
     }
 
-    // POST: api/Gadgets
-    [HttpPost]
-    [AuthorizeAd("Admin")]
-    public async Task<ActionResult<GadgetViewModel>> PostGadget(GadgetViewModel gadget)
-    {
-      Gadget gad = await AddGroup(gadget);
-      _context.Gadgets.Add(gad);
-      await _context.SaveChangesAsync();
-
-      EmailTrigger.SendEmail("Hilfsmittel erzeugt", $"{gadget.Title} wurde erstellt", recipient: base.RequestSender.Email);
-      Log.Information("Gadget {@gadets.IdTitle} was inserted by {@User.email}", gadget.Id + gadget.Title, base.RequestSender.Email);
-      var returnGadget = _mapper.Map<Gadget, GadgetViewModel>(gad);
-      return CreatedAtAction("GetGadget", new { id = gad.Id }, returnGadget);
-    }
-
-    private async Task<Gadget> AddGroup(GadgetViewModel gadget)
-    {
-      var supplier = await _context.SupplierGroups.FindAsync(gadget.SuppliedBy);
-      Gadget gad = new Gadget() { Title = gadget.Title, SuppliedBy = supplier };
-      if (gadget.Id != 0) gad.Id = gadget.Id;
-      return gad;
-    }
-
-    // DELETE: api/Gadgets/5
+    // DELETE: gadgets/5
     [HttpDelete("{id}")]
     [AuthorizeAd("Admin")]
     public async Task<ActionResult<Gadget>> DeleteGadget(long id)
     {
-      var gadget = await _context.Gadgets.FindAsync(id);
-      if (gadget == null)
+      Log.Information("DELETE gadgets/{id}", id);
+
+      Gadget gadget;
+
+      try
       {
+        gadget = await _context.Gadgets.FindAsync(id);
+        if (gadget == null)
+        {
+          return NotFound();
+        }
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting gadget");
         return NotFound();
       }
-
-      _context.Gadgets.Remove(gadget);
-      await _context.SaveChangesAsync();
-
-      Log.Information("Gadget {@gadets.IdTitle} was deleted by {@User.email}", gadget.Id + gadget.Title, base.RequestSender.Email);
-      return gadget;
-    }
-
-    private bool GadgetExists(long id)
-    {
-      return _context.Gadgets.Any(e => e.Id == id);
+      
+      try
+      {
+        _context.Gadgets.Remove(gadget);
+        await _context.SaveChangesAsync();
+        return NoContent();
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while removing gadget");
+        return Conflict();
+      }
     }
   }
 }
