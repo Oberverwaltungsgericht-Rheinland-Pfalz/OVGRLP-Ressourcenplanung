@@ -148,6 +148,17 @@ namespace Rema.WebApi.Controllers
       Log.Information("POST allocation: {allocation}", allocationVM);
 
       Allocation allocation;
+      User requestedUser;
+
+      try
+      {
+        requestedUser = await _context.Users.FindAsync(this.RequestSender.Id);
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while getting request sender");
+        return Conflict();
+      }
 
       try
       {
@@ -180,7 +191,7 @@ namespace Rema.WebApi.Controllers
       try
       {
         allocation.LastModified = DateTime.Now;
-        allocation.LastModifiedBy = base.RequestSender;
+        allocation.LastModifiedBy = requestedUser;
       }
       catch (Exception ex)
       {
@@ -190,7 +201,7 @@ namespace Rema.WebApi.Controllers
       try
       {
         allocation.CreatedAt = DateTime.Now;
-        allocation.CreatedBy = base.RequestSender;
+        allocation.CreatedBy = requestedUser;
       }
       catch (Exception ex)
       {
@@ -199,7 +210,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation.ApprovedBy = base.RequestSender;
+        allocation.ApprovedBy = requestedUser;
       }
       catch (Exception ex)
       {
@@ -223,7 +234,7 @@ namespace Rema.WebApi.Controllers
       {
         if (allocationVM.ReferencePerson_id == 0)
         {
-          allocation.ReferencePerson = base.RequestSender;
+          allocation.ReferencePerson = requestedUser;
         }
         else
         {
