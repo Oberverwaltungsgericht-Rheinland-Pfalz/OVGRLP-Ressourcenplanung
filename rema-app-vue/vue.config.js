@@ -2,6 +2,7 @@
 const Agent = require('agentkeepalive')
 
 module.exports = {
+  transpileDependencies: ['vuetify'],
   devServer: {
     port: 5002,
     proxy: {
