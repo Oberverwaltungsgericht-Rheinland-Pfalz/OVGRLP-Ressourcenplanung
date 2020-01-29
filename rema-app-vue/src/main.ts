@@ -1,4 +1,3 @@
-import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import Vue from 'vue'
 import './plugins/axios'
 import App from './App.vue'
@@ -6,26 +5,13 @@ import router from './router'
 import store from '@/store/index'
 import './registerServiceWorker'
 import dayjs from 'dayjs'
-
-import VuetifyDialog from 'vuetify-dialog'
-import 'vuetify-dialog/dist/vuetify-dialog.css'
-import Vuetify from 'vuetify'
-import 'vuetify/dist/vuetify.min.css'
 import 'dayjs/locale/de' // load on demand
+import vuetify from './plugins/vuetify'
+import '@mdi/font/css/materialdesignicons.css'
 
 dayjs.locale('de')
-Vue.use(Vuetify, {
-  iconfont: 'md'
-})
 
 Vue.config.productionTip = false
-
-const vuetify = new Vuetify({})
-Vue.use(VuetifyDialog, {
-  context: {
-    vuetify
-  }
-})
 
 Vue.filter('toLocal', (dateVal: Date) =>
   dayjs(dateVal).format(' DD.MM.YYYY hh:mm')
