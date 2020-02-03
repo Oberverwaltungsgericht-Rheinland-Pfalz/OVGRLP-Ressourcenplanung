@@ -9,6 +9,8 @@ import 'dayjs/locale/de' // load on demand
 import vuetify from './plugins/vuetify'
 import '@mdi/font/css/materialdesignicons.css'
 
+import './plugins/moment'
+
 dayjs.locale('de')
 
 Vue.config.productionTip = false
