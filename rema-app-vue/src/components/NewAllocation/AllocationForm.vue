@@ -8,164 +8,100 @@
     </v-card-title>
     <v-card-text>
       <v-container>
-        <v-text-field v-model="Title" label="Titel" required></v-text-field>
         <v-row>
-          <v-col cols="2">
-            <v-switch
-              style="margin:0"
-              v-model="isWholeDay"
-              :label="`Ganztägiges Ereignis`"
-            ></v-switch>
+          <v-col>
+            <v-text-field
+              v-model="title"
+              label="Titel"
+              required
+              placeholder="Bitte geben Sie einen Titel für den Termin an."
+            ></v-text-field>
           </v-col>
-          <v-col v-if="!isWholeDay && isRepeating" cols="6" id="repeatingTime">
-            Jeweils von: <input v-model="timeFrom" type="time" /> bis:
-            <input v-model="timeTo" type="time" />
+          <v-col>
+            <v-combobox
+              v-model="ressourceId"
+              :items="Rooms"
+              item-text="Name"
+              item-value="Id"
+              clearable
+              placeholder="Bitte wählen Sie einen Raum aus."
+              label="Raum"
+            />
           </v-col>
         </v-row>
-        <v-switch
-          style="margin:0"
-          v-model="isRepeating"
-          :label="`Wiederkehrender Termin`"
-        ></v-switch>
-
-        <div v-show="!isRepeating">
-          <label for="meeting-From"
-            >Vom:
-            <input
-              :value="dateFrom"
-              @input="dateFrom = $event.target.value"
-              :type="dateInputType"
-              step="900"
-              id="meeting-from"
-              name="meeting-time"
-              :min="today"
-          /></label>
-
-          <label
-            >Bis:
-            <input
-              :value="dateTo"
-              @input="dateTo = $event.target.value"
-              :type="dateInputType"
-              @change="dateToChanged = true"
-              name="meeting-time"
-              id="meeting-to"
-              step="900"
-              :min="today"
-          /></label>
-        </div>
-
-        <div v-show="isRepeating">
-          <v-menu
-            ref="showMultipleDatesMenu"
-            v-model="showMultipleDatesMenu"
-            :close-on-content-click="false"
-            :return-value.sync="multipleDates"
-            transition="scale-transition"
-            offset-y
-            min-width="290px"
-          >
-            <template v-slot:activator="{ on }">
-              <v-combobox
-                v-model="multipleDates"
-                multiple
-                chips
-                small-chips
-                label="Gewählte Termine"
-                prepend-icon="event"
-                readonly
-                v-on="on"
-              >
-                <template v-slot:selection="data">
-                  <v-chip
-                    >{{ data.item | toLocalDate }}
-                    <v-icon right @click="removeDate(data.item)"
-                      >close</v-icon
-                    ></v-chip
-                  >
-                </template>
-              </v-combobox>
-            </template>
-            <v-date-picker
-              v-model="multipleDates"
-              locale="de"
+        <v-divider />
+        <v-row>
+          <v-col cols="5">
+            <!-- Datum von -->
+            <date-time-picker
+              label="von"
+              v-model="dateFrom"
+              :with-time="!fullday"
+              placeholder="Bitte wählen Sie ein Datum aus."
+            />
+          </v-col>
+          <v-col cols="5">
+            <!-- Datum bis -->
+            <date-time-picker
+              label="bis"
+              v-model="dateTo"
+              :with-time="!fullday"
+              placeholder="Bitte wählen Sie ein Datum aus."
+            />
+          </v-col>
+          <v-col>
+            <v-checkbox v-model="fullday" label="ganztägig"></v-checkbox>
+          </v-col>
+        </v-row>
+        <v-divider />
+        <v-row>
+          <v-col v-for="(group, idx) in GadgetGroups" :key="idx + 'group'" cols="6">
+            <v-combobox
+              v-model="selectedGadgets"
+              :items="getGadgets(group.Id)"
+              :label="'Hilsmittel (' + group.Title + ')'"
+              item-text="Title"
+              item-value="Id"
+              placeholder="Bitte wählen Sie Hilfmittel aus."
               multiple
-              no-title
-              scrollable
+              clearable
             >
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="showMultipleDatesMenu = false"
-                >Cancel</v-btn
-              >
-              <v-btn
-                text
-                color="primary"
-                @click="$refs.showMultipleDatesMenu.save(multipleDates)"
-                >OK</v-btn
-              >
-            </v-date-picker>
-          </v-menu>
-        </div>
-
-        <v-select
-          v-model="selectedRessourceId"
-          :items="Rooms"
-          item-text="Name"
-          item-value="Id"
-          label="Raum"
-        />
-
-        <div v-for="(group, idx) in GadgetGroups" :key="idx + 'group'">
-          <v-select
-            v-model="seltedGadgets"
-            :items="getGadgets(group.Id)"
-            :label="'Hilfsmittel der ' + group.Title"
-            item-text="Title"
-            item-value="Id"
-            multiple
-            chips
-            persistent-hint
-          />
-        </div>
-
-        <!-- Todo: Autocomplete mit Namenseingabe und GET Webservice, welcher von AD gespeist wird-->
-        <v-combobox
-          v-model="contactPerson2"
-          :search-input.sync="contactPerson"
-          :items="contactPersons"
-          label="Ansprechpartner/In"
-          required
-        ></v-combobox>
-        {{ contactPerson }}{{ contactPerson2 }}
-        <!--<v-text-field
-        v-model="contactPerson"
-        label="Ansprechpartner/In"
-        required
-        ></v-text-field>-->
-        <v-text-field
-          v-model="telNumber"
-          type="tel"
-          label="Telefonnummer"
-          required
-        ></v-text-field>
-
-        <v-textarea
-          v-model="Description"
-          :label="'Beschreibung'"
-          auto-grow
-          clearable
-          outlined
-          rounded
-        ></v-textarea>
-
-        <v-textarea
-          v-model="Notes"
-          :label="'Notizen'"
-          auto-grow
-          clearable
-          outlined
-          rounded
-        ></v-textarea>
+            </v-combobox>
+          </v-col>
+        </v-row>
+        <v-divider />
+        <v-row>
+          <v-col>
+            <v-text-field
+              v-model="contactPerson"
+              label="Ansprechpartner(in)"
+              placeholder="Bitte geben Sie eine(n) Ansprechpartner(in) an."
+              required
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              v-model="telNumber"
+              type="tel"
+              label="Telefonnummer"
+              placeholder="Bitte geben Sie eine Telefonnummer an."
+              required
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-divider />
+        <v-row>
+          <v-col>
+            <v-textarea
+              v-model="Notes"
+              :label="'Notizen'"
+              auto-grow
+              clearable
+              outlined
+              rounded
+            ></v-textarea>
+          </v-col>
+        </v-row>
       </v-container>
     </v-card-text>
     <v-card-actions>
@@ -203,40 +139,46 @@ import AllocationPurposes, {
   AllocationPurposeModel
 } from '../../models/AllocationpurposeModel'
 import Allocations, { AllocationModel } from '../../models/AllocationModel'
-import dayjs from 'dayjs'
+import DateTimePicker from '@/components/DateTimePicker.vue'
 
-@Component
+@Component({
+  components: {
+    DateTimePicker
+  }
+})
 export default class AllocationForm extends Vue {
-  public isRepeating: boolean = false
-  public valid: boolean = false
-  public editId: number = 0
-  public isWholeDay: boolean = true
-  private Title: string = ''
-  private Description: string = ''
-  private Notes: string = ''
-  private Email: string = ''
-  private timeFrom: string = '08:00'
-  private timeTo: string = '17:00'
-  private dateFromIntern: Date = new Date(new Date().setHours(8, 0, 0, 0))
-  private dateToIntern: Date = new Date(new Date().setHours(16, 0, 0, 0))
-  private dateToChanged: boolean = false
-  private selectedRessourceId: number = 0
-  private seltedGadgets: number[] = []
-  private telNumber: string = ''
-  private contactPerson: number = 0
-  private multipleDates: string[] = []
-  private showMultipleDatesMenu: boolean = false
+  title: String = '';
+  ressourceId: any = null;
+  dateFrom: string = '';
+  dateTo: string = '';
+  fullday: boolean = false;
+  notes: string = '';
+  seltedGadgets: number[] = [];
+  telNumber: string = '';
+  contactPerson: string = '';
 
-  private contactPersons: string[] = ['']
-  private contactPerson2: string = ''
+  // public isRepeating: boolean = false
+  // public valid: boolean = false
+  // public editId: number = 0
+  // private Description: string = ''
+
+  // private Email: string = ''
+  // private timeFrom: string = '08:00'
+  // private timeTo: string = '17:00'
+  // private dateToIntern: Date = new Date(new Date().setHours(16, 0, 0, 0))
+  // private dateToChanged: boolean = false
+  // private multipleDates: string[] = []
+  // private showMultipleDatesMenu: boolean = false
 
   private get permissionToEdit (): boolean {
     return this.$store.state.user.role >= 10
   }
 
   private async sendAllocation (status: number) {
-    const purposeId = await this.savePurpose()
-    console.log('purposeid ' + purposeId)
+    // const purposeId = await this.savePurpose()
+    // console.log('purposeid ' + purposeId)
+    // this.saveAllocation(status, purposeId)
+    /*
     if (this.isRepeating) {
       this.multipleDates.forEach(e => {
         this.saveAllocation(status, purposeId, e)
@@ -244,6 +186,7 @@ export default class AllocationForm extends Vue {
     } else {
       this.saveAllocation(status, purposeId)
     }
+    */
     this.close()
   }
 
@@ -252,6 +195,7 @@ export default class AllocationForm extends Vue {
     purpose: AllocationPurposeModel,
     date?: string
   ) {
+    /*
     let from = this.dateFrom
     let to = this.dateTo
     if (date) {
@@ -263,7 +207,8 @@ export default class AllocationForm extends Vue {
         to = `${date}T${this.timeTo}`
       }
     }
-
+    */
+    /* TODO: save with date
     await Allocations.api().post('allocations', {
       From: from,
       To: to,
@@ -272,9 +217,11 @@ export default class AllocationForm extends Vue {
       Purpose_id: purpose,
       Ressource_id: this.selectedRessourceId
     })
+    */
   }
 
   private async savePurpose () {
+    /*
     const response = await AllocationPurposes.api().post('allocationPurposes', {
       Title: this.Title,
       Description: this.Description,
@@ -297,14 +244,15 @@ export default class AllocationForm extends Vue {
         { position: 'top-center' }
       )
     }
+    */
   }
   private close () {
-    this.clearAll()
+    // this.clearAll()
     this.$emit('close')
   }
   public get formInvalid () {
     let rValue = true
-    if (!this.selectedRessourceId) rValue = false
+    if (!this.ressourceId) rValue = false
     return !rValue
   }
 
@@ -316,6 +264,7 @@ export default class AllocationForm extends Vue {
   }
 
   // dateFrom
+  /*
   private get dateFrom (): string {
     if (this.isWholeDay) {
       return dayjs(this.dateFromIntern).format('YYYY-MM-DD')
@@ -327,8 +276,10 @@ export default class AllocationForm extends Vue {
     this.dateFromIntern = new Date(val)
     if (!this.dateToChanged) this.dateTo = val
   }
+  */
 
   // dateTo
+  /*
   private get dateTo (): string {
     if (this.isWholeDay) {
       return dayjs(this.dateToIntern).format('YYYY-MM-DD')
@@ -339,7 +290,9 @@ export default class AllocationForm extends Vue {
   private set dateTo (val: string) {
     this.dateToIntern = new Date(val)
   }
+  */
 
+  /*
   private get dateInputType (): string {
     if (this.isWholeDay) return 'date'
     else return 'datetime-local'
@@ -349,6 +302,7 @@ export default class AllocationForm extends Vue {
     if (this.isWholeDay) return dayjs().format('YYYY-MM-DD')
     else return dayjs().format('YYYY-MM-DDThh:mm')
   }
+  */
 
   private getGadgets (groupId: number) {
     return Gadgets.query()
@@ -356,23 +310,23 @@ export default class AllocationForm extends Vue {
       .get()
   }
 
+  /*
   private removeDate (item: string) {
     const idx = this.multipleDates.findIndex(v => v === item)
     this.multipleDates.splice(idx, 1)
   }
+  */
+
   private clearAll () {
-    this.Title = ''
-    this.Description = ''
-    this.Notes = ''
+    this.title = ''
+    this.notes = ''
     this.telNumber = ''
-    this.contactPerson = 0
-    this.multipleDates = []
-    this.isRepeating = false
-    this.dateFromIntern = new Date(new Date().setHours(8, 0, 0, 0))
-    this.dateToIntern = new Date(new Date().setHours(16, 0, 0, 0))
-    this.timeFrom = '08:00'
-    this.timeTo = '17:00'
-    this.selectedRessourceId = 0
+    this.contactPerson = ''
+    this.dateFrom = ''
+    this.dateTo = ''
+    this.fullday = false
+    this.ressourceId = null
+    this.seltedGadgets = []
   }
 }
 </script>
