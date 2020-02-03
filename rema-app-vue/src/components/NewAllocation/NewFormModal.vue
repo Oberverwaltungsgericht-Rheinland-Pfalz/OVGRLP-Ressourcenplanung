@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" scrollable>
+  <v-dialog v-model="dialog" scrollable persistent max-width="1200px">
     <template v-slot:activator="{ on }">
       <v-btn color="success" dark v-on="on">
         <v-icon>add</v-icon>Termin anlegen
