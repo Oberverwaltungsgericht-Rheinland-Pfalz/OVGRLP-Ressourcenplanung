@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Rema.Infrastructure.Models
 {
+  [Obsolete]
   public class AllocationPurpose
   {
     public AllocationPurpose()
