@@ -5,6 +5,8 @@
       :items="items"
       :disable-pagination="true"
       hide-default-footer
+      height="75vh"
+      fixed-header
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
