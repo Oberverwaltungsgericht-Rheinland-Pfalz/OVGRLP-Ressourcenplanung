@@ -1,6 +1,13 @@
 <template>
   <v-layout column>
-    <v-data-table :headers="headers" :items="items" :disable-pagination="true" hide-default-footer>
+    <v-data-table
+      :headers="headers"
+      :items="items"
+      :disable-pagination="true"
+      hide-default-footer
+      height="75vh"
+      fixed-header
+    >
       <template v-slot:top>
         <v-toolbar flat color="white">
           <v-btn @click="dialog = 1" color="primary">
@@ -13,19 +20,24 @@
         <v-icon @click="editItem(item)">edit</v-icon>
         <v-icon @click="deleteItem(item)">delete</v-icon>
       </template>
-      <template v-slot:item.SuppliedBy="{ item }">{{item.SuppliedBy | supplierName}}</template>
+      <template v-slot:item.SuppliedBy="{ item }">{{
+        item.SuppliedBy | supplierName
+      }}</template>
     </v-data-table>
-
     <v-dialog :value="dialog" persistent max-width="600px" scrollable>
       <v-card>
         <v-card-title>
-          <span class="headline">{{ModalTitle}}: {{editTitle}}</span>
+          <span class="headline">{{ ModalTitle }}: {{ editTitle }}</span>
         </v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
               <v-col cols="12">
-                <v-text-field label="Bezeichnung*" v-model="editTitle" required></v-text-field>
+                <v-text-field
+                  label="Bezeichnung*"
+                  v-model="editTitle"
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-select
@@ -42,7 +54,11 @@
         </v-card-text>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn color="green darken-1" :disabled="invalidForm" @click="updateItem">
+          <v-btn
+            color="green darken-1"
+            :disabled="invalidForm"
+            @click="updateItem"
+          >
             <v-icon>save</v-icon>Speichern
           </v-btn>
           <v-btn color="orange darken-1" text @click="closeModal">
@@ -69,18 +85,18 @@ import Gadgets, { GadgetModel } from '../../models/GadgetModel'
   }
 })
 export default class SupplierManagement extends Vue {
-  private dialog: number = 0;
-  private editId: number = 0;
-  private editTitle: string = '';
-  private editSupplier: string = '';
+  private dialog: number = 0
+  private editId: number = 0
+  private editTitle: string = ''
+  private editSupplier: string = ''
 
-  private nameRules = [(v: string) => !!v || 'Name is required'];
-  private valid: boolean = false;
+  private nameRules = [(v: string) => !!v || 'Name is required']
+  private valid: boolean = false
   private headers: object[] = [
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Unterstützergruppe', value: 'SuppliedBy' },
     { text: 'Bearbeiten', value: 'action', sortable: false }
-  ];
+  ]
 
   private get ModalTitle () {
     if (this.dialog === 1) return 'Neues Hilfsmittel'
@@ -152,7 +168,9 @@ export default class SupplierManagement extends Vue {
       ]
     })
 
-    if (confirmation === true) { Gadgets.api().delete(`gadgets/${item.Id}`, { delete: item.Id }) }
+    if (confirmation === true) {
+      Gadgets.api().delete(`gadgets/${item.Id}`, { delete: item.Id })
+    }
   }
 }
 </script>
