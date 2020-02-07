@@ -18,7 +18,7 @@
             ></v-text-field>
           </v-col>
           <v-col>
-            <v-combobox
+            <v-select
               v-model="ressourceId"
               :items="Rooms"
               item-text="Name"
@@ -26,6 +26,7 @@
               clearable
               placeholder="Bitte wählen Sie einen Raum aus."
               label="Raum"
+              :menu-props="{ offsetY: true }"
             />
           </v-col>
         </v-row>
@@ -94,7 +95,7 @@
         <v-row>
           <v-col>
             <v-textarea
-              v-model="Notes"
+              v-model="notes"
               :label="'Notizen'"
               auto-grow
               clearable
@@ -146,12 +147,12 @@ import DateTimePicker from '@/components/DateTimePicker.vue'
 })
 export default class AllocationForm extends Vue {
   title: String = '';
-  ressourceId: any = null;
+  ressourceId: number | any = null;
   dateFrom: string = '';
   dateTo: string = '';
   fullday: boolean = false;
   notes: string = '';
-  seltedGadgets: number[] = [];
+  selectedGadgets: number[] = [];
   telNumber: string = '';
   contactPerson: string = '';
 
@@ -173,6 +174,8 @@ export default class AllocationForm extends Vue {
   }
 
   private async sendAllocation (status: number) {
+    this.saveAllocation(status)
+
     // const purposeId = await this.savePurpose()
     // console.log('purposeid ' + purposeId)
     // this.saveAllocation(status, purposeId)
@@ -192,6 +195,20 @@ export default class AllocationForm extends Vue {
     status: number,
     date?: string
   ) {
+    let newAllocation = {
+      from: this.dateFrom,
+      to: this.dateTo,
+      title: this.title,
+      notes: this.notes,
+      isAllDay: this.fullday,
+      ressourceId: this.ressourceId,
+      gadgetsIds: [...this.selectedGadgets],
+      contactName: this.contactPerson,
+      contactPhone: this.telNumber
+    }
+
+    await Allocations.api().post('allocations', newAllocation)
+
     /*
     let from = this.dateFrom
     let to = this.dateTo
@@ -323,12 +340,10 @@ export default class AllocationForm extends Vue {
     this.dateTo = ''
     this.fullday = false
     this.ressourceId = null
-    this.seltedGadgets = []
+    this.selectedGadgets = []
   }
 }
 </script>
 
 <style lang="stylus">
-#repeatingTime input[type="time"]
-  border-bottom 1px solid darkgray
 </style>
