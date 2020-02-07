@@ -56,17 +56,18 @@
         <v-divider />
         <v-row>
           <v-col v-for="(group, idx) in GadgetGroups" :key="idx + 'group'" cols="6">
-            <v-combobox
+            <v-select
               v-model="selectedGadgets"
               :items="getGadgets(group.Id)"
               :label="'Hilsmittel (' + group.Title + ')'"
               item-text="Title"
               item-value="Id"
+              :menu-props="{ top: true, offsetY: true }"
               placeholder="Bitte wählen Sie Hilfmittel aus."
               multiple
               clearable
             >
-            </v-combobox>
+            </v-select>
           </v-col>
         </v-row>
         <v-divider />
