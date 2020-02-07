@@ -1,6 +1,5 @@
 import { Model } from '@vuex-orm/core'
 import Ressource from './RessourceModel'
-import Allocationpurpose from './AllocationpurposeModel'
 
 export default class Allocation extends Model {
   // This is the name used as module name of the Vuex Store.
@@ -13,6 +12,7 @@ export default class Allocation extends Model {
       Id: this.attr(null),
       From: this.attr(null),
       To: this.attr(null),
+      Title: this.attr(null),
       IsAllDay: this.attr(true),
       Status: this.attr(0),
       CreatedBy: this.attr(null),
@@ -23,9 +23,7 @@ export default class Allocation extends Model {
       ApprovedAt: this.attr(null),
       ReferencePerson: this.attr(''),
       Ressource_id: this.attr(null),
-      Ressource: this.belongsTo(Ressource, 'Ressource_id', 'Id'),
-      Purpose: this.belongsTo(Allocationpurpose, 'Purpose_id', 'Id'),
-      Purpose_id: this.attr(null)
+      Ressource: this.belongsTo(Ressource, 'Ressource_id', 'Id')
     }
   }
 }
