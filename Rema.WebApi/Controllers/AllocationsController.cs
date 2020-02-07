@@ -28,7 +28,7 @@ namespace Rema.WebApi.Controllers
 
     // GET: allocations
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<object>>> GetAllocations()
+    public async Task<ActionResult<IEnumerable<AllocationViewModel>>> GetAllocations()
     {
       Log.Information("GET allocations");
 
@@ -38,9 +38,9 @@ namespace Rema.WebApi.Controllers
       {
         allocations = await _context.Allocations
           .Include(g => g.Ressource)
-          .Include(g => g.Purpose)
           .Include(g => g.ApprovedBy)
           .Include(g => g.CreatedBy)
+          .Include(g => g.AllocationGadgets)
           .Include(g => g.LastModifiedBy)
           .Include(g => g.ReferencePerson)
           .ToListAsync();
@@ -53,7 +53,9 @@ namespace Rema.WebApi.Controllers
 
       try
       {
+        var allMapped = allocations.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
         //var allMapped = all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
+        /*
         var p = (from a in _context.Allocations
                  select new
                  {
@@ -63,7 +65,6 @@ namespace Rema.WebApi.Controllers
                    IsAllDay = a.IsAllDay,
                    Status = a.Status,
                    Ressource_id = a.Ressource.Id,
-                   Purpose_id = a.Purpose.Id,
                    CreatedBy = a.CreatedBy.Id,
                    CreatedAt = a.CreatedAt,
                    LastModified = a.LastModified,
@@ -72,8 +73,8 @@ namespace Rema.WebApi.Controllers
                    ApprovedAt = a.ApprovedAt,
                    ReferencePerson = a.ReferencePerson.Id
                  }).ToList();
-
-        return Ok(p);
+        */
+        return Ok(allMapped);
       }
       catch (Exception ex)
       {
@@ -154,7 +155,7 @@ namespace Rema.WebApi.Controllers
       {
         requestedUser = await _context.Users.FindAsync(this.RequestSender.Id);
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting request sender");
         return Conflict();
@@ -168,15 +169,6 @@ namespace Rema.WebApi.Controllers
       {
         Log.Error(ex, "error while mapping allocation");
         return BadRequest();
-      }
-
-      try
-      {
-        allocation.Purpose = await _context.AllocationPurposes.FindAsync(allocationVM.Purpose_id);
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting purpose");
       }
 
       try
@@ -252,7 +244,7 @@ namespace Rema.WebApi.Controllers
         _context.Allocations.Add(allocation);
         await _context.SaveChangesAsync();
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while saving the new allocation");
         return Conflict();
@@ -265,7 +257,7 @@ namespace Rema.WebApi.Controllers
           allocation.Status = allocationVM.Status;
           EmailTrigger.SendEmail(
             "Buchung wurde erstellt",
-            $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} " +
+            $"Ihre Buchungsanfrage {allocation.Title} der Ressource {allocation.Ressource.Name} " +
             $"vom {allocation.From} bis {allocation.To} wurde vorgenommen",
             recipient: base.RequestSender.Email);
         }
@@ -274,11 +266,11 @@ namespace Rema.WebApi.Controllers
           allocation.Status = MeetingStatus.Pending;
           EmailTrigger.SendEmail(
             "Anfrage wurde erstellt",
-            $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} " +
+            $"Ihre Buchungsanfrage {allocation.Title} der Ressource {allocation.Ressource.Name} " +
             $"vom {allocation.From} bis {allocation.To} wurde gestellt", recipient: base.RequestSender.Email);
         }
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while processing mails");
       }
@@ -288,7 +280,7 @@ namespace Rema.WebApi.Controllers
         var returnAllocation = _mapper.Map<Allocation, AllocationViewModel>(allocation);
         return CreatedAtAction("GetAllocation", new { id = allocation.Id }, returnAllocation);
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while mapping save allocation to result");
       }
@@ -307,11 +299,10 @@ namespace Rema.WebApi.Controllers
       try
       {
         allocation = await _context.Allocations
-          .Include(o => o.Purpose)
           .Include(o => o.Ressource)
           .FirstOrDefaultAsync(i => i.Id == id);
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting allocation");
         return NotFound();
@@ -327,7 +318,7 @@ namespace Rema.WebApi.Controllers
         _context.Allocations.Remove(allocation);
         await _context.SaveChangesAsync();
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while deleting allocation");
       }
@@ -341,12 +332,11 @@ namespace Rema.WebApi.Controllers
       //TODO: Aktuell wird hier garnicht gefiltert
 
       Log.Information("GET allocations/filter/{filter}", filter);
-      
+
       try
       {
         var all = await _context.Allocations
           .Include(g => g.Ressource)
-          .Include(g => g.Purpose)
           .Include(g => g.ApprovedBy)
           .Include(g => g.CreatedBy)
           .Include(g => g.LastModifiedBy)
@@ -363,7 +353,6 @@ namespace Rema.WebApi.Controllers
                    IsAllDay = a.IsAllDay,
                    Status = a.Status,
                    Ressource_id = a.Ressource.Id,
-                   Purpose_id = a.Purpose.Id,
                    CreatedBy = a.CreatedBy,
                    CreatedAt = a.CreatedAt,
                    LastModified = a.LastModified,
@@ -374,7 +363,7 @@ namespace Rema.WebApi.Controllers
                  }).ToList();
         return Ok(p);
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting filtered allocation");
         return NotFound();
@@ -388,24 +377,24 @@ namespace Rema.WebApi.Controllers
       Log.Information("PUT allocations/status/{id}: {status}", id, status);
 
       Allocation allocation;
-            
+
       try
       {
         allocation = await _context.Allocations.FindAsync(id);
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting allocation");
         return NotFound();
       }
-      
+
       if (allocation == null)
       {
         return NotFound();
       }
 
       try
-      { 
+      {
         allocation.Status = (MeetingStatus)status;
         allocation.LastModified = DateTime.Now;
         allocation.LastModifiedBy = base.RequestSender;
@@ -433,11 +422,10 @@ namespace Rema.WebApi.Controllers
       try
       {
         allocation = await _context.Allocations
-          .Include(o => o.Purpose)
           .Include(o => o.Ressource)
           .FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting allocation");
         return NotFound();
@@ -461,10 +449,10 @@ namespace Rema.WebApi.Controllers
           allocation.From = editedRequest.From.GetValueOrDefault();
           allocation.To = editedRequest.To.GetValueOrDefault();
         }
-          _context.Entry(allocation).State = EntityState.Modified;
+        _context.Entry(allocation).State = EntityState.Modified;
         await _context.SaveChangesAsync();
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while editing and saving allocation");
         return Conflict();
@@ -474,19 +462,19 @@ namespace Rema.WebApi.Controllers
       {
         if ((MeetingStatus)editedRequest.status == MeetingStatus.Moved)
         {
-          EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde verschoben von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
+          EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde verschoben von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
         }
         else if ((MeetingStatus)editedRequest.status == MeetingStatus.Approved)
         {
-          EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde genehmigt von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
+          EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde genehmigt von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
         }
         else if ((MeetingStatus)editedRequest.status == MeetingStatus.Clarification)
         {
-          EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Purpose.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde abgelehnt", recipient: base.RequestSender.Email);
+          EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde abgelehnt", recipient: base.RequestSender.Email);
         }
       }
 
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while processing mails");
       }
