@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rema.DbAccess;
 
 namespace Rema.DbAccess.Migrations
 {
     [DbContext(typeof(RpDbContext))]
-    partial class RpDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200204095700_AllocationReplacePurpose")]
+    partial class AllocationReplacePurpose
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
