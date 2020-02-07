@@ -124,12 +124,12 @@ export default class SupplierManagement extends Vue {
     }
     if (this.dialog === 2) {
       const response = await Suppliers.api().put(
-        `SupplierGroups/${this.editId}`,
+        `suppliergroups/${this.editId}`,
         gadget
       )
       await Suppliers.update(gadget)
     } else {
-      await Suppliers.api().post('SupplierGroups', gadget)
+      await Suppliers.api().post('suppliergroups', gadget)
     }
     this.closeModal()
   }
@@ -153,7 +153,7 @@ export default class SupplierManagement extends Vue {
     })
 
     if (confirmation === true) {
-      Suppliers.api().delete(`SupplierGroups/${item.Id}`, { delete: item.Id })
+      Suppliers.api().delete(`suppliergroups/${item.Id}`, { delete: item.Id })
     }
   }
 }

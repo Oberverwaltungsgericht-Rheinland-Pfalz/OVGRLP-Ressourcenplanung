@@ -162,7 +162,7 @@ export default class App extends Vue {
     })
 
     Gadgets.api().get('gadgets')
-    Suppliers.api().get('SupplierGroups')
+    Suppliers.api().get('suppliergroups')
     Ressources.api().get('ressources')
     Allocations.api().get('allocations')
   }

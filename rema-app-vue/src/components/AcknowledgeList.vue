@@ -131,7 +131,7 @@ export default class AcknowledgeList extends Vue {
   }
   public refreshAllocations () {
     Gadgets.api().get('gadgets')
-    Suppliers.api().get('SupplierGroups')
+    Suppliers.api().get('suppliergroups')
     Ressources.api().get('ressources')
     Allocations.api().get('allocations')
   }
