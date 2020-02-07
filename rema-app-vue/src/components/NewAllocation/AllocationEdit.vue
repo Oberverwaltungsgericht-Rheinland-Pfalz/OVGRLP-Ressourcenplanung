@@ -120,9 +120,6 @@ import Suppliers from '../../models/SupplierModel'
 import AllocationRequest, {
   AllocationRequestView
 } from '../../models/AllocationRequest'
-import AllocationPurposes, {
-  AllocationPurposeModel
-} from '../../models/AllocationpurposeModel'
 import Allocations, { AllocationModel } from '../../models/AllocationModel'
 import UserData, { ContactUser } from '../../models/UserData'
 const namespace = 'user'

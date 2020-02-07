@@ -41,9 +41,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/Acknowledges/types'
 import AllocationRequest from '../models/AllocationRequest'
 import Allocations, { AllocationModel } from '../models/AllocationModel'
-import AllocationPurposes, {
-  AllocationPurposeModel
-} from '../models/AllocationpurposeModel'
 const namespace = 'acknowledges'
 
 @Component
@@ -114,14 +111,6 @@ export default class AcknowledgeList extends Vue {
         delete: item.Id
       }
     )
-    if (isLastAllocation) {
-      const responseDeletePurpose = await AllocationPurposes.api().delete(
-        `allocationpurposes/${item.PurposeId}`,
-        {
-          delete: item.PurposeId
-        }
-      )
-    }
   }
   private isLastAllocation (purposeID: number): boolean {
     const purposes = this.Requests.filter(

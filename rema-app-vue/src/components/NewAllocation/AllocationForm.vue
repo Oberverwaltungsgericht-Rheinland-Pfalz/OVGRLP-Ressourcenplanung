@@ -135,9 +135,6 @@ import Component from 'vue-class-component'
 import Gadgets from '../../models/GadgetModel'
 import Ressources, { RessourceModel } from '../../models/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
-import AllocationPurposes, {
-  AllocationPurposeModel
-} from '../../models/AllocationpurposeModel'
 import Allocations, { AllocationModel } from '../../models/AllocationModel'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 
@@ -192,7 +189,6 @@ export default class AllocationForm extends Vue {
 
   private async saveAllocation (
     status: number,
-    purpose: AllocationPurposeModel,
     date?: string
   ) {
     /*

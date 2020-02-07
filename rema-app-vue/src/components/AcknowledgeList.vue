@@ -50,9 +50,6 @@ import AllocationRequest from '../models/AllocationRequest'
 import AllocationRequestView from '../models/AllocationRequestView'
 import UserData, { ContactUser } from '../models/UserData'
 import Allocations, { AllocationModel } from '../models/AllocationModel'
-import AllocationsPurpose, {
-  AllocationPurposeModel
-} from '../models/AllocationpurposeModel'
 import AcknowledgeView from './AcknowledgeView.vue'
 import Gadgets from '../models/GadgetModel'
 import Ressources from '../models/RessourceModel'
@@ -137,7 +134,6 @@ export default class AcknowledgeList extends Vue {
     Suppliers.api().get('SupplierGroups')
     Ressources.api().get('ressources')
     Allocations.api().get('allocations')
-    AllocationsPurpose.api().get('allocationpurposes')
   }
   public async fillContactUsers () {
     const referencePersons = this.UnAcknowledgedAllocations.map(
