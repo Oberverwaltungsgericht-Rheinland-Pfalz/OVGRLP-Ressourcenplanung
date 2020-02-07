@@ -16,8 +16,6 @@ namespace Rema.Infrastructure.Contracts.Stores
 
     IEnumerable<Allocation> GetAllocationsByStatus(MeetingStatus status, DateTime? from, DateTime? to);
 
-    IEnumerable<Allocation> GetAllocationsByPurpose(long allocationPurposeId, DateTime? from, DateTime? to);
-
     Allocation UpdateAllocation(Allocation allocation);
 
     bool DeleteAllocation(long id);

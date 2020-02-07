@@ -11,15 +11,13 @@ namespace Rema.ServiceLayer.Services
     private readonly IAllocationStore _allocationStore;
     private readonly IUserStore _userStore;
     private readonly IRessourceStore _ressourceStore;
-    private readonly IAllocationPurposeStore _allocationPurposeStore;
     private readonly IGadgetStore _gadgetStore;
 
-    public AppointmentService(IAllocationStore allocationStore, IUserStore userStore, IRessourceStore ressourceStore, IAllocationPurposeStore allocationPurposeStore, IGadgetStore gadgetStore)
+    public AppointmentService(IAllocationStore allocationStore, IUserStore userStore, IRessourceStore ressourceStore, IGadgetStore gadgetStore)
     {
       _allocationStore = allocationStore;
       _userStore = userStore;
       _ressourceStore = ressourceStore;
-      _allocationPurposeStore = allocationPurposeStore;
       _gadgetStore = gadgetStore;
     }
 
@@ -43,8 +41,8 @@ namespace Rema.ServiceLayer.Services
         Status = MeetingStatus.Pending
       };
 
-      var purpuse = _allocationPurposeStore.GetAllocationPurposeById(allocationPurposeId);
-      allocation.Purpose = purpuse;
+      //var purpuse = _allocationPurposeStore.GetAllocationPurposeById(allocationPurposeId);
+      //allocation.Purpose = purpuse;
 
       var creator = _userStore.GetUserById(creatorId);
       allocation.CreatedBy = creator;
@@ -59,39 +57,41 @@ namespace Rema.ServiceLayer.Services
       return savedAllocation;
     }
 
-    public Allocation RequestAppointment(long creatorId, AllocationRequest request, long ressourceId, AllocationPurposeRequest allocationPurpose)
+    public Allocation RequestAppointment(long creatorId, AllocationRequest request, long ressourceId)
     {
-      var purpose = new AllocationPurpose();
-      purpose.Title = allocationPurpose.Title;
-      purpose.Description = allocationPurpose.Description;
-      purpose.Notes = allocationPurpose.Notes;
-      purpose.ContactPhone = allocationPurpose.ContactPhone;
+      //var purpose = new AllocationPurpose();
+      //purpose.Title = allocationPurpose.Title;
+      //purpose.Description = allocationPurpose.Description;
+      //purpose.Notes = allocationPurpose.Notes;
+      //purpose.ContactPhone = allocationPurpose.ContactPhone;
 
-      foreach (var gadgetId in allocationPurpose.Gadgets)
-      {
-        var gadget = _gadgetStore.GetGadgetById(gadgetId);
-        //if (purpose.Gadgets == null || purpose.Gadgets.Count == 0)
-        //    purpose.Gadgets = new List<Gadget>() { gadget };
-        //else
-        //    purpose.Gadgets.Add(gadget);
-      }
+      //foreach (var gadgetId in allocationPurpose.Gadgets)
+      //{
+      //var gadget = _gadgetStore.GetGadgetById(gadgetId);
+      //if (purpose.Gadgets == null || purpose.Gadgets.Count == 0)
+      //    purpose.Gadgets = new List<Gadget>() { gadget };
+      //else
+      //    purpose.Gadgets.Add(gadget);
+      //}
 
-      _allocationPurposeStore.CreateAllocationPurpose(purpose);
+      //_allocationPurposeStore.CreateAllocationPurpose(purpose);
 
-      return RequestAppointment(creatorId, request, ressourceId, purpose.Id);
+      //return RequestAppointment(creatorId, request, ressourceId, purpose.Id);
+      throw new NotImplementedException();
     }
 
     public Allocation SetAppointment(long userId, AllocationRequest request, long ressourceId, IEnumerable<long> gadgetIds, long allocationPurposeId)
     {
-      var purpose = _allocationPurposeStore.GetAllocationPurposeById(allocationPurposeId);
-      var requestedAllocation = RequestAppointment(userId, request, ressourceId, purpose.Id);
-      var approvedAppointment = ApproveAppointment(requestedAllocation.Id, userId);
-      return approvedAppointment;
+      //var purpose = _allocationPurposeStore.GetAllocationPurposeById(allocationPurposeId);
+      //var requestedAllocation = RequestAppointment(userId, request, ressourceId, purpose.Id);
+      //var approvedAppointment = ApproveAppointment(requestedAllocation.Id, userId);
+      //return approvedAppointment;
+      throw new NotImplementedException();
     }
 
     public Allocation SetAppointment(long userId, AllocationRequest request, long ressourceId, IEnumerable<long> gadgetIds, AllocationPurposeRequest allocationPurpose)
     {
-      var requestedAllocation = RequestAppointment(userId, request, ressourceId, allocationPurpose);
+      var requestedAllocation = RequestAppointment(userId, request, ressourceId);
       var approvedAppointment = ApproveAppointment(requestedAllocation.Id, userId);
       return SetAppointment(userId, request, ressourceId, gadgetIds, allocationPurpose);
     }
@@ -154,11 +154,6 @@ namespace Rema.ServiceLayer.Services
     public Allocation GetDetails(long id)
     {
       return _allocationStore.GetAllocationById(id);
-    }
-
-    public IEnumerable<AllocationPurpose> GetAvailablePurposes()
-    {
-      return _allocationPurposeStore.GetPurposes();
     }
 
     public IEnumerable<Gadget> GetAllGadgets()
