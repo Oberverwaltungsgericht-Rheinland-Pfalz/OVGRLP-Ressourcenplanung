@@ -182,6 +182,27 @@ namespace Rema.WebApi.Controllers
 
       try
       {
+        var gadgets = _context.Gadgets.Where(g => allocationVM.GadgetsIds.Contains(g.Id));
+
+        allocation.AllocationGadgets = new List<AllocationGagdet>();
+        foreach(var g in gadgets)
+        {
+          allocation.AllocationGadgets.Add(new AllocationGagdet
+          {
+            AllocationId = allocation.Id,
+            Allocation = allocation,
+            GadgetId = g.Id,
+            Gadget = g
+          });
+        }
+      }
+      catch(Exception ex)
+      {
+        Log.Error(ex, "error while mapping gadgets to allocation");
+      }
+
+      try
+      {
         allocation.LastModified = DateTime.Now;
         allocation.LastModifiedBy = requestedUser;
       }
