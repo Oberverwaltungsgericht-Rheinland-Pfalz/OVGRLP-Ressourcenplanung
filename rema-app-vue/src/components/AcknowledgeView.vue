@@ -142,9 +142,6 @@ import AllocationRequest from '../models/AllocationRequest'
 import AllocationRequestView from '../models/AllocationRequestView'
 import UserData, { ContactUser } from '../models/UserData'
 import Allocations, { AllocationModel } from '../models/AllocationModel'
-import AllocationsPurpose, {
-  AllocationPurposeModel
-} from '../models/AllocationpurposeModel'
 const namespace = 'user'
 
 @Component

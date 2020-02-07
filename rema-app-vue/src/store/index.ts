@@ -9,7 +9,6 @@ import Ressource from '../models/RessourceModel'
 import Visibleallocation from '../models/VisibleAllocationModel'
 import SupplierModel from '../models/SupplierModel'
 import AllocationModel from '../models/AllocationModel'
-import AllocationpurposeModel from '../models/AllocationpurposeModel'
 import packageInfo from '../../package.json'
 import axios from 'axios'
 import VuexORM from '@vuex-orm/core'
@@ -24,7 +23,6 @@ database.register(Ressource)
 database.register(Visibleallocation)
 database.register(AllocationModel)
 database.register(SupplierModel)
-database.register(AllocationpurposeModel)
 
 VuexORM.use(VuexORMAxios, {
   axios,

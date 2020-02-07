@@ -124,7 +124,6 @@ import Gadgets from './models/GadgetModel'
 import Ressources from './models/RessourceModel'
 import Suppliers from './models/SupplierModel'
 import Allocations from './models/AllocationModel'
-import AllocationPurposes from './models/AllocationpurposeModel'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 
@@ -166,8 +165,6 @@ export default class App extends Vue {
     Suppliers.api().get('SupplierGroups')
     Ressources.api().get('ressources')
     Allocations.api().get('allocations')
-
-    const allpResp = await AllocationPurposes.api().get('allocationpurposes')
   }
 }
 </script>
