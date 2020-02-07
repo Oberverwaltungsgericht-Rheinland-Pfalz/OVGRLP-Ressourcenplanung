@@ -24,6 +24,8 @@ export default class Allocation extends Model {
       ReferencePerson: this.attr(''),
       Ressource_id: this.attr(null),
       Ressource: this.belongsTo(Ressource, 'Ressource_id', 'Id')
+      GadgetsIds: this.attr(null),
+      Gadgets: this.hasManyBy(Gadget, 'GadgetsIds', 'Id')
     }
   }
 }
