@@ -173,7 +173,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation.Ressource = await _context.Ressources.FindAsync(allocationVM.Ressource_id);
+        allocation.Ressource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
       }
       catch (Exception ex)
       {
@@ -245,13 +245,13 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        if (allocationVM.ReferencePerson_id == 0)
+        if (allocationVM.ReferencePersonId == 0)
         {
           allocation.ReferencePerson = requestedUser;
         }
         else
         {
-          var referencePerson = await _context.Users.FindAsync(allocationVM.ReferencePerson_id);
+          var referencePerson = await _context.Users.FindAsync(allocationVM.ReferencePersonId);
           allocation.ReferencePerson = referencePerson;
         }
       }

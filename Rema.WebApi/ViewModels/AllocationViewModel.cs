@@ -19,24 +19,28 @@ namespace Rema.WebApi.ViewModels
 
     public Boolean IsAllDay { get; set; }
 
+    public string ContactName { get; set; }
+
+    public string ContactPhone { get; set; }
+
     public MeetingStatus Status { get; set; }
 
-    public long Ressource_id { get; set; }
+    public long RessourceId { get; set; }
 
     public IEnumerable<long> GadgetsIds { get; set; }
 
-    public long CreatedBy_id { get; set; }
+    public long CreatedById { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime LastModified { get; set; }
 
-    public long LastModifiedBy_id { get; set; }
+    public long LastModifiedById { get; set; }
 
-    public long ApprovedBy_id { get; set; }
+    public long ApprovedById { get; set; }
 
     public DateTime ApprovedAt { get; set; }
 
-    public long ReferencePerson_id { get; set; }
+    public long ReferencePersonId { get; set; }
   }
 }
