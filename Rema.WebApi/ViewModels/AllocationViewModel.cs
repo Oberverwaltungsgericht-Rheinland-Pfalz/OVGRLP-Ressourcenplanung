@@ -23,7 +23,7 @@ namespace Rema.WebApi.ViewModels
 
     public long Ressource_id { get; set; }
 
-    public IEnumerable<long> GadgetIds { get; set; }
+    public IEnumerable<long> GadgetsIds { get; set; }
 
     public long CreatedBy_id { get; set; }
 
