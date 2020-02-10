@@ -41,7 +41,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import Gadgets from '../models/GadgetModel'
 import Ressources from '../models/RessourceModel'
-import Allocations from '../models/AllocationModel'
+import Allocation from '../models/Allocation'
 import Suppliers from '../models/SupplierModel'
 
 @Component({})
@@ -57,7 +57,7 @@ export default class DbContentView extends Vue {
     return Ressources.all()
   }
   private get allocationItems () {
-    return Allocations.query()
+    return Allocation.query()
       .withAll()
       .get()
   }

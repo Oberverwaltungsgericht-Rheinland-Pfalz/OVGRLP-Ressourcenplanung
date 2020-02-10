@@ -8,7 +8,7 @@ import Gadget from '../models/GadgetModel'
 import Ressource from '../models/RessourceModel'
 import Visibleallocation from '../models/VisibleAllocationModel'
 import SupplierModel from '../models/SupplierModel'
-import AllocationModel from '../models/AllocationModel'
+import Allocation from '../models/Allocation'
 import packageInfo from '../../package.json'
 import axios from 'axios'
 import VuexORM from '@vuex-orm/core'
@@ -21,7 +21,7 @@ const database = new VuexORM.Database()
 database.register(Gadget)
 database.register(Ressource)
 database.register(Visibleallocation)
-database.register(AllocationModel)
+database.register(Allocation)
 database.register(SupplierModel)
 
 VuexORM.use(VuexORMAxios, {

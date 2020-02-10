@@ -137,7 +137,8 @@ import Component from 'vue-class-component'
 import Gadgets from '../../models/GadgetModel'
 import Ressources, { RessourceModel } from '../../models/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
-import Allocations, { AllocationModel } from '../../models/AllocationModel'
+import Allocation from '../../models/Allocation'
+import AllocationModel from '../../models/interfaces/AllocationModel'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 
 @Component({
@@ -207,7 +208,7 @@ export default class AllocationForm extends Vue {
       contactPhone: this.telNumber
     }
 
-    await Allocations.api().post('allocations', newAllocation)
+    await Allocation.api().post('allocations', newAllocation)
 
     /*
     let from = this.dateFrom

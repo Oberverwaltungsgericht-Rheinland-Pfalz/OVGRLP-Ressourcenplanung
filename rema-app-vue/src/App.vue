@@ -123,7 +123,7 @@ import { MyRouteConfig } from './router'
 import Gadgets from './models/GadgetModel'
 import Ressources from './models/RessourceModel'
 import Suppliers from './models/SupplierModel'
-import Allocations from './models/AllocationModel'
+import Allocation from './models/Allocation'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 
@@ -164,7 +164,7 @@ export default class App extends Vue {
     Gadgets.api().get('gadgets')
     Suppliers.api().get('suppliergroups')
     Ressources.api().get('ressources')
-    Allocations.api().get('allocations')
+    Allocation.api().get('allocations')
   }
 }
 </script>

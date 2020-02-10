@@ -69,7 +69,7 @@
 
 <script>
 import dayjs from 'dayjs'
-import Allocations from '../models/AllocationModel'
+import Allocation from '../models/Allocation'
 
 export default {
   data: () => ({

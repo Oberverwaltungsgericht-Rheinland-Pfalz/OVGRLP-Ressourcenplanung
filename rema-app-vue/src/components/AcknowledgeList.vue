@@ -49,7 +49,8 @@ import { Names as Fnn } from '../store/Acknowledges/types'
 import AllocationRequest from '../models/interfaces/AllocationRequest'
 import AllocationRequestView from '../models/interfaces/AllocationRequestView'
 import UserData, { ContactUser } from '../models/UserData'
-import Allocations, { AllocationModel } from '../models/AllocationModel'
+import Allocation from '../models/Allocation'
+import AllocationModel from '../models/interfaces/AllocationModel'
 import AcknowledgeView from './AcknowledgeView.vue'
 import Gadgets from '../models/GadgetModel'
 import Ressources from '../models/RessourceModel'
@@ -83,13 +84,13 @@ export default class AcknowledgeList extends Vue {
   ];
 
   public get hasItems () {
-    const allocations = Allocations.query()
+    const allocations = Allocation.query()
       .withAll()
       .get()
     return allocations.length
   }
   public openDialog (id: number) {
-    const viewA = Allocations.query()
+    const viewA = Allocation.query()
       .withAll()
       .where('Id', id)
       .first() as any
@@ -104,13 +105,13 @@ export default class AcknowledgeList extends Vue {
       Notices: viewA.Purpose.Notes
     }
   }
-  public get UnAcknowledgedAllocations (): Allocations[] {
-    return Allocations.query()
+  public get UnAcknowledgedAllocations (): Allocation[] {
+    return Allocation.query()
       .withAll()
       .get()
   }
   public get Requests () {
-    if (!Allocations.all().length) return []
+    if (!Allocation.all().length) return []
     this.fillContactUsers()
     return this.UnAcknowledgedAllocations.map((v: any) => ({
       Id: v.Id,
@@ -133,7 +134,7 @@ export default class AcknowledgeList extends Vue {
     Gadgets.api().get('gadgets')
     Suppliers.api().get('suppliergroups')
     Ressources.api().get('ressources')
-    Allocations.api().get('allocations')
+    Allocation.api().get('allocations')
   }
   public async fillContactUsers () {
     const referencePersons = this.UnAcknowledgedAllocations.map(

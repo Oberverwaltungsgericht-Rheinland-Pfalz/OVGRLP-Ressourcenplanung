@@ -33,7 +33,7 @@
 import _ from 'lodash'
 import * as d3 from 'd3'
 import Ressources from '../models/RessourceModel'
-import Allocations from '../models/AllocationModel'
+import Allocation from '../models/Allocation'
 import dayjs from 'dayjs'
 
 export default {
