@@ -12,7 +12,6 @@ export default interface AllocationRequestView {
   ApprovedAt: string
   ReferencePerson: string
   ReferencePersonId: number
-
   PurposeTitle: string
   RessourceTitle: string
   ContactTel: string
