@@ -1,5 +1,5 @@
 import { Model } from '@vuex-orm/core'
-import AllocationModel from './AllocationModel'
+import Allocation from './Allocation'
 
 export default class Ressource extends Model {
   // This is the name used as module name of the Vuex Store.
@@ -15,7 +15,7 @@ export default class Ressource extends Model {
       Type: this.attr('Raum'),
       FunctionDescription: this.attr(''),
       SpecialsDescription: this.attr(''),
-      allocations: this.hasMany(AllocationModel, 'Ressource_id')
+      allocations: this.hasMany(Allocation, 'Ressource_id')
     }
   }
 }

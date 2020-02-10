@@ -141,7 +141,8 @@ import { Names as Fnn } from '../store/User/types'
 import AllocationRequest from '../models/interfaces/AllocationRequest'
 import AllocationRequestView from '../models/interfaces/AllocationRequestView'
 import UserData, { ContactUser } from '../models/UserData'
-import Allocations, { AllocationModel } from '../models/AllocationModel'
+import Allocation from '../models/Allocation'
+import AllocationModel from '../models/interfaces/AllocationModel'
 const namespace = 'user'
 
 @Component
@@ -171,17 +172,17 @@ export default class AcknowledgeView extends Vue {
     this.$emit('input', false)
     // this.viewAllocation = {} as AllocationRequestView
   }
-  public get UnAcknowledgedAllocations (): Allocations[] {
-    return Allocations.query()
+  public get UnAcknowledgedAllocations (): Allocation[] {
+    return Allocation.query()
       .withAll()
       .get()
   }
 
-  public get possibleCollisions (): Allocations[] {
+  public get possibleCollisions (): Allocation[] {
     const start = Date.parse(this.viewAllocation.From)
     const end = Date.parse(this.viewAllocation.To)
     const id = this.viewAllocation.Id
-    const rValues = Allocations.query()
+    const rValues = Allocation.query()
       .withAll()
       .where('Status', (s: number) => s !== 2)
       // @ts-ignore
@@ -244,7 +245,7 @@ export default class AcknowledgeView extends Vue {
       },
       body: JSON.stringify(editedRequest)
     })
-    Allocations.update({
+    Allocation.update({
       where: task.Id,
       data: { From: task.From, To: task.To, Status: status }
     })
