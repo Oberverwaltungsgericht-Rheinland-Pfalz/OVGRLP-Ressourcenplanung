@@ -1,4 +1,4 @@
-import AllocationRequest from '../../models/AllocationRequest'
+import AllocationRequest from '../../models/interfaces/AllocationRequest'
 // export {default as AllocationRequest}  from '../../models/AllocationRequest'
 export { AllocationRequest }
 

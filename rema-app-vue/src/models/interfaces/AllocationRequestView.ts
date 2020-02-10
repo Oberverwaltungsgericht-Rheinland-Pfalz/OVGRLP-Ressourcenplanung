@@ -1,12 +1,4 @@
-export default interface AllocationRequest {
-  id: number,
-  Title: string,
-  Status: string,
-  Description: string,
-  DateTime: Date
-}
-
-export interface AllocationRequestView {
+export default interface AllocationRequestView {
   Id: number
   From: string
   To: string
