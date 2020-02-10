@@ -117,9 +117,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../../store/User/types'
 import Ressources, { RessourceModel } from '../../models/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
-import AllocationRequest, {
-  AllocationRequestView
-} from '../../models/AllocationRequest'
+import AllocationRequest from '../../models/interfaces/AllocationRequest'
+import AllocationRequestView from '../../models/interfaces/AllocationRequestView'
 import Allocations, { AllocationModel } from '../../models/AllocationModel'
 import UserData, { ContactUser } from '../../models/UserData'
 const namespace = 'user'
