@@ -1,15 +1,16 @@
 import Vue from 'vue'
 import Vuex, { StoreOptions } from 'vuex'
-import { RootState } from './types'
+import { RootState } from '@/models/interfaces'
 import { counter } from './counter/index'
 import { acknowledges } from './Acknowledges/index'
 import { user } from './User/index'
-import Gadget from '../models/GadgetModel'
-import Ressource from '../models/RessourceModel'
-import Visibleallocation from '../models/VisibleAllocationModel'
-import SupplierModel from '../models/SupplierModel'
-import AllocationModel from '../models/AllocationModel'
-import AllocationpurposeModel from '../models/AllocationpurposeModel'
+import {
+  Gadget,
+  Ressource,
+  VisibleAllocation,
+  Supplier,
+  Allocation
+} from '../models'
 import packageInfo from '../../package.json'
 import axios from 'axios'
 import VuexORM from '@vuex-orm/core'
@@ -21,10 +22,9 @@ const database = new VuexORM.Database()
 // Register Models to Database.
 database.register(Gadget)
 database.register(Ressource)
-database.register(Visibleallocation)
-database.register(AllocationModel)
-database.register(SupplierModel)
-database.register(AllocationpurposeModel)
+database.register(VisibleAllocation)
+database.register(Allocation)
+database.register(Supplier)
 
 VuexORM.use(VuexORMAxios, {
   axios,

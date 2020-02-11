@@ -39,32 +39,28 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import Gadgets from '../models/GadgetModel'
-import Ressources from '../models/RessourceModel'
-import Allocations from '../models/AllocationModel'
-import AllocationPurposes from '../models/AllocationpurposeModel'
-import Suppliers from '../models/SupplierModel'
+import {
+  Gadget,
+  Ressource,
+  Allocation,
+  Supplier
+} from '@/models'
 
 @Component({})
 export default class DbContentView extends Vue {
   private gadgetTitle: string = '';
   private get supplierItems () {
-    return Suppliers.all()
+    return Supplier.all()
   }
   private get gadgetItems () {
-    return Gadgets.all()
+    return Gadget.all()
   }
   private get ressourceItems () {
-    return Ressources.all()
+    return Ressource.all()
   }
   private get allocationItems () {
-    return Allocations.query()
+    return Allocation.query()
       .withAll()
-      .get()
-  }
-  private get allocationPurposeItems () {
-    return AllocationPurposes.query()
-      .with('Allocations')
       .get()
   }
   private saveGadget () {

@@ -1,11 +1,3 @@
-import UserData, { ContactUser } from '../../models/UserData'
-export { UserData }
-
-export interface UserState extends UserData {
-  lastUpdated: Date | boolean,
-  ContactUsers: ContactUser[]
-}
-
 // action & mutation names:
 export const Names = {
   a: {

@@ -87,19 +87,5 @@ namespace Rema.DbAccess.Stores
           )
           .ToList();
     }
-
-    public IEnumerable<Allocation> GetAllocationsByPurpose(long allocationPurposeId, DateTime? from, DateTime? to)
-    {
-      return _context.Allocations
-          .Where(e =>
-              e.Purpose.Id == allocationPurposeId
-              && !from.HasValue || (
-                  (e.From >= from && e.From < to) ||
-                  (e.To > from && e.To <= to) ||
-                  (e.From < from && e.To > to)
-              )
-          )
-          .ToList();
-    }
   }
 }

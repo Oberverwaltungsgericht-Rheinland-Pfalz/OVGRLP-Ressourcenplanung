@@ -69,7 +69,7 @@
 
 <script>
 import dayjs from 'dayjs'
-import Allocations from '../models/AllocationModel'
+import Allocation from '../models/Allocation'
 
 export default {
   data: () => ({
@@ -208,7 +208,7 @@ function transfer2Calendar (v) {
       v.From
     ).toLocaleTimeString()} bis ${new Date(v.To).toLocaleTimeString()}`
   }
-  rVal.name = (v.Purpose || {}).Title + ' in ' + (v.Ressource || {}).Name
+  rVal.name = v.Title + ' in ' + (v.Ressource || {}).Name
   rVal.color = 'success'
   rVal.id = v.Id
 

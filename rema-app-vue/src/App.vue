@@ -118,13 +118,15 @@
 import { Component, Vue } from 'vue-property-decorator'
 import Router from 'vue-router'
 import { State, Action, Getter, Mutation } from 'vuex-class'
-import { Names as Fnn, UserData } from './store/User/types'
+import { Names as Fnn } from './store/User/types'
+import { UserData } from '@/models/interfaces'
 import { MyRouteConfig } from './router'
-import Gadgets from './models/GadgetModel'
-import Ressources from './models/RessourceModel'
-import Suppliers from './models/SupplierModel'
-import Allocations from './models/AllocationModel'
-import AllocationPurposes from './models/AllocationpurposeModel'
+import {
+  Gadget,
+  Ressource,
+  Supplier,
+  Allocation
+} from './models'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 
@@ -162,12 +164,10 @@ export default class App extends Vue {
       }
     })
 
-    Gadgets.api().get('gadgets')
-    Suppliers.api().get('SupplierGroups')
-    Ressources.api().get('ressources')
-    Allocations.api().get('allocations')
-
-    const allpResp = await AllocationPurposes.api().get('allocationpurposes')
+    Gadget.api().get('gadgets')
+    Supplier.api().get('suppliergroups')
+    Ressource.api().get('ressources')
+    Allocation.api().get('allocations')
   }
 }
 </script>

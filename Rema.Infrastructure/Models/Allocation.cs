@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
@@ -15,54 +16,41 @@ namespace Rema.Infrastructure.Models
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
 
+    [Required]
+    public string Title { get; set; }
+
+    public string ContactName { get; set; }
+
+    public string ContactPhone { get; set; }
+    
+    [MaxLength(3000)]
+    public string Notes { get; set; }
+
     public DateTime From { get; set; }
+
     public DateTime To { get; set; }
+
     public Boolean IsAllDay { get; set; }
 
     public MeetingStatus Status { get; set; }
 
     public virtual Ressource Ressource { get; set; }
-
-    public virtual AllocationPurpose Purpose { get; set; }
-
+    
     [Required]
     public virtual User CreatedBy { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime LastModified { get; set; }
+
     public User LastModifiedBy { get; set; }
 
     public virtual User ApprovedBy { get; set; }
+
     public DateTime ApprovedAt { get; set; }
 
     public virtual User ReferencePerson { get; set; }
-  }
 
-  public enum MeetingStatus
-  {
-    [EnumMember(Value = "Draft")]
-    Draft = -1,
-
-    [EnumMember(Value = "Pending")]
-    Pending = 0,
-
-    [EnumMember(Value = "Acknowledged")]
-    Approved = 1,
-
-    [EnumMember(Value = "Clarification")]
-    Clarification = 2,
-
-    [EnumMember(Value = "MovedAcknowledge")]
-    Moved = 3,
-
-    [EnumMember(Value = "Hidden")]
-    Hidden,
-
-    [EnumMember(Value = "Archived")]
-    Archived,
-
-    [EnumMember(Value = "Deleted")]
-    Deleted
+    public virtual ICollection<AllocationGagdet> AllocationGadgets { get; set; }
   }
 }

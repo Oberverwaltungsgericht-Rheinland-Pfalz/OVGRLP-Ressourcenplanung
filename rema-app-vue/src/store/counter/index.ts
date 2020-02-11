@@ -2,8 +2,7 @@ import { Module } from 'vuex'
 import { getters } from './getters'
 import { actions } from './actions'
 import { mutations } from './mutations'
-import { CounterState } from './types'
-import { RootState } from '../types'
+import { RootState, CounterState } from '@/models/interfaces'
 
 export const state: CounterState = {
   counter: 0

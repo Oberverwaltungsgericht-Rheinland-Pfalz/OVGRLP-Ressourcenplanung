@@ -69,8 +69,8 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import Suppliers, { SupplierGroupModel } from '../../models/SupplierModel'
-import Ressources from '../../models/RessourceModel'
+import { SupplierGroupModel } from '../../models/interfaces'
+import { Supplier, Ressource } from '../../models'
 
 @Component
 export default class SupplierManagement extends Vue {
@@ -94,12 +94,12 @@ export default class SupplierManagement extends Vue {
     if (this.dialog === 2) return 'Bearbeite Gruppe'
   }
   private get RessourceNames () {
-    return Ressources.all()
+    return Ressource.all()
       .filter((v: any) => !!v.Title)
       .map((v: any) => v.Title)
   }
   private get items () {
-    return Suppliers.all()
+    return Supplier.all()
   }
   private get invalidForm (): boolean {
     return !this.editTitle || !this.editEmail
@@ -123,13 +123,13 @@ export default class SupplierManagement extends Vue {
       GroupEmail: this.editEmail
     }
     if (this.dialog === 2) {
-      const response = await Suppliers.api().put(
-        `SupplierGroups/${this.editId}`,
+      const response = await Supplier.api().put(
+        `suppliergroups/${this.editId}`,
         gadget
       )
-      await Suppliers.update(gadget)
+      await Supplier.update(gadget)
     } else {
-      await Suppliers.api().post('SupplierGroups', gadget)
+      await Supplier.api().post('suppliergroups', gadget)
     }
     this.closeModal()
   }
@@ -153,7 +153,7 @@ export default class SupplierManagement extends Vue {
     })
 
     if (confirmation === true) {
-      Suppliers.api().delete(`SupplierGroups/${item.Id}`, { delete: item.Id })
+      Supplier.api().delete(`suppliergroups/${item.Id}`, { delete: item.Id })
     }
   }
 }

@@ -138,13 +138,14 @@
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/User/types'
-import AllocationRequest from '../models/AllocationRequest'
-import AllocationRequestView from '../models/AllocationRequestView'
-import UserData, { ContactUser } from '../models/UserData'
-import Allocations, { AllocationModel } from '../models/AllocationModel'
-import AllocationsPurpose, {
-  AllocationPurposeModel
-} from '../models/AllocationpurposeModel'
+import {
+  AllocationRequest,
+  AllocationRequestView,
+  UserData,
+  ContactUser,
+  AllocationModel
+} from '../models/interfaces'
+import { Allocation } from '../models'
 const namespace = 'user'
 
 @Component
@@ -174,17 +175,17 @@ export default class AcknowledgeView extends Vue {
     this.$emit('input', false)
     // this.viewAllocation = {} as AllocationRequestView
   }
-  public get UnAcknowledgedAllocations (): Allocations[] {
-    return Allocations.query()
+  public get UnAcknowledgedAllocations (): Allocation[] {
+    return Allocation.query()
       .withAll()
       .get()
   }
 
-  public get possibleCollisions (): Allocations[] {
+  public get possibleCollisions (): Allocation[] {
     const start = Date.parse(this.viewAllocation.From)
     const end = Date.parse(this.viewAllocation.To)
     const id = this.viewAllocation.Id
-    const rValues = Allocations.query()
+    const rValues = Allocation.query()
       .withAll()
       .where('Status', (s: number) => s !== 2)
       // @ts-ignore
@@ -247,7 +248,7 @@ export default class AcknowledgeView extends Vue {
       },
       body: JSON.stringify(editedRequest)
     })
-    Allocations.update({
+    Allocation.update({
       where: task.Id,
       data: { From: task.From, To: task.To, Status: status }
     })

@@ -1,6 +1,5 @@
 import { GetterTree } from 'vuex'
-import { CounterState } from './types'
-import { RootState } from '../types'
+import { RootState, CounterState } from '@/models/interfaces'
 
 export const getters: GetterTree<CounterState, RootState> = {
   currentCount (state): number {

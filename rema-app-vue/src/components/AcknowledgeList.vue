@@ -46,17 +46,20 @@ import dayjs from 'dayjs'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/Acknowledges/types'
-import AllocationRequest from '../models/AllocationRequest'
-import AllocationRequestView from '../models/AllocationRequestView'
-import UserData, { ContactUser } from '../models/UserData'
-import Allocations, { AllocationModel } from '../models/AllocationModel'
-import AllocationsPurpose, {
-  AllocationPurposeModel
-} from '../models/AllocationpurposeModel'
+import {
+  AllocationRequest,
+  AllocationRequestView,
+  UserData,
+  ContactUser,
+  AllocationModel
+} from '../models/interfaces'
 import AcknowledgeView from './AcknowledgeView.vue'
-import Gadgets from '../models/GadgetModel'
-import Ressources from '../models/RessourceModel'
-import Suppliers from '../models/SupplierModel'
+import {
+  Allocation,
+  Gadget,
+  Ressource,
+  Supplier
+} from '../models'
 const namespace = 'user'
 
 @Component({
@@ -86,13 +89,13 @@ export default class AcknowledgeList extends Vue {
   ];
 
   public get hasItems () {
-    const allocations = Allocations.query()
+    const allocations = Allocation.query()
       .withAll()
       .get()
     return allocations.length
   }
   public openDialog (id: number) {
-    const viewA = Allocations.query()
+    const viewA = Allocation.query()
       .withAll()
       .where('Id', id)
       .first() as any
@@ -107,13 +110,13 @@ export default class AcknowledgeList extends Vue {
       Notices: viewA.Purpose.Notes
     }
   }
-  public get UnAcknowledgedAllocations (): Allocations[] {
-    return Allocations.query()
+  public get UnAcknowledgedAllocations (): Allocation[] {
+    return Allocation.query()
       .withAll()
       .get()
   }
   public get Requests () {
-    if (!Allocations.all().length) return []
+    if (!Allocation.all().length) return []
     this.fillContactUsers()
     return this.UnAcknowledgedAllocations.map((v: any) => ({
       Id: v.Id,
@@ -133,11 +136,10 @@ export default class AcknowledgeList extends Vue {
     }))
   }
   public refreshAllocations () {
-    Gadgets.api().get('gadgets')
-    Suppliers.api().get('SupplierGroups')
-    Ressources.api().get('ressources')
-    Allocations.api().get('allocations')
-    AllocationsPurpose.api().get('allocationpurposes')
+    Gadget.api().get('gadgets')
+    Supplier.api().get('suppliergroups')
+    Ressource.api().get('ressources')
+    Allocation.api().get('allocations')
   }
   public async fillContactUsers () {
     const referencePersons = this.UnAcknowledgedAllocations.map(

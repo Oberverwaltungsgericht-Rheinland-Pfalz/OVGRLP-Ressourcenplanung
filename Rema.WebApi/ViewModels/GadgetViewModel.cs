@@ -9,14 +9,4 @@ namespace Rema.WebApi.ViewModels
     public string Title { get; set; }
     public long SuppliedBy { get; set; }
   }
-
-  public class GadgetVMProfile : Profile
-  {
-    public GadgetVMProfile()
-    {
-      CreateMap<Gadget, GadgetViewModel>()
-          .ForMember(dest => dest.SuppliedBy, opt => opt.MapFrom(src => src.SuppliedBy.Id));
-      // todo: reverse mapping
-    }
-  }
 }

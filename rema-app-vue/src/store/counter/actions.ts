@@ -1,7 +1,5 @@
 import { ActionTree } from 'vuex'
-import axios from 'axios'
-import { CounterState } from './types'
-import { RootState } from '../types'
+import { RootState, CounterState } from '@/models/interfaces'
 
 export const actions: ActionTree<CounterState, RootState> = {
   increment ({ commit }): any {

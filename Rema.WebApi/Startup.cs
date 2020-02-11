@@ -42,7 +42,6 @@ namespace Rema.WebApi
 
       services.AddScoped<IGadgetStore, GadgetStore>();
       services.AddScoped<IUserStore, UserStore>();
-      services.AddScoped<IAllocationPurposeStore, AllocatoinPurposeStore>();
       services.AddScoped<IAllocationStore, AllocationStore>();
       services.AddScoped<IRessourceStore, RessourceStore>();
       services.AddScoped<ISupplierGroupStore, SupplierGroupStore>();

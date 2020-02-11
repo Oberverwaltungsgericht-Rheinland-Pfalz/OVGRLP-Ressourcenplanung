@@ -39,11 +39,8 @@
 import dayjs from 'dayjs'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/Acknowledges/types'
-import AllocationRequest from '../models/AllocationRequest'
-import Allocations, { AllocationModel } from '../models/AllocationModel'
-import AllocationPurposes, {
-  AllocationPurposeModel
-} from '../models/AllocationpurposeModel'
+import { Allocation } from '../models'
+import { AllocationRequest, AllocationModel } from '../models/interfaces'
 const namespace = 'acknowledges'
 
 @Component
@@ -59,13 +56,13 @@ export default class AcknowledgeList extends Vue {
     { text: 'Zuletzt geändert', value: 'DateTime' }
   ];
   public get hasItems () {
-    const allocations = Allocations.query()
+    const allocations = Allocation.query()
       .withAll()
       .get()
     return allocations.length
   }
   public get Requests (): VisibleAllocation[] {
-    const allocations = Allocations.query()
+    const allocations = Allocation.query()
       .withAll()
       .where('CreatedBy', this.$store.state.user.id)
       .where((a: any) => {
@@ -108,20 +105,12 @@ export default class AcknowledgeList extends Vue {
     if (confirmation !== true) return
 
     const isLastAllocation = this.isLastAllocation(item.PurposeId)
-    const responseDeleteAllocation = await Allocations.api().delete(
+    const responseDeleteAllocation = await Allocation.api().delete(
       `allocations/${item.Id}`,
       {
         delete: item.Id
       }
     )
-    if (isLastAllocation) {
-      const responseDeletePurpose = await AllocationPurposes.api().delete(
-        `allocationpurposes/${item.PurposeId}`,
-        {
-          delete: item.PurposeId
-        }
-      )
-    }
   }
   private isLastAllocation (purposeID: number): boolean {
     const purposes = this.Requests.filter(

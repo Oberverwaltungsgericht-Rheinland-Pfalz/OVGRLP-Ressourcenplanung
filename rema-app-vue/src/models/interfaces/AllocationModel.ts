@@ -1,4 +1,4 @@
-export default interface AllocationRequestView {
+export interface AllocationModel {
   Id: number
   From: string
   To: string
@@ -11,10 +11,4 @@ export default interface AllocationRequestView {
   ApprovedBy: string
   ApprovedAt: string
   ReferencePerson: string
-  ReferencePersonId: number
-  PurposeTitle: string
-  RessourceTitle: string
-  ContactTel: string
-  Description: string
-  Notices: string
 }

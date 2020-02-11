@@ -32,8 +32,8 @@
 // includes code from d3-gantt-scheduler, @Repository: https://github.com/bertrandg/d3-gantt-scheduler/, @by Author 'bertrandg <bertrandgaillard@hotmail.fr>  (https://github.com/bertrandg)', @Licensed under ISC License
 import _ from 'lodash'
 import * as d3 from 'd3'
-import Ressources from '../models/RessourceModel'
-import Allocations from '../models/AllocationModel'
+import Ressource from '../models/Ressource'
+import Allocation from '../models/Allocation'
 import dayjs from 'dayjs'
 
 export default {
