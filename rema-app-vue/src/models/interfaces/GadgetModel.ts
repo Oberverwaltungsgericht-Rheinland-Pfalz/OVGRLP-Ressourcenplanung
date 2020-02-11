@@ -1,4 +1,4 @@
-export default interface GadgetModel {
+export interface GadgetModel {
   Id: number
   Title: string
   SuppliedBy: string

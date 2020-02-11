@@ -1,4 +1,4 @@
-export default interface AllocationRequest {
+export interface AllocationRequest {
   id: number,
   Title: string,
   Status: string,

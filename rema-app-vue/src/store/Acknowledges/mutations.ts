@@ -1,5 +1,6 @@
 import { MutationTree } from 'vuex'
-import { AcknowledgeState, AllocationRequest, Names } from './types'
+import { Names } from './types'
+import { AllocationRequest, AcknowledgeState } from '@/models/interfaces'
 
 export const mutations: MutationTree<AcknowledgeState> = {
   [Names.m.updateTask] (state, payload: AllocationRequest) {

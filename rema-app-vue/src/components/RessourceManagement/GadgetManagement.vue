@@ -74,10 +74,9 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import Supplier from '../../models/Supplier'
-import SupplierGroupModel from '../../models/interfaces/SupplierModel'
 import Ressource from '../../models/Ressource'
 import Gadget from '../../models/Gadget'
-import GadgetModel from '../../models/interfaces/GadgetModel'
+import { SupplierGroupModel, GadgetModel } from '../../models/interfaces'
 
 @Component({
   filters: {

@@ -1,6 +1,5 @@
 import { GetterTree } from 'vuex'
-import { AcknowledgeState } from './types'
-import { RootState } from '../types'
+import { AcknowledgeState, RootState } from '@/models/interfaces'
 
 export const getters: GetterTree<AcknowledgeState, RootState> = {
   isLoadingDone (state): boolean {

@@ -1,4 +1,4 @@
-export default interface RessourceModel {
+export interface RessourceModel {
   Id: number
   Name: string
   Type: string

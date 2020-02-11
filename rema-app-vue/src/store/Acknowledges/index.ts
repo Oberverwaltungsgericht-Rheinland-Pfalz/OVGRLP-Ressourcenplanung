@@ -2,8 +2,7 @@ import { Module } from 'vuex'
 import { getters } from './getters'
 import { actions } from './actions'
 import { mutations } from './mutations'
-import { AcknowledgeState } from './types'
-import { RootState } from '../types'
+import { AcknowledgeState, RootState } from '@/models/interfaces'
 
 export const state: AcknowledgeState = {
   tasks: [],

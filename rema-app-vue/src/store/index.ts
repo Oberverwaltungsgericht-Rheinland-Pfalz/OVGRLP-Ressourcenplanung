@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex, { StoreOptions } from 'vuex'
-import { RootState } from './types'
+import { RootState } from '@/models/interfaces'
 import { counter } from './counter/index'
 import { acknowledges } from './Acknowledges/index'
 import { user } from './User/index'
