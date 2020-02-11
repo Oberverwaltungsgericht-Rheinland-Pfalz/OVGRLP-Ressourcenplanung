@@ -1,7 +1,5 @@
 import { GetterTree } from 'vuex'
-import { UserState } from './types'
-import UserData from '@/models/interfaces/UserData'
-import { RootState } from '../types'
+import { UserData, UserState, RootState } from '@/models/interfaces'
 
 export const getters: GetterTree<UserState, RootState> = {
   isLoadingDone (state: UserState): boolean {

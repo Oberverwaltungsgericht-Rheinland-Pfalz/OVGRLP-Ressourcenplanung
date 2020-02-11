@@ -1,3 +1,3 @@
-export default interface NewAllocationRequestModel {
+export interface NewAllocationRequestModel {
   Title: string
 }

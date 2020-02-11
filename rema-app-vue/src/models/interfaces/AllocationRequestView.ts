@@ -1,4 +1,4 @@
-export default interface AllocationRequestView {
+export interface AllocationRequestView {
   Id: number
   From: string
   To: string

@@ -1,7 +1,6 @@
 import { ActionTree } from 'vuex'
-import axios from 'axios'
-import { AcknowledgeState, AllocationRequest, Names } from './types'
-import { RootState } from '../types'
+import { Names } from './types'
+import { AcknowledgeState, AllocationRequest, RootState } from '@/models/interfaces'
 
 const exampleTasks: AllocationRequest[] = [
   { id: 2, Title: 'Meeting', Status: 'offen', Description: 'Raum1', DateTime: new Date() },

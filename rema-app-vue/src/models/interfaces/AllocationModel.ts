@@ -1,4 +1,4 @@
-export default interface AllocationModel {
+export interface AllocationModel {
   Id: number
   From: string
   To: string

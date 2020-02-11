@@ -70,7 +70,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import Supplier from '../../models/Supplier'
-import SupplierGroupModel from '../../models/interfaces/SupplierModel'
+import { SupplierGroupModel } from '../../models/interfaces'
 import Ressource from '../../models/Ressource'
 
 @Component

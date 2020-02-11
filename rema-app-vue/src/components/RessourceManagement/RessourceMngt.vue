@@ -73,7 +73,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import Ressource from '../../models/Ressource'
-import RessourceModel from '../../models/interfaces/RessourceModel'
+import { RessourceModel } from '../../models/interfaces'
 
 @Component({})
 export default class RessourceManagement extends Vue {

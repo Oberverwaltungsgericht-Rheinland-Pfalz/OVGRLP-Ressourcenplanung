@@ -136,10 +136,9 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import Gadget from '../../models/Gadget'
 import Ressource from '../../models/Ressource'
-import RessourceModel from '../../models/interfaces/RessourceModel'
 import Supplier from '../../models/Supplier'
 import Allocation from '../../models/Allocation'
-import AllocationModel from '../../models/interfaces/AllocationModel'
+import { RessourceModel, AllocationModel } from '../../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 
 @Component({

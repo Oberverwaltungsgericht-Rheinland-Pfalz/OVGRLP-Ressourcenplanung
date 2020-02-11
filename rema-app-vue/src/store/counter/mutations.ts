@@ -1,5 +1,5 @@
 import { MutationTree } from 'vuex'
-import { CounterState } from './types'
+import { CounterState } from '@/models/interfaces'
 
 export const mutations: MutationTree<CounterState> = {
   incrementCounter (state) {
