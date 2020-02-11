@@ -69,6 +69,7 @@
 <script>
 import dayjs from 'dayjs'
 import { Allocation } from '../models'
+var moment = require('moment')
 
 export default {
   data: () => ({
@@ -197,15 +198,16 @@ function transfer2Calendar (v) {
   let rVal = {}
   if (v.IsAllDay) {
     rVal.start = v.From.substring(0, 10)
-    rVal.details = `${(v.Purpose || {}).Description} ganztägig ${
+    rVal.details = `ganztägig ${
       (v.Purpose || {}).Notes
     } || ''`
   } else {
     rVal.start = v.From.substring(0, 16).replace('T', ' ') // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
     rVal.end = v.To.substring(0, 16).replace('T', ' ') // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
-    rVal.details = `${(v.Purpose || {}).Description} von ${new Date(
-      v.From
-    ).toLocaleTimeString()} bis ${new Date(v.To).toLocaleTimeString()}`
+    rVal.details = `
+      von ${moment(v.From).format('LT')} 
+      bis ${moment(v.To).format('LT')}
+    `
   }
   rVal.name = v.Title + ' in ' + (v.Ressource || {}).Name
   rVal.color = 'success'
