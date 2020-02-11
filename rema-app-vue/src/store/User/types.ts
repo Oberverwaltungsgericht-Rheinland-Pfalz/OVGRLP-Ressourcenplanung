@@ -1,5 +1,5 @@
-import UserData, { ContactUser } from '../../models/UserData'
-export { UserData }
+import UserData from '../../models/interfaces/UserData'
+import ContactUser from '../../models/interfaces/ContactUser'
 
 export interface UserState extends UserData {
   lastUpdated: Date | boolean,

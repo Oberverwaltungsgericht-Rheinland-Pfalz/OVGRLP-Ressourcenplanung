@@ -122,7 +122,8 @@ import AllocationRequest from '../../models/interfaces/AllocationRequest'
 import AllocationRequestView from '../../models/interfaces/AllocationRequestView'
 import Allocation from '../../models/Allocation'
 import AllocationModel from '../../models/interfaces/AllocationModel'
-import UserData, { ContactUser } from '../../models/UserData'
+import UserData from '../../models/interfaces/UserData'
+import ContactUser from '../../models/interfaces/ContactUser'
 const namespace = 'user'
 
 @Component
