@@ -42,13 +42,13 @@ import { Component, Vue } from 'vue-property-decorator'
 import Gadget from '../models/Gadget'
 import Ressource from '../models/Ressource'
 import Allocation from '../models/Allocation'
-import Suppliers from '../models/SupplierModel'
+import Supplier from '../models/Supplier'
 
 @Component({})
 export default class DbContentView extends Vue {
   private gadgetTitle: string = '';
   private get supplierItems () {
-    return Suppliers.all()
+    return Supplier.all()
   }
   private get gadgetItems () {
     return Gadget.all()

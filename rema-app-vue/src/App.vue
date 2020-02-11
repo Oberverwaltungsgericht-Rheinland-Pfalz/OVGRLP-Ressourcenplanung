@@ -122,7 +122,7 @@ import { Names as Fnn, UserData } from './store/User/types'
 import { MyRouteConfig } from './router'
 import Gadget from './models/Gadget'
 import Ressource from './models/Ressource'
-import Suppliers from './models/SupplierModel'
+import Supplier from './models/Supplier'
 import Allocation from './models/Allocation'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
@@ -162,7 +162,7 @@ export default class App extends Vue {
     })
 
     Gadget.api().get('gadgets')
-    Suppliers.api().get('suppliergroups')
+    Supplier.api().get('suppliergroups')
     Ressource.api().get('ressources')
     Allocation.api().get('allocations')
   }

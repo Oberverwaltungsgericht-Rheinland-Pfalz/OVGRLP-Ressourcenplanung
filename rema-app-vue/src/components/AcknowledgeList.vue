@@ -54,7 +54,7 @@ import AllocationModel from '../models/interfaces/AllocationModel'
 import AcknowledgeView from './AcknowledgeView.vue'
 import Gadget from '../models/Gadget'
 import Ressource from '../models/Ressource'
-import Suppliers from '../models/SupplierModel'
+import Supplier from '../models/Supplier'
 const namespace = 'user'
 
 @Component({
@@ -132,7 +132,7 @@ export default class AcknowledgeList extends Vue {
   }
   public refreshAllocations () {
     Gadget.api().get('gadgets')
-    Suppliers.api().get('suppliergroups')
+    Supplier.api().get('suppliergroups')
     Ressource.api().get('ressources')
     Allocation.api().get('allocations')
   }

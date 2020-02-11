@@ -73,7 +73,8 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import Suppliers, { SupplierGroupModel } from '../../models/SupplierModel'
+import Supplier from '../../models/Supplier'
+import SupplierGroupModel from '../../models/interfaces/SupplierModel'
 import Ressource from '../../models/Ressource'
 import Gadget from '../../models/Gadget'
 import GadgetModel from '../../models/interfaces/GadgetModel'
@@ -81,7 +82,7 @@ import GadgetModel from '../../models/interfaces/GadgetModel'
 @Component({
   filters: {
     supplierName (id: number) {
-      return ((Suppliers.find(id) as any) || { Title: '' }).Title
+      return ((Supplier.find(id) as any) || { Title: '' }).Title
     }
   }
 })
@@ -109,11 +110,11 @@ export default class SupplierManagement extends Vue {
       .map((v: any) => v.Title)
   }
   private get supplierItems () {
-    return Suppliers.all()
+    return Supplier.all()
   }
   private get items () {
     const suppNames: any = {}
-    Suppliers.all().forEach((e: any) => (suppNames[e.Id] = e.Title))
+    Supplier.all().forEach((e: any) => (suppNames[e.Id] = e.Title))
     return Gadget.all().map((v: any) => ({
       ...v,
       supplierTitle: suppNames[v.SuppliedBy]
@@ -144,7 +145,7 @@ export default class SupplierManagement extends Vue {
       const response = await Gadget.api().put(`gadgets/${this.editId}`, data)
       await Gadget.update(data)
     } else {
-      const group = Suppliers.find(this.editSupplier)
+      const group = Supplier.find(this.editSupplier)
 
       await Gadget.api().post('gadgets', data)
     }
