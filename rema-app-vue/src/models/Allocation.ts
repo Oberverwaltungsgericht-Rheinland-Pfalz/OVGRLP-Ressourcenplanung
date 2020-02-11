@@ -1,5 +1,5 @@
 import { Model } from '@vuex-orm/core'
-import Ressource from './RessourceModel'
+import Ressource from './Ressource'
 import Gadget from './GadgetModel'
 
 export default class Allocation extends Model {

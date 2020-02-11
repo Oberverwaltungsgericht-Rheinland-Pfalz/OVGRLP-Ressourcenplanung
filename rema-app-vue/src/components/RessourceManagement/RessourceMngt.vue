@@ -72,7 +72,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import Ressources, { RessourceModel } from '../../models/RessourceModel'
+import Ressource from '../../models/Ressource'
+import RessourceModel from '../../models/interfaces/RessourceModel'
 
 @Component({})
 export default class RessourceManagement extends Vue {
@@ -97,7 +98,7 @@ export default class RessourceManagement extends Vue {
   private editedIndex: number = -1;
 
   private get typeItems () {
-    return Ressources.query()
+    return Ressource.query()
       .all()
       .map((e: any) => e.Type)
   }
@@ -114,13 +115,13 @@ export default class RessourceManagement extends Vue {
       SpecialsDescription: this.editDetails
     }
     if (this.dialog === 2) {
-      const response = await Ressources.api().put(
+      const response = await Ressource.api().put(
         `ressources/${this.editId}`,
         data
       )
-      await Ressources.update(data)
+      await Ressource.update(data)
     } else {
-      await Ressources.api().post('ressources', data)
+      await Ressource.api().post('ressources', data)
     }
     this.closeModal()
   }
@@ -141,7 +142,7 @@ export default class RessourceManagement extends Vue {
   }
 
   private get items () {
-    return Ressources.all()
+    return Ressource.all()
   }
 
   private editItem (item: RessourceModel) {
@@ -172,7 +173,7 @@ export default class RessourceManagement extends Vue {
       ]
     })
 
-    if (confirmation === true) { Ressources.api().delete(`ressources/${item.Id}`, { delete: item.Id }) }
+    if (confirmation === true) { Ressource.api().delete(`ressources/${item.Id}`, { delete: item.Id }) }
   }
 
   private saveNew (event: ViewRessource) {

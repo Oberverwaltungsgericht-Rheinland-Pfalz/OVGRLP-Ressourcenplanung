@@ -74,7 +74,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import Suppliers, { SupplierGroupModel } from '../../models/SupplierModel'
-import Ressources from '../../models/RessourceModel'
+import Ressource from '../../models/Ressource'
 import Gadgets, { GadgetModel } from '../../models/GadgetModel'
 
 @Component({
@@ -103,7 +103,7 @@ export default class SupplierManagement extends Vue {
     if (this.dialog === 2) return 'Bearbeite Hilfsmittel'
   }
   private get RessourceNames () {
-    return Ressources.all()
+    return Ressource.all()
       .filter((v: any) => !!v.Title)
       .map((v: any) => v.Title)
   }
