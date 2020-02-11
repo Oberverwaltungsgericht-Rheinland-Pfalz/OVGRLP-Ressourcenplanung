@@ -1,7 +1,7 @@
 import { Model } from '@vuex-orm/core'
-import Gadget from './GadgetModel'
+import { Gadget } from '.'
 
-export default class Supplier extends Model {
+export class Supplier extends Model {
   // This is the name used as module name of the Vuex Store.
   public static entity = 'SupplierGroups'
   public static primaryKey = 'Id'
@@ -16,10 +16,4 @@ export default class Supplier extends Model {
       Gadgets: this.hasMany(Gadget, 'SuppliedBy', 'Id')
     }
   }
-}
-
-export interface SupplierGroupModel {
-  Id: number
-  Title: string
-  GroupEmail: string
 }

@@ -73,14 +73,17 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import Suppliers, { SupplierGroupModel } from '../../models/SupplierModel'
-import Ressources from '../../models/RessourceModel'
-import Gadgets, { GadgetModel } from '../../models/GadgetModel'
+import {
+  Supplier,
+  Ressource,
+  Gadget
+} from '../../models'
+import { SupplierGroupModel, GadgetModel } from '../../models/interfaces'
 
 @Component({
   filters: {
     supplierName (id: number) {
-      return ((Suppliers.find(id) as any) || { Title: '' }).Title
+      return ((Supplier.find(id) as any) || { Title: '' }).Title
     }
   }
 })
@@ -103,17 +106,17 @@ export default class SupplierManagement extends Vue {
     if (this.dialog === 2) return 'Bearbeite Hilfsmittel'
   }
   private get RessourceNames () {
-    return Ressources.all()
+    return Ressource.all()
       .filter((v: any) => !!v.Title)
       .map((v: any) => v.Title)
   }
   private get supplierItems () {
-    return Suppliers.all()
+    return Supplier.all()
   }
   private get items () {
     const suppNames: any = {}
-    Suppliers.all().forEach((e: any) => (suppNames[e.Id] = e.Title))
-    return Gadgets.all().map((v: any) => ({
+    Supplier.all().forEach((e: any) => (suppNames[e.Id] = e.Title))
+    return Gadget.all().map((v: any) => ({
       ...v,
       supplierTitle: suppNames[v.SuppliedBy]
     }))
@@ -140,12 +143,12 @@ export default class SupplierManagement extends Vue {
       SuppliedBy: this.editSupplier
     }
     if (this.dialog === 2) {
-      const response = await Gadgets.api().put(`gadgets/${this.editId}`, data)
-      await Gadgets.update(data)
+      const response = await Gadget.api().put(`gadgets/${this.editId}`, data)
+      await Gadget.update(data)
     } else {
-      const group = Suppliers.find(this.editSupplier)
+      const group = Supplier.find(this.editSupplier)
 
-      await Gadgets.api().post('gadgets', data)
+      await Gadget.api().post('gadgets', data)
     }
     this.closeModal()
   }
@@ -169,7 +172,7 @@ export default class SupplierManagement extends Vue {
     })
 
     if (confirmation === true) {
-      Gadgets.api().delete(`gadgets/${item.Id}`, { delete: item.Id })
+      Gadget.api().delete(`gadgets/${item.Id}`, { delete: item.Id })
     }
   }
 }

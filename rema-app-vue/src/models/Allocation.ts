@@ -1,8 +1,7 @@
 import { Model } from '@vuex-orm/core'
-import Ressource from './RessourceModel'
-import Allocationpurpose from './AllocationpurposeModel'
+import { Ressource, Gadget } from '.'
 
-export default class Allocation extends Model {
+export class Allocation extends Model {
   // This is the name used as module name of the Vuex Store.
   public static entity = 'allocations'
   public static primaryKey = 'Id'
@@ -13,6 +12,7 @@ export default class Allocation extends Model {
       Id: this.attr(null),
       From: this.attr(null),
       To: this.attr(null),
+      Title: this.attr(null),
       IsAllDay: this.attr(true),
       Status: this.attr(0),
       CreatedBy: this.attr(null),
@@ -22,25 +22,10 @@ export default class Allocation extends Model {
       ApprovedBy: this.attr(null),
       ApprovedAt: this.attr(null),
       ReferencePerson: this.attr(''),
-      Ressource_id: this.attr(null),
-      Ressource: this.belongsTo(Ressource, 'Ressource_id', 'Id'),
-      Purpose: this.belongsTo(Allocationpurpose, 'Purpose_id', 'Id'),
-      Purpose_id: this.attr(null)
+      RessourceId: this.attr(null),
+      Ressource: this.belongsTo(Ressource, 'RessourceId', 'Id'),
+      GadgetsIds: this.attr(null),
+      Gadgets: this.hasManyBy(Gadget, 'GadgetsIds', 'Id')
     }
   }
-}
-
-export interface AllocationModel {
-  Id: number
-  From: string
-  To: string
-  IsAllDay: boolean
-  Status: number
-  CreatedBy: string
-  CreatedAt: string
-  LastModified: string
-  LastModifiedBy: string
-  ApprovedBy: string
-  ApprovedAt: string
-  ReferencePerson: string
 }

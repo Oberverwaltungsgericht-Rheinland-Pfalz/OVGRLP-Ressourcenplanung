@@ -1,7 +1,6 @@
 import { ActionTree } from 'vuex'
-import axios from 'axios'
-import { UserState, UserData, Names } from './types'
-import { RootState } from '../types'
+import { Names } from './types'
+import { UserState, RootState } from '@/models/interfaces'
 
 export const actions: ActionTree<UserState, RootState> = {
   async [Names.a.loadUser] ({ commit }): Promise<any> {

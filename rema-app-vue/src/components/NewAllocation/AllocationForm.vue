@@ -18,7 +18,7 @@
             ></v-text-field>
           </v-col>
           <v-col>
-            <v-combobox
+            <v-select
               v-model="ressourceId"
               :items="Rooms"
               item-text="Name"
@@ -26,6 +26,7 @@
               clearable
               placeholder="Bitte wählen Sie einen Raum aus."
               label="Raum"
+              :menu-props="{ offsetY: true }"
             />
           </v-col>
         </v-row>
@@ -56,17 +57,18 @@
         <v-divider />
         <v-row>
           <v-col v-for="(group, idx) in GadgetGroups" :key="idx + 'group'" cols="6">
-            <v-combobox
+            <v-select
               v-model="selectedGadgets"
               :items="getGadgets(group.Id)"
               :label="'Hilsmittel (' + group.Title + ')'"
               item-text="Title"
               item-value="Id"
+              :menu-props="{ top: true, offsetY: true }"
               placeholder="Bitte wählen Sie Hilfmittel aus."
               multiple
               clearable
             >
-            </v-combobox>
+            </v-select>
           </v-col>
         </v-row>
         <v-divider />
@@ -93,7 +95,7 @@
         <v-row>
           <v-col>
             <v-textarea
-              v-model="Notes"
+              v-model="notes"
               :label="'Notizen'"
               auto-grow
               clearable
@@ -132,13 +134,13 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import Gadgets from '../../models/GadgetModel'
-import Ressources, { RessourceModel } from '../../models/RessourceModel'
-import Suppliers from '../../models/SupplierModel'
-import AllocationPurposes, {
-  AllocationPurposeModel
-} from '../../models/AllocationpurposeModel'
-import Allocations, { AllocationModel } from '../../models/AllocationModel'
+import {
+  Gadget,
+  Ressource,
+  Supplier,
+  Allocation
+} from '../../models'
+import { RessourceModel, AllocationModel } from '../../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 
 @Component({
@@ -148,12 +150,12 @@ import DateTimePicker from '@/components/DateTimePicker.vue'
 })
 export default class AllocationForm extends Vue {
   title: String = '';
-  ressourceId: any = null;
+  ressourceId: number | any = null;
   dateFrom: string = '';
   dateTo: string = '';
   fullday: boolean = false;
   notes: string = '';
-  seltedGadgets: number[] = [];
+  selectedGadgets: number[] = [];
   telNumber: string = '';
   contactPerson: string = '';
 
@@ -175,6 +177,8 @@ export default class AllocationForm extends Vue {
   }
 
   private async sendAllocation (status: number) {
+    this.saveAllocation(status)
+
     // const purposeId = await this.savePurpose()
     // console.log('purposeid ' + purposeId)
     // this.saveAllocation(status, purposeId)
@@ -192,9 +196,22 @@ export default class AllocationForm extends Vue {
 
   private async saveAllocation (
     status: number,
-    purpose: AllocationPurposeModel,
     date?: string
   ) {
+    let newAllocation = {
+      from: this.dateFrom,
+      to: this.dateTo,
+      title: this.title,
+      notes: this.notes,
+      isAllDay: this.fullday,
+      ressourceId: this.ressourceId,
+      gadgetsIds: [...this.selectedGadgets],
+      contactName: this.contactPerson,
+      contactPhone: this.telNumber
+    }
+
+    await Allocation.api().post('allocations', newAllocation)
+
     /*
     let from = this.dateFrom
     let to = this.dateTo
@@ -257,10 +274,10 @@ export default class AllocationForm extends Vue {
   }
 
   private get Rooms () {
-    return Ressources.all()
+    return Ressource.all()
   }
   private get GadgetGroups () {
-    return Suppliers.all()
+    return Supplier.all()
   }
 
   // dateFrom
@@ -305,7 +322,7 @@ export default class AllocationForm extends Vue {
   */
 
   private getGadgets (groupId: number) {
-    return Gadgets.query()
+    return Gadget.query()
       .where('SuppliedBy', groupId)
       .get()
   }
@@ -326,12 +343,10 @@ export default class AllocationForm extends Vue {
     this.dateTo = ''
     this.fullday = false
     this.ressourceId = null
-    this.seltedGadgets = []
+    this.selectedGadgets = []
   }
 }
 </script>
 
 <style lang="stylus">
-#repeatingTime input[type="time"]
-  border-bottom 1px solid darkgray
 </style>

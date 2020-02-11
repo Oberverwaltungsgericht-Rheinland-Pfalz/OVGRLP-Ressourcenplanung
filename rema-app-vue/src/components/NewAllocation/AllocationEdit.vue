@@ -111,20 +111,23 @@
 </template>
 
 <script lang="ts">
-import Gadgets from '../../models/GadgetModel'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../../store/User/types'
-import Ressources, { RessourceModel } from '../../models/RessourceModel'
-import Suppliers from '../../models/SupplierModel'
-import AllocationRequest, {
-  AllocationRequestView
-} from '../../models/AllocationRequest'
-import AllocationPurposes, {
-  AllocationPurposeModel
-} from '../../models/AllocationpurposeModel'
-import Allocations, { AllocationModel } from '../../models/AllocationModel'
-import UserData, { ContactUser } from '../../models/UserData'
+import {
+  Gadget,
+  Ressource,
+  Supplier,
+  Allocation
+} from '../../models'
+import {
+  RessourceModel,
+  AllocationRequest,
+  AllocationRequestView,
+  AllocationModel,
+  UserData,
+  ContactUser
+} from '../../models/interfaces'
 const namespace = 'user'
 
 @Component

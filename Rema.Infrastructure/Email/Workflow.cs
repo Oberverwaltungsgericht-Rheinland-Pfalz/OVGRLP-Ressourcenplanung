@@ -9,7 +9,7 @@ namespace Rema.Infrastructure.Email
     {
     }
 
-    public void TriggerTask(WorkflowDomain domain, string action, User triggerUser, string context = "", Ressource ressource = null, Allocation allocation = null, AllocationPurpose allocationPurpose = null)
+    public void TriggerTask(WorkflowDomain domain, string action, User triggerUser, string context = "", Ressource ressource = null, Allocation allocation = null)
     {
       // logging
       // decision

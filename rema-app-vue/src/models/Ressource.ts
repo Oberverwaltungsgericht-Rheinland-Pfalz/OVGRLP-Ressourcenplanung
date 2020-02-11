@@ -1,8 +1,9 @@
 import { Model } from '@vuex-orm/core'
+import { Allocation } from '.'
 
-export default class Gadget extends Model {
+export class Ressource extends Model {
   // This is the name used as module name of the Vuex Store.
-  public static entity = 'gadgets'
+  public static entity = 'ressources'
   public static primaryKey = 'Id'
 
   // List of all fields (schema) of the post model. `this.attr` is used
@@ -10,14 +11,11 @@ export default class Gadget extends Model {
   public static fields () {
     return {
       Id: this.attr(null),
-      Title: this.attr(''),
-      SuppliedBy: this.attr(null)
+      Name: this.attr(''),
+      Type: this.attr('Raum'),
+      FunctionDescription: this.attr(''),
+      SpecialsDescription: this.attr(''),
+      allocations: this.hasMany(Allocation, 'Ressource_id')
     }
   }
-}
-
-export interface GadgetModel {
-  Id: number
-  Title: string
-  SuppliedBy: string
 }

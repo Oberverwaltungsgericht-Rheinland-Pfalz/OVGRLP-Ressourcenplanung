@@ -1,11 +1,3 @@
-export default interface AllocationRequest {
-  id: number,
-  Title: string,
-  Status: string,
-  Description: string,
-  DateTime: Date
-}
-
 export interface AllocationRequestView {
   Id: number
   From: string
@@ -20,7 +12,6 @@ export interface AllocationRequestView {
   ApprovedAt: string
   ReferencePerson: string
   ReferencePersonId: number
-
   PurposeTitle: string
   RessourceTitle: string
   ContactTel: string

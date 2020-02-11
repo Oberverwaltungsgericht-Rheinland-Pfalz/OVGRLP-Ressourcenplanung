@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Rema.DbAccess;
 
 namespace Rema.DbAccess.Migrations
 {
@@ -14,41 +15,66 @@ namespace Rema.DbAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("DbRaumplanung.Models.Allocation", b =>
+            modelBuilder.Entity("Rema.Infrastructure.Models.Allocation", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("ApprovedAt");
+                    b.Property<DateTime>("ApprovedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long?>("ApprovedById");
+                    b.Property<long?>("ApprovedById")
+                        .HasColumnType("bigint");
 
-                    b.Property<DateTime>("CreatedAt");
+                    b.Property<string>("ContactName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("CreatedById");
+                    b.Property<string>("ContactPhone")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("From");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsAllDay");
+                    b.Property<long>("CreatedById")
+                        .HasColumnType("bigint");
 
-                    b.Property<DateTime>("LastModified");
+                    b.Property<DateTime>("From")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long?>("LastModifiedById");
+                    b.Property<bool>("IsAllDay")
+                        .HasColumnType("bit");
 
-                    b.Property<long?>("PurposeId");
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long?>("ReferencePersonId");
+                    b.Property<long?>("LastModifiedById")
+                        .HasColumnType("bigint");
 
-                    b.Property<long?>("RessourceId");
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(3000)")
+                        .HasMaxLength(3000);
 
-                    b.Property<int>("Status");
+                    b.Property<long?>("ReferencePersonId")
+                        .HasColumnType("bigint");
 
-                    b.Property<DateTime>("To");
+                    b.Property<long?>("RessourceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("To")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -58,8 +84,6 @@ namespace Rema.DbAccess.Migrations
 
                     b.HasIndex("LastModifiedById");
 
-                    b.HasIndex("PurposeId");
-
                     b.HasIndex("ReferencePersonId");
 
                     b.HasIndex("RessourceId");
@@ -67,39 +91,36 @@ namespace Rema.DbAccess.Migrations
                     b.ToTable("Allocations");
                 });
 
-            modelBuilder.Entity("DbRaumplanung.Models.AllocationPurpose", b =>
+            modelBuilder.Entity("Rema.Infrastructure.Models.AllocationGagdet", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<long>("AllocationId")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("ContactPhone");
+                    b.Property<long>("GadgetId")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(3000);
+                    b.HasKey("AllocationId", "GadgetId");
 
-                    b.Property<string>("Notes")
-                        .HasMaxLength(3000);
+                    b.HasIndex("GadgetId");
 
-                    b.Property<string>("Title")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AllocationPurposes");
+                    b.ToTable("AllocationGagdet");
                 });
 
-            modelBuilder.Entity("DbRaumplanung.Models.Gadget", b =>
+            modelBuilder.Entity("Rema.Infrastructure.Models.Gadget", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long?>("RessourceId");
+                    b.Property<long?>("RessourceId")
+                        .HasColumnType("bigint");
 
-                    b.Property<long?>("SuppliedById");
+                    b.Property<long?>("SuppliedById")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -110,35 +131,28 @@ namespace Rema.DbAccess.Migrations
                     b.ToTable("Gadgets");
                 });
 
-            modelBuilder.Entity("DbRaumplanung.Models.GadgetPurpose", b =>
-                {
-                    b.Property<long>("GadgetId");
-
-                    b.Property<long>("AllocationPurposeId");
-
-                    b.HasKey("GadgetId", "AllocationPurposeId");
-
-                    b.HasIndex("AllocationPurposeId");
-
-                    b.ToTable("GadgetPurposes");
-                });
-
-            modelBuilder.Entity("DbRaumplanung.Models.Ressource", b =>
+            modelBuilder.Entity("Rema.Infrastructure.Models.Ressource", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("FunctionDescription");
+                    b.Property<string>("FunctionDescription")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("SpecialsDescription");
+                    b.Property<string>("SpecialsDescription")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Type");
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Usability");
+                    b.Property<string>("Usability")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -147,18 +161,22 @@ namespace Rema.DbAccess.Migrations
                     b.ToTable("Ressources");
                 });
 
-            modelBuilder.Entity("DbRaumplanung.Models.SupplierGroup", b =>
+            modelBuilder.Entity("Rema.Infrastructure.Models.SupplierGroup", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("GroupEmail");
+                    b.Property<string>("GroupEmail")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<long?>("UserId");
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -169,21 +187,26 @@ namespace Rema.DbAccess.Migrations
                     b.ToTable("SupplierGroups");
                 });
 
-            modelBuilder.Entity("DbRaumplanung.Models.User", b =>
+            modelBuilder.Entity("Rema.Infrastructure.Models.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ActiveDirectoryID");
+                    b.Property<string>("ActiveDirectoryID")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Organisation");
+                    b.Property<string>("Organisation")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -192,61 +215,60 @@ namespace Rema.DbAccess.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("DbRaumplanung.Models.Allocation", b =>
+            modelBuilder.Entity("Rema.Infrastructure.Models.Allocation", b =>
                 {
-                    b.HasOne("DbRaumplanung.Models.User", "ApprovedBy")
+                    b.HasOne("Rema.Infrastructure.Models.User", "ApprovedBy")
                         .WithMany()
                         .HasForeignKey("ApprovedById");
 
-                    b.HasOne("DbRaumplanung.Models.User", "CreatedBy")
+                    b.HasOne("Rema.Infrastructure.Models.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("DbRaumplanung.Models.User", "LastModifiedBy")
+                    b.HasOne("Rema.Infrastructure.Models.User", "LastModifiedBy")
                         .WithMany()
                         .HasForeignKey("LastModifiedById");
 
-                    b.HasOne("DbRaumplanung.Models.AllocationPurpose", "Purpose")
-                        .WithMany("Allocations")
-                        .HasForeignKey("PurposeId");
-
-                    b.HasOne("DbRaumplanung.Models.User", "ReferencePerson")
+                    b.HasOne("Rema.Infrastructure.Models.User", "ReferencePerson")
                         .WithMany()
                         .HasForeignKey("ReferencePersonId");
 
-                    b.HasOne("DbRaumplanung.Models.Ressource", "Ressource")
+                    b.HasOne("Rema.Infrastructure.Models.Ressource", "Ressource")
                         .WithMany()
                         .HasForeignKey("RessourceId");
                 });
 
-            modelBuilder.Entity("DbRaumplanung.Models.Gadget", b =>
+            modelBuilder.Entity("Rema.Infrastructure.Models.AllocationGagdet", b =>
                 {
-                    b.HasOne("DbRaumplanung.Models.Ressource")
+                    b.HasOne("Rema.Infrastructure.Models.Allocation", "Allocation")
+                        .WithMany("AllocationGadgets")
+                        .HasForeignKey("AllocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rema.Infrastructure.Models.Gadget", "Gadget")
+                        .WithMany("AllocationGadgets")
+                        .HasForeignKey("GadgetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Rema.Infrastructure.Models.Gadget", b =>
+                {
+                    b.HasOne("Rema.Infrastructure.Models.Ressource", null)
                         .WithMany("Gadgets")
                         .HasForeignKey("RessourceId");
 
-                    b.HasOne("DbRaumplanung.Models.SupplierGroup", "SuppliedBy")
+                    b.HasOne("Rema.Infrastructure.Models.SupplierGroup", "SuppliedBy")
                         .WithMany()
                         .HasForeignKey("SuppliedById");
                 });
 
-            modelBuilder.Entity("DbRaumplanung.Models.GadgetPurpose", b =>
+            modelBuilder.Entity("Rema.Infrastructure.Models.SupplierGroup", b =>
                 {
-                    b.HasOne("DbRaumplanung.Models.AllocationPurpose", "AllocationPurpose")
-                        .WithMany("Gadgets")
-                        .HasForeignKey("AllocationPurposeId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DbRaumplanung.Models.Gadget", "Gadget")
-                        .WithMany("AllocationPurposes")
-                        .HasForeignKey("GadgetId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("DbRaumplanung.Models.SupplierGroup", b =>
-                {
-                    b.HasOne("DbRaumplanung.Models.User")
+                    b.HasOne("Rema.Infrastructure.Models.User", null)
                         .WithMany("SupplierGroups")
                         .HasForeignKey("UserId");
                 });
