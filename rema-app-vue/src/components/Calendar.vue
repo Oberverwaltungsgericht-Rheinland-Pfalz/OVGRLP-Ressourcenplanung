@@ -26,7 +26,6 @@
           :event-margin-bottom="3"
           :now="today"
           :type="type"
-          locale="de"
           :weekdays="[1, 2, 3, 4, 5, 6, 0]"
           :short-weekdays="false"
           @click:event="showEvent"
@@ -69,7 +68,7 @@
 
 <script>
 import dayjs from 'dayjs'
-import Allocation from '../models/Allocation'
+import { Allocation } from '../models'
 
 export default {
   data: () => ({
@@ -107,7 +106,7 @@ export default {
       }
     },
     items () {
-      return Allocations.query()
+      return Allocation.query()
         .with('Purpose')
         .with('Ressource')
         .get()
