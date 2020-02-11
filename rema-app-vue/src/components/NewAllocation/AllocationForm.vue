@@ -134,10 +134,12 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import Gadget from '../../models/Gadget'
-import Ressource from '../../models/Ressource'
-import Supplier from '../../models/Supplier'
-import Allocation from '../../models/Allocation'
+import {
+  Gadget,
+  Ressource,
+  Supplier,
+  Allocation
+} from '../../models'
 import { RessourceModel, AllocationModel } from '../../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 

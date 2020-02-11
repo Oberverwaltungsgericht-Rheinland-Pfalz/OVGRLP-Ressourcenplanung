@@ -4,11 +4,13 @@ import { RootState } from '@/models/interfaces'
 import { counter } from './counter/index'
 import { acknowledges } from './Acknowledges/index'
 import { user } from './User/index'
-import Gadget from '../models/Gadget'
-import Ressource from '../models/Ressource'
-import VisibleAllocation from '../models/VisibleAllocation'
-import Supplier from '../models/Supplier'
-import Allocation from '../models/Allocation'
+import {
+  Gadget,
+  Ressource,
+  VisibleAllocation,
+  Supplier,
+  Allocation
+} from '../models'
 import packageInfo from '../../package.json'
 import axios from 'axios'
 import VuexORM from '@vuex-orm/core'

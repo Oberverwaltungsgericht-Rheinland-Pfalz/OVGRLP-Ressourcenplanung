@@ -53,11 +53,13 @@ import {
   ContactUser,
   AllocationModel
 } from '../models/interfaces'
-import Allocation from '../models/Allocation'
 import AcknowledgeView from './AcknowledgeView.vue'
-import Gadget from '../models/Gadget'
-import Ressource from '../models/Ressource'
-import Supplier from '../models/Supplier'
+import {
+  Allocation,
+  Gadget,
+  Ressource,
+  Supplier
+} from '../models'
 const namespace = 'user'
 
 @Component({

@@ -145,7 +145,7 @@ import {
   ContactUser,
   AllocationModel
 } from '../models/interfaces'
-import Allocation from '../models/Allocation'
+import { Allocation } from '../models'
 const namespace = 'user'
 
 @Component

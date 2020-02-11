@@ -121,10 +121,12 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names as Fnn } from './store/User/types'
 import { UserData } from '@/models/interfaces'
 import { MyRouteConfig } from './router'
-import Gadget from './models/Gadget'
-import Ressource from './models/Ressource'
-import Supplier from './models/Supplier'
-import Allocation from './models/Allocation'
+import {
+  Gadget,
+  Ressource,
+  Supplier,
+  Allocation
+} from './models'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 

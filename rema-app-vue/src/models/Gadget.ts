@@ -1,6 +1,6 @@
 import { Model } from '@vuex-orm/core'
 
-export default class Gadget extends Model {
+export class Gadget extends Model {
   // This is the name used as module name of the Vuex Store.
   public static entity = 'gadgets'
   public static primaryKey = 'Id'
