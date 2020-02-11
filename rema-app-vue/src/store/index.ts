@@ -6,7 +6,7 @@ import { acknowledges } from './Acknowledges/index'
 import { user } from './User/index'
 import Gadget from '../models/Gadget'
 import Ressource from '../models/Ressource'
-import Visibleallocation from '../models/VisibleAllocationModel'
+import VisibleAllocation from '../models/VisibleAllocation'
 import Supplier from '../models/Supplier'
 import Allocation from '../models/Allocation'
 import packageInfo from '../../package.json'
@@ -20,7 +20,7 @@ const database = new VuexORM.Database()
 // Register Models to Database.
 database.register(Gadget)
 database.register(Ressource)
-database.register(Visibleallocation)
+database.register(VisibleAllocation)
 database.register(Allocation)
 database.register(Supplier)
 
