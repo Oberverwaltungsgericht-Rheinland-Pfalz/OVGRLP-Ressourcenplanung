@@ -111,7 +111,7 @@
 </template>
 
 <script lang="ts">
-import Gadgets from '../../models/GadgetModel'
+import Gadget from '../../models/Gadget'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../../store/User/types'

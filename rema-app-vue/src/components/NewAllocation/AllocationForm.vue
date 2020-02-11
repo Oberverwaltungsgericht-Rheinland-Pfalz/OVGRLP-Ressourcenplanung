@@ -134,7 +134,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import Gadgets from '../../models/GadgetModel'
+import Gadget from '../../models/Gadget'
 import Ressource from '../../models/Ressource'
 import RessourceModel from '../../models/interfaces/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
@@ -321,7 +321,7 @@ export default class AllocationForm extends Vue {
   */
 
   private getGadgets (groupId: number) {
-    return Gadgets.query()
+    return Gadget.query()
       .where('SuppliedBy', groupId)
       .get()
   }

@@ -52,7 +52,7 @@ import UserData, { ContactUser } from '../models/UserData'
 import Allocation from '../models/Allocation'
 import AllocationModel from '../models/interfaces/AllocationModel'
 import AcknowledgeView from './AcknowledgeView.vue'
-import Gadgets from '../models/GadgetModel'
+import Gadget from '../models/Gadget'
 import Ressource from '../models/Ressource'
 import Suppliers from '../models/SupplierModel'
 const namespace = 'user'
@@ -131,7 +131,7 @@ export default class AcknowledgeList extends Vue {
     }))
   }
   public refreshAllocations () {
-    Gadgets.api().get('gadgets')
+    Gadget.api().get('gadgets')
     Suppliers.api().get('suppliergroups')
     Ressource.api().get('ressources')
     Allocation.api().get('allocations')
