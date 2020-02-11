@@ -75,7 +75,8 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import Suppliers, { SupplierGroupModel } from '../../models/SupplierModel'
 import Ressource from '../../models/Ressource'
-import Gadgets, { GadgetModel } from '../../models/GadgetModel'
+import Gadget from '../../models/Gadget'
+import GadgetModel from '../../models/interfaces/GadgetModel'
 
 @Component({
   filters: {
@@ -113,7 +114,7 @@ export default class SupplierManagement extends Vue {
   private get items () {
     const suppNames: any = {}
     Suppliers.all().forEach((e: any) => (suppNames[e.Id] = e.Title))
-    return Gadgets.all().map((v: any) => ({
+    return Gadget.all().map((v: any) => ({
       ...v,
       supplierTitle: suppNames[v.SuppliedBy]
     }))
@@ -140,12 +141,12 @@ export default class SupplierManagement extends Vue {
       SuppliedBy: this.editSupplier
     }
     if (this.dialog === 2) {
-      const response = await Gadgets.api().put(`gadgets/${this.editId}`, data)
-      await Gadgets.update(data)
+      const response = await Gadget.api().put(`gadgets/${this.editId}`, data)
+      await Gadget.update(data)
     } else {
       const group = Suppliers.find(this.editSupplier)
 
-      await Gadgets.api().post('gadgets', data)
+      await Gadget.api().post('gadgets', data)
     }
     this.closeModal()
   }
@@ -169,7 +170,7 @@ export default class SupplierManagement extends Vue {
     })
 
     if (confirmation === true) {
-      Gadgets.api().delete(`gadgets/${item.Id}`, { delete: item.Id })
+      Gadget.api().delete(`gadgets/${item.Id}`, { delete: item.Id })
     }
   }
 }

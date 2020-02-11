@@ -120,7 +120,7 @@ import Router from 'vue-router'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names as Fnn, UserData } from './store/User/types'
 import { MyRouteConfig } from './router'
-import Gadgets from './models/GadgetModel'
+import Gadget from './models/Gadget'
 import Ressource from './models/Ressource'
 import Suppliers from './models/SupplierModel'
 import Allocation from './models/Allocation'
@@ -161,7 +161,7 @@ export default class App extends Vue {
       }
     })
 
-    Gadgets.api().get('gadgets')
+    Gadget.api().get('gadgets')
     Suppliers.api().get('suppliergroups')
     Ressource.api().get('ressources')
     Allocation.api().get('allocations')

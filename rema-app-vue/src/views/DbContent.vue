@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import Gadgets from '../models/GadgetModel'
+import Gadget from '../models/Gadget'
 import Ressource from '../models/Ressource'
 import Allocation from '../models/Allocation'
 import Suppliers from '../models/SupplierModel'
@@ -51,7 +51,7 @@ export default class DbContentView extends Vue {
     return Suppliers.all()
   }
   private get gadgetItems () {
-    return Gadgets.all()
+    return Gadget.all()
   }
   private get ressourceItems () {
     return Ressource.all()
