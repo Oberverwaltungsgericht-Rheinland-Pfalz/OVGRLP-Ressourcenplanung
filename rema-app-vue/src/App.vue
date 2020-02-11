@@ -121,7 +121,7 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names as Fnn, UserData } from './store/User/types'
 import { MyRouteConfig } from './router'
 import Gadgets from './models/GadgetModel'
-import Ressources from './models/RessourceModel'
+import Ressource from './models/Ressource'
 import Suppliers from './models/SupplierModel'
 import Allocation from './models/Allocation'
 import { Getters } from '@vuex-orm/core'
@@ -163,7 +163,7 @@ export default class App extends Vue {
 
     Gadgets.api().get('gadgets')
     Suppliers.api().get('suppliergroups')
-    Ressources.api().get('ressources')
+    Ressource.api().get('ressources')
     Allocation.api().get('allocations')
   }
 }

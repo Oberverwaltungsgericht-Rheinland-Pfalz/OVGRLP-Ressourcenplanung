@@ -70,7 +70,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import Suppliers, { SupplierGroupModel } from '../../models/SupplierModel'
-import Ressources from '../../models/RessourceModel'
+import Ressource from '../../models/Ressource'
 
 @Component
 export default class SupplierManagement extends Vue {
@@ -94,7 +94,7 @@ export default class SupplierManagement extends Vue {
     if (this.dialog === 2) return 'Bearbeite Gruppe'
   }
   private get RessourceNames () {
-    return Ressources.all()
+    return Ressource.all()
       .filter((v: any) => !!v.Title)
       .map((v: any) => v.Title)
   }

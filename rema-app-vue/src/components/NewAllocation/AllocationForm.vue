@@ -135,7 +135,8 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import Gadgets from '../../models/GadgetModel'
-import Ressources, { RessourceModel } from '../../models/RessourceModel'
+import Ressource from '../../models/Ressource'
+import RessourceModel from '../../models/interfaces/RessourceModel'
 import Suppliers from '../../models/SupplierModel'
 import Allocation from '../../models/Allocation'
 import AllocationModel from '../../models/interfaces/AllocationModel'
@@ -272,7 +273,7 @@ export default class AllocationForm extends Vue {
   }
 
   private get Rooms () {
-    return Ressources.all()
+    return Ressource.all()
   }
   private get GadgetGroups () {
     return Suppliers.all()
