@@ -1,8 +1,7 @@
 import { Model } from '@vuex-orm/core'
-import Ressource from './Ressource'
-import Gadget from './Gadget'
+import { Ressource, Gadget } from '.'
 
-export default class Allocation extends Model {
+export class Allocation extends Model {
   // This is the name used as module name of the Vuex Store.
   public static entity = 'allocations'
   public static primaryKey = 'Id'

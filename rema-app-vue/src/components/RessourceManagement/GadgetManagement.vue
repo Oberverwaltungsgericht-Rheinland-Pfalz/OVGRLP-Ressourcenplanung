@@ -73,9 +73,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import Supplier from '../../models/Supplier'
-import Ressource from '../../models/Ressource'
-import Gadget from '../../models/Gadget'
+import {
+  Supplier,
+  Ressource,
+  Gadget
+} from '../../models'
 import { SupplierGroupModel, GadgetModel } from '../../models/interfaces'
 
 @Component({

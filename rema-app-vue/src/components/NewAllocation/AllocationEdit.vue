@@ -111,13 +111,15 @@
 </template>
 
 <script lang="ts">
-import Gadget from '../../models/Gadget'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../../store/User/types'
-import Ressource from '../../models/Ressource'
-import Supplier from '../../models/Supplier'
-import Allocation from '../../models/Allocation'
+import {
+  Gadget,
+  Ressource,
+  Supplier,
+  Allocation
+} from '../../models'
 import {
   RessourceModel,
   AllocationRequest,

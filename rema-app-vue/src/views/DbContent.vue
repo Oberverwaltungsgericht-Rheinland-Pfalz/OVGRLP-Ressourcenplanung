@@ -39,10 +39,12 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import Gadget from '../models/Gadget'
-import Ressource from '../models/Ressource'
-import Allocation from '../models/Allocation'
-import Supplier from '../models/Supplier'
+import {
+  Gadget,
+  Ressource,
+  Allocation,
+  Supplier
+} from '@/models'
 
 @Component({})
 export default class DbContentView extends Vue {

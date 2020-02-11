@@ -39,7 +39,7 @@
 import dayjs from 'dayjs'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/Acknowledges/types'
-import Allocation from '../models/Allocation'
+import { Allocation } from '../models'
 import { AllocationRequest, AllocationModel } from '../models/interfaces'
 const namespace = 'acknowledges'
 
