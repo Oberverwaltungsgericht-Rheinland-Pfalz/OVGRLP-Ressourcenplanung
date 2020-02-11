@@ -1,5 +1,6 @@
 import { GetterTree } from 'vuex'
-import { UserState, UserData } from './types'
+import { UserState } from './types'
+import UserData from '@/models/interfaces/UserData'
 import { RootState } from '../types'
 
 export const getters: GetterTree<UserState, RootState> = {

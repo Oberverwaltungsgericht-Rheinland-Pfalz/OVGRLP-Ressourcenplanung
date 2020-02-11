@@ -1,6 +1,6 @@
 import { MutationTree } from 'vuex'
-import { UserState, UserData, Names } from './types'
-import { ContactUser } from '@/models/UserData'
+import { UserState, Names } from './types'
+import ContactUser from '@/models/interfaces/ContactUser'
 
 export const mutations: MutationTree<UserState> = {
   [Names.m.clearUser] (state: any) {

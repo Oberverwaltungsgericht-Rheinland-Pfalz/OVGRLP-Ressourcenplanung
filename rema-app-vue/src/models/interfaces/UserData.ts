@@ -1,4 +1,3 @@
-
 export default interface UserData {
   id: number,
   name: string,
@@ -7,11 +6,4 @@ export default interface UserData {
   roleNames: string,
   organisation: string,
   supplierGroups: number[] | boolean
-}
-
-export interface ContactUser {
-  Id: number
-  Title: string
-  Email: string
-  Organisation: string
 }
