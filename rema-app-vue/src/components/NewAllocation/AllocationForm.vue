@@ -137,7 +137,7 @@ import Component from 'vue-class-component'
 import Gadget from '../../models/Gadget'
 import Ressource from '../../models/Ressource'
 import RessourceModel from '../../models/interfaces/RessourceModel'
-import Suppliers from '../../models/SupplierModel'
+import Supplier from '../../models/Supplier'
 import Allocation from '../../models/Allocation'
 import AllocationModel from '../../models/interfaces/AllocationModel'
 import DateTimePicker from '@/components/DateTimePicker.vue'
@@ -276,7 +276,7 @@ export default class AllocationForm extends Vue {
     return Ressource.all()
   }
   private get GadgetGroups () {
-    return Suppliers.all()
+    return Supplier.all()
   }
 
   // dateFrom

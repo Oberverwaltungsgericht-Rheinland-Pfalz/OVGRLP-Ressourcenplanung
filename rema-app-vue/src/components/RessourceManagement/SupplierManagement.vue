@@ -69,7 +69,8 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import Suppliers, { SupplierGroupModel } from '../../models/SupplierModel'
+import Supplier from '../../models/Supplier'
+import SupplierGroupModel from '../../models/interfaces/SupplierModel'
 import Ressource from '../../models/Ressource'
 
 @Component
@@ -99,7 +100,7 @@ export default class SupplierManagement extends Vue {
       .map((v: any) => v.Title)
   }
   private get items () {
-    return Suppliers.all()
+    return Supplier.all()
   }
   private get invalidForm (): boolean {
     return !this.editTitle || !this.editEmail
@@ -123,13 +124,13 @@ export default class SupplierManagement extends Vue {
       GroupEmail: this.editEmail
     }
     if (this.dialog === 2) {
-      const response = await Suppliers.api().put(
+      const response = await Supplier.api().put(
         `suppliergroups/${this.editId}`,
         gadget
       )
-      await Suppliers.update(gadget)
+      await Supplier.update(gadget)
     } else {
-      await Suppliers.api().post('suppliergroups', gadget)
+      await Supplier.api().post('suppliergroups', gadget)
     }
     this.closeModal()
   }
@@ -153,7 +154,7 @@ export default class SupplierManagement extends Vue {
     })
 
     if (confirmation === true) {
-      Suppliers.api().delete(`suppliergroups/${item.Id}`, { delete: item.Id })
+      Supplier.api().delete(`suppliergroups/${item.Id}`, { delete: item.Id })
     }
   }
 }

@@ -7,7 +7,7 @@ import { user } from './User/index'
 import Gadget from '../models/Gadget'
 import Ressource from '../models/Ressource'
 import Visibleallocation from '../models/VisibleAllocationModel'
-import SupplierModel from '../models/SupplierModel'
+import Supplier from '../models/Supplier'
 import Allocation from '../models/Allocation'
 import packageInfo from '../../package.json'
 import axios from 'axios'
@@ -22,7 +22,7 @@ database.register(Gadget)
 database.register(Ressource)
 database.register(Visibleallocation)
 database.register(Allocation)
-database.register(SupplierModel)
+database.register(Supplier)
 
 VuexORM.use(VuexORMAxios, {
   axios,
