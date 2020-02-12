@@ -120,7 +120,6 @@ import Router from 'vue-router'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names as Fnn } from './store/User/types'
 import { UserData } from '@/models/interfaces'
-import { MyRouteConfig } from './router'
 import {
   Gadget,
   Ressource,
@@ -129,6 +128,7 @@ import {
 } from './models'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
+import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'
 
 @Component({
   components: { NewFormModal }
@@ -149,7 +149,7 @@ export default class App extends Vue {
   private miniVariant: boolean = false
   private right: boolean = true
   private title: string = 'NJZ Raumplanung'
-  private items: MyRouteConfig[] = []
+  private items: RemaRouteConfig[] = []
 
   public async created () {
     await this.loadUser()

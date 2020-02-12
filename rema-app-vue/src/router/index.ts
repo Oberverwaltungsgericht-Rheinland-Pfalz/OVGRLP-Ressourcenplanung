@@ -1,17 +1,13 @@
 import Vue from 'vue'
 import Router, { RouteConfig } from 'vue-router'
 import store from '@/store/index'
+import { RemaRouteConfig } from '@/models/interfaces/RemaRouteConfig'
 
 Vue.use(Router)
 
-export interface MyRouteConfig extends RouteConfig {
-  icon: string,
-  authLevel: number
-}
-
 /* tslint:disable:ter-indent */
 export default new Router({
-  mode: 'history',
+  mode: 'hash',
   base: process.env.BASE_URL,
   routes: [
     {
@@ -20,7 +16,7 @@ export default new Router({
       icon: 'business',
       authLevel: 0,
       component: () => import('@/views/Calendar.vue')
-    } as MyRouteConfig,
+    } as RemaRouteConfig,
     /*  {
           path: '/multi-select',
           name: 'multiselector',
@@ -30,6 +26,7 @@ export default new Router({
           // which is lazy-loaded when the route is visited.
           component: () => import( './views/MutliDates.vue')
      //   } as MyRouteConfig, */
+    /*
     {
       path: '/acknowledge',
       name: 'Anfragenverwaltung',
@@ -37,14 +34,15 @@ export default new Router({
       authLevel: 10,
       beforeEnter: (to, from, next) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')
-    } as MyRouteConfig,
+    } as RemaRouteConfig,
     {
       path: '/mylist',
       name: 'Ihre Anfragen',
       icon: 'calendar_view_day',
       authLevel: 0,
       component: () => import('@/components/MyList.vue')
-    } as MyRouteConfig,
+    } as RemaRouteConfig,
+    */
     {
       path: '/ressources',
       name: 'Administration',
@@ -52,14 +50,15 @@ export default new Router({
       authLevel: 100,
       beforeEnter: (to, from, next) => requireAuth(100, to, from, next),
       component: () => import('@/views/Ressources.vue')
-    } as MyRouteConfig,
+    } as RemaRouteConfig
+    /*
     {
       path: '/occupancy',
       name: 'Scheduler',
       icon: 'schedule',
       authLevel: 0,
       component: () => import('@/views/Occupancy.vue')
-    } as MyRouteConfig,
+    } as RemaRouteConfig,
     {
       path: '/supports',
       name: 'Aufgaben',
@@ -67,7 +66,8 @@ export default new Router({
       authLevel: 0,
       beforeEnter: (to, from, next) => requireAuth(0, to, from, next),
       component: () => import('@/views/Supporters.vue')
-    } as MyRouteConfig
+    } as RemaRouteConfig
+    */
     /*    {
       path: '/fetch-data',
       name: 'fetch-data',
