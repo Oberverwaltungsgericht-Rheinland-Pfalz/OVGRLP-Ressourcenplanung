@@ -17,7 +17,7 @@ namespace Rema.WebApi.ViewModels
 
     public bool HasRole(Role role)
     {
-      return role.Level >= Level;
+      return Level >= role.Level;
     }
   }
 }
