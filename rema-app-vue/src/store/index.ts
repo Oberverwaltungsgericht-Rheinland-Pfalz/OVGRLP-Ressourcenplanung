@@ -3,7 +3,7 @@ import Vuex, { StoreOptions } from 'vuex'
 import { RootState } from '@/models/interfaces'
 import { counter } from './counter/index'
 import { acknowledges } from './Acknowledges/index'
-import { user } from './User/index'
+import { user } from './user/index'
 import {
   Gadget,
   Ressource,

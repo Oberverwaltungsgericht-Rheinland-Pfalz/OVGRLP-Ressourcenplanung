@@ -137,7 +137,7 @@
 <script lang="ts">
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Names as Fnn } from '../store/User/types'
+import { Names as Fnn } from '../store/user/types'
 import {
   AllocationRequest,
   AllocationRequestView,
