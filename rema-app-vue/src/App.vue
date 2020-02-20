@@ -118,7 +118,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import Router from 'vue-router'
 import { State, Action, Getter, Mutation } from 'vuex-class'
-import { Names as Fnn } from './store/User/types'
+import { Names as Fnn } from './store/user/types'
 import { UserData } from '@/models/interfaces'
 import {
   Gadget,
