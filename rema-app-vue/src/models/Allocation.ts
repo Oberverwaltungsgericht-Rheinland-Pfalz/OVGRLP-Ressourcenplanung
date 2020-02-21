@@ -13,6 +13,8 @@ export class Allocation extends Model {
       From: this.attr(null),
       To: this.attr(null),
       Title: this.attr(null),
+      Notes: this.attr(null),
+      ContactName: this.attr(null),
       IsAllDay: this.attr(true),
       Status: this.attr(0),
       CreatedBy: this.attr(null),

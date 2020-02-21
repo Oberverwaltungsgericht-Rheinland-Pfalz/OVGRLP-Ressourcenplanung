@@ -41,20 +41,14 @@
         >
           <v-card color="grey lighten-4" min-width="350px" flat>
             <v-toolbar :color="selectedEvent.color" dark>
-              <!--<v-btn icon>
-                <v-icon>edit</v-icon>
-              </v-btn>-->
-              <!--<v-btn icon>
-                <v-icon>favorite</v-icon>
-              </v-btn>
-              <v-btn icon>
-                <v-icon>more_vert</v-icon>
-              </v-btn>-->
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
-              <span v-html="selectedEvent.details"></span>
+              <p>{{selectedEvent.schedule}}</p>
+              <p><strong>Notizen: </strong>{{selectedEvent.Notes}}</p>
+              <p><strong>Kontaktperson: </strong>{{selectedEvent.Contact}}</p>
+              <p><strong>Hilfsmittel: </strong><span v-html="selectedEvent.Gadgets"></span></p>
             </v-card-text>
             <v-card-actions>
               <v-btn text color="secondary" @click="selectedOpen = false">Schließen</v-btn>
@@ -68,7 +62,7 @@
 
 <script>
 import dayjs from 'dayjs'
-import { Allocation } from '../models'
+import { Allocation, Gadget } from '../models'
 var moment = require('moment')
 
 export default {
@@ -108,8 +102,8 @@ export default {
     },
     items () {
       return Allocation.query()
-        .with('Purpose')
         .with('Ressource')
+        .with('Gadget')
         .get()
     },
     itemsFormated () {
@@ -198,20 +192,26 @@ function transfer2Calendar (v) {
   let rVal = {}
   if (v.IsAllDay) {
     rVal.start = v.From.substring(0, 10)
-    rVal.details = `ganztägig ${
-      (v.Purpose || {}).Notes
-    } || ''`
+    rVal.schedule = `ganztägig`
   } else {
     rVal.start = v.From.substring(0, 16).replace('T', ' ') // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
     rVal.end = v.To.substring(0, 16).replace('T', ' ') // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
-    rVal.details = `
-      von ${moment(v.From).format('LT')} 
-      bis ${moment(v.To).format('LT')}
-    `
+    rVal.schedule = `
+      Von ${moment(v.From).format('LT')} 
+      bis ${moment(v.To).format('LT')}`
   }
   rVal.name = v.Title + ' in ' + (v.Ressource || {}).Name
   rVal.color = 'success'
   rVal.id = v.Id
+  rVal.Notes = v.Notes
+  rVal.Contact = v.ContactName
+
+  rVal.Gadgets = '<br>'
+
+  v.GadgetsIds.map(e => Gadget.find(e).Title)
+    .forEach(e => { rVal.Gadgets += e + '<br> ' })
+  rVal.Gadgets.slice(0, -1)
+  // rVal.Gadgets += v.GadgetsIds.map(e => Gadget.find(e).Title)
 
   return rVal
 }
