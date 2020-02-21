@@ -44,7 +44,7 @@ namespace Rema.WebApi.Filter
 
       if (baseController.RequestSenderVM.Roles.Exists(e => e.HasRole(requiredRole)))
         return;
-      else
+      else if(_permission != "Reader")  // Schränkt nur ein auf bekannte Nutzer
         context.Result = new UnauthorizedResult();
     }
   }
