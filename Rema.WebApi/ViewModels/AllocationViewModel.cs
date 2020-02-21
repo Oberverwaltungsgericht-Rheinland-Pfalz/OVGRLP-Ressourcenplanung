@@ -42,5 +42,7 @@ namespace Rema.WebApi.ViewModels
     public DateTime ApprovedAt { get; set; }
 
     public long ReferencePersonId { get; set; }
+
+    public string ScheduleSeries { get; set; }
   }
 }

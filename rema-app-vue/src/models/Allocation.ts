@@ -10,6 +10,7 @@ export class Allocation extends Model {
   public static fields (): any {
     return {
       Id: this.attr(null),
+      ScheduleSeries: this.attr(null),
       From: this.attr(null),
       To: this.attr(null),
       Title: this.attr(null),
