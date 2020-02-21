@@ -142,7 +142,7 @@ namespace Rema.WebApi.Controllers
       return Ok();
     }
 
-    // POST: allocations
+    // POST: allocation
     [HttpPost]
     public async Task<ActionResult<AllocationViewModel>> PostAllocation(AllocationViewModel allocationVM)
     {
@@ -304,6 +304,188 @@ namespace Rema.WebApi.Controllers
       catch (Exception ex)
       {
         Log.Error(ex, "error while mapping save allocation to result");
+      }
+
+      return Ok();
+    }
+
+    // POST: allocations
+    [Route("PostAllocations")]
+    [HttpPost]
+    public async Task<ActionResult<AllocationViewModel>> PostAllocations(MultipleAllocationsViewModel allocationsVM)
+    {
+      Log.Information("POST allocations: {allocation}", allocationsVM);
+
+      List<Allocation> allocations = new List<Allocation>();
+      User requestedUser;
+
+      try
+      {
+        requestedUser = await _context.Users.FindAsync(this.RequestSender.Id);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting request sender");
+        return Conflict();
+      }
+
+      try
+      {
+        foreach(var date in allocationsVM.Dates)
+        {
+          var singleDate = _mapper.Map<AllocationViewModel, Allocation>(allocationsVM);
+          var newFrom = DateTime.Parse(date);
+          singleDate.From = newFrom.Date + allocationsVM.From.TimeOfDay;
+
+          var newTo = DateTime.Parse(date);
+          singleDate.To = newFrom.Date + allocationsVM.To.TimeOfDay;
+          allocations.Add(singleDate);
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while mapping allocations");
+        return BadRequest();
+      }
+
+      try
+      {
+        var ressource = await _context.Ressources.FindAsync(allocationsVM.RessourceId);
+        allocations.ForEach(e => e.Ressource = ressource);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting ressource");
+      }
+
+      try
+      {
+        var gadgets = _context.Gadgets.Where(g => allocationsVM.GadgetsIds.Contains(g.Id));
+
+        foreach (var a in allocations)
+        {
+          a.AllocationGadgets = new List<AllocationGagdet>();
+          foreach (var g in gadgets)
+          {
+            a.AllocationGadgets.Add(new AllocationGagdet
+            {
+              AllocationId = a.Id,
+              Allocation = a,
+              GadgetId = g.Id,
+              Gadget = g
+            });
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while mapping gadgets to allocation");
+      }
+
+      try
+      {
+        allocations.ForEach(e => e.LastModified = DateTime.Now);
+        allocations.ForEach(e => e.LastModifiedBy = requestedUser);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while setting modified informations");
+      }
+
+      try
+      {
+        allocations.ForEach(e => e.CreatedAt = DateTime.Now);
+        allocations.ForEach(e => e.CreatedBy = requestedUser);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while setting created informations");
+      }
+
+      try
+      {
+        allocations.ForEach(e => e.ApprovedBy = requestedUser);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while setting approved information");
+      }
+
+      try
+      {
+        if (allocationsVM.IsAllDay)
+        {
+          allocations.ForEach((e) => {
+            e.From = e.From.Date + new TimeSpan(0, 0, 0);
+            e.To = e.To.Date + new TimeSpan(23, 59, 00);
+          });
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while set correct times for all day");
+      }
+
+      try
+      {
+        if (allocationsVM.ReferencePersonId == 0)
+        {
+          allocations.ForEach(e => e.ReferencePerson = requestedUser);
+        }
+        else
+        {
+          var referencePerson = await _context.Users.FindAsync(allocationsVM.ReferencePersonId);
+          allocations.ForEach(e => e.ReferencePerson = requestedUser);
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while setting referencePerson");
+      }
+
+      var status = allocations[0].Status;
+      Boolean hasApproveRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
+      if (status >= MeetingStatus.Approved && !hasApproveRight)
+        return new UnauthorizedResult();
+      
+
+      try
+      {
+        allocations.ForEach(e => _context.Allocations.Add(e));
+        await _context.SaveChangesAsync();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while saving the new allocation");
+        return Conflict();
+      }
+
+      try
+      {
+        var title = allocationsVM.Title;
+        var ressourceName = allocations[0].Ressource.Name;
+        var from = allocations[0].From;
+        var to = allocations[0].To;
+
+        if (status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)))
+        {
+          EmailTrigger.SendEmail(
+            "Buchung wurde erstellt",
+            $"Ihre Buchungsanfrage {title} der Ressource {ressourceName} " +
+            $"vom {from} bis {to} wurde vorgenommen",
+            recipient: base.RequestSender.Email);
+        }
+        else
+        {
+          EmailTrigger.SendEmail(
+            "Anfrage wurde erstellt",
+            $"Ihre Buchungsanfrage {title} der Ressource {ressourceName} " +
+            $"vom {from} bis {to} wurde gestellt", recipient: base.RequestSender.Email);
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while processing mails");
       }
 
       return Ok();
