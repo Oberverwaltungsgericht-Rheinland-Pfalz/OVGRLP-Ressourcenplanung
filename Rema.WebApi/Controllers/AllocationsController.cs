@@ -107,14 +107,31 @@ namespace Rema.WebApi.Controllers
 
     // PUT: allocations/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutAllocation(long id, Allocation allocation)
+    public async Task<IActionResult> PutAllocation(long id, AllocationViewModel allocationVM)
     {
-      Log.Information("PUT allocations/{id}: {allocation}", id, allocation);
-
-      if (id != allocation.Id)
+      Log.Information("PUT allocations/{id}: {allocation}", id, allocationVM);
+     
+      if (id != allocationVM.Id)
       {
         Log.Error("allocation not mached the id");
         return BadRequest();
+      }
+      Allocation allocation;
+      try
+      {
+        allocation = _mapper.Map<AllocationViewModel, Allocation>(allocationVM);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while mapping allocation");
+        return BadRequest();
+      }
+
+      bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || allocation.CreatedBy.Id == base.RequestSenderVM.Id;
+      if (!hasRight)
+      {
+        Log.Warning("User {user} was restricted to change allocation {allocation}", base.RequestSenderVM, allocation);
+        return new UnauthorizedResult();
       }
 
       try
@@ -122,6 +139,94 @@ namespace Rema.WebApi.Controllers
         allocation.LastModified = DateTime.Now;
         allocation.LastModifiedBy = base.RequestSender;
         _context.Entry(allocation).State = EntityState.Modified;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while set modified values for allocation");
+        return Conflict();
+      }
+
+      try
+      {
+        await _context.SaveChangesAsync();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while save allocation");
+        return Conflict();
+      }
+
+      return Ok();
+    }
+
+    [HttpPut("ChangeAllocationSeries/{id}")]
+    public async Task<IActionResult> ChangeAllocationSeries(AllocationViewModel allocationVM)
+    {
+      Log.Information("PUT ChangeAllocationSeries/{id}: {allocation}", allocationVM.Id, allocationVM);
+
+      Allocation allocation;
+      try
+      {
+        allocation = _mapper.Map<AllocationViewModel, Allocation>(allocationVM);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while mapping allocation");
+        return BadRequest();
+      }
+
+      bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || allocation.CreatedBy.Id == base.RequestSenderVM.Id;
+      if (!hasRight)
+      {
+        Log.Warning("User {user} was restricted to change allocation {allocation}", base.RequestSenderVM, allocation);
+        return new UnauthorizedResult();
+      }
+
+      var datesList = new List<Allocation>();
+      try
+      {
+        datesList = await _context.Allocations.Where(s => s.ScheduleSeriesGuid == allocation.ScheduleSeriesGuid).ToListAsync();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while querying scheduleSeries allocations");
+        return Conflict();
+      }
+
+      Ressource ressource = null;
+      try
+      {
+        ressource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting ressource");
+      }
+
+      User referencePerson = null;
+      try
+      {
+        referencePerson = await _context.Users.FindAsync(allocationVM.ReferencePersonId);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting referencePerson");
+      }
+
+      try
+      {
+        foreach(var all in datesList)
+        {
+          all.Title = allocation.Title;
+          all.Notes = allocation.Notes;
+          all.ReferencePerson = referencePerson;
+          all.ContactName = allocation.ContactName;
+          all.ContactPhone = allocation.ContactPhone;
+          all.Ressource = ressource;
+          all.LastModified = DateTime.Now;
+          all.LastModifiedBy = base.RequestSender;
+          _context.Entry(all).State = EntityState.Modified;
+        }
       }
       catch (Exception ex)
       {
@@ -318,6 +423,7 @@ namespace Rema.WebApi.Controllers
 
       List<Allocation> allocations = new List<Allocation>();
       User requestedUser;
+      Guid scheduleSeries = Guid.NewGuid();
 
       try
       {
@@ -339,6 +445,8 @@ namespace Rema.WebApi.Controllers
 
           var newTo = DateTime.Parse(date);
           singleDate.To = newFrom.Date + allocationsVM.To.TimeOfDay;
+
+          singleDate.ScheduleSeriesGuid = scheduleSeries;
           allocations.Add(singleDate);
         }
       }
