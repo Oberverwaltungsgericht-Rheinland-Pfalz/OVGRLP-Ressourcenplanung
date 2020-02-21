@@ -32,6 +32,51 @@
         </v-row>
         <v-divider />
         <v-row>
+          <v-col :cols="6">
+            <v-checkbox v-model="isRepeating" label="Wiederkehrender Termin"></v-checkbox>
+          </v-col>
+          <v-col :cols="6">
+            <v-checkbox v-model="fullday" label="ganztägig"></v-checkbox>
+          </v-col>
+
+          <template v-if="isRepeating">
+            <v-col v-show="!fullday" :cols="6"><strong>Von: </strong><drop-down-time-picker v-model="timeFrom"/></v-col>
+            <v-col v-show="!fullday" :cols="6"><strong>Bis: </strong><drop-down-time-picker v-model="timeTo"/></v-col>
+            <v-col>
+              <div v-show="isRepeating">
+                <v-menu
+                  ref="showMultipleDatesMenu"
+                  v-model="showMultipleDatesMenu"
+                  :close-on-content-click="false"
+                  :return-value.sync="multipleDates"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on }">
+                    <v-combobox
+                      v-model="multipleDates"
+                      multiple chips small-chips readonly
+                      label="Gewählte Termine"
+                      prepend-icon="event"
+                      v-on="on"
+                    >
+                      <template v-slot:selection="data">
+                        <v-chip>{{data.item | toLocalDate}} <v-icon right @click="removeDate(data.item)">close</v-icon></v-chip>
+                      </template>
+                    </v-combobox>
+                  </template>
+                  <v-date-picker v-model="multipleDates" locale="de" multiple no-title scrollable>
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" @click="showMultipleDatesMenu = false">Abbrechen</v-btn>
+                    <v-btn text color="primary" @click="$refs.showMultipleDatesMenu.save(multipleDates)">OK</v-btn>
+                  </v-date-picker>
+                </v-menu>
+              </div>
+            </v-col>
+          </template>
+        </v-row>
+        <v-row v-if="!isRepeating"> <!-- single date row -->
           <v-col cols="5">
             <!-- Datum von -->
             <date-time-picker
@@ -49,9 +94,6 @@
               :with-time="!fullday"
               placeholder="Bitte wählen Sie ein Datum aus."
             />
-          </v-col>
-          <v-col>
-            <v-checkbox v-model="fullday" label="ganztägig"></v-checkbox>
           </v-col>
         </v-row>
         <v-divider />
@@ -140,12 +182,13 @@ import {
   Supplier,
   Allocation
 } from '../../models'
+import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel } from '../../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 
 @Component({
   components: {
-    DateTimePicker
+    DateTimePicker, DropDownTimePicker
   }
 })
 export default class AllocationForm extends Vue {
@@ -158,15 +201,17 @@ export default class AllocationForm extends Vue {
   selectedGadgets: number[] = [];
   telNumber: string = '';
   contactPerson: string = '';
+  private multipleDates: string[] = []
+  private showMultipleDatesMenu: boolean = false
 
-  // public isRepeating: boolean = false
+  public isRepeating: boolean = false
   // public valid: boolean = false
   // public editId: number = 0
   // private Description: string = ''
 
   // private Email: string = ''
-  // private timeFrom: string = '08:00'
-  // private timeTo: string = '17:00'
+  private timeFrom: string = '08:00'
+  private timeTo: string = '17:00'
   // private dateToIntern: Date = new Date(new Date().setHours(16, 0, 0, 0))
   // private dateToChanged: boolean = false
   // private multipleDates: string[] = []
@@ -198,7 +243,10 @@ export default class AllocationForm extends Vue {
     status: number,
     date?: string
   ) {
+    debugger
+
     let newAllocation = {
+      status: status,
       from: this.dateFrom,
       to: this.dateTo,
       title: this.title,
@@ -207,10 +255,29 @@ export default class AllocationForm extends Vue {
       ressourceId: this.ressourceId,
       gadgetsIds: [...this.selectedGadgets],
       contactName: this.contactPerson,
-      contactPhone: this.telNumber
+      contactPhone: this.telNumber,
+      dates: ['']
     }
 
-    await Allocation.api().post('allocations', newAllocation)
+    if (!this.isRepeating) {
+      await Allocation.api().post('allocations', newAllocation)
+    } else {
+      newAllocation.from = this.timeFrom
+      newAllocation.to = this.timeTo
+      newAllocation.dates = this.multipleDates
+
+      const response = await fetch(`/api/Allocations/PostAllocations`, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, cors, *same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newAllocation)
+      })
+      await Allocation.api().get('allocations')
+    }
 
     /*
     let from = this.dateFrom
@@ -264,12 +331,15 @@ export default class AllocationForm extends Vue {
     */
   }
   private close () {
-    // this.clearAll()
+    this.clearAll()
     this.$emit('close')
   }
   public get formInvalid () {
     let rValue = true
     if (!this.ressourceId) rValue = false
+    if (!this.dateFrom && !this.isRepeating) rValue = false
+    if (!this.dateTo && !this.isRepeating) rValue = false
+    if (this.isRepeating && !this.multipleDates.length) rValue = false
     return !rValue
   }
 
@@ -327,12 +397,10 @@ export default class AllocationForm extends Vue {
       .get()
   }
 
-  /*
   private removeDate (item: string) {
     const idx = this.multipleDates.findIndex(v => v === item)
     this.multipleDates.splice(idx, 1)
   }
-  */
 
   private clearAll () {
     this.title = ''
@@ -341,9 +409,12 @@ export default class AllocationForm extends Vue {
     this.contactPerson = ''
     this.dateFrom = ''
     this.dateTo = ''
+    this.timeTo = '18:00'
+    this.timeFrom = '00:00'
     this.fullday = false
     this.ressourceId = null
     this.selectedGadgets = []
+    this.multipleDates = []
   }
 }
 </script>
