@@ -36,6 +36,8 @@
             <!-- Datum von -->
             <date-time-picker
               label="von"
+              defaultTime="08:00"
+              defaultTimeFullDay="00:00"
               v-model="dateFrom"
               :with-time="!fullday"
               placeholder="Bitte wählen Sie ein Datum aus."
@@ -45,6 +47,8 @@
             <!-- Datum bis -->
             <date-time-picker
               label="bis"
+              defaultTime="16:00"
+              defaultTimeFullDay="23:59"
               v-model="dateTo"
               :with-time="!fullday"
               placeholder="Bitte wählen Sie ein Datum aus."
@@ -132,8 +136,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Component from 'vue-class-component'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import {
   Gadget,
   Ressource,
@@ -171,6 +174,14 @@ export default class AllocationForm extends Vue {
   // private dateToChanged: boolean = false
   // private multipleDates: string[] = []
   // private showMultipleDatesMenu: boolean = false
+
+  @Watch('dateFrom')
+  public dateFromChange (val: string) {
+    if (!this.dateTo || this.dateTo.length === 0) {
+      let datePart = val.split('T')[0]
+      this.dateTo = datePart + 'T16:00'
+    }
+  }
 
   private get permissionToEdit (): boolean {
     return this.$store.state.user.role >= 10
