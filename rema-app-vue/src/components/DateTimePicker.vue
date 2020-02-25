@@ -5,30 +5,25 @@
         <v-dialog
           ref="dialog"
           v-model="modal"
-          :return-value.sync="date"
           persistent
           width="290px"
         >
           <template v-slot:activator="{ on }">
             <v-text-field
-              :value="date | moment(dateFormat)"
+              :value="formatedDate"
               prepend-icon="event"
               :placeholder="placeholder"
               :label="label"
               readonly
+              clearable
+              @click:clear="date = null"
               v-on="on"
             ></v-text-field>
           </template>
           <v-date-picker
             v-model="date"
             scrollable
-            @dblclick:date="$refs.dialog.save(date)"
-          >
-            <v-btn text color="primary" @click="modal = false">Abbrechen</v-btn>
-            <v-btn text color="primary" @click="$refs.dialog.save(date)"
-              >OK</v-btn
-            >
-          </v-date-picker>
+            @change="modal = false" />
         </v-dialog>
       </v-col>
       <v-col cols="3" v-if="withTime">
@@ -38,14 +33,15 @@
     <v-row>
       <span v-if="debug">
         {{ value }}
-      </span></v-row
-    >
+      </span>
+    </v-row>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { Component, Prop } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
+var moment = require('moment')
 
 @Component
 export default class DateTimePicker extends Vue {
@@ -53,39 +49,62 @@ export default class DateTimePicker extends Vue {
   @Prop() label!: string;
   @Prop(Boolean) debug!: Boolean;
   @Prop(Boolean) withTime!: Boolean;
+  @Prop({ default: '08:00' }) defaultTime!: string;
+  @Prop({ default: '00:00' }) defaultTimeFullDay!: string
 
   @Prop({ default: 'L' }) dateFormat!: string;
-  @Prop({ default: new Date(Date.now()).toISOString() }) value!: string;
+  @Prop({ default: '' }) value!: string;
 
-  private timeOffset: string = '';
+  private date: string = ''
+  private time: string = this.defaultTime
 
   modal: Boolean = false;
 
-  get date (): string {
-    if (this.value.indexOf('T') > 0) {
-      return this.value.split('T')[0]
-    } else {
-      return this.value
-    }
+  @Watch('withTime')
+  public withTimeChange (val: Boolean) {
+    this.$emit('input', this.getValue())
   }
 
-  set date (isoDatePart: string) {
-    let timePart = this.value.split('T')[1]
-    let newValue = isoDatePart + 'T' + timePart
-    this.$emit('input', newValue)
+  @Watch('value')
+  public valueChange (val: string) {
+    let datePart = ''
+    let timePart = this.defaultTime
+
+    if (val && val.length > 0 && val.indexOf('T')) {
+      datePart = val.split('T')[0]
+      timePart = val.split('T')[1]
+    }
+
+    this.date = datePart
+    this.time = timePart
   }
 
-  get time (): string {
-    if (this.value.indexOf('T') > 0) {
-      this.timeOffset = this.value.split('T')[1].substring(12)
-      return this.value.split('T')[1].substring(0, 5)
-    } else {
-      return this.value
-    }
+  @Watch('date')
+  public dateChange (val: string) {
+    this.$emit('input', this.getValue())
   }
-  set time (isoTimePart: string) {
-    let newValue = this.date + 'T' + isoTimePart + ':00.000' + this.timeOffset
-    this.$emit('input', newValue)
+
+  @Watch('time')
+  public timeChange (val: string) {
+    this.$emit('input', this.getValue())
+  }
+
+  private getValue () : string {
+    let newValue = ''
+
+    if (this.date && this.date.length > 0) {
+      if (!this.withTime) {
+        newValue = this.date + 'T' + this.defaultTimeFullDay
+      } else if (this.time && this.time.length > 0) {
+        newValue = this.date + 'T' + this.time
+      }
+    }
+
+    return newValue
+  }
+
+  get formatedDate (): string {
+    return this.date ? moment(this.date).format(this.dateFormat) : ''
   }
 }
 </script>
