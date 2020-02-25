@@ -254,8 +254,6 @@ export default class AllocationForm extends Vue {
     status: number,
     date?: string
   ) {
-    debugger
-
     let newAllocation = {
       status: status,
       from: this.dateFrom,
@@ -429,6 +427,7 @@ export default class AllocationForm extends Vue {
     this.ressourceId = null
     this.selectedGadgets = []
     this.multipleDates = []
+    this.isRepeating = false
   }
 }
 </script>

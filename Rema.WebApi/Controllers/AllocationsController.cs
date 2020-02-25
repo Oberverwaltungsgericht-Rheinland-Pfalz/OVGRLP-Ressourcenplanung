@@ -728,12 +728,15 @@ namespace Rema.WebApi.Controllers
       Log.Information("PUT allocations/editrequest: {editRequest}", editedRequest);
 
       Allocation allocation;
+      string ressourceName;
 
       try
       {
-        allocation = await _context.Allocations
+        allocation = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == editedRequest.Id); //FindAsync(editedRequest.Id);
+        /*var allocation2 = await _context.Allocations
           .Include(o => o.Ressource)
           .FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
+        */ressourceName = allocation.Ressource.Name;
       }
       catch (Exception ex)
       {
@@ -759,6 +762,7 @@ namespace Rema.WebApi.Controllers
           allocation.From = editedRequest.From.GetValueOrDefault();
           allocation.To = editedRequest.To.GetValueOrDefault();
         }
+
         _context.Entry(allocation).State = EntityState.Modified;
         await _context.SaveChangesAsync();
       }
@@ -772,15 +776,15 @@ namespace Rema.WebApi.Controllers
       {
         if ((MeetingStatus)editedRequest.status == MeetingStatus.Moved)
         {
-          EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde verschoben von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
+          EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Title} der Ressource {ressourceName} vom {allocation.From} bis {allocation.To} wurde verschoben von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
         }
         else if ((MeetingStatus)editedRequest.status == MeetingStatus.Approved)
         {
-          EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde genehmigt von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
+          EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Title} der Ressource {ressourceName} vom {allocation.From} bis {allocation.To} wurde genehmigt von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
         }
         else if ((MeetingStatus)editedRequest.status == MeetingStatus.Clarification)
         {
-          EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From} bis {allocation.To} wurde abgelehnt", recipient: base.RequestSender.Email);
+          EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Title} der Ressource {ressourceName} vom {allocation.From} bis {allocation.To} wurde abgelehnt", recipient: base.RequestSender.Email);
         }
       }
 

@@ -24,8 +24,8 @@
           />
         </v-toolbar>
       </template>
-      <template v-slot:item.From="{ item }">{{item.From | simpleDateTime}}</template>
-      <template v-slot:item.To="{ item }">{{item.To | simpleDateTime}}</template>
+      <template v-slot:item.From="{ item }">{{item.From | toLocal}}</template>
+      <template v-slot:item.To="{ item }">{{item.To | toLocal}}</template>
       <template v-slot:item.DateTime="{ item }">{{item.DateTime | toLocal}}</template>
       <template v-slot:item.CreateDate="{ item }">{{item.CreateDate | toLocal}}</template>
       <template v-slot:item.action="{ item }">
@@ -104,10 +104,9 @@ export default class AcknowledgeList extends Vue {
     this.viewAllocation = {
       ...viewA,
       RessourceTitle: viewA.Ressource.Name,
-      PurposeTitle: viewA.Purpose.Title,
-      ContactTel: viewA.Purpose.ContactPhone,
-      Description: viewA.Purpose.Description,
-      Notices: viewA.Purpose.Notes
+      PurposeTitle: viewA.Title,
+      ContactTel: viewA.ContactName,
+      Notices: viewA.Notes
     }
   }
   public get UnAcknowledgedAllocations (): Allocation[] {
@@ -120,13 +119,13 @@ export default class AcknowledgeList extends Vue {
     this.fillContactUsers()
     return this.UnAcknowledgedAllocations.map((v: any) => ({
       Id: v.Id,
-      Title: (v.Purpose || {}).Title,
+      Title: v.Title,
       CreateDate: v.CreatedAt,
       // @ts-ignore
       Status: this.$options.filters.status2string(v.Status),
       Contact: (
         this.ContactUsers.find(
-          (w: ContactUser) => w.Id === v.ReferencePerson
+          (w: ContactUser) => w.Id === v.ReferencePersonId
         ) || { Title: '' }
       ).Title,
       Ressource: (v.Ressource || {}).Name,
@@ -143,7 +142,7 @@ export default class AcknowledgeList extends Vue {
   }
   public async fillContactUsers () {
     const referencePersons = this.UnAcknowledgedAllocations.map(
-      (v: any) => v.ReferencePerson
+      (v: any) => v.ReferencePersonId
     )
     const referencePersonsUnique = [...new Set(referencePersons)]
 
