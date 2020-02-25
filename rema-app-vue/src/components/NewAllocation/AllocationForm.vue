@@ -106,7 +106,7 @@
             <v-select
               v-model="selectedGadgets"
               :items="getGadgets(group.Id)"
-              :label="'Hilsmittel (' + group.Title + ')'"
+              :label="'Hilfsmittel (' + group.Title + ')'"
               item-text="Title"
               item-value="Id"
               :menu-props="{ top: true, offsetY: true }"
@@ -355,7 +355,10 @@ export default class AllocationForm extends Vue {
   }
 
   private get Rooms () {
-    return Ressource.all()
+    function compareNumbers (a: any, b: any) {
+      return (a.Name > b.Name) ? 1 : -1
+    }
+    return Ressource.all().sort(compareNumbers)
   }
   private get GadgetGroups () {
     return Supplier.all()
