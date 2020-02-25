@@ -35,6 +35,7 @@ export default new Router({
       beforeEnter: (to, from, next) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')
     } as RemaRouteConfig,
+    */
     {
       path: '/mylist',
       name: 'Ihre Anfragen',
@@ -42,7 +43,6 @@ export default new Router({
       authLevel: 0,
       component: () => import('@/components/MyList.vue')
     } as RemaRouteConfig,
-    */
     {
       path: '/ressources',
       name: 'Administration',

@@ -66,6 +66,9 @@ namespace Rema.DbAccess.Migrations
                     b.Property<long?>("RessourceId")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid?>("ScheduleSeriesGuid")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 

@@ -10,13 +10,14 @@ import vuetify from './plugins/vuetify'
 import '@mdi/font/css/materialdesignicons.css'
 
 import './plugins/moment'
+import moment from 'moment'
 
 dayjs.locale('de')
 
 Vue.config.productionTip = false
 
 Vue.filter('toLocal', (dateVal: Date) =>
-  dayjs(dateVal).format(' DD.MM.YYYY hh:mm')
+  moment(dateVal).format('l') + ' ' + moment(dateVal).format('LT')
 )
 // new Date(dateVal).toLocaleTimeString())
 Vue.filter('toLocalDate', (dateVal: Date) =>

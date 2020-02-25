@@ -36,7 +36,7 @@ namespace Rema.Infrastructure.Models
 
     public virtual Ressource Ressource { get; set; }
     
-    public Guid ScheduleSeriesGuid { get; set; }
+    public Guid? ScheduleSeriesGuid { get; set; }
 
     [Required]
     public virtual User CreatedBy { get; set; }
