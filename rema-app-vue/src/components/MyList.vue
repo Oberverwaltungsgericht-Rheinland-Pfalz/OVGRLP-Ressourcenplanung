@@ -27,6 +27,7 @@
       </template>
       <template v-slot:item.DateTime="{ item }">{{item.DateTime | toLocal}}</template>
       <template v-slot:item.From="{ item }">{{item.From | toLocal}}</template>
+      <template v-slot:item.To="{ item }">{{item.To | toLocal}}</template>
       <template v-slot:item.action="{ item }">
         <v-icon @click="deleteItem(item)">delete</v-icon>
       </template>
@@ -41,10 +42,11 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/Acknowledges/types'
 import { Allocation } from '../models'
 import { AllocationRequest, AllocationModel } from '../models/interfaces'
+import moment from 'moment'
 const namespace = 'acknowledges'
 
 @Component
-export default class AcknowledgeList extends Vue {
+export default class MyAllocationsList extends Vue {
   private search: string = '';
   private hideOld: boolean = true;
   private headers: object[] = [
@@ -52,7 +54,8 @@ export default class AcknowledgeList extends Vue {
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Status', value: 'Status' },
     { text: 'Raum', value: 'Ressource' },
-    { text: 'Ab', value: 'From' },
+    { text: 'Von', value: 'From' },
+    { text: 'Bis', value: 'To' },
     { text: 'Zuletzt geändert', value: 'DateTime' }
   ];
   public get hasItems () {
@@ -62,24 +65,20 @@ export default class AcknowledgeList extends Vue {
     return allocations.length
   }
   public get Requests (): VisibleAllocation[] {
-    const allocations = Allocation.query()
-      .withAll()
-      .where('CreatedBy', this.$store.state.user.id)
+    const allocations = Allocation.query().withAll()
+      .where('CreatedById', this.$store.state.user.id)
       .where((a: any) => {
         return !this.hideOld || Date.parse(a.To) > Date.now()
       })
       .get()
+
     if (!allocations.length) return []
 
     return allocations.map((v: any) => ({
-      Id: v.Id,
-      Title: (v.Purpose || {}).Title,
-      PurposeId: v.Purpose_id,
+      ...v,
       // @ts-ignore
       Status: this.$options.filters.status2string(v.Status),
-      Ressource: (v.Ressource || {}).Name,
-      From: v.From,
-      DateTime: v.LastModified
+      Ressource: v.Ressource.Name
     }))
   }
 

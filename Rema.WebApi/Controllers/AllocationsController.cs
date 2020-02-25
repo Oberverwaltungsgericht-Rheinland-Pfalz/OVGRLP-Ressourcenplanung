@@ -15,7 +15,6 @@ using Serilog;
 
 namespace Rema.WebApi.Controllers
 {
-  [Authorize]
   [Produces("application/json")]
   [Route("[controller]")]
   [ApiController]

@@ -19,6 +19,7 @@ export class Allocation extends Model {
       IsAllDay: this.attr(true),
       Status: this.attr(0),
       CreatedBy: this.attr(null),
+      CreatedById: this.attr(this.number),
       CreatedAt: this.attr(null),
       LastModified: this.attr(null),
       LastModifiedBy: this.attr(''),
