@@ -25,13 +25,13 @@
               <strong>Anfragedatum:</strong>
             </v-col>
             <v-col cols="3">{{
-              viewAllocation.CreatedAt | simpleDateTime
+              viewAllocation.CreatedAt | toLocal
             }}</v-col>
             <v-col cols="3">
               <strong>Letzte Veränderung:</strong>
             </v-col>
             <v-col cols="3">{{
-              viewAllocation.LastModified | simpleDateTime
+              viewAllocation.LastModified | toLocal
             }}</v-col>
 
             <v-col cols="3">
@@ -41,11 +41,11 @@
             <v-col cols="3">
               <strong>Von:</strong>
             </v-col>
-            <v-col cols="3">{{ viewAllocation.From | simpleDateTime }}</v-col>
+            <v-col cols="3">{{ viewAllocation.From | toLocal }}</v-col>
             <v-col cols="3">
               <strong>Bis:</strong>
             </v-col>
-            <v-col cols="3">{{ viewAllocation.To | simpleDateTime }}</v-col>
+            <v-col cols="3">{{ viewAllocation.To | toLocal }}</v-col>
 
             <v-col cols="3">
               <strong>Ansprechpartner:</strong>
@@ -57,10 +57,10 @@
               <strong>Telefonnummer:</strong>
             </v-col>
             <v-col cols="3">{{ viewAllocation.ContactTel }}</v-col>
-            <v-col cols="3">
+            <!--<v-col cols="3">
               <strong>Beschreibung:</strong>
             </v-col>
-            <v-col cols="3">{{ viewAllocation.Description }}</v-col>
+            <v-col cols="3">{{ viewAllocation.Description }}</v-col>-->
             <v-col cols="3">
               <strong>Notizen:</strong>
             </v-col>
@@ -99,9 +99,9 @@
         </v-row>
         <v-row v-for="(i, idx) in possibleCollisions" v-bind:key="idx + 'cols'">
           <v-col cols="4"
-            >{{ i.From | simpleDateTime }} - {{ i.To | simpleDateTime }}</v-col
+            >{{ i.From | toLocal }} - {{ i.To | toLocal }}</v-col
           >
-          <v-col cols="4">{{ i.Purpose.Title }}</v-col>
+          <v-col cols="4">{{ i.Title }}</v-col>
           <v-col cols="4">{{ i.Status | status2string }}</v-col>
         </v-row>
       </v-card-text>
