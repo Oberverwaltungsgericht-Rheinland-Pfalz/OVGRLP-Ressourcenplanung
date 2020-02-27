@@ -104,7 +104,7 @@ export default class AcknowledgeList extends Vue {
     this.viewAllocation = {
       ...viewA,
       RessourceTitle: viewA.Ressource.Name,
-      PurposeTitle: viewA.Title,
+      Title: viewA.Title,
       ContactTel: viewA.ContactName,
       Notices: viewA.Notes
     }

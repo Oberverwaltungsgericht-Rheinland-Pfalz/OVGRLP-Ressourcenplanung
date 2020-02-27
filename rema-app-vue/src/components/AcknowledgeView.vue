@@ -11,7 +11,7 @@
               <strong>Bezeichnung:</strong>
             </v-col>
             <v-col cols="3"
-              >{{ viewAllocation.PurposeTitle }} {{ viewAllocation.Id }}</v-col
+              >{{ viewAllocation.Title }} {{ viewAllocation.Id }}</v-col
             >
             <v-col cols="3">
               <strong>Status:</strong>

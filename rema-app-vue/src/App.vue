@@ -120,12 +120,7 @@ import Router from 'vue-router'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names as Fnn } from './store/user/types'
 import { UserData } from '@/models/interfaces'
-import {
-  Gadget,
-  Ressource,
-  Supplier,
-  Allocation
-} from './models'
+import { Gadget, Ressource, Supplier, Allocation } from './models'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'

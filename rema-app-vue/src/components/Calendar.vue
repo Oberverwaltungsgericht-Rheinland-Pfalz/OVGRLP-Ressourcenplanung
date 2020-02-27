@@ -43,6 +43,9 @@
             <v-toolbar :color="selectedEvent.color" dark>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
+              <edit-form-modal v-if="selectedOpen" :viewAllocation="selectedEvent">
+                <v-icon small>edit</v-icon>
+              </edit-form-modal>
             </v-toolbar>
             <v-card-text>
               <p>{{selectedEvent.schedule}}</p>
@@ -60,136 +63,140 @@
   </v-layout>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { AllocationRequestView, GadgetModel } from '../models/interfaces'
+import DateTimePicker from '@/components/DateTimePicker.vue'
+
 import dayjs from 'dayjs'
 import { Allocation, Gadget } from '../models'
-var moment = require('moment')
+import EditFormModal from './EditFormModal.vue'
+import moment from 'moment'
 
-export default {
-  data: () => ({
-    viewType: true,
-    today: dayjs().format('YYYY-MM-DD'),
-    focus: dayjs().format('YYYY-MM-DD'),
-    typeToLabel: {
-      month: 'Monat',
-      week: 'Woche',
-      day: 'Tag',
-      '4day': '4 Tage'
-    },
-    start: null,
-    end: null,
-    selectedEvent: {},
-    selectedElement: null,
-    selectedOpen: false
-    /*    events: [
-      {
-        name: 'IT Meeting',
-        details: 'Spending time on how we do not have enough time',
-        start: `${dayjs().format('YYYY-MM-DD')} 09:00`,
-        end: `${dayjs().format('YYYY-MM-DD')} 19:00`,
-        color: 'indigo'
-      }
-    ] */
-  }),
-  computed: {
-    type: {
-      get () {
-        return this.viewType ? 'month' : 'day'
-      },
-      set (v) {
-        this.viewType = v
-      }
-    },
-    items () {
-      return Allocation.query()
-        .with('Ressource')
-        .with('Gadget')
-        .get()
-    },
-    itemsFormated () {
-      return this.items.map(transfer2Calendar)
-    },
-    title () {
-      const { start, end } = this
-      if (!start || !end) return dayjs().format('MMMM YYYY')
+@Component({
+  components: { EditFormModal }
+})
+export default class Calendar extends Vue {
+  private viewType: boolean = true
+  private today: string = dayjs().format('YYYY-MM-DD')
+  private focus: string = dayjs().format('YYYY-MM-DD')
+  private typeToLabel: object = {
+    month: 'Monat',
+    week: 'Woche',
+    day: 'Tag',
+    '4day': '4 Tage'
+  }
+  private start: any = null
+  private end: any = null
+  private selectedEvent: object = {}
+  private selectedElement: object = {}
+  private selectedOpen: Boolean = false
 
-      const startMonth = this.monthFormatter(start)
-      const endMonth = this.monthFormatter(end)
-      const suffixMonth = startMonth === endMonth ? '' : endMonth
+  public get permissionToEdit (): Boolean {
+    return this.$store.state.user.role >= 10
+  }
+  public get type (): string {
+    return this.viewType ? 'month' : 'day'
+  }
+  public set type (v: string) {
+    this.viewType = Boolean(v)
+  }
+  public get items () {
+    return Allocation.query()
+      .with('Ressource')
+      .with('Gadget')
+      .get()
+  }
+  public get itemsFormated () {
+    return this.items.map(transfer2Calendar)
+  }
+  public get title () {
+    const { start, end } = this
+    if (!start || !end) return dayjs().format('MMMM YYYY')
 
-      const startYear = start.year
-      const endYear = end.year
-      const suffixYear = startYear === endYear ? '' : endYear
+    const startMonth = this.monthFormatter(start)
+    const endMonth = this.monthFormatter(end)
+    const suffixMonth = startMonth === endMonth ? '' : endMonth
 
-      const startDay = start.day + this.nth(start.day)
-      const endDay = end.day + this.nth(end.day)
+    const startYear = start.year
+    const endYear = end.year
+    const suffixYear = startYear === endYear ? '' : endYear
 
-      switch (this.type) {
-        case 'month':
-          return `${startMonth} ${startYear}`
-        case 'week':
-        case '4day':
-          return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
-        case 'day':
-          return `${startMonth} ${startDay} ${startYear}`
-      }
-      return ''
-    },
-    monthFormatter () {
-      return this.$refs.calendar.getFormatter({
-        timeZone: 'UTC',
-        month: 'long'
-      })
+    const startDay = start.day + this.nth(start.day)
+    const endDay = end.day + this.nth(end.day)
+
+    switch (this.type) {
+      case 'month':
+        return `${startMonth} ${startYear}`
+      case 'week':
+      case '4day':
+        return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
+      case 'day':
+        return `${startMonth} ${startDay} ${startYear}`
     }
-  },
-  methods: {
-    viewDay ({ date }) {
-      this.focus = date
-      this.type = 'day'
-    },
-    getEventColor (event) {
-      return event.color
-    },
-    setToday () {
-      this.focus = this.today
-    },
-    prev () {
-      this.$refs.calendar.prev()
-    },
-    next () {
-      this.$refs.calendar.next()
-    },
-    showEvent ({ nativeEvent, event }) {
-      const open = () => {
-        this.selectedEvent = event
-        this.selectedElement = nativeEvent.target
-        setTimeout(() => (this.selectedOpen = true), 10)
-      }
+    return ''
+  }
 
-      if (this.selectedOpen) {
-        this.selectedOpen = false
-        setTimeout(open, 10)
-      } else {
-        open()
-      }
+  public get monthFormatter () {
+    // @ts-ignore
+    return this.$refs.calendar.getFormatter({
+      timeZone: 'UTC',
+      month: 'long'
+    })
+  }
 
-      nativeEvent.stopPropagation()
-    },
-    updateRange ({ start, end }) {
-      // You could load events from an outside source (like database)
-      // now that we have the start and end dates on the calendar
-      this.start = start
-      this.end = end
-    },
-    nth (d) {
-      return d > 3 && d < 21
-        ? 'th'
-        : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][d % 10]
+  public editAllocation () {
+    this.selectedOpen = false
+  }
+
+  public viewDay ({ date }: any) {
+    this.focus = date
+    this.type = 'day'
+  }
+  public getEventColor (event: any) {
+    return event.color
+  }
+  public setToday () {
+    this.focus = this.today
+  }
+  public prev () {
+    // @ts-ignore
+    this.$refs.calendar.prev()
+  }
+  public next () {
+    // @ts-ignore
+    this.$refs.calendar.next()
+  }
+  public showEvent ({ nativeEvent, event }: any) {
+    const open = () => {
+      this.selectedEvent = event
+      this.selectedElement = nativeEvent.target
+      setTimeout(() => (this.selectedOpen = true), 10)
     }
+
+    if (this.selectedOpen) {
+      this.selectedOpen = false
+      setTimeout(open, 10)
+    } else {
+      open()
+    }
+
+    nativeEvent.stopPropagation()
+  }
+  public updateRange ({ start, end }: any) {
+    // You could load events from an outside source (like database)
+    // now that we have the start and end dates on the calendar
+    this.start = start
+    this.end = end
+  }
+  public nth (d:number) {
+    return d > 3 && d < 21
+      ? 'th'
+      : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][d % 10]
   }
 }
-function transfer2Calendar (v) {
-  let rVal = {}
+function transfer2Calendar (v: any) {
+  let rVal:any = {}
   if (v.IsAllDay) {
     rVal.start = v.From.substring(0, 10)
     rVal.schedule = `ganztägig`
@@ -205,11 +212,12 @@ function transfer2Calendar (v) {
   rVal.id = v.Id
   rVal.Notes = v.Notes
   rVal.Contact = v.ContactName
+  rVal.Original = v
 
   rVal.Gadgets = '<br>'
 
-  v.GadgetsIds.map(e => Gadget.find(e).Title)
-    .forEach(e => { rVal.Gadgets += e + '<br> ' })
+  v.GadgetsIds.map((e:any) => (Gadget.find(e) as any).Title)
+    .forEach((e: any) => { rVal.Gadgets += e + '<br> ' })
   rVal.Gadgets.slice(0, -1)
   // rVal.Gadgets += v.GadgetsIds.map(e => Gadget.find(e).Title)
 
