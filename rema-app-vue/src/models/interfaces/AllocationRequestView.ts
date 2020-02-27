@@ -12,7 +12,7 @@ export interface AllocationRequestView {
   ApprovedAt: string
   ReferencePerson: string
   ReferencePersonId: number
-  PurposeTitle: string
+  Title: string
   RessourceTitle: string
   ContactTel: string
   Description: string

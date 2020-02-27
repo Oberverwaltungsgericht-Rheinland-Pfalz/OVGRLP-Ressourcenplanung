@@ -10,7 +10,7 @@
             <v-col cols="3"><strong>Bezeichnung:</strong> </v-col>
             <v-col cols="3"
               ><v-btn text><v-icon v-html="'create'"/></v-btn
-              >{{ viewAllocation.PurposeTitle }} {{ viewAllocation.Id }}</v-col
+              >{{ viewAllocation.Title }} {{ viewAllocation.Id }}</v-col
             >
             <v-col cols="3"><strong>Ganztägiges Ereignis:</strong> </v-col>
             <v-col cols="3"

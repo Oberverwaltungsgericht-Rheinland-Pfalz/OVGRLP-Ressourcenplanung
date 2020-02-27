@@ -16,6 +16,7 @@ export class Allocation extends Model {
       Title: this.attr(null),
       Notes: this.attr(null),
       ContactName: this.attr(null),
+      ContactPhone: this.attr(null),
       IsAllDay: this.attr(true),
       Status: this.attr(0),
       CreatedBy: this.attr(null),

@@ -61,6 +61,44 @@ namespace Rema.WebApi.Controllers
       }
     }
 
+    // GET: adUser/name/5
+    [HttpGet("adUser/{namePart}")]
+    public async Task<ActionResult<AdUserViewModel>> GetAdUsers(string namePart)
+    {
+      Log.Information("GET users/adUser/{namePart}", namePart);
+
+      List<AdUserViewModel> possibleUsers = new List<AdUserViewModel>();
+
+      // todo
+      // retrieve user list from ad which contains namePart
+      // map to ContactUser
+
+      try
+      {
+        var user = await _context.Users.FindAsync(1); // remove
+        return null; // remove
+        /*if (user == null)
+        {
+          return NotFound();
+        }*/
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting userContacts");
+        return NotFound();
+      }
+      try
+      {
+        //var userVM = _mapper.Map<User, ContactUser>(user);
+        //return userVM;
+      }
+      catch (Exception ex)
+      {
+        return Conflict();
+        Log.Error(ex, "error while mapping userContacts");
+      }
+    }
+
     // GET: users/name/5
     [HttpGet("name/{id}")]
     public async Task<ActionResult<ContactUser>> GetUserName(long id)

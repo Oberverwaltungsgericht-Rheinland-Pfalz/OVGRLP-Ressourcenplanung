@@ -15,8 +15,7 @@
       </select>
     </span>
 
-    <label>&emsp;
-    <input type="checkbox" v-model="precise"/>&ensp;Genau &ensp;</label>
+    <v-switch v-model="precise" class="ma-2 inline-checkbox" label="Genau"></v-switch>
   </span>
 </template>
 
@@ -34,7 +33,7 @@ import { Component, Prop } from 'vue-property-decorator'
 export default class DropDownTimePicker extends Vue {
   @Prop({ default: '00:00' }) value!: string;
 
-  private precise: boolean = false
+  private precise: boolean = isPrecise(this.value)
   private hourInternal: number = 0
   private minuteInternal: number = 0
   private hours = Array.from(Array(24).keys())
@@ -53,6 +52,17 @@ export default class DropDownTimePicker extends Vue {
     (this.minuteInternal > 9 ? this.minuteInternal : '0' + this.minuteInternal)
   }
 
+  /* get precise (): boolean {
+    let minutes = this.value.substring(3, 5)
+    let wasQuarter = this.quarters.includes(parseInt(minutes))
+    let isQuarter = this.quarters.includes(this.minuteInternal)
+    if (!wasQuarter && !isQuarter) return false
+
+    return this.preciseInternal
+  }
+  set precise (v: boolean) {
+    this.preciseInternal = v
+  } */
   get hour (): number {
     return this.hourInternal
   }
@@ -68,10 +78,19 @@ export default class DropDownTimePicker extends Vue {
     this.$emit('input', this.outputValue)
   }
 }
+function isPrecise (value: string) : boolean {
+  let minutes = value.substring(3, 5)
+  let wasQuarter = [0, 15, 30, 45].includes(parseInt(minutes))
+  return !wasQuarter
+}
 </script>
 
 <style lang="stylus" scoped>
 .ddtp-inner-border
   border-bottom 1px solid darkgrey
   padding 3px
+
+.inline-checkbox
+  display inline-block
+  margin-left .5em
 </style>

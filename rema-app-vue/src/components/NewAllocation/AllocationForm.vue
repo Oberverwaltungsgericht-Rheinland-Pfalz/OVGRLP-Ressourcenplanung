@@ -179,12 +179,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import {
-  Gadget,
-  Ressource,
-  Supplier,
-  Allocation
-} from '../../models'
+import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel } from '../../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
