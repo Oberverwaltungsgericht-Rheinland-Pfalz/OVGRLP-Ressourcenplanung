@@ -733,10 +733,11 @@ namespace Rema.WebApi.Controllers
       try
       {
         allocation = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == editedRequest.Id); //FindAsync(editedRequest.Id);
-        /*var allocation2 = await _context.Allocations
-          .Include(o => o.Ressource)
-          .FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
-        */ressourceName = allocation.Ressource.Name;
+                                                                                                                                             /*var allocation2 = await _context.Allocations
+                                                                                                                                               .Include(o => o.Ressource)
+                                                                                                                                               .FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
+                                                                                                                                             */
+        ressourceName = allocation.Ressource.Name;
       }
       catch (Exception ex)
       {
@@ -791,6 +792,106 @@ namespace Rema.WebApi.Controllers
       catch (Exception ex)
       {
         Log.Error(ex, "error while processing mails");
+      }
+
+      return Ok();
+    }
+    
+    // PUT: allocations/editAllocation
+    [HttpPut("{editAllocation}")]
+    public async Task<ActionResult<Boolean>> EditAllocation(AllocationViewModel allocationVM)
+    {
+      Log.Information("PUT allocations/editAllocation: {allocationModel}", allocationVM);
+
+      if (allocationVM.Id != 0)
+      {
+        Log.Error("allocation id was not filled");
+        return BadRequest();
+      }
+
+      Allocation oldAllocation;
+      try
+      {
+        oldAllocation = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting allocation");
+        return NotFound();
+      }
+
+      Allocation changedAllocation;
+      try
+      {
+        changedAllocation = _mapper.Map<AllocationViewModel, Allocation>(allocationVM);
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while mapping allocation");
+        return BadRequest();
+      }
+
+      if (!string.IsNullOrEmpty(allocationVM.ScheduleSeries) && oldAllocation.ScheduleSeriesGuid == null)
+      {
+        return BadRequest(); // nachträgliches hinzufügen zu serienterminen ist nicht möglich
+      }
+
+      if (string.IsNullOrEmpty(allocationVM.ScheduleSeries) && oldAllocation.ScheduleSeriesGuid != null)
+      {
+        oldAllocation.ScheduleSeriesGuid = null;
+      }
+
+      Ressource newRessource = null;
+      if(oldAllocation.Ressource.Id != allocationVM.RessourceId)
+      {
+        newRessource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
+      }
+
+      IEnumerable<Gadget> newGadgets = null;
+    /*  if () // todo gadgets
+      {
+        newGadgets = await _context.Gadgets.
+      }*/
+
+      // Änderungen sind nur für Bearbeiter und darüber hinaus erlaubt, außer wenn Anfrage noch nicht genehmigt
+      bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || 
+                      (changedAllocation.CreatedBy.Id == base.RequestSenderVM.Id && changedAllocation.Status == MeetingStatus.Pending);
+      if (!hasRight)
+      {
+        Log.Warning("User {user} was restricted to change allocation {allocation}", base.RequestSenderVM, changedAllocation);
+        return new UnauthorizedResult();
+      }
+
+      try
+      {
+        oldAllocation.Title = changedAllocation.Title;
+        oldAllocation.IsAllDay = changedAllocation.IsAllDay;
+        oldAllocation.Notes = changedAllocation.Notes;
+        oldAllocation.From = changedAllocation.From;
+        oldAllocation.To = changedAllocation.To;
+        oldAllocation.ContactName = changedAllocation.ContactName;
+        oldAllocation.ContactPhone = changedAllocation.ContactPhone;
+        if (newRessource != null) oldAllocation.Ressource = newRessource;
+        //if (newGadgets != null) oldAllocation.AllocationGadgets = newGadgets;
+        // todo rest, wie datum
+        changedAllocation.LastModified = DateTime.Now;
+        changedAllocation.LastModifiedBy = base.RequestSender;
+        _context.Entry(changedAllocation).State = EntityState.Modified;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while set modified values for allocation");
+        return Conflict();
+      }
+
+      try
+      {
+        await _context.SaveChangesAsync();
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while save allocation");
+        return Conflict();
       }
 
       return Ok();

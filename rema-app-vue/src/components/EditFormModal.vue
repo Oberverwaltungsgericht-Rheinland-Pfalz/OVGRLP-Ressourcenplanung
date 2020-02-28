@@ -7,8 +7,9 @@
     </template>
     <v-card>
     <v-card-title class="headline">Termin bearbeiten</v-card-title>
-    <v-card-text>
-      <v-container>
+
+    <v-card-text class="no-bottom-padding">
+      <v-container class="no-bottom-padding">
         <v-row>
           <v-col>
             <v-text-field
@@ -33,10 +34,10 @@
         </v-row>
         <v-divider />
         <v-row>
-          <v-col v-if="wasRepeating" :cols="6">
+          <v-col v-if="wasRepeating" :cols="6" class="no-top-padding no-bottom-padding">
             <v-checkbox v-model="isRepeating" label="Belassen in Terminserie"></v-checkbox>
           </v-col>
-          <v-col :cols="6">
+          <v-col :cols="6" class="no-top-padding no-bottom-padding">
             <v-checkbox v-model="fullday" label="ganztägig"></v-checkbox>
           </v-col>
 
@@ -123,9 +124,10 @@
         <v-divider />
         <v-row>
           <v-col>
-            <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined rounded></v-textarea>
+            <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined></v-textarea>
           </v-col>
         </v-row>
+        <v-row><v-col class="no-top-padding"><span class="right-head">Terminstatus: {{Status | status2string}}</span></v-col></v-row>
       </v-container>
     </v-card-text>
     <v-card-actions>
@@ -133,18 +135,9 @@
       <v-btn
         v-if="permissionToEdit"
         :disabled="formInvalid"
-        color="green darken-1"
-        text
-        @click="sendAllocation(1)"
+        color="green darken-1" text
+        @click="saveAllocation"
         ><v-icon>save</v-icon> Speichern</v-btn
-      >
-      <v-btn
-        v-else
-        :disabled="formInvalid"
-        color="green darken-1"
-        text
-        @click="sendAllocation(0)"
-        ><v-icon>save</v-icon> Anfragen</v-btn
       >
       <v-btn color="red darken-1" text @click="dialog = false"
         ><v-icon>cancel</v-icon> Abbrechen</v-btn
@@ -166,7 +159,7 @@ import { Gadget, Ressource, Supplier, Allocation } from '../models'
   components: { DateTimePicker, DropDownTimePicker }
 })
 export default class EditFormModal extends Vue {
-  @Prop(Object) private viewAllocation!: any
+  @Prop(Number) private eventId!: number
 
   private title: String = ''
   private Notes: string = ''
@@ -185,41 +178,44 @@ export default class EditFormModal extends Vue {
   private Status: number = 0
   private Id: number = 0
   private CreatedBy: number = 0
+  private CreatedById: number = 0
   private CreatedAt: string = ''
   private ScheduleSeries: string = ''
   private dateFromFocus: boolean = false
   private dateToFocus: boolean = false
   private dateOfSeries: string = ''
+  private eventAllocation: any = {}
 
   public isRepeating: boolean = false
-  // public valid: boolean = false
-  // public editId: number = 0
-  // private Description: string = ''
-
   public dialog: boolean = false
 
   @Watch('dialog')
   private watchDialog (newVal:boolean) {
     if (newVal) {
-      this.title = this.viewAllocation.Original.Title
-      this.fullday = this.viewAllocation.Original.IsAllDay
-      this.Notes = this.viewAllocation.Original.Notes
-      this.ScheduleSeries = this.viewAllocation.Original.ScheduleSeries
-      this.isRepeating = !!this.viewAllocation.Original.ScheduleSeries
-      this.ressourceId = this.viewAllocation.Original.RessourceId
-      this.ReferencePersonId = this.viewAllocation.Original.ReferencePersonId
-      this.Status = this.viewAllocation.Original.Status
-      this.Id = this.viewAllocation.Original.Id
-      this.dateFrom = this.viewAllocation.Original.From.substring(0, 10)
-      this.timeFrom = this.viewAllocation.Original.From.substring(11, 16)
-      this.dateTo = this.viewAllocation.Original.To.substring(0, 10)
-      this.timeTo = this.viewAllocation.Original.To.substring(11, 16)
-      this.contactPerson = this.viewAllocation.Original.ContactName
-      this.CreatedBy = this.viewAllocation.CreatedBy
-      this.CreatedAt = this.viewAllocation.CreatedAt
-      this.telNumber = this.viewAllocation.Original.ContactPhone
-      this.selectedGadgets = this.viewAllocation.Original.GadgetsIds
-      this.dateOfSeries = this.viewAllocation.start.substring(0, 10)
+      let all : any = Allocation.find(this.eventId)
+      this.eventAllocation = all
+
+      this.Id = all.Id
+      this.title = all.Title
+      this.ressourceId = all.RessourceId
+      this.isRepeating = !!all.ScheduleSeries
+      this.ScheduleSeries = all.ScheduleSeries
+      this.fullday = all.IsAllDay
+      this.ReferencePersonId = all.ReferencePersonId
+      this.dateOfSeries = all.From.substring(0, 10)
+      this.dateFrom = all.From.substring(0, 10)
+      this.timeFrom = all.From.substring(11, 16)
+      this.dateTo = all.To.substring(0, 10)
+      this.timeTo = all.To.substring(11, 16)
+      this.selectedGadgets = all.GadgetsIds
+      this.contactPerson = all.ContactName
+      this.telNumber = all.ContactPhone
+      this.Notes = all.Notes
+
+      this.Status = all.Status
+      this.CreatedBy = all.CreatedBy
+      this.CreatedById = all.CreatedById
+      this.CreatedAt = all.CreatedAt
     }
   }
   private changeDateFrom (e:any) {
@@ -235,7 +231,7 @@ export default class EditFormModal extends Vue {
   }
 
   private get wasRepeating () : boolean {
-    return !!this.viewAllocation.Original.ScheduleSeries
+    return !!this.eventAllocation.ScheduleSeries
   }
   private get Rooms () {
     function compareNumbers (a: any, b: any) {
@@ -270,5 +266,8 @@ export default class EditFormModal extends Vue {
 .span-input
   border-bottom 1px solid black
   padding 3px
-
+.no-top-padding
+  padding-top 0
+.no-bottom-padding
+  padding-bottom 0 !important
 </style>
