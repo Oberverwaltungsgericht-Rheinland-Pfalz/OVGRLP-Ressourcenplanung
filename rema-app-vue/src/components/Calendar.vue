@@ -43,7 +43,7 @@
             <v-toolbar :color="selectedEvent.color" dark>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
-              <edit-form-modal v-if="selectedOpen" :viewAllocation="selectedEvent">
+              <edit-form-modal v-if="selectedOpen" :eventId="selectedEvent.id">
                 <v-icon small>edit</v-icon>
               </edit-form-modal>
             </v-toolbar>

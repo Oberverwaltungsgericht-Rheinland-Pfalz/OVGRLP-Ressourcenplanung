@@ -25,6 +25,7 @@ export class Allocation extends Model {
       LastModified: this.attr(null),
       LastModifiedBy: this.attr(''),
       ApprovedBy: this.attr(null),
+      ApprovedById: this.attr(null),
       ApprovedAt: this.attr(null),
       ReferencePerson: this.attr(''),
       ReferencePersonId: this.number(0),

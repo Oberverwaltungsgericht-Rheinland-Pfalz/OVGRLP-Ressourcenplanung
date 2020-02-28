@@ -26,7 +26,6 @@ export default new Router({
           // which is lazy-loaded when the route is visited.
           component: () => import( './views/MutliDates.vue')
      //   } as MyRouteConfig, */
-    /*
     {
       path: '/acknowledge',
       name: 'Anfragenverwaltung',
@@ -35,7 +34,6 @@ export default new Router({
       beforeEnter: (to, from, next) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')
     } as RemaRouteConfig,
-    */
     {
       path: '/mylist',
       name: 'Ihre Anfragen',
