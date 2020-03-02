@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
@@ -64,6 +65,26 @@ namespace Rema.WebApi.Controllers
       return securityMembers;
     }
 
+    [HttpGet("adUser")]
+    public IEnumerable<string> GetAllAdUsers()
+    {
+      var adUsers = new List<string>();
+
+      adUsers = SearchAdUsers("");
+
+      return adUsers;
+    }
+
+    [HttpGet("adUser/{namePart}")]
+    public IEnumerable<string> GetAdUsers(string namePart)
+    {
+      var adUsers = new List<string>();
+
+      adUsers = SearchAdUsers(namePart);
+
+      return adUsers;
+    }
+
     private Domain FindDomainByName(string name)
     {
       DomainCollection domains = Forest.GetCurrentForest().Domains;
@@ -92,6 +113,43 @@ namespace Rema.WebApi.Controllers
         }
       }
       return securityMembers;
+    }
+
+    private List<string> SearchAdUsers(string userName)
+    {
+      var foundUsers = new List<string>();
+      var searchDomainList = new List<string>() { "ovgvg.jmrlp.de", "lag.jmrlp.de", "genstako.jmrlp.de", "lsg.jmrlp.de" };
+
+      DomainCollection domains = Forest.GetCurrentForest().Domains;
+      foreach (Domain dom in domains)
+      {
+        if (searchDomainList.Contains(dom.Name))
+        {
+          using (var context = new PrincipalContext(ContextType.Domain, dom.Name))
+          {
+            UserPrincipal userPrin = new UserPrincipal(context);
+            userPrin.Enabled = true;   // nur aktive Nutzer
+            if (!string.IsNullOrEmpty(userName))
+              userPrin.DisplayName = "*" + userName + "*";
+
+            using (var searcher = new PrincipalSearcher(userPrin))
+            {
+              var ds = searcher.GetUnderlyingSearcher() as DirectorySearcher;
+              //ds.PropertiesToLoad.Clear();
+              //ds.PropertiesToLoad.Add("mail");
+              foreach (var result in searcher.FindAll())
+              {
+                DirectoryEntry de = result.GetUnderlyingObject() as DirectoryEntry;
+
+                foundUsers.Add(result.DisplayName);
+                //if (null != de.Properties["mail"] && null != de.Properties["mail"].Value)
+                //foundUsers.Add(de.Properties["mail"]?.Value?.ToString());
+              }
+            }
+          }
+        }
+      }
+      return foundUsers;
     }
   }
 }
