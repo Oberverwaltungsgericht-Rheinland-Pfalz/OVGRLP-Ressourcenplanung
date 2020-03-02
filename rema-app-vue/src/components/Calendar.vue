@@ -43,6 +43,8 @@
             <v-toolbar :color="selectedEvent.color" dark>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
+              <v-btn @click="deleteAllocation" fab small outlined><v-icon small>delete</v-icon>
+              </v-btn><span>&emsp;</span>
               <edit-form-modal v-if="selectedOpen" :eventId="selectedEvent.id">
                 <v-icon small>edit</v-icon>
               </edit-form-modal>
@@ -145,8 +147,32 @@ export default class Calendar extends Vue {
     })
   }
 
-  public editAllocation () {
-    this.selectedOpen = false
+  public async deleteAllocation () {
+    const { id, name } = this.selectedEvent as any
+    const confirmation = await this.$dialog.confirm({
+      text: `Möchten sie dem Termin ${name} wirklich löschen?`,
+      title: 'Löschen bestätigen',
+      persistent: true,
+      actions: [
+        {
+          text: 'Nein',
+          color: 'blue',
+          key: false
+        },
+        {
+          text: 'Löschen',
+          color: 'red',
+          key: true
+        }
+      ]
+    })
+
+    if (confirmation !== true) return
+
+    const responseDeleteAllocation = await Allocation.api().delete(
+      `allocations/${id}`,
+      { delete: id }
+    )
   }
 
   public viewDay ({ date }: any) {
