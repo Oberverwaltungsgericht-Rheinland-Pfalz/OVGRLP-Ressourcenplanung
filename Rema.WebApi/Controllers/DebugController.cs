@@ -9,6 +9,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Rema.DbAccess;
 using Rema.WebApi.Filter;
+using Microsoft.Extensions.Configuration;
 
 namespace Rema.WebApi.Controllers
 {
@@ -118,12 +119,12 @@ namespace Rema.WebApi.Controllers
     private List<string> SearchAdUsers(string userName)
     {
       var foundUsers = new List<string>();
-      var searchDomainList = new List<string>() { "ovgvg.jmrlp.de", "lag.jmrlp.de", "genstako.jmrlp.de", "lsg.jmrlp.de" };
+      List<string> searchDomainList = Startup.DomainsToSearch;
 
       DomainCollection domains = Forest.GetCurrentForest().Domains;
       foreach (Domain dom in domains)
       {
-        if (searchDomainList.Contains(dom.Name))
+        if (null == searchDomainList || searchDomainList.Count == 0 || searchDomainList.Contains(dom.Name))
         {
           using (var context = new PrincipalContext(ContextType.Domain, dom.Name))
           {
