@@ -11,6 +11,8 @@ using Rema.DbAccess;
 using Rema.WebApi.Filter;
 using Microsoft.Extensions.Configuration;
 using Rema.ServiceLayer.Services;
+using Rema.Infrastructure.Models;
+using Rema.Infrastructure.LDAP;
 
 namespace Rema.WebApi.Controllers
 {
@@ -73,17 +75,18 @@ namespace Rema.WebApi.Controllers
     {
       var adService = new AdService(Startup.DomainsToSearch);
 
-      List<string> adUsers = adService.SearchAdUsers("");
+      List<string> adUsers = adService.SearchAdUsers<string>("");
 
       return adUsers;
     }
 
     [HttpGet("adUser/{namePart}")]
-    public IEnumerable<string> GetAdUsers(string namePart)
+    public IEnumerable<AdUserViewModel> GetAdUsers(string namePart)
     {
       var adService = new AdService(Startup.DomainsToSearch);
 
-      List<string> adUsers = adService.SearchAdUsers(namePart);
+      //List<string> adUsers = adService.SearchAdUsers<string>(namePart);
+      List<AdUserViewModel> adUsers = adService.SearchAdUsers<AdUserViewModel>(namePart);
 
       return adUsers;
     }
