@@ -1,5 +1,5 @@
 import { AcknowledgeState } from './AcknowledgeState'
-import { AllocationModel } from './AllocationModel'
+import { AllocationModel, AllocationShortModel } from './AllocationModel'
 import { AllocationRequest } from './AllocationRequest'
 import { AllocationRequestView } from './AllocationRequestView'
 import { ContactUser } from './ContactUser'
@@ -15,6 +15,7 @@ import { CounterState } from './CounterState'
 export {
   AcknowledgeState,
   AllocationModel,
+  AllocationShortModel,
   AllocationRequest,
   AllocationRequestView,
   ContactUser,

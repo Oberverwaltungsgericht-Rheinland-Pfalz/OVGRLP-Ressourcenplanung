@@ -137,11 +137,9 @@
         :disabled="formInvalid"
         color="green darken-1" text
         @click="saveAllocation"
-        ><v-icon>save</v-icon> Speichern</v-btn
-      >
-      <v-btn color="red darken-1" text @click="dialog = false"
-        ><v-icon>cancel</v-icon> Abbrechen</v-btn
-      >
+        ><v-icon>save</v-icon> Speichern</v-btn>
+      <v-btn color="red darken-1" text @click="dialog = false">
+        <v-icon>cancel</v-icon> Abbrechen</v-btn>
     </v-card-actions>
   </v-card>
 
@@ -258,6 +256,38 @@ export default class EditFormModal extends Vue {
     if (!this.timeFrom && !this.fullday) rValue = false
 
     return !rValue
+  }
+  public async saveAllocation () {
+    let data = {} as any
+    data.Id = this.eventId
+
+    data.Title = this.title
+    data.RessourceId = this.ressourceId
+    data.IsAllDay = this.fullday
+    data.ReferencePersonId = this.ReferencePersonId
+    data.gadgetsIds = this.selectedGadgets
+    data.ContactName = this.contactPerson
+    data.ContactPhone = this.telNumber
+    data.Notes = this.Notes
+
+    if (this.isRepeating) data.ScheduleSeries = this.ScheduleSeries
+    else data.ScheduleSeries = ''
+
+    if (this.isRepeating) {
+      data.from = this.dateOfSeries + 'T' + (this.fullday ? '00:00' : this.timeFrom)
+      data.to = this.dateOfSeries + 'T' + (this.fullday ? '23:59' : this.timeTo)
+    } else {
+      data.from = this.dateFrom + 'T' + (this.fullday ? '00:00' : this.timeFrom)
+      data.to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
+    }
+
+    const response = await Allocation.api().put(`allocations/${this.eventId}`,
+      data
+    )
+    await Allocation.update(data)
+    Allocation.api().get('allocations')
+    this.$emit('updateview')
+    this.dialog = false
   }
 }
 </script>
