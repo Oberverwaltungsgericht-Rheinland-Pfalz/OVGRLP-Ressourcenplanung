@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Rema.DbAccess;
 using Rema.Infrastructure.Models;
+using Rema.Infrastructure.LDAP;
 using Rema.WebApi.Filter;
 using Rema.WebApi.ViewModels;
 using Serilog;
@@ -32,7 +33,7 @@ namespace Rema.WebApi.Controllers
       {
         return await _context.Users.ToListAsync();
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting users");
         return NotFound();
@@ -54,7 +55,7 @@ namespace Rema.WebApi.Controllers
         }
         return user;
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting user");
         return NotFound();
@@ -114,7 +115,7 @@ namespace Rema.WebApi.Controllers
           return NotFound();
         }
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting user");
         return NotFound();
@@ -125,7 +126,7 @@ namespace Rema.WebApi.Controllers
         var userVM = _mapper.Map<User, ContactUser>(user);
         return userVM;
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while mapping user");
         return Conflict();
@@ -141,7 +142,7 @@ namespace Rema.WebApi.Controllers
       {
         return RequestSenderVM;
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting current user");
         return NotFound();
@@ -187,14 +188,14 @@ namespace Rema.WebApi.Controllers
     public async Task<ActionResult<User>> PostUser(User user)
     {
       Log.Information("POST users: {user}", user);
-      
+
       try
       {
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         return CreatedAtAction("GetUser", new { id = user.Id }, user);
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while saving new user");
         return Conflict();
@@ -217,7 +218,7 @@ namespace Rema.WebApi.Controllers
           return NotFound();
         }
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while getting user");
         return NotFound();
@@ -229,7 +230,7 @@ namespace Rema.WebApi.Controllers
         await _context.SaveChangesAsync();
         return NoContent();
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while removing user");
         return Conflict();

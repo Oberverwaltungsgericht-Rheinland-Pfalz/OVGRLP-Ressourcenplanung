@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
@@ -8,6 +9,10 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Rema.DbAccess;
 using Rema.WebApi.Filter;
+using Microsoft.Extensions.Configuration;
+using Rema.ServiceLayer.Services;
+using Rema.Infrastructure.Models;
+using Rema.Infrastructure.LDAP;
 
 namespace Rema.WebApi.Controllers
 {
@@ -42,6 +47,7 @@ namespace Rema.WebApi.Controllers
     [AuthorizeAd("Admin")]
     public IEnumerable<string> GetUserMembers(string AdName)
     {
+      var adService = new AdService();
       var securityMembers = new List<string>();
 
       if (!AdName.Contains("@"))
@@ -52,46 +58,39 @@ namespace Rema.WebApi.Controllers
       string username = AdName.Split('@')[0].ToString();
       string domainName = AdName.Split('@')[1].ToString();
 
-      Domain domain = FindDomainByName(domainName);
+      Domain domain = adService.FindDomainByName(domainName);
       if (null == domain)
       {
         securityMembers.Add(string.Format("Es konnte keine Domäne zu '{0}' ermittelt werden!", domainName));
         return securityMembers;
       }
 
-      securityMembers = GetMemberListByUserName(domain.Name, username);
+      securityMembers = adService.GetMemberListByUserName(domain.Name, username);
 
       return securityMembers;
     }
 
-    private Domain FindDomainByName(string name)
+    [HttpGet("adUser")]
+    [AuthorizeAd("Admin")]
+    public IEnumerable<string> GetAllAdUsers()
     {
-      DomainCollection domains = Forest.GetCurrentForest().Domains;
-      Domain domain = null;
-      foreach (Domain dom in domains)
-      {
-        if (dom.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
-          domain = dom;
-      }
-      return domain;
+      var adService = new AdService(Startup.DomainsToSearch);
+
+      List<string> adUsers = adService.SearchAdUsers<string>("");
+
+      return adUsers;
     }
 
-    private List<string> GetMemberListByUserName(string domainName, string userName)
+    [HttpGet("adUser/{namePart}")]
+    [AuthorizeAd("Admin")]
+    public IEnumerable<AdUserViewModel> GetAdUsers(string namePart)
     {
-      var securityMembers = new List<string>();
-      using (var context = new PrincipalContext(ContextType.Domain, domainName))
-      {
-        var user = UserPrincipal.FindByIdentity(context, userName);
-        if (null != user)
-        {
-          var userIsMemberOf = user.GetAuthorizationGroups().Where(o => o.Guid != null).Select(o => o.Sid.Translate(typeof(NTAccount)).ToString());
-          var groups = new HashSet<string>(userIsMemberOf, StringComparer.OrdinalIgnoreCase);
+      var adService = new AdService(Startup.DomainsToSearch);
 
-          securityMembers.Add(user.DisplayName);
-          securityMembers.AddRange(groups);
-        }
-      }
-      return securityMembers;
+      //List<string> adUsers = adService.SearchAdUsers<string>(namePart);
+      List<AdUserViewModel> adUsers = adService.SearchAdUsers<AdUserViewModel>(namePart);
+
+      return adUsers;
     }
   }
 }
