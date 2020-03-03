@@ -11,6 +11,7 @@ using Rema.Infrastructure.LDAP;
 using Rema.WebApi.Filter;
 using Rema.WebApi.ViewModels;
 using Serilog;
+using Rema.ServiceLayer.Services;
 
 namespace Rema.WebApi.Controllers
 {
@@ -64,40 +65,16 @@ namespace Rema.WebApi.Controllers
 
     // GET: adUser/name/5
     [HttpGet("adUser/{namePart}")]
-    public async Task<ActionResult<AdUserViewModel>> GetAdUsers(string namePart)
+    public ActionResult<List<AdUserViewModel>> GetAdUsers(string namePart)
     {
       Log.Information("GET users/adUser/{namePart}", namePart);
 
-      List<AdUserViewModel> possibleUsers = new List<AdUserViewModel>();
+      if (namePart.Length < 3) return new List<AdUserViewModel>();
 
-      // todo
-      // retrieve user list from ad which contains namePart
-      // map to ContactUser
+      var adService = new AdService(Startup.DomainsToSearch);
+      List<AdUserViewModel> adUsers = adService.SearchAdUsers<AdUserViewModel>(namePart);
 
-      try
-      {
-        var user = await _context.Users.FindAsync(1); // remove
-        return null; // remove
-        /*if (user == null)
-        {
-          return NotFound();
-        }*/
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting userContacts");
-        return NotFound();
-      }
-      try
-      {
-        //var userVM = _mapper.Map<User, ContactUser>(user);
-        //return userVM;
-      }
-      catch (Exception ex)
-      {
-        return Conflict();
-        Log.Error(ex, "error while mapping userContacts");
-      }
+      return adUsers;
     }
 
     // GET: users/name/5

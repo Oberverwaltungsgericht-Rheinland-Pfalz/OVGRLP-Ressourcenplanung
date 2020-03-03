@@ -11,9 +11,11 @@ import { UserData } from './UserData'
 import { UserState } from './UserState'
 import { RootState } from './RootState'
 import { CounterState } from './CounterState'
+import { AdUsers } from './AdUsers'
 
 export {
   AcknowledgeState,
+  AdUsers,
   AllocationModel,
   AllocationShortModel,
   AllocationRequest,
