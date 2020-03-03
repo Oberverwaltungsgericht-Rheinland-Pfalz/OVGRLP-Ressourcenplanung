@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Rema.WebApi.ViewModels
+namespace Rema.Infrastructure.LDAP
 {
   public class AdUserViewModel
   {
