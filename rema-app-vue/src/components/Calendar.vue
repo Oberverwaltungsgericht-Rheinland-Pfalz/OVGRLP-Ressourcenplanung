@@ -45,7 +45,7 @@
               <v-spacer></v-spacer>
               <v-btn @click="deleteAllocation" fab small outlined><v-icon small>delete</v-icon>
               </v-btn><span>&emsp;</span>
-              <edit-form-modal v-if="selectedOpen" :eventId="selectedEvent.id">
+              <edit-form-modal v-if="selectedOpen" :eventId="selectedEvent.id" @updateview="selectedOpen = false">
                 <v-icon small>edit</v-icon>
               </edit-form-modal>
             </v-toolbar>
@@ -103,14 +103,11 @@ export default class Calendar extends Vue {
   public set type (v: string) {
     this.viewType = Boolean(v)
   }
-  public get items () {
+  public get itemsFormated () {
     return Allocation.query()
       .with('Ressource')
       .with('Gadget')
-      .get()
-  }
-  public get itemsFormated () {
-    return this.items.map(transfer2Calendar)
+      .get().map(transfer2Calendar)
   }
   public get title () {
     const { start, end } = this

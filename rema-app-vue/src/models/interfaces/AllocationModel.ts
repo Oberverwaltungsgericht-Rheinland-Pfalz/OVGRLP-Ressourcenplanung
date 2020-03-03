@@ -12,3 +12,12 @@ export interface AllocationModel {
   ApprovedAt: string
   ReferencePerson: string
 }
+export interface AllocationShortModel {
+  Id: number
+  Title: string
+  Timespan: string
+  Notes: string
+  ContactName: string
+  ContactPhone: string
+  Gadgets: string
+}

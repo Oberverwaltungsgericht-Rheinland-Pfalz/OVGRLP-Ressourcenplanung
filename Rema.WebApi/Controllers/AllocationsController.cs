@@ -803,7 +803,7 @@ namespace Rema.WebApi.Controllers
     {
       Log.Information("PUT allocations/editAllocation: {allocationModel}", allocationVM);
 
-      if (allocationVM.Id != 0)
+      if (allocationVM.Id == 0)
       {
         Log.Error("allocation id was not filled");
         return BadRequest();
