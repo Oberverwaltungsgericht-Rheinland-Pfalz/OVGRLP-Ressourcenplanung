@@ -6,6 +6,8 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
+using Rema.Infrastructure.LDAP;
+using Rema.Infrastructure.Models;
 
 namespace Rema.ServiceLayer.Services
 {
@@ -52,9 +54,9 @@ namespace Rema.ServiceLayer.Services
       return securityMembers;
     }
 
-    public List<string> SearchAdUsers(string userName)
+    public List<T> SearchAdUsers<T>(string userName) where T : class
     {
-      var foundUsers = new List<string>();
+      var foundUsers = new List<T>();
       List<string> searchDomainList = this.DomainsToSearch;
 
       DomainCollection domains = Forest.GetCurrentForest().Domains;
@@ -72,15 +74,20 @@ namespace Rema.ServiceLayer.Services
             using (var searcher = new PrincipalSearcher(userPrin))
             {
               var ds = searcher.GetUnderlyingSearcher() as DirectorySearcher;
-              //ds.PropertiesToLoad.Clear();
-              //ds.PropertiesToLoad.Add("mail");
               foreach (var result in searcher.FindAll())
               {
-                DirectoryEntry de = result.GetUnderlyingObject() as DirectoryEntry;
+                object found = result.DisplayName;
 
-                foundUsers.Add(result.DisplayName);
-                //if (null != de.Properties["mail"] && null != de.Properties["mail"].Value)
-                //foundUsers.Add(de.Properties["mail"]?.Value?.ToString());
+                if (typeof(T) == typeof(AdUserViewModel))
+                {
+                  DirectoryEntry de = result.GetUnderlyingObject() as DirectoryEntry;
+                  string mail = string.Empty;
+                  if (null != de.Properties["mail"] && null != de.Properties["mail"].Value)
+                    mail = de.Properties["mail"]?.Value?.ToString();
+                  found = new AdUserViewModel() { ActiveDirectoryID = result.Sid.Value, Name = result.DisplayName, Email = mail };
+                }
+
+                foundUsers.Add(found as T);
               }
             }
           }
