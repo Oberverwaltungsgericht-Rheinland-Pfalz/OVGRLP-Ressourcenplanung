@@ -71,6 +71,7 @@ namespace Rema.WebApi.Controllers
     }
 
     [HttpGet("adUser")]
+    [AuthorizeAd("Admin")]
     public IEnumerable<string> GetAllAdUsers()
     {
       var adService = new AdService(Startup.DomainsToSearch);
@@ -81,6 +82,7 @@ namespace Rema.WebApi.Controllers
     }
 
     [HttpGet("adUser/{namePart}")]
+    [AuthorizeAd("Admin")]
     public IEnumerable<AdUserViewModel> GetAdUsers(string namePart)
     {
       var adService = new AdService(Startup.DomainsToSearch);
