@@ -12,6 +12,7 @@
           </v-btn>
           <v-toolbar-title>{{ title }}</v-toolbar-title>
           <v-spacer></v-spacer>
+          <v-select v-model="titleFilter" :items="possibleTitles" attach chips label="Räume" multiple single-line></v-select>
           <v-switch v-model="viewType" inset :label="typeToLabel[type]"></v-switch>
         </v-toolbar>
       </v-sheet>
@@ -21,7 +22,7 @@
           ref="calendar"
           v-model="focus"
           color="primary"
-          :events="itemsFormated"
+          :events="filteredItems"
           :event-color="getEventColor"
           :event-margin-bottom="3"
           :now="today"
@@ -93,6 +94,7 @@ export default class Calendar extends Vue {
   private selectedEvent: object = {}
   private selectedElement: object = {}
   private selectedOpen: Boolean = false
+  private titleFilter: string[] = []
 
   public get permissionToEdit (): Boolean {
     return this.$store.state.user.role >= 10
@@ -103,11 +105,24 @@ export default class Calendar extends Vue {
   public set type (v: string) {
     this.viewType = Boolean(v)
   }
+  public get filteredItems () {
+    return this.itemsFormated
+      .filter((v: any) => {
+        if (this.titleFilter.length) return this.titleFilter.includes(v.RessourceName)
+        return true
+      })
+  }
   public get itemsFormated () {
     return Allocation.query()
       .with('Ressource')
       .with('Gadget')
       .get().map(transfer2Calendar)
+  }
+  public get possibleTitles () {
+    return Allocation.query()
+      .with('Ressource')
+      .with('Gadget')
+      .get().map((v:any) => v.Ressource).map((v:any) => v.Name)
   }
   public get title () {
     const { start, end } = this
@@ -236,6 +251,7 @@ function transfer2Calendar (v: any) {
   rVal.Notes = v.Notes
   rVal.Contact = v.ContactName
   rVal.Original = v
+  rVal.RessourceName = (v.Ressource || {}).Name
 
   rVal.Gadgets = '<br>'
 
