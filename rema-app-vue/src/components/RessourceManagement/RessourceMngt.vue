@@ -173,7 +173,16 @@ export default class RessourceManagement extends Vue {
       ]
     })
 
-    if (confirmation === true) { Ressource.api().delete(`ressources/${item.Id}`, { delete: item.Id }) }
+    if (confirmation === true) {
+      try {
+        let response = await Ressource.api().delete(`ressources/${item.Id}`, { delete: item.Id })
+      } catch (e) {
+        await this.$dialog.error({
+          text: 'Löschen fehlgeschlagen',
+          title: 'Warning'
+        })
+      }
+    }
   }
 
   private saveNew (event: ViewRessource) {
