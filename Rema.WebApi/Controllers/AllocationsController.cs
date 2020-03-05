@@ -812,7 +812,7 @@ namespace Rema.WebApi.Controllers
       Allocation oldAllocation;
       try
       {
-        oldAllocation = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
+        oldAllocation = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).Include(o => o.AllocationGadgets).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
       }
       catch (Exception ex)
       {
@@ -847,15 +847,64 @@ namespace Rema.WebApi.Controllers
         newRessource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
       }
 
-      IEnumerable<Gadget> newGadgets = null;
-    /*  if () // todo gadgets
+
+      oldAllocation.AllocationGadgets = oldAllocation.AllocationGadgets ?? new List<AllocationGagdet>();
+      // Entfallene Hilfsmittel müssen aus allocationGadgets vom Allocation-Objekt entfernt werden
+      // Neue Hilfsmittel müssen hinzugefügt werden
+      var currentGadgetIds = oldAllocation.AllocationGadgets.Select(x => x.GadgetId);
+      var newGadgets = allocationVM.GadgetsIds.Where(x => !currentGadgetIds.Contains(x));
+      var droppedGadgets = currentGadgetIds.Where(x => !allocationVM.GadgetsIds.Contains(x)).ToArray();
+
+      if (newGadgets.Any()) { 
+        try
+        {
+          var newGadgetsObjects = _context.Gadgets.Where(g => newGadgets.Contains(g.Id));
+          foreach (var g in newGadgetsObjects)
+          {
+            oldAllocation.AllocationGadgets.Add(new AllocationGagdet
+            {
+              AllocationId = oldAllocation.Id,
+              Allocation = oldAllocation,
+              GadgetId = g.Id,
+              Gadget = g
+            });
+          }
+        }
+        catch (Exception ex)
+        {
+          Log.Error(ex, "error while creating new gadgets to allocation");
+        }
+      }
+
+      if(droppedGadgets.Any())
       {
-        newGadgets = await _context.Gadgets.
-      }*/
+        try 
+        {
+          var removeGadgetObjects = oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
+          //var backup = oldAllocation.AllocationGadgets.Where(x => !removeGadgetObjects.Contains(x));
+          //oldAllocation.AllocationGadgets.Clear();
+
+          foreach(var i in droppedGadgets)
+          {
+            var fuu = oldAllocation.AllocationGadgets.SingleOrDefault(x => x.GadgetId == i);
+            _context.Entry(fuu).State = EntityState.Modified;
+            oldAllocation.AllocationGadgets.Remove(fuu);
+          }
+          //removeGadgetObjects.Select(x => oldAllocation.AllocationGadgets.Add(x));
+          //foreach (var g in backup)
+          //{
+          //  //oldAllocation.AllocationGadgets.Add(g);
+          //}
+        }
+        catch (Exception ex)
+        {
+          Log.Error(ex, "error while creating deleted gadgets of allocation");
+        }
+      }
 
       // Änderungen sind nur für Bearbeiter und darüber hinaus erlaubt, außer wenn Anfrage noch nicht genehmigt
       bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || 
-                      (changedAllocation.CreatedBy.Id == base.RequestSenderVM.Id && changedAllocation.Status == MeetingStatus.Pending);
+                      (oldAllocation.CreatedBy.Id == base.RequestSenderVM.Id && oldAllocation.Status == MeetingStatus.Pending);
       if (!hasRight)
       {
         Log.Warning("User {user} was restricted to change allocation {allocation}", base.RequestSenderVM, changedAllocation);
@@ -872,11 +921,13 @@ namespace Rema.WebApi.Controllers
         oldAllocation.ContactName = changedAllocation.ContactName;
         oldAllocation.ContactPhone = changedAllocation.ContactPhone;
         if (newRessource != null) oldAllocation.Ressource = newRessource;
-        //if (newGadgets != null) oldAllocation.AllocationGadgets = newGadgets;
-        // todo rest, wie datum
-        changedAllocation.LastModified = DateTime.Now;
-        changedAllocation.LastModifiedBy = base.RequestSender;
-        _context.Entry(changedAllocation).State = EntityState.Modified;
+        // gadgets are added above
+
+        oldAllocation.LastModified = DateTime.Now;
+        oldAllocation.LastModifiedBy = base.RequestSender;
+        _context.Entry(oldAllocation).State = EntityState.Modified;
+        _context.Entry(oldAllocation).Collection("AllocationGadgets").IsModified = true;
+        _context.Allocations.Update(oldAllocation);
       }
       catch (Exception ex)
       {
