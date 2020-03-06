@@ -153,7 +153,14 @@ export default class SupplierManagement extends Vue {
     })
 
     if (confirmation === true) {
-      Supplier.api().delete(`suppliergroups/${item.Id}`, { delete: item.Id })
+      try {
+        let response = await Supplier.api().delete(`suppliergroups/${item.Id}`, { delete: item.Id })
+      } catch (e) {
+        await this.$dialog.error({
+          text: 'Löschen fehlgeschlagen',
+          title: 'Warning'
+        })
+      }
     }
   }
 }
