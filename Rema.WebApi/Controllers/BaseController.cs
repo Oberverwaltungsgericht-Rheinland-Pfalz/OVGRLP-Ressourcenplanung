@@ -5,6 +5,7 @@ using System.Security.Principal;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Rema.DbAccess;
 using Rema.Infrastructure.Models;
 using Rema.WebApi.ViewModels;
@@ -57,7 +58,7 @@ namespace Rema.WebApi.Controllers
     {
       try
       {
-        var dbUser = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == user.ActiveDirectoryID);
+        var dbUser = _context.Users.AsNoTracking().FirstOrDefault(p => p.ActiveDirectoryID == user.ActiveDirectoryID);
 
         if(dbUser == null)
         {

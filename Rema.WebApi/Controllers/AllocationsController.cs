@@ -812,7 +812,7 @@ namespace Rema.WebApi.Controllers
       Allocation oldAllocation;
       try
       {
-        oldAllocation = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).Include(o => o.AllocationGadgets).ThenInclude(o => o.Gadget).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
+        oldAllocation = await _context.Allocations.Include(o => o.Ressource).Include(o => o.AllocationGadgets).ThenInclude(ag => ag.Gadget).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
       }
       catch (Exception ex)
       {
@@ -861,13 +861,14 @@ namespace Rema.WebApi.Controllers
           var newGadgetsObjects = _context.Gadgets.Where(g => newGadgets.Contains(g.Id));
           foreach (var g in newGadgetsObjects)
           {
-            oldAllocation.AllocationGadgets.Add(new AllocationGagdet
+            var ag = new AllocationGagdet
             {
               AllocationId = oldAllocation.Id,
               Allocation = oldAllocation,
               GadgetId = g.Id,
               Gadget = g
-            });
+            };
+            oldAllocation.AllocationGadgets.Add(ag);
           }
         }
         catch (Exception ex)
@@ -887,7 +888,7 @@ namespace Rema.WebApi.Controllers
           foreach(var i in droppedGadgets)
           {
             var fuu = oldAllocation.AllocationGadgets.SingleOrDefault(x => x.GadgetId == i);
-            _context.Entry(fuu).State = EntityState.Modified;
+            //_context.Entry(fuu).State = EntityState.Modified;
             oldAllocation.AllocationGadgets.Remove(fuu);
             //_context.AllocationGagdets.Remove(fuu);
           }
@@ -926,8 +927,8 @@ namespace Rema.WebApi.Controllers
 
         oldAllocation.LastModified = DateTime.Now;
         oldAllocation.LastModifiedBy = base.RequestSender;
-        _context.Entry(oldAllocation).State = EntityState.Modified;
-        _context.Entry(oldAllocation).Collection("AllocationGadgets").IsModified = true;
+        //_context.Entry(oldAllocation).State = EntityState.Modified;
+        //_context.Entry(oldAllocation).Collection("AllocationGadgets").IsModified = true;
         //_context.Allocations.Update(oldAllocation);
         
       }
