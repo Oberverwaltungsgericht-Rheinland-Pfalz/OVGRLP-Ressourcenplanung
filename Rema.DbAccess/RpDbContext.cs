@@ -10,6 +10,7 @@ namespace Rema.DbAccess
     public DbSet<Ressource> Ressources { get; set; }
     public DbSet<SupplierGroup> SupplierGroups { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<AllocationGagdet> AllocationGagdets {get; set;}
 
     public RpDbContext(DbContextOptions<RpDbContext> options) : base(options)
     {
