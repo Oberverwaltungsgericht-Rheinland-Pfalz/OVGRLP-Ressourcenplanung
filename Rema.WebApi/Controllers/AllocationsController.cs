@@ -812,7 +812,7 @@ namespace Rema.WebApi.Controllers
       Allocation oldAllocation;
       try
       {
-        oldAllocation = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).Include(o => o.AllocationGadgets).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
+        oldAllocation = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).Include(o => o.AllocationGadgets).ThenInclude(o => o.Gadget).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
       }
       catch (Exception ex)
       {
@@ -889,6 +889,7 @@ namespace Rema.WebApi.Controllers
             var fuu = oldAllocation.AllocationGadgets.SingleOrDefault(x => x.GadgetId == i);
             _context.Entry(fuu).State = EntityState.Modified;
             oldAllocation.AllocationGadgets.Remove(fuu);
+            //_context.AllocationGagdets.Remove(fuu);
           }
           //removeGadgetObjects.Select(x => oldAllocation.AllocationGadgets.Add(x));
           //foreach (var g in backup)
@@ -927,7 +928,8 @@ namespace Rema.WebApi.Controllers
         oldAllocation.LastModifiedBy = base.RequestSender;
         _context.Entry(oldAllocation).State = EntityState.Modified;
         _context.Entry(oldAllocation).Collection("AllocationGadgets").IsModified = true;
-        _context.Allocations.Update(oldAllocation);
+        //_context.Allocations.Update(oldAllocation);
+        
       }
       catch (Exception ex)
       {
@@ -944,6 +946,9 @@ namespace Rema.WebApi.Controllers
         Log.Error(ex, "error while save allocation");
         return Conflict();
       }
+
+      var oldAllocation2 = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).Include(o => o.AllocationGadgets).ThenInclude(o => o.Gadget).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
+
 
       return Ok();
     }
