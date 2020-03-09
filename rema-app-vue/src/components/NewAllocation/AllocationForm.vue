@@ -417,7 +417,7 @@ export default class AllocationForm extends Vue {
     this.dateFrom = ''
     this.dateTo = ''
     this.timeTo = '18:00'
-    this.timeFrom = '00:00'
+    this.timeFrom = '08:00'
     this.fullday = false
     this.ressourceId = null
     this.selectedGadgets = []
