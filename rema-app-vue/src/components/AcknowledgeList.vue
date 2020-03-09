@@ -46,20 +46,9 @@ import dayjs from 'dayjs'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/Acknowledges/types'
-import {
-  AllocationRequest,
-  AllocationRequestView,
-  UserData,
-  ContactUser,
-  AllocationModel
-} from '../models/interfaces'
+import { AllocationRequest, AllocationRequestView, UserData, ContactUser, AllocationModel } from '../models/interfaces'
 import AcknowledgeView from './AcknowledgeView.vue'
-import {
-  Allocation,
-  Gadget,
-  Ressource,
-  Supplier
-} from '../models'
+import { Allocation, Gadget, Ressource, Supplier } from '../models'
 const namespace = 'user'
 
 @Component({

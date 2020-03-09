@@ -281,7 +281,7 @@ export default class EditFormModal extends Vue {
       data.to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
     }
 
-    const response = await Allocation.api().put(`allocations/${this.eventId}`,
+    const response = await Allocation.api().put(`allocations/edit/${this.eventId}`,
       data
     )
     await Allocation.update(data)
