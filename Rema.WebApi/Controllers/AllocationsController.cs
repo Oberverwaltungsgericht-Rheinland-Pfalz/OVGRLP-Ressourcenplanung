@@ -53,26 +53,6 @@ namespace Rema.WebApi.Controllers
       try
       {
         var allMapped = allocations.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
-        //var allMapped = all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
-        /*
-        var p = (from a in _context.Allocations
-                 select new
-                 {
-                   Id = a.Id,
-                   From = a.From,
-                   To = a.To,
-                   IsAllDay = a.IsAllDay,
-                   Status = a.Status,
-                   Ressource_id = a.Ressource.Id,
-                   CreatedBy = a.CreatedBy.Id,
-                   CreatedAt = a.CreatedAt,
-                   LastModified = a.LastModified,
-                   LastModifiedBy = a.LastModifiedBy.Id,
-                   ApprovedBy = a.ApprovedBy.Id,
-                   ApprovedAt = a.ApprovedAt,
-                   ReferencePerson = a.ReferencePerson.Id
-                 }).ToList();
-        */
         return Ok(allMapped);
       }
       catch (Exception ex)
@@ -375,25 +355,18 @@ namespace Rema.WebApi.Controllers
         return Conflict();
       }
 
+      var isBooking = allocation.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
+      allocation.Status = isBooking ? allocationVM.Status : MeetingStatus.Pending;
+      var emailTitle = isBooking ? "Buchung wurde erstellt" : "Anfrage wurde erstellt";
+      var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";
+
       try
       {
-        if (allocation.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)))
-        {
-          allocation.Status = allocationVM.Status;
-          EmailTrigger.SendEmail(
-            "Buchung wurde erstellt",
-            $"Ihre Buchungsanfrage {allocation.Title} der Ressource {allocation.Ressource.Name} " +
-            $"vom {allocation.From} bis {allocation.To} wurde vorgenommen",
-            recipient: base.RequestSender.Email);
-        }
-        else
-        {
-          allocation.Status = MeetingStatus.Pending;
-          EmailTrigger.SendEmail(
-            "Anfrage wurde erstellt",
-            $"Ihre Buchungsanfrage {allocation.Title} der Ressource {allocation.Ressource.Name} " +
-            $"vom {allocation.From} bis {allocation.To} wurde gestellt", recipient: base.RequestSender.Email);
-        }
+        EmailTrigger.SendEmail(
+        emailTitle,
+        $@"Ihre {yourRequest} {allocation.Title} der Ressource {allocation.Ressource.Name}
+vom {allocation.From} bis {allocation.To} wurde vorgenommen",
+        recipient: allocation.ReferencePerson.Email);
       }
       catch (Exception ex)
       {
@@ -570,25 +543,23 @@ namespace Rema.WebApi.Controllers
       try
       {
         var title = allocationsVM.Title;
+        var recipient = allocations[0].ReferencePerson;
         var ressourceName = allocations[0].Ressource.Name;
-        var from = allocations[0].From;
-        var to = allocations[0].To;
+        string list = "";
+        foreach(var all in allocations) {
+          list += $@"*{all.From.ToString("dddd, dd MMMM y HH:mm")} - {all.To.ToString("dddd, dd MMMM y HH:mm")}
+";
+        }
 
-        if (status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)))
-        {
-          EmailTrigger.SendEmail(
-            "Buchung wurde erstellt",
-            $"Ihre Buchungsanfrage {title} der Ressource {ressourceName} " +
-            $"vom {from} bis {to} wurde vorgenommen",
-            recipient: base.RequestSender.Email);
-        }
-        else
-        {
-          EmailTrigger.SendEmail(
-            "Anfrage wurde erstellt",
-            $"Ihre Buchungsanfrage {title} der Ressource {ressourceName} " +
-            $"vom {from} bis {to} wurde gestellt", recipient: base.RequestSender.Email);
-        }
+        var isBooking = allocations[0].Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
+        var emailTitle = isBooking ? "Buchung wurde erstellt" : "Anfrage wurde erstellt";
+        var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";
+
+        EmailTrigger.SendEmail(
+          emailTitle,
+          $@"Ihre Serientermin-{yourRequest} {title} der Ressource {ressourceName} wurde vorgenomme für folgende Termine:
+" + list,
+          recipient: recipient.Email);
       }
       catch (Exception ex)
       {
@@ -610,6 +581,7 @@ namespace Rema.WebApi.Controllers
       {
         allocation = await _context.Allocations
           .Include(o => o.Ressource)
+          .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget)
           .FirstOrDefaultAsync(i => i.Id == id);
       }
       catch (Exception ex)

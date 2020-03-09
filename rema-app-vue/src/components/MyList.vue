@@ -25,7 +25,7 @@
           />
         </v-toolbar>
       </template>
-      <template v-slot:item.DateTime="{ item }">{{item.DateTime | toLocal}}</template>
+      <template v-slot:item.LastModified="{ item }">{{item.LastModified | toLocal}}</template>
       <template v-slot:item.From="{ item }">{{item.From | toLocal}}</template>
       <template v-slot:item.To="{ item }">{{item.To | toLocal}}</template>
       <template v-slot:item.action="{ item }">
@@ -56,7 +56,7 @@ export default class MyAllocationsList extends Vue {
     { text: 'Raum', value: 'Ressource' },
     { text: 'Von', value: 'From' },
     { text: 'Bis', value: 'To' },
-    { text: 'Zuletzt geändert', value: 'DateTime' }
+    { text: 'Zuletzt geändert', value: 'LastModified' }
   ];
   public get hasItems () {
     const allocations = Allocation.query()
@@ -127,7 +127,7 @@ interface VisibleAllocation {
   Ressource: string;
   From: string;
   PurposeId: number;
-  DateTime: string;
+  LastModified: string;
 }
 </script>
 

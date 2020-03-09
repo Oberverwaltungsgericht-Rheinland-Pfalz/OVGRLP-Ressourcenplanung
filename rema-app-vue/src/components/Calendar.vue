@@ -106,6 +106,9 @@ export default class Calendar extends Vue {
     this.viewType = Boolean(v)
   }
   public get filteredItems () {
+    console.dir(Allocation.all())
+    let isEmpty = !Allocation.all().length
+    if (isEmpty) return []
     return this.itemsFormated
       .filter((v: any) => {
         if (this.titleFilter.length) return this.titleFilter.includes(v.RessourceName)
@@ -254,11 +257,11 @@ function transfer2Calendar (v: any) {
   rVal.RessourceName = (v.Ressource || {}).Name
 
   rVal.Gadgets = '<br>'
-
-  v.GadgetsIds.map((e:any) => (Gadget.find(e) as any).Title)
-    .forEach((e: any) => { rVal.Gadgets += e + '<br> ' })
+  if (!Gadget.all().length) {
+    v.GadgetsIds.map((e:any) => (Gadget.find(e) as any).Title)
+      .forEach((e: any) => { rVal.Gadgets += e + '<br> ' })
+  }
   rVal.Gadgets.slice(0, -1)
-  // rVal.Gadgets += v.GadgetsIds.map(e => Gadget.find(e).Title)
 
   return rVal
 }
