@@ -721,8 +721,8 @@ namespace Rema.WebApi.Controllers
       return Ok();
     }
 
-    // PUT: allocations/editrequest
-    [HttpPut("{editedRequest}")]
+    // PUT: allocations/editRequest
+    [HttpPut("editRequest/")]
     public async Task<ActionResult<Boolean>> EditRequest(AllocationRequestEdition editedRequest)
     {
       Log.Information("PUT allocations/editrequest: {editRequest}", editedRequest);
@@ -732,7 +732,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == editedRequest.Id); //FindAsync(editedRequest.Id);
+        allocation = await _context.Allocations.Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == editedRequest.Id); //FindAsync(editedRequest.Id);
                                                                                                                                              /*var allocation2 = await _context.Allocations
                                                                                                                                                .Include(o => o.Ressource)
                                                                                                                                                .FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
@@ -797,8 +797,8 @@ namespace Rema.WebApi.Controllers
       return Ok();
     }
     
-    // PUT: allocations/editAllocation
-    [HttpPut("{editAllocation}")]
+    // PUT: allocations/{editAllocation}
+    [HttpPut("edit/{editAllocation}")]
     public async Task<ActionResult<Boolean>> EditAllocation(AllocationViewModel allocationVM)
     {
       Log.Information("PUT allocations/editAllocation: {allocationModel}", allocationVM);
@@ -882,21 +882,12 @@ namespace Rema.WebApi.Controllers
         try 
         {
           var removeGadgetObjects = oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
-          //var backup = oldAllocation.AllocationGadgets.Where(x => !removeGadgetObjects.Contains(x));
-          //oldAllocation.AllocationGadgets.Clear();
 
           foreach(var i in droppedGadgets)
           {
             var fuu = oldAllocation.AllocationGadgets.SingleOrDefault(x => x.GadgetId == i);
-            //_context.Entry(fuu).State = EntityState.Modified;
             oldAllocation.AllocationGadgets.Remove(fuu);
-            //_context.AllocationGagdets.Remove(fuu);
           }
-          //removeGadgetObjects.Select(x => oldAllocation.AllocationGadgets.Add(x));
-          //foreach (var g in backup)
-          //{
-          //  //oldAllocation.AllocationGadgets.Add(g);
-          //}
         }
         catch (Exception ex)
         {
@@ -926,11 +917,7 @@ namespace Rema.WebApi.Controllers
         // gadgets are added above
 
         oldAllocation.LastModified = DateTime.Now;
-        oldAllocation.LastModifiedBy = base.RequestSender;
-        //_context.Entry(oldAllocation).State = EntityState.Modified;
-        //_context.Entry(oldAllocation).Collection("AllocationGadgets").IsModified = true;
-        //_context.Allocations.Update(oldAllocation);
-        
+        oldAllocation.LastModifiedBy = base.RequestSender;       
       }
       catch (Exception ex)
       {
@@ -947,10 +934,6 @@ namespace Rema.WebApi.Controllers
         Log.Error(ex, "error while save allocation");
         return Conflict();
       }
-
-      var oldAllocation2 = await _context.Allocations.AsNoTracking().Include(o => o.Ressource).Include(o => o.AllocationGadgets).ThenInclude(o => o.Gadget).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
-
-
       return Ok();
     }
   }
