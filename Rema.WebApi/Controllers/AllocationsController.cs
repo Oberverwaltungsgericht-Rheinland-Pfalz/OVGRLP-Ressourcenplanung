@@ -138,6 +138,7 @@ namespace Rema.WebApi.Controllers
       return Ok();
     }
 
+    /* // Gerade keine Anforderung
     [HttpPut("ChangeAllocationSeries/{id}")]
     public async Task<IActionResult> ChangeAllocationSeries(AllocationViewModel allocationVM)
     {
@@ -225,6 +226,7 @@ namespace Rema.WebApi.Controllers
 
       return Ok();
     }
+    */
 
     // POST: allocation
     [HttpPost]
@@ -547,7 +549,7 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
         var ressourceName = allocations[0].Ressource.Name;
         string list = "";
         foreach(var all in allocations) {
-          list += $@"*{all.From.ToString("dddd, dd MMMM y HH:mm")} - {all.To.ToString("dddd, dd MMMM y HH:mm")}
+          list += $@"*{all.From.ToString("dddd, dd MMMM y HH:mm")} - {all.To.ToString("dddd, dd MMMM y HH:mm")}{System.Environment.NewLine}
 ";
         }
 
@@ -581,7 +583,8 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
       {
         allocation = await _context.Allocations
           .Include(o => o.Ressource)
-          .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget)
+          .Include(r => r.ReferencePerson)
+          .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
           .FirstOrDefaultAsync(i => i.Id == id);
       }
       catch (Exception ex)
@@ -605,13 +608,39 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
         Log.Error(ex, "error while deleting allocation");
       }
 
+      // Terminverantwortlichen benachrichtigen
+      EmailTrigger.SendEmail(
+        "Termin wurde storniert",
+        $"Ihr Termin {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From.ToString("dddd, dd MMMM y HH:mm")} bis {allocation.To.ToString("dddd, dd MMMM y HH:mm")} wurde storniert von {base.RequestSender.Name}", 
+        recipient: allocation.ReferencePerson.Email);
+
+      var dict = new Dictionary<string, string>();
+      foreach (var gadget in allocation.AllocationGadgets) {
+        var groupEmail = gadget.Gadget.SuppliedBy.GroupEmail;
+        if (dict.TryGetValue(groupEmail, out string oldTitles))
+          dict[groupEmail] = oldTitles + $", {gadget.Gadget.Title}";
+        else
+          dict.Add(groupEmail, gadget.Gadget.Title);
+      }
+
+      // Absage an Hilfsmittel Unterstützergruppen
+      foreach(var group in dict)
+      {
+      EmailTrigger.SendEmail(
+        "Termin wurde storniert",
+        $@"Der Termin {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From.ToString("dddd, dd MMMM y HH:mm")} bis {allocation.To.ToString("dddd, dd MMMM y HH:mm")} wurde storniert von {base.RequestSender.Name}.
+Die Bereitstellung der Hilfsmittel {group.Value} wird nicht benötigt.",
+        recipient: group.Key);
+      }
+
       return Ok();
     }
 
+    /*
+    //TODO: Aktuell wird hier garnicht gefiltert 
     [HttpGet("filter/{filter}")]
     public async Task<ActionResult<IEnumerable<object>>> GetAllocations(AllocationFilter filter)
     {
-      //TODO: Aktuell wird hier garnicht gefiltert
 
       Log.Information("GET allocations/filter/{filter}", filter);
 
@@ -651,7 +680,9 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
         return NotFound();
       }
     }
+    */
 
+    /* unused
     // PUT: allocations/status/5
     [HttpPut("status/{id}")]
     public async Task<IActionResult> PutAllocation(long id, int status)
@@ -691,12 +722,13 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
       }
 
       return Ok();
-    }
+    } */
 
     // PUT: allocations/editRequest
     [HttpPut("editRequest/")]
     public async Task<ActionResult<Boolean>> EditRequest(AllocationRequestEdition editedRequest)
     {
+      // Todo: klären ob eine Absage gleichbedeutend mit einer Löschung ist
       Log.Information("PUT allocations/editrequest: {editRequest}", editedRequest);
 
       Allocation allocation;
@@ -704,11 +736,7 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
 
       try
       {
-        allocation = await _context.Allocations.Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == editedRequest.Id); //FindAsync(editedRequest.Id);
-                                                                                                                                             /*var allocation2 = await _context.Allocations
-                                                                                                                                               .Include(o => o.Ressource)
-                                                                                                                                               .FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
-                                                                                                                                             */
+        allocation = await _context.Allocations.Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
         ressourceName = allocation.Ressource.Name;
       }
       catch (Exception ex)
@@ -784,7 +812,11 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
       Allocation oldAllocation;
       try
       {
-        oldAllocation = await _context.Allocations.Include(o => o.Ressource).Include(o => o.AllocationGadgets).ThenInclude(ag => ag.Gadget).FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
+        oldAllocation = await _context.Allocations
+          .Include(o => o.Ressource)
+          .Include(o => o.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
+          .FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
+        if (oldAllocation == null) return BadRequest("ID does not exist");
       }
       catch (Exception ex)
       {
@@ -819,18 +851,24 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
         newRessource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
       }
 
-
       oldAllocation.AllocationGadgets = oldAllocation.AllocationGadgets ?? new List<AllocationGagdet>();
       // Entfallene Hilfsmittel müssen aus allocationGadgets vom Allocation-Objekt entfernt werden
       // Neue Hilfsmittel müssen hinzugefügt werden
       var currentGadgetIds = oldAllocation.AllocationGadgets.Select(x => x.GadgetId);
       var newGadgets = allocationVM.GadgetsIds.Where(x => !currentGadgetIds.Contains(x));
       var droppedGadgets = currentGadgetIds.Where(x => !allocationVM.GadgetsIds.Contains(x)).ToArray();
+      IQueryable<Gadget> newGadgetsObjects = new List<Gadget>().AsQueryable();
+      IEnumerable<AllocationGagdet> droppedGadgetObjects = new List<AllocationGagdet>();
+      var deletedGadgets = new List<AllocationGagdet>();
+      var createdGadgets = new List<AllocationGagdet>();
 
       if (newGadgets.Any()) { 
         try
         {
-          var newGadgetsObjects = _context.Gadgets.Where(g => newGadgets.Contains(g.Id));
+          newGadgetsObjects = _context.Gadgets
+            .Include(g => g.SuppliedBy)
+            .Where(g => newGadgets.Contains(g.Id));
+
           foreach (var g in newGadgetsObjects)
           {
             var ag = new AllocationGagdet
@@ -840,6 +878,7 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
               GadgetId = g.Id,
               Gadget = g
             };
+            createdGadgets.Add(ag);
             oldAllocation.AllocationGadgets.Add(ag);
           }
         }
@@ -853,11 +892,12 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
       {
         try 
         {
-          var removeGadgetObjects = oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
+          droppedGadgetObjects = oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
 
           foreach(var i in droppedGadgets)
           {
             var fuu = oldAllocation.AllocationGadgets.SingleOrDefault(x => x.GadgetId == i);
+            deletedGadgets.Add(fuu);
             oldAllocation.AllocationGadgets.Remove(fuu);
           }
         }
@@ -885,7 +925,7 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
         oldAllocation.To = changedAllocation.To;
         oldAllocation.ContactName = changedAllocation.ContactName;
         oldAllocation.ContactPhone = changedAllocation.ContactPhone;
-        if (newRessource != null) oldAllocation.Ressource = newRessource;
+        oldAllocation.Ressource = newRessource ?? oldAllocation.Ressource;
         // gadgets are added above
 
         oldAllocation.LastModified = DateTime.Now;
@@ -906,6 +946,43 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
         Log.Error(ex, "error while save allocation");
         return Conflict();
       }
+
+
+      // entfallene Hilfsmittel benachrichtigen
+      var dictDeleted = new Dictionary<string, string>();
+      var dictCreated = new Dictionary<string, string>();
+
+      foreach (var gadget in deletedGadgets)
+      {
+        var groupEmail = gadget.Gadget.SuppliedBy.GroupEmail;
+        if (dictDeleted.TryGetValue(groupEmail, out string oldTitles))
+          dictDeleted[groupEmail] = $"{oldTitles}, {gadget.Gadget.Title}";
+        else
+          dictDeleted.Add(groupEmail, $"{System.Environment.NewLine}#Folgende Hilfsmittel werden nicht mehr benötigt: {gadget.Gadget.Title}");
+      }
+
+      // wegen neuer Hilfsmittel benachrichtigen
+      foreach (var alGadget in createdGadgets)
+      {
+        var groupEmail = alGadget.Gadget.SuppliedBy.GroupEmail;
+        if (dictCreated.TryGetValue(groupEmail, out string oldTitles))
+          dictCreated[groupEmail] = $"{oldTitles}, {alGadget.Gadget.Title}";
+        else
+          dictCreated.Add(groupEmail, $"{System.Environment.NewLine}#Folgende Hilfsmittel werden zusätzlich benötigt: {alGadget.Gadget.Title}");
+      }
+
+      // Merge dictionarys
+      dictDeleted.ToList().ForEach(x => dictCreated[x.Key] = (dictCreated[x.Key] ?? "") + x.Value);
+      // Absage an Hilfsmittel Unterstützergruppen
+      foreach (var group in dictCreated)
+      {
+        EmailTrigger.SendEmail(
+          "Termin wurde geändert",
+          $@"Der Termin {oldAllocation.Title} der Ressource {oldAllocation.Ressource.Name} vom {oldAllocation.From.ToString("dddd, dd MMMM y HH:mm")} bis {oldAllocation.To.ToString("dddd, dd MMMM y HH:mm")} wurde storniert von {base.RequestSender.Name}.
+{group.Value}",
+          recipient: group.Key);
+      }
+
       return Ok();
     }
   }

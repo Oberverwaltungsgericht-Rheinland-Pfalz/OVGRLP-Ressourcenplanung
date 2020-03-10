@@ -106,7 +106,6 @@ export default class Calendar extends Vue {
     this.viewType = Boolean(v)
   }
   public get filteredItems () {
-    console.dir(Allocation.all())
     let isEmpty = !Allocation.all().length
     if (isEmpty) return []
     return this.itemsFormated
@@ -241,14 +240,16 @@ function transfer2Calendar (v: any) {
   if (v.IsAllDay) {
     rVal.start = v.From.substring(0, 10)
     rVal.schedule = `ganztägig`
+    rVal.name = (v.Ressource || {}).Name + ' in ' + v.Title
   } else {
     rVal.start = v.From.substring(0, 16).replace('T', ' ') // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
     rVal.end = v.To.substring(0, 16).replace('T', ' ') // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
     rVal.schedule = `
       Von ${moment(v.From).format('LT')} 
       bis ${moment(v.To).format('LT')}`
+    rVal.name = `${(v.Ressource || {}).Name} ab ${moment(v.From).format('LT')} in ${v.Title}`
   }
-  rVal.name = v.Title + ' in ' + (v.Ressource || {}).Name
+
   rVal.color = 'success'
   rVal.id = v.Id
   rVal.Notes = v.Notes
@@ -257,7 +258,7 @@ function transfer2Calendar (v: any) {
   rVal.RessourceName = (v.Ressource || {}).Name
 
   rVal.Gadgets = '<br>'
-  if (!Gadget.all().length) {
+  if (Gadget.all().length) {
     v.GadgetsIds.map((e:any) => (Gadget.find(e) as any).Title)
       .forEach((e: any) => { rVal.Gadgets += e + '<br> ' })
   }
