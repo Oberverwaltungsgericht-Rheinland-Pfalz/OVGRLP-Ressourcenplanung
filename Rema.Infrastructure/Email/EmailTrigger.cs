@@ -9,7 +9,7 @@ namespace Rema.Infrastructure.Email
       SmtpClient smtp = new SmtpClient("outlook.jmrlp.de");
       smtp.EnableSsl = false;
       smtp.Port = 25;
-      smtp.Send("support@ovg.jm.rlp.de", recipient, $"[Raumplanung] {subject}", body);
+      smtp.Send("support@ovg.jm.rlp.de", recipient, $"[Ressourcenplanungssystem] {subject}", body);
     }
   }
 }

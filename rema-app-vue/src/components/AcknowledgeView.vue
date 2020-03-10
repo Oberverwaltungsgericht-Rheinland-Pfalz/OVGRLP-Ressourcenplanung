@@ -236,7 +236,6 @@ export default class AcknowledgeView extends Vue {
   }
 
   public async saveStatus (task: AllocationModel, status: number) {
-    console.dir(task)
     const editedRequest = { Id: task.Id, status, From: task.From, To: task.To }
     const response = await fetch(`/api/allocations/editRequest`, {
       method: 'PUT', // *GET, POST, PUT, DELETE, etc.
