@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Rema.DbAccess;
 using Rema.Infrastructure.Email;
+using Rema.Infrastructure.Email.Templates;
 using Rema.Infrastructure.Models;
 using Rema.WebApi.Filter;
 using Rema.WebApi.ViewModels;
@@ -360,15 +361,12 @@ namespace Rema.WebApi.Controllers
       var isBooking = allocation.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
       allocation.Status = isBooking ? allocationVM.Status : MeetingStatus.Pending;
       var emailTitle = isBooking ? "Buchung wurde erstellt" : "Anfrage wurde erstellt";
-      var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";
+      var yourRequest = isBooking ? "Buchung" : "Anfrage";
 
       try
       {
-        EmailTrigger.SendEmail(
-        emailTitle,
-        $@"Ihre {yourRequest} {allocation.Title} der Ressource {allocation.Ressource.Name}
-vom {allocation.From} bis {allocation.To} wurde vorgenommen",
-        recipient: allocation.ReferencePerson.Email);
+        var template = new NewAllocationTemplate(allocation, yourRequest);
+        EmailTrigger.SendEmail(template, allocation.ReferencePerson.Email, template.GetGroupEmails());
       }
       catch (Exception ex)
       {
@@ -545,7 +543,7 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
       try
       {
         var title = allocationsVM.Title;
-        var recipient = allocations[0].ReferencePerson;
+        var recipient = allocations[0].ReferencePerson.Email;
         var ressourceName = allocations[0].Ressource.Name;
         string list = "";
         foreach(var all in allocations) {
@@ -557,11 +555,8 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
         var emailTitle = isBooking ? "Buchung wurde erstellt" : "Anfrage wurde erstellt";
         var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";
 
-        EmailTrigger.SendEmail(
-          emailTitle,
-          $@"Ihre Serientermin-{yourRequest} {title} der Ressource {ressourceName} wurde vorgenomme für folgende Termine:
-" + list,
-          recipient: recipient.Email);
+        var template = new NewAllocationTemplate(allocations, "Serientermin");
+        EmailTrigger.SendEmail(template, recipient, template.GetGroupEmails());
       }
       catch (Exception ex)
       {
@@ -608,31 +603,8 @@ vom {allocation.From} bis {allocation.To} wurde vorgenommen",
         Log.Error(ex, "error while deleting allocation");
       }
 
-      // Terminverantwortlichen benachrichtigen
-      EmailTrigger.SendEmail(
-        "Termin wurde storniert",
-        $"Ihr Termin {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From.ToString("dddd, dd MMMM y HH:mm")} bis {allocation.To.ToString("dddd, dd MMMM y HH:mm")} wurde storniert von {base.RequestSender.Name}", 
-        recipient: allocation.ReferencePerson.Email);
-
-      var dict = new Dictionary<string, string>();
-      foreach (var gadget in allocation.AllocationGadgets) {
-        var groupEmail = gadget.Gadget.SuppliedBy.GroupEmail;
-        if (dict.TryGetValue(groupEmail, out string oldTitles))
-          dict[groupEmail] = oldTitles + $", {gadget.Gadget.Title}";
-        else
-          dict.Add(groupEmail, gadget.Gadget.Title);
-      }
-
-      // Absage an Hilfsmittel Unterstützergruppen
-      foreach(var group in dict)
-      {
-      EmailTrigger.SendEmail(
-        "Termin wurde storniert",
-        $@"Der Termin {allocation.Title} der Ressource {allocation.Ressource.Name} vom {allocation.From.ToString("dddd, dd MMMM y HH:mm")} bis {allocation.To.ToString("dddd, dd MMMM y HH:mm")} wurde storniert von {base.RequestSender.Name}.
-Die Bereitstellung der Hilfsmittel {group.Value} wird nicht benötigt.",
-        recipient: group.Key);
-      }
-
+      var template = new DeletedAllocationTemplate(allocation);
+      EmailTrigger.SendEmail(template, allocation.ReferencePerson.Email, template.GetGroupEmails());
       return Ok();
     }
 
@@ -681,49 +653,7 @@ Die Bereitstellung der Hilfsmittel {group.Value} wird nicht benötigt.",
       }
     }
     */
-
-    /* unused
-    // PUT: allocations/status/5
-    [HttpPut("status/{id}")]
-    public async Task<IActionResult> PutAllocation(long id, int status)
-    {
-      Log.Information("PUT allocations/status/{id}: {status}", id, status);
-
-      Allocation allocation;
-
-      try
-      {
-        allocation = await _context.Allocations.FindAsync(id);
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting allocation");
-        return NotFound();
-      }
-
-      if (allocation == null)
-      {
-        return NotFound();
-      }
-
-      try
-      {
-        allocation.Status = (MeetingStatus)status;
-        allocation.LastModified = DateTime.Now;
-        allocation.LastModifiedBy = base.RequestSender;
-        _context.Entry(allocation).State = EntityState.Modified;
-
-        await _context.SaveChangesAsync();
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while changing status and save allocation");
-        return Conflict();
-      }
-
-      return Ok();
-    } */
-
+    
     // PUT: allocations/editRequest
     [HttpPut("editRequest/")]
     public async Task<ActionResult<Boolean>> EditRequest(AllocationRequestEdition editedRequest)
@@ -775,18 +705,21 @@ Die Bereitstellung der Hilfsmittel {group.Value} wird nicht benötigt.",
 
       try
       {
+        EmailTemplate template = null;
         if ((MeetingStatus)editedRequest.status == MeetingStatus.Moved)
         {
-          EmailTrigger.SendEmail("Buchung wurde verschoben", $"Ihre Buchung {allocation.Title} der Ressource {ressourceName} vom {allocation.From} bis {allocation.To} wurde verschoben von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
+          template = new StatusChangedTemplate(allocation, "verschoben");
         }
         else if ((MeetingStatus)editedRequest.status == MeetingStatus.Approved)
         {
-          EmailTrigger.SendEmail("Buchung wurde genehmigt", $"Ihre Buchungsanfrage {allocation.Title} der Ressource {ressourceName} vom {allocation.From} bis {allocation.To} wurde genehmigt von {base.RequestSender.Name}", recipient: base.RequestSender.Email);
+          template = new StatusChangedTemplate(allocation, "genehmigt");
         }
         else if ((MeetingStatus)editedRequest.status == MeetingStatus.Clarification)
         {
-          EmailTrigger.SendEmail("Buchung wurde abgelehnt", $"Ihre Buchungsanfrage {allocation.Title} der Ressource {ressourceName} vom {allocation.From} bis {allocation.To} wurde abgelehnt", recipient: base.RequestSender.Email);
+          template = new StatusChangedTemplate(allocation, "abgelehnt");
         }
+        if (template != null)
+          EmailTrigger.SendEmail(template, allocation.ReferencePerson.Email, new List<string>());
       }
 
       catch (Exception ex)
@@ -947,32 +880,10 @@ Die Bereitstellung der Hilfsmittel {group.Value} wird nicht benötigt.",
         return Conflict();
       }
 
-
-      // entfallene Hilfsmittel benachrichtigen
-      var dictDeleted = new Dictionary<string, string>();
-      var dictCreated = new Dictionary<string, string>();
-
-      foreach (var gadget in deletedGadgets)
-      {
-        var groupEmail = gadget.Gadget.SuppliedBy.GroupEmail;
-        if (dictDeleted.TryGetValue(groupEmail, out string oldTitles))
-          dictDeleted[groupEmail] = $"{oldTitles}, {gadget.Gadget.Title}";
-        else
-          dictDeleted.Add(groupEmail, $"{System.Environment.NewLine}#Folgende Hilfsmittel werden nicht mehr benötigt: {gadget.Gadget.Title}");
-      }
-
-      // wegen neuer Hilfsmittel benachrichtigen
-      foreach (var alGadget in createdGadgets)
-      {
-        var groupEmail = alGadget.Gadget.SuppliedBy.GroupEmail;
-        if (dictCreated.TryGetValue(groupEmail, out string oldTitles))
-          dictCreated[groupEmail] = $"{oldTitles}, {alGadget.Gadget.Title}";
-        else
-          dictCreated.Add(groupEmail, $"{System.Environment.NewLine}#Folgende Hilfsmittel werden zusätzlich benötigt: {alGadget.Gadget.Title}");
-      }
-
+      var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets);
+      EmailTrigger.SendEmail(template, oldAllocation.ReferencePerson.Email, template.GetGroupEmails());
       // Merge dictionarys
-      dictDeleted.ToList().ForEach(x => dictCreated[x.Key] = (dictCreated[x.Key] ?? "") + x.Value);
+/*      dictDeleted.ToList().ForEach(x => dictCreated[x.Key] = (dictCreated[x.Key] ?? "") + x.Value);
       // Absage an Hilfsmittel Unterstützergruppen
       foreach (var group in dictCreated)
       {
@@ -982,7 +893,7 @@ Die Bereitstellung der Hilfsmittel {group.Value} wird nicht benötigt.",
 {group.Value}",
           recipient: group.Key);
       }
-
+*/
       return Ok();
     }
   }
