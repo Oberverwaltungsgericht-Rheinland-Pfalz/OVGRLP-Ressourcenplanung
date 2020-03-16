@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
+using Newtonsoft.Json;
 using Rema.Infrastructure.Models;
 
 namespace Rema.WebApi.ViewModels
@@ -41,8 +42,12 @@ namespace Rema.WebApi.ViewModels
 
     public DateTime ApprovedAt { get; set; }
 
-    public long ReferencePersonId { get; set; }
+    public string ReferencePersonId { get; set; }
 
     public string ScheduleSeries { get; set; }
+    public override string ToString ()
+    {
+      return JsonConvert.SerializeObject(this);
+    }
   }
 }

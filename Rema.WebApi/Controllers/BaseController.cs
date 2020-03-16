@@ -45,10 +45,10 @@ namespace Rema.WebApi.Controllers
       get
       {
         if (_user != null) return _user;
-
-        _user = GetUserFromHttpContext(this.HttpContext);
-
-        SaveUser(_user);
+        else _user = GetUserFromDB(this.HttpContext);
+//        _user = GetUserFromHttpContext(this.HttpContext);  
+//        SaveUser(_user);
+          // todo: check who to add new user informations
 
         return _user;
       }
@@ -75,6 +75,23 @@ namespace Rema.WebApi.Controllers
       {
         Log.Error(ex, "An error occured while storing the user the database.");
       }
+    }
+
+    private User GetUserFromDB (HttpContext context)
+    {
+      var requester = this.HttpContext.User;
+      var identity = (WindowsIdentity)requester.Identity;
+      var adID = identity.User.Value;
+
+      var dbUser = _context.Users.AsNoTracking().FirstOrDefault(p => p.ActiveDirectoryID == adID);
+      if (dbUser != null)
+        return dbUser;
+      else
+      {
+        _user = GetUserFromHttpContext(this.HttpContext);
+        SaveUser(_user);
+      }
+      return _user;
     }
 
     private User GetUserFromHttpContext(HttpContext context)

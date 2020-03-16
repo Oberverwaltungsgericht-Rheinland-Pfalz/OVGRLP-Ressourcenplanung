@@ -49,7 +49,7 @@ namespace Rema.Infrastructure.Email.Templates
       }
     }
     private string TimeOneDateSingle (Allocation al) {
-      if (al.IsAllDay) return "Ganztägig";
+      if (al.IsAllDay) return $"{al.From.ToString("dddd, dd MMMM y")}  - {al.To.ToString("dddd, dd MMMM y")} Ganztägig";
       return $"{al.From.ToString("dddd, dd MMMM y HH:mm")}  - {al.To.ToString("dddd, dd MMMM y HH:mm")}";
     }
     private string TimeOneDateMultiple ()
@@ -67,20 +67,20 @@ namespace Rema.Infrastructure.Email.Templates
 
     protected string GroupsGadgets { get
       {
-        var dictGroups = new Dictionary<string, IList<string>>();
+        var dictGroups = new Dictionary<SupplierGroup, IList<string>>();
 
         foreach (var gadget in _allocation.AllocationGadgets.Select(e => e.Gadget))
         {
-          var groupEmail = gadget.SuppliedBy.GroupEmail;
-          if (dictGroups.TryGetValue(groupEmail, out IList<string> oldTitles))
+          var group = gadget.SuppliedBy;
+          if (dictGroups.TryGetValue(group, out IList<string> oldTitles))
             oldTitles.Add(gadget.Title);
           else
-            dictGroups.Add(groupEmail, new List<string>() { gadget.Title });
+            dictGroups.Add(group, new List<string>() { gadget.Title });
         }
         string rValue = "";
         foreach(var group in dictGroups.ToList())
         {
-          rValue += $"{System.Environment.NewLine}{System.Environment.NewLine}Organisation {group}:\n";
+          rValue += $"{System.Environment.NewLine}{System.Environment.NewLine}Organisation {group.Key.Title}:\n";
           foreach(var gadget in group.Value)
           {
             rValue += $"{gadget}";

@@ -114,20 +114,8 @@
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Names as Fnn } from '../../store/user/types'
-import {
-  Gadget,
-  Ressource,
-  Supplier,
-  Allocation
-} from '../../models'
-import {
-  RessourceModel,
-  AllocationRequest,
-  AllocationRequestView,
-  AllocationModel,
-  UserData,
-  ContactUser
-} from '../../models/interfaces'
+import { Gadget, Ressource, Supplier, Allocation } from '../../models'
+import { RessourceModel, AllocationRequest, AllocationRequestView, AllocationModel, UserData, ContactUser } from '../../models/interfaces'
 const namespace = 'user'
 
 @Component

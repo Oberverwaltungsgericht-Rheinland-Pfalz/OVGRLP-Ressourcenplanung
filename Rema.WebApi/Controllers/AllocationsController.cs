@@ -43,6 +43,7 @@ namespace Rema.WebApi.Controllers
           .Include(g => g.AllocationGadgets)
           .Include(g => g.LastModifiedBy)
           .Include(g => g.ReferencePerson)
+          .Include(g => g.ReferencePerson)
           .ToListAsync();
       }
       catch (Exception ex)
@@ -117,7 +118,8 @@ namespace Rema.WebApi.Controllers
       try
       {
         allocation.LastModified = DateTime.Now;
-        allocation.LastModifiedBy = base.RequestSender;
+        if (allocation.LastModifiedBy.Id != base.RequestSender.Id)
+          allocation.LastModifiedBy = base.RequestSender;
         _context.Entry(allocation).State = EntityState.Modified;
       }
       catch (Exception ex)
@@ -269,7 +271,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var gadgets = _context.Gadgets.Where(g => allocationVM.GadgetsIds.Contains(g.Id));
+        var gadgets = _context.Gadgets.Include(e => e.SuppliedBy).Where(g => allocationVM.GadgetsIds.Contains(g.Id));
 
         allocation.AllocationGadgets = new List<AllocationGagdet>();
         foreach(var g in gadgets)
@@ -332,13 +334,14 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        if (allocationVM.ReferencePersonId == 0)
+        if (string.IsNullOrEmpty(allocationVM.ReferencePersonId))
         {
           allocation.ReferencePerson = requestedUser;
         }
         else
         {
-          var referencePerson = await _context.Users.FindAsync(allocationVM.ReferencePersonId);
+          // find 
+          var referencePerson = await _context.Users.SingleOrDefaultAsync(e=> e.ActiveDirectoryID == allocationVM.ReferencePersonId);
           allocation.ReferencePerson = referencePerson;
         }
       }
@@ -365,6 +368,11 @@ namespace Rema.WebApi.Controllers
 
       try
       {
+        allocation = await _context.Allocations
+          .Include(r => r.ReferencePerson)
+          .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
+          .FirstOrDefaultAsync(i => i.Id == allocation.Id);
+        allocation = await _context.Allocations.FindAsync(allocation.Id);
         var template = new NewAllocationTemplate(allocation, yourRequest);
         EmailTrigger.SendEmail(template, allocation.ReferencePerson.Email, template.GetGroupEmails());
       }
@@ -440,7 +448,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var gadgets = _context.Gadgets.Where(g => allocationsVM.GadgetsIds.Contains(g.Id));
+        var gadgets = _context.Gadgets.Include(e => e.SuppliedBy).Where(g => allocationsVM.GadgetsIds.Contains(g.Id));
 
         foreach (var a in allocations)
         {
@@ -508,13 +516,13 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        if (allocationsVM.ReferencePersonId == 0)
+        if (string.IsNullOrEmpty(allocationsVM.ReferencePersonId))
         {
           allocations.ForEach(e => e.ReferencePerson = requestedUser);
         }
         else
         {
-          var referencePerson = await _context.Users.FindAsync(allocationsVM.ReferencePersonId);
+          var referencePerson = await _context.Users.SingleOrDefaultAsync(e => e.ActiveDirectoryID == allocationsVM.ReferencePersonId);
           allocations.ForEach(e => e.ReferencePerson = requestedUser);
         }
       }
@@ -552,15 +560,16 @@ namespace Rema.WebApi.Controllers
         }
 
         var isBooking = allocations[0].Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
-        var emailTitle = isBooking ? "Buchung wurde erstellt" : "Anfrage wurde erstellt";
+        var requestType = isBooking ? "erstellt" : "angefragt";
         var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";
 
-        var template = new NewAllocationTemplate(allocations, "Serientermin");
+        var template = new NewAllocationTemplate(allocations, requestType);
         EmailTrigger.SendEmail(template, recipient, template.GetGroupEmails());
       }
       catch (Exception ex)
       {
         Log.Error(ex, "error while processing mails");
+        return Conflict();
       }
 
       return Ok();
@@ -579,6 +588,7 @@ namespace Rema.WebApi.Controllers
         allocation = await _context.Allocations
           .Include(o => o.Ressource)
           .Include(r => r.ReferencePerson)
+          .Include(r => r.LastModifiedBy)
           .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
           .FirstOrDefaultAsync(i => i.Id == id);
       }
@@ -666,7 +676,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation = await _context.Allocations.Include(o => o.Ressource).FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
+        allocation = await _context.Allocations.Include(o => o.Ressource).Include(o => o.ReferencePerson).FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
         ressourceName = allocation.Ressource.Name;
       }
       catch (Exception ex)
@@ -684,7 +694,8 @@ namespace Rema.WebApi.Controllers
       {
         allocation.Status = (MeetingStatus)editedRequest.status;
         allocation.LastModified = DateTime.Now;
-        allocation.LastModifiedBy = base.RequestSender;
+        if (allocation.LastModifiedBy.Id != base.RequestSender.Id)
+          allocation.LastModifiedBy = base.RequestSender;
         allocation.ApprovedAt = DateTime.Now;
         allocation.ApprovedBy = base.RequestSender;
 
@@ -747,6 +758,8 @@ namespace Rema.WebApi.Controllers
       {
         oldAllocation = await _context.Allocations
           .Include(o => o.Ressource)
+          .Include(o => o.ReferencePerson)
+          .Include(o => o.LastModifiedBy)
           .Include(o => o.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
           .FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
         if (oldAllocation == null) return BadRequest("ID does not exist");
@@ -776,6 +789,19 @@ namespace Rema.WebApi.Controllers
       if (string.IsNullOrEmpty(allocationVM.ScheduleSeries) && oldAllocation.ScheduleSeriesGuid != null)
       {
         oldAllocation.ScheduleSeriesGuid = null;
+      }
+
+      try
+      {
+        if (string.IsNullOrEmpty(allocationVM.ReferencePersonId) && allocationVM.ReferencePersonId.Length > 12)
+        {
+          var referencePerson = await _context.Users.SingleOrDefaultAsync(e => e.ActiveDirectoryID == allocationVM.ReferencePersonId);
+          oldAllocation.ReferencePerson = referencePerson;
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while changing referencePerson");
       }
 
       Ressource newRessource = null;
@@ -862,7 +888,8 @@ namespace Rema.WebApi.Controllers
         // gadgets are added above
 
         oldAllocation.LastModified = DateTime.Now;
-        oldAllocation.LastModifiedBy = base.RequestSender;       
+        if(oldAllocation.LastModifiedBy.Id != base.RequestSender.Id)
+          oldAllocation.LastModifiedBy = base.RequestSender;       
       }
       catch (Exception ex)
       {
