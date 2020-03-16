@@ -14,6 +14,9 @@
         <v-toolbar flat color="white">
           <v-toolbar-title>Wartende Anfragen</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
+          <label>
+            <input type="checkbox" v-model="hideOld" /> vergangene Termine ausblenden
+          </label>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -63,6 +66,7 @@ export default class AcknowledgeList extends Vue {
   private reserveContactUser: any;
   private dialog: boolean = false;
   private viewAllocation: AllocationRequestView = {} as AllocationRequestView;
+  private hideOld: boolean = true
 
   private search: string = '';
   private headers: object[] = [
@@ -106,22 +110,26 @@ export default class AcknowledgeList extends Vue {
   public get Requests () {
     if (!Allocation.all().length) return []
     this.fillContactUsers()
-    return this.UnAcknowledgedAllocations.map((v: any) => ({
-      Id: v.Id,
-      Title: v.Title,
-      CreateDate: v.CreatedAt,
-      // @ts-ignore
-      Status: this.$options.filters.status2string(v.Status),
-      Contact: (
-        this.ContactUsers.find(
-          (w: ContactUser) => w.Id === v.ReferencePersonId
-        ) || { Title: '' }
-      ).Title,
-      Ressource: (v.Ressource || {}).Name,
-      From: v.From,
-      To: v.To,
-      DateTime: v.LastModified
-    }))
+    return this.UnAcknowledgedAllocations
+      .filter((a: any) => {
+        return !this.hideOld || Date.parse(a.To) > Date.now()
+      })
+      .map((v: any) => ({
+        Id: v.Id,
+        Title: v.Title,
+        CreateDate: v.CreatedAt,
+        // @ts-ignore
+        Status: this.$options.filters.status2string(v.Status),
+        Contact: (
+          this.ContactUsers.find(
+            (w: ContactUser) => w.Id === v.ReferencePersonId
+          ) || { Title: '' }
+        ).Title,
+        Ressource: (v.Ressource || {}).Name,
+        From: v.From,
+        To: v.To,
+        DateTime: v.LastModified
+      }))
   }
   public refreshAllocations () {
     Gadget.api().get('gadgets')

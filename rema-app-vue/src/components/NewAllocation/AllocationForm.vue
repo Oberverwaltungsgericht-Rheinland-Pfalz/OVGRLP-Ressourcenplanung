@@ -119,13 +119,16 @@
         </v-row>
         <v-divider />
         <v-row>
-          <v-col>
+          <!--<v-col>
             <v-text-field
               v-model="contactPerson"
               label="Ansprechpartner(in)"
               placeholder="Bitte geben Sie eine(n) Ansprechpartner(in) an."
               required
             ></v-text-field>
+          </v-col>-->
+          <v-col>
+            <input-reference-person @selected="referencePerson=$event" :key="'re'+refreshInputReferencePerson"/>
           </v-col>
           <v-col>
             <v-text-field
@@ -181,12 +184,13 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { RessourceModel, AllocationModel } from '../../models/interfaces'
+import { RessourceModel, AllocationModel, AdUsers } from '../../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
+import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 
 @Component({
   components: {
-    DateTimePicker, DropDownTimePicker
+    DateTimePicker, DropDownTimePicker, InputReferencePerson
   }
 })
 export default class AllocationForm extends Vue {
@@ -199,22 +203,19 @@ export default class AllocationForm extends Vue {
   selectedGadgets: number[] = [];
   telNumber: string = '';
   contactPerson: string = '';
+  referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '' }
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
+  private refreshInputReferencePerson: number = 0
 
   public isRepeating: boolean = false
-  // public valid: boolean = false
-  // public editId: number = 0
-  // private Description: string = ''
 
-  // private Email: string = ''
   private timeFrom: string = '08:00'
   private timeTo: string = '17:00'
-  // private dateToIntern: Date = new Date(new Date().setHours(16, 0, 0, 0))
-  // private dateToChanged: boolean = false
-  // private multipleDates: string[] = []
-  // private showMultipleDatesMenu: boolean = false
 
+  public setReferencePerson (e:AdUsers) {
+    this.referencePerson = e
+  }
   @Watch('dateFrom')
   public dateFromChange (val: string) {
     if (!this.dateTo || this.dateTo.length === 0) {
@@ -260,6 +261,7 @@ export default class AllocationForm extends Vue {
       gadgetsIds: [...this.selectedGadgets],
       contactName: this.contactPerson,
       contactPhone: this.telNumber,
+      ReferencePersonId: this.referencePerson.ActiveDirectoryID,
       dates: ['']
     }
 
@@ -279,61 +281,11 @@ export default class AllocationForm extends Vue {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(newAllocation)
-      })
+      }).catch(() => this.$dialog.error({ text: 'Speichern fehlgeschlagen', title: 'Warning' }))
       await Allocation.api().get('allocations')
     }
-
-    /*
-    let from = this.dateFrom
-    let to = this.dateTo
-    if (date) {
-      from = date
-      to = date
-
-      if (!this.isWholeDay) {
-        from = `${date}T${this.timeFrom}`
-        to = `${date}T${this.timeTo}`
-      }
-    }
-    */
-    /* TODO: save with date
-    await Allocations.api().post('allocations', {
-      From: from,
-      To: to,
-      IsAllDay: this.isWholeDay,
-      Status: status,
-      Purpose_id: purpose,
-      Ressource_id: this.selectedRessourceId
-    })
-    */
   }
 
-  private async savePurpose () {
-    /*
-    const response = await AllocationPurposes.api().post('allocationPurposes', {
-      Title: this.Title,
-      Description: this.Description,
-      Notes: this.Notes,
-      ContactPhone: this.telNumber,
-      GadgetIds: [...this.seltedGadgets]
-    })
-    if (response && response !== null && response.entities !== null) {
-      const entity = response.entities.AllocationPurposes.pop()
-      if (entity === null) {
-        return this.$dialog.message.warning(
-          'AllocationPurpose was not saved correctly ' + response,
-          { position: 'top-center' }
-        )
-      }
-      return (entity as any).Id
-    } else {
-      this.$dialog.message.warning(
-        'AllocationPurpose was not saved correctly ' + response,
-        { position: 'top-center' }
-      )
-    }
-    */
-  }
   private close () {
     this.clearAll()
     this.$emit('close')
@@ -342,7 +294,7 @@ export default class AllocationForm extends Vue {
     let rValue = true
     if (!this.ressourceId) rValue = false
     if (!this.dateFrom && !this.isRepeating) rValue = false
-    if (!this.dateTo && !this.isRepeating) rValue = false
+    if (!this.dateTo && !this.isRepeating && this.dateTo.length < 7) rValue = false
     if (this.isRepeating && !this.multipleDates.length) rValue = false
     return !rValue
   }
@@ -356,47 +308,6 @@ export default class AllocationForm extends Vue {
   private get GadgetGroups () {
     return Supplier.all()
   }
-
-  // dateFrom
-  /*
-  private get dateFrom (): string {
-    if (this.isWholeDay) {
-      return dayjs(this.dateFromIntern).format('YYYY-MM-DD')
-    } else {
-      return dayjs(this.dateFromIntern).format('YYYY-MM-DDThh:mm')
-    }
-  }
-  private set dateFrom (val: string) {
-    this.dateFromIntern = new Date(val)
-    if (!this.dateToChanged) this.dateTo = val
-  }
-  */
-
-  // dateTo
-  /*
-  private get dateTo (): string {
-    if (this.isWholeDay) {
-      return dayjs(this.dateToIntern).format('YYYY-MM-DD')
-    } else {
-      return dayjs(this.dateToIntern).format('YYYY-MM-DDThh:mm')
-    }
-  }
-  private set dateTo (val: string) {
-    this.dateToIntern = new Date(val)
-  }
-  */
-
-  /*
-  private get dateInputType (): string {
-    if (this.isWholeDay) return 'date'
-    else return 'datetime-local'
-  }
-
-  private get today () {
-    if (this.isWholeDay) return dayjs().format('YYYY-MM-DD')
-    else return dayjs().format('YYYY-MM-DDThh:mm')
-  }
-  */
 
   private getGadgets (groupId: number) {
     return Gadget.query()
@@ -416,16 +327,15 @@ export default class AllocationForm extends Vue {
     this.contactPerson = ''
     this.dateFrom = ''
     this.dateTo = ''
-    this.timeTo = '18:00'
+    this.timeTo = '16:00'
     this.timeFrom = '08:00'
     this.fullday = false
     this.ressourceId = null
     this.selectedGadgets = []
     this.multipleDates = []
     this.isRepeating = false
+    this.referencePerson = { ActiveDirectoryID: '', Name: '', Email: '' }
+    this.refreshInputReferencePerson++
   }
 }
 </script>
-
-<style lang="stylus">
-</style>

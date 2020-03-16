@@ -12,6 +12,7 @@ using Rema.WebApi.Filter;
 using Rema.WebApi.ViewModels;
 using Serilog;
 using Rema.ServiceLayer.Services;
+using Microsoft.Extensions.Primitives;
 
 namespace Rema.WebApi.Controllers
 {
@@ -43,7 +44,7 @@ namespace Rema.WebApi.Controllers
 
     // GET: users/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetUser(long id)
+    public async Task<ActionResult<AdUserViewModel>> GetUser(long id)
     {
       Log.Information("GET users/{id}", id);
 
@@ -54,7 +55,8 @@ namespace Rema.WebApi.Controllers
         {
           return NotFound();
         }
-        return user;
+        var returnUser = new AdUserViewModel() { ActiveDirectoryID = user.ActiveDirectoryID, Email = user.Email, Name = user.Name};
+        return returnUser;
       }
       catch (Exception ex)
       {
@@ -74,6 +76,8 @@ namespace Rema.WebApi.Controllers
       var adService = new AdService(Startup.DomainsToSearch);
       List<AdUserViewModel> adUsers = adService.SearchAdUsers<AdUserViewModel>(namePart);
 
+      Request.Headers.TryGetValue("timestamp", out StringValues timestampValue);
+      Response.Headers.Add("timestamp", timestampValue.ToString());
       return adUsers;
     }
 

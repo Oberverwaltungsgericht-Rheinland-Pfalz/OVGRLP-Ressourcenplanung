@@ -14,7 +14,7 @@ namespace Rema.Infrastructure.Email.Templates
     }
     public NewAllocationTemplate(IList<Allocation> allocations, string bookingType) : base(allocations)
     {
-      base.Type = "wurde als Serientermin erstellt";
+      base.Type = "wurde als Serientermin";
       _bookingType = bookingType;
     }
 

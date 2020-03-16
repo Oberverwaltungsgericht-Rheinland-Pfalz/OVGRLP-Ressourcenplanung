@@ -55,7 +55,7 @@
                   <!-- Serientermindatum -->
                   <label class="date-label">
                     Datum im Serientermin
-                    <input v-if="dateFromFocus" type="date" :value="dateOfSeries" @change="changeDateFrom" @blur="dateFromFocus=false" ref="dateSeries" autofocus>
+                    <input v-if="dateFromFocus" type="date" :value="dateOfSeries" @change="changeDateSeries" @blur="dateFromFocus=false" ref="dateSeries" autofocus>
                     <span v-else @click="dateFromFocus=true" class="span-input">{{dateOfSeries | toLocalDate}}</span>
                   </label> &emsp;
               </div>
@@ -104,12 +104,7 @@
         <v-divider />
         <v-row>
           <v-col>
-            <v-text-field
-              v-model="contactPerson"
-              label="Ansprechpartner(in)"
-              placeholder="Bitte geben Sie eine(n) Ansprechpartner(in) an."
-              required
-            ></v-text-field>
+            <input-reference-person :userid="ReferencePersonId" @selected="referencePerson=$event" :key="'re'+refreshInputReferencePerson"/>
           </v-col>
           <v-col>
             <v-text-field
@@ -148,13 +143,15 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { AllocationRequestView } from '../models/interfaces'
+import { AllocationRequestView, AdUsers } from '../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
+import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
+import { actions } from '../store/counter/actions'
 
 @Component({
-  components: { DateTimePicker, DropDownTimePicker }
+  components: { DateTimePicker, DropDownTimePicker, InputReferencePerson }
 })
 export default class EditFormModal extends Vue {
   @Prop(Number) private eventId!: number
@@ -183,12 +180,14 @@ export default class EditFormModal extends Vue {
   private dateToFocus: boolean = false
   private dateOfSeries: string = ''
   private eventAllocation: any = {}
+  private refreshInputReferencePerson: number = 0
+  private referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '' }
 
   public isRepeating: boolean = false
   public dialog: boolean = false
 
   @Watch('dialog')
-  private watchDialog (newVal:boolean) {
+  private async watchDialog (newVal:boolean) {
     if (newVal) {
       let all : any = Allocation.find(this.eventId)
       this.eventAllocation = all
@@ -218,6 +217,9 @@ export default class EditFormModal extends Vue {
   }
   private changeDateFrom (e:any) {
     if (e.target.value) { this.dateFrom = e.target.value.substring(0, 10) }
+  }
+  private changeDateSeries (e:any) {
+    if (e.target.value) { this.dateOfSeries = e.target.value.substring(0, 10) }
   }
   private changeDateTo (e:any) {
     if (e.target.value) { this.dateTo = e.target.value.substring(0, 10) }
@@ -254,6 +256,7 @@ export default class EditFormModal extends Vue {
     if (!this.dateOfSeries && this.isRepeating) rValue = false
     if (!this.timeTo && !this.fullday) rValue = false
     if (!this.timeFrom && !this.fullday) rValue = false
+    if (!this.ReferencePersonId) rValue = false
 
     return !rValue
   }
@@ -264,7 +267,10 @@ export default class EditFormModal extends Vue {
     data.Title = this.title
     data.RessourceId = this.ressourceId
     data.IsAllDay = this.fullday
-    data.ReferencePersonId = this.ReferencePersonId
+
+    if (this.referencePerson.ActiveDirectoryID) data.ReferencePersonId = this.referencePerson.ActiveDirectoryID
+    else data.ReferencePersonId = this.ReferencePersonId
+
     data.gadgetsIds = this.selectedGadgets
     data.ContactName = this.contactPerson
     data.ContactPhone = this.telNumber

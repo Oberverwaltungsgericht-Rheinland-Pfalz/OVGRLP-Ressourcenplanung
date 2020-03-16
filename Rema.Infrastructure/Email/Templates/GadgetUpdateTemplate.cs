@@ -65,15 +65,16 @@ namespace Rema.Infrastructure.Email.Templates
       get
       {
         (var dictDeleted, var dictCreated) = GetGadgetGroups();
+        string rValue = base.GroupsGadgets;
 
-        string rValue = $"Entfernte Hilfsmittel{System.Environment.NewLine}";
+        if(dictDeleted.Any()) rValue = $"{System.Environment.NewLine}Entfernte Hilfsmittel{System.Environment.NewLine}";
         // Absage an Hilfsmittel Unterstützergruppen
         foreach (var group in dictDeleted)
         {
           rValue += $"{System.Environment.NewLine}Die Unterstützungsgruppe {group.Key.Title} wird hiermit benachrichtigt {group.Value}";
         }
 
-        rValue += $"{System.Environment.NewLine}Hinzugefügte Hilfsmittel{System.Environment.NewLine}";
+        if (dictCreated.Any()) rValue += $"{System.Environment.NewLine}{System.Environment.NewLine}Hinzugefügte Hilfsmittel{System.Environment.NewLine}";
         foreach (var group in dictCreated)
         {
           rValue += $"{System.Environment.NewLine}Die Unterstützungsgruppe {group.Key.Title} wird hiermit benachrichtigt {group.Value}";

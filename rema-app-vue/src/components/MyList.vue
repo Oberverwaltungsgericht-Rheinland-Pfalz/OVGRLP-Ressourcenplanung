@@ -47,8 +47,8 @@ const namespace = 'acknowledges'
 
 @Component
 export default class MyAllocationsList extends Vue {
-  private search: string = '';
-  private hideOld: boolean = true;
+  private search: string = ''
+  private hideOld: boolean = true
   private headers: object[] = [
     { text: 'Bearbeiten', value: 'action', sortable: false },
     { text: 'Bezeichnung', value: 'Title' },
@@ -104,12 +104,18 @@ export default class MyAllocationsList extends Vue {
     if (confirmation !== true) return
 
     const isLastAllocation = this.isLastAllocation(item.PurposeId)
-    const responseDeleteAllocation = await Allocation.api().delete(
-      `allocations/${item.Id}`,
-      {
-        delete: item.Id
-      }
-    )
+
+    try {
+      const responseDeleteAllocation = await Allocation.api().delete(
+        `allocations/${item.Id}`,
+        { delete: item.Id }
+      )
+    } catch (e) {
+      await this.$dialog.error({
+        text: 'Löschen fehlgeschlagen',
+        title: 'Warning'
+      })
+    }
   }
   private isLastAllocation (purposeID: number): boolean {
     const purposes = this.Requests.filter(
