@@ -166,7 +166,6 @@ export default class EditFormModal extends Vue {
   private fullday: boolean = false
   private selectedGadgets: number[] = []
   private telNumber: string = ''
-  private contactPerson: string = ''
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
   private ReferencePersonId: number = 0
@@ -205,7 +204,6 @@ export default class EditFormModal extends Vue {
       this.dateTo = all.To.substring(0, 10)
       this.timeTo = all.To.substring(11, 16)
       this.selectedGadgets = all.GadgetsIds
-      this.contactPerson = all.ContactName
       this.telNumber = all.ContactPhone
       this.Notes = all.Notes
 
@@ -272,7 +270,6 @@ export default class EditFormModal extends Vue {
     else data.ReferencePersonId = this.ReferencePersonId
 
     data.gadgetsIds = this.selectedGadgets
-    data.ContactName = this.contactPerson
     data.ContactPhone = this.telNumber
     data.Notes = this.Notes
 

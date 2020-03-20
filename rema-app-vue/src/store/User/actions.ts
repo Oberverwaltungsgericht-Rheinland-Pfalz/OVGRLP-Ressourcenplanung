@@ -20,5 +20,16 @@ export const actions: ActionTree<UserState, RootState> = {
     commit(Names.m.clearUser)
     await dispatch(Names.a.loadUser)
     // commit(Names.m.setUser, user)
+  },
+  async [Names.a.loadUsers] ({ commit, state }, referencePersonsUnique: number[]): Promise<any> {
+    const response = await fetch(`/api/Users/Names/${referencePersonsUnique}`)
+    const responseArray = await response.json()
+
+    responseArray.forEach((id : number) => {
+      
+    })
+    const entryIdx = state.ContactUsers.findIndex((s) => s.Id === userPayload.Id)
+    state.ContactUsers.splice(entryIdx, 1, userPayload)
+    commit(Names.m.setUser, responseObj)
   }
 }

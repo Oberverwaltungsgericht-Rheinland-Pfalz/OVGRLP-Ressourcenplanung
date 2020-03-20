@@ -98,7 +98,6 @@ export default class AcknowledgeList extends Vue {
       ...viewA,
       RessourceTitle: viewA.Ressource.Name,
       Title: viewA.Title,
-      ContactTel: viewA.ContactName,
       Notices: viewA.Notes
     }
   }
