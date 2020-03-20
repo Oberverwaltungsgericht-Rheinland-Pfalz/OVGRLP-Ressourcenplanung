@@ -53,7 +53,7 @@
             <v-card-text>
               <p>{{selectedEvent.schedule}}</p>
               <p><strong>Notizen: </strong>{{selectedEvent.Notes}}</p>
-              <p><strong>Kontaktperson: </strong>{{selectedEvent.Contact}}</p>
+              <p><strong>Kontaktperson: </strong>{{selectedEvent.Contact || ReferenceUserName}}</p>
               <p><strong>Hilfsmittel: </strong><span v-html="selectedEvent.Gadgets"></span></p>
             </v-card-text>
             <v-card-actions>
@@ -68,8 +68,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { AllocationRequestView, GadgetModel } from '../models/interfaces'
+import { AllocationRequestView, GadgetModel, ContactUser } from '../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
+import { State, Action, Getter, Mutation } from 'vuex-class'
 
 import dayjs from 'dayjs'
 import { Allocation, Gadget } from '../models'
@@ -77,9 +78,18 @@ import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
 
 @Component({
-  components: { EditFormModal }
+  components: { EditFormModal },
+  filters: { ReferenceUserName (id:number) {
+    // @ts-ignore
+    let user = this.ContactUsers.find(id)
+    return user ? user.Title : id
+  } }
 })
 export default class Calendar extends Vue {
+  @State('ContactUsers', { namespace: 'user' })
+  private ContactUsers!: ContactUser[]
+  @Mutation('addContactUser', { namespace: 'user' })
+  private addContactUser: any;
   private viewType: boolean = true
   private today: string = dayjs().format('YYYY-MM-DD')
   private focus: string = dayjs().format('YYYY-MM-DD')
@@ -115,10 +125,18 @@ export default class Calendar extends Vue {
       })
   }
   public get itemsFormated () {
-    return Allocation.query()
+    let formatedItems = Allocation.query()
       .with('Ressource')
       .with('Gadget')
-      .get().map(transfer2Calendar)
+      .get()
+    this.loadUsernames(formatedItems.map((e:any) => e.ReferencePersonId))
+    return formatedItems.map(transfer2Calendar)
+  }
+  public async loadUsernames (ids: string[]) {
+    const referencePersonsUnique = [...new Set(ids)]
+    const response = await fetch(`/api/Users/Names/${referencePersonsUnique}`)
+    const newContacts = await response.json()
+    this.addContactUser(newContact)
   }
   public get possibleTitles () {
     return Allocation.query()
@@ -253,7 +271,7 @@ function transfer2Calendar (v: any) {
   rVal.color = 'success'
   rVal.id = v.Id
   rVal.Notes = v.Notes
-  rVal.Contact = v.ContactName
+  rVal.Contact = v.ReferencePersonId
   rVal.Original = v
   rVal.RessourceName = (v.Ressource || {}).Name
 

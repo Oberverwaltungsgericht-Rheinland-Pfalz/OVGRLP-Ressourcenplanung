@@ -37,6 +37,7 @@ export default class InputReferencePerson extends Vue {
   public lastLoad: string = '0'
 
   public async mounted () {
+    if (!this.userid) return
     const response = await fetch(`/api/Users/${this.userid}`)
     let responseValues = await response.json() as AdUsers
     this.search = responseValues.Name

@@ -20,8 +20,6 @@ namespace Rema.WebApi.ViewModels
 
     public Boolean IsAllDay { get; set; }
 
-    public string ContactName { get; set; }
-
     public string ContactPhone { get; set; }
 
     public MeetingStatus Status { get; set; }
