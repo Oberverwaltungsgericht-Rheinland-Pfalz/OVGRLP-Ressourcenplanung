@@ -10,4 +10,9 @@ namespace Rema.Infrastructure.Models
     public SupplierGroup Group { get; set; }
     public string Message { get; set; }
   }
+  public class SimpleSupplierHint
+  {
+    public long GroupId { get; set; }
+    public string Message { get; set; }
+  }
 }
