@@ -43,6 +43,7 @@ namespace Rema.WebApi.ViewModels
     public string ReferencePersonId { get; set; }
 
     public string ScheduleSeries { get; set; }
+    public IList<SimpleSupplierHint> HintsForSuppliers { get; set; }
     public override string ToString ()
     {
       return JsonConvert.SerializeObject(this);

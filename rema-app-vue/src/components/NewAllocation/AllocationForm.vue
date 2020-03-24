@@ -101,8 +101,8 @@
           </v-col>
         </v-row>
         <v-divider />
-        <v-row>
-          <v-col v-for="(group, idx) in GadgetGroups" :key="idx + 'group'" cols="6">
+        <v-row  v-for="(group, idx) in GadgetGroups" :key="idx + 'group'">
+          <v-col cols="6">
             <v-select
               v-model="selectedGadgets"
               :items="getGadgets(group.Id)"
@@ -116,17 +116,17 @@
             >
             </v-select>
           </v-col>
+          <v-col>
+            <v-text-field
+              v-model="groupTexts[group.Id]"
+              :label="'Nachricht für ' + group.Title"
+              placeholder="Nachrichttext"
+              required
+            ></v-text-field>
+          </v-col>
         </v-row>
         <v-divider />
         <v-row>
-          <!--<v-col>
-            <v-text-field
-              v-model="contactPerson"
-              label="Ansprechpartner(in)"
-              placeholder="Bitte geben Sie eine(n) Ansprechpartner(in) an."
-              required
-            ></v-text-field>
-          </v-col>-->
           <v-col>
             <input-reference-person @selected="referencePerson=$event" :key="'re'+refreshInputReferencePerson"/>
           </v-col>
@@ -211,6 +211,7 @@ export default class AllocationForm extends Vue {
 
   private timeFrom: string = '08:00'
   private timeTo: string = '17:00'
+  private groupTextsInternal: string[] = []
 
   public setReferencePerson (e:AdUsers) {
     this.referencePerson = e
@@ -221,6 +222,18 @@ export default class AllocationForm extends Vue {
       let datePart = val.split('T')[0]
       this.dateTo = datePart + 'T16:00'
     }
+  }
+
+  private get groupTexts () : string[] {
+    if (!this.groupTextsInternal.length) {
+      this.GadgetGroups.forEach((g:any) => {
+        this.groupTextsInternal[g.Id] = ''
+      })
+    }
+    return this.groupTextsInternal
+  }
+  private set groupTexts (input: string[]) {
+    this.groupTextsInternal.splice(0, Infinity, ...input)
   }
 
   private get permissionToEdit (): boolean {
