@@ -202,7 +202,6 @@ export default class AllocationForm extends Vue {
   notes: string = '';
   selectedGadgets: number[] = [];
   telNumber: string = '';
-  contactPerson: string = '';
   referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '' }
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
@@ -259,7 +258,6 @@ export default class AllocationForm extends Vue {
       isAllDay: this.fullday,
       ressourceId: this.ressourceId,
       gadgetsIds: [...this.selectedGadgets],
-      contactName: this.contactPerson,
       contactPhone: this.telNumber,
       ReferencePersonId: this.referencePerson.ActiveDirectoryID,
       dates: ['']
@@ -324,7 +322,6 @@ export default class AllocationForm extends Vue {
     this.title = ''
     this.notes = ''
     this.telNumber = ''
-    this.contactPerson = ''
     this.dateFrom = ''
     this.dateTo = ''
     this.timeTo = '16:00'

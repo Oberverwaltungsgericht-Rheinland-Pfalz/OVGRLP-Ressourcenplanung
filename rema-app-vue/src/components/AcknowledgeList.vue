@@ -52,6 +52,8 @@ import { Names as Fnn } from '../store/Acknowledges/types'
 import { AllocationRequest, AllocationRequestView, UserData, ContactUser, AllocationModel } from '../models/interfaces'
 import AcknowledgeView from './AcknowledgeView.vue'
 import { Allocation, Gadget, Ressource, Supplier } from '../models'
+import { Names } from '../store/user/types'
+
 const namespace = 'user'
 
 @Component({
@@ -64,6 +66,9 @@ export default class AcknowledgeList extends Vue {
   private addContactUser: any;
   @Mutation('reserveContactUser', { namespace })
   private reserveContactUser: any;
+  @Action(Names.a.loadUsers, { namespace: 'user' })
+  private loadUsers: any;
+
   private dialog: boolean = false;
   private viewAllocation: AllocationRequestView = {} as AllocationRequestView;
   private hideOld: boolean = true
@@ -98,7 +103,6 @@ export default class AcknowledgeList extends Vue {
       ...viewA,
       RessourceTitle: viewA.Ressource.Name,
       Title: viewA.Title,
-      ContactTel: viewA.ContactName,
       Notices: viewA.Notes
     }
   }
@@ -138,27 +142,10 @@ export default class AcknowledgeList extends Vue {
     Allocation.api().get('allocations')
   }
   public async fillContactUsers () {
-    const referencePersons = this.UnAcknowledgedAllocations.map(
-      (v: any) => v.ReferencePersonId
-    )
-    const referencePersonsUnique = [...new Set(referencePersons)]
+    const referencePersons = this.UnAcknowledgedAllocations.map((v: any) => v.ReferencePersonId)
+    let hasAllUsernames = referencePersons.every((id: number) => this.ContactUsers.find((v: ContactUser) => v.Id === id))
 
-    const requestFunc = async (id: number) => {
-      const tmpUser = this.ContactUsers.find((v: ContactUser) => v.Id === id)
-      if (tmpUser) return tmpUser
-
-      this.reserveContactUser(id)
-      const response = await fetch(`/api/Users/Name/${id}`, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      const newContact = await response.json()
-      this.addContactUser(newContact)
-    }
-    referencePersonsUnique.forEach(requestFunc)
+    if (!hasAllUsernames) this.loadUsers(referencePersons)
   }
 }
 </script>

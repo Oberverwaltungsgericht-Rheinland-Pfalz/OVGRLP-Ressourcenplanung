@@ -27,7 +27,8 @@ export const mutations: MutationTree<UserState> = {
   },
   [Names.m.addContactUser] (state: UserState, userPayload: ContactUser) {
     const entryIdx = state.ContactUsers.findIndex((s) => s.Id === userPayload.Id)
-    state.ContactUsers.splice(entryIdx, 1, userPayload)
+    let deleteAnEntry = entryIdx < 0 ? 0 : 1
+    state.ContactUsers.splice(entryIdx, deleteAnEntry, userPayload)
   },
   [Names.m.reserveContactUser] (state: UserState, id: number) {
     const hasEntry = state.ContactUsers.find((s) => s.Id === id && s.Title)

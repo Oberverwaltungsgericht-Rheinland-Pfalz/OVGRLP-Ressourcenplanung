@@ -12,7 +12,23 @@
           </v-btn>
           <v-toolbar-title>{{ title }}</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-select v-model="titleFilter" :items="possibleTitles" attach chips label="Räume" multiple single-line></v-select>
+
+          <v-dialog v-model="showFilterModal" width="800" scrollable >
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" color="primary">Suchkriterien ({{titleFilter.length}})</v-btn>
+            </template>
+            <v-card>
+              <v-card-title>Anzeige einschränken auf:
+                <v-spacer/>
+                <v-btn @click="resetFilter" :style="{visibility: titleFilter.length ? 'visible':'hidden'}" color="warning" right class="ma-2">Zurücksetzen</v-btn>
+                <v-btn @click="showFilterModal=false" class="ma-2" right color="success">Ok</v-btn>
+              </v-card-title>
+              <v-card-text id="pad-bot-twenty">
+                <v-select v-model="titleFilter" :items="possibleTitles" attach chips label="Räume" multiple single-line></v-select>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+          <v-spacer/>
           <v-switch v-model="viewType" inset :label="typeToLabel[type]"></v-switch>
         </v-toolbar>
       </v-sheet>
@@ -53,7 +69,7 @@
             <v-card-text>
               <p>{{selectedEvent.schedule}}</p>
               <p><strong>Notizen: </strong>{{selectedEvent.Notes}}</p>
-              <p><strong>Kontaktperson: </strong>{{selectedEvent.Contact}}</p>
+              <p><strong>Kontaktperson: </strong>{{ReferenceUserName(selectedEvent.Contact)}}</p>
               <p><strong>Hilfsmittel: </strong><span v-html="selectedEvent.Gadgets"></span></p>
             </v-card-text>
             <v-card-actions>
@@ -68,8 +84,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { AllocationRequestView, GadgetModel } from '../models/interfaces'
+import { AllocationRequestView, GadgetModel, ContactUser } from '../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
+import { State, Action, Getter, Mutation } from 'vuex-class'
+import { Names } from '../store/user/types'
 
 import dayjs from 'dayjs'
 import { Allocation, Gadget } from '../models'
@@ -80,6 +98,10 @@ import moment from 'moment'
   components: { EditFormModal }
 })
 export default class Calendar extends Vue {
+  @State('ContactUsers', { namespace: 'user' })
+  private ContactUsers!: ContactUser[]
+  @Action(Names.a.loadUsers, { namespace: 'user' })
+  private loadUsers: any;
   private viewType: boolean = true
   private today: string = dayjs().format('YYYY-MM-DD')
   private focus: string = dayjs().format('YYYY-MM-DD')
@@ -95,6 +117,7 @@ export default class Calendar extends Vue {
   private selectedElement: object = {}
   private selectedOpen: Boolean = false
   private titleFilter: string[] = []
+  private showFilterModal: boolean = false
 
   public get permissionToEdit (): Boolean {
     return this.$store.state.user.role >= 10
@@ -115,11 +138,20 @@ export default class Calendar extends Vue {
       })
   }
   public get itemsFormated () {
-    return Allocation.query()
+    let formatedItems = Allocation.query()
       .with('Ressource')
       .with('Gadget')
-      .get().map(transfer2Calendar)
+      .get()
+    this.loadUsers(formatedItems.map((e:any) => e.ReferencePersonId))
+    return formatedItems.map(transfer2Calendar)
   }
+  public ReferenceUserName (id:number) {
+    if (!id) return ''
+
+    let user = this.ContactUsers.find(e => e.Id === id)
+    return user ? user.Title : id
+  }
+
   public get possibleTitles () {
     return Allocation.query()
       .with('Ressource')
@@ -159,6 +191,10 @@ export default class Calendar extends Vue {
       timeZone: 'UTC',
       month: 'long'
     })
+  }
+
+  public resetFilter () {
+    this.titleFilter.splice(0, Infinity)
   }
 
   public async deleteAllocation () {
@@ -253,7 +289,7 @@ function transfer2Calendar (v: any) {
   rVal.color = 'success'
   rVal.id = v.Id
   rVal.Notes = v.Notes
-  rVal.Contact = v.ContactName
+  rVal.Contact = v.ReferencePersonId
   rVal.Original = v
   rVal.RessourceName = (v.Ressource || {}).Name
 
@@ -267,3 +303,8 @@ function transfer2Calendar (v: any) {
   return rVal
 }
 </script>
+
+<style lang="stylus" >
+#pad-bot-twenty
+  padding-bottom 20em
+</style>

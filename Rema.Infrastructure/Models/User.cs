@@ -23,7 +23,5 @@ namespace Rema.Infrastructure.Models
 
     [Required]
     public string Email { get; set; }
-
-    public virtual ICollection<SupplierGroup> SupplierGroups { get; set; }
   }
 }

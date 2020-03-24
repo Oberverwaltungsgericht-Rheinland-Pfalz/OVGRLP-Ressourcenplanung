@@ -17,7 +17,6 @@ export interface AllocationShortModel {
   Title: string
   Timespan: string
   Notes: string
-  ContactName: string
   ContactPhone: string
   Gadgets: string
 }

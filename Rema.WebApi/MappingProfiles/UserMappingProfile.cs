@@ -12,8 +12,7 @@ namespace Rema.WebApi.MappingProfiles
   {
     public UserMappingProfile()
     {
-      CreateMap<User, UserViewModel>()
-          .ForMember(dest => dest.SupportGroupIds, opt => opt.MapFrom(src => src.SupplierGroups.Select(e => e.Id)));
+      CreateMap<User, UserViewModel>();
 
       CreateMap<UserViewModel, User>();
       CreateMap<User, ContactUser>()
