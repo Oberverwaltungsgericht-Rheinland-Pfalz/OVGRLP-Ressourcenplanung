@@ -676,7 +676,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation = await _context.Allocations.Include(o => o.Ressource).Include(o => o.ReferencePerson).FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
+        allocation = await _context.Allocations.Include(o => o.Ressource).Include(o => o.LastModifiedBy).Include(o => o.ReferencePerson).AsNoTracking().FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
         ressourceName = allocation.Ressource.Name;
       }
       catch (Exception ex)

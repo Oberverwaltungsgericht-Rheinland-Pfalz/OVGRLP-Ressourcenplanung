@@ -113,6 +113,38 @@ namespace Rema.WebApi.Controllers
         return Conflict();
       }
     }
+    // GET: users/names/[] array as underline separated numbers
+    [HttpGet("names/{ids}")]
+    public async Task<ActionResult<List<ContactUser>>> GetUserNames(string ids)
+    {
+      Log.Information("GET users/names/{id}", ids);
+      var idArray = ids.Split('_').Select(e => long.Parse(e));
+      IList<User> users;
+      try
+      {
+        users = await _context.Users.Where(e => idArray.Contains(e.Id)).ToListAsync();
+        if (users == null)
+        {
+          return NotFound();
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting user");
+        return NotFound();
+      }
+
+      try
+      {
+        var userVM = users.Select(_mapper. Map<User, ContactUser>).ToList();
+        return userVM;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while mapping user");
+        return Conflict();
+      }
+    }
 
     // GET: users/me
     [HttpGet("me")]

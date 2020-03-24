@@ -15,7 +15,6 @@ export class Allocation extends Model {
       To: this.attr(null),
       Title: this.attr(null),
       Notes: this.attr(null),
-      ContactName: this.attr(null),
       ContactPhone: this.attr(null),
       IsAllDay: this.attr(true),
       Status: this.attr(0),
@@ -32,7 +31,8 @@ export class Allocation extends Model {
       RessourceId: this.attr(null),
       Ressource: this.belongsTo(Ressource, 'RessourceId', 'Id'),
       GadgetsIds: this.attr(null),
-      Gadgets: this.hasManyBy(Gadget, 'GadgetsIds', 'Id')
+      Gadgets: this.hasManyBy(Gadget, 'GadgetsIds', 'Id'),
+      HintsForSuppliers: this.attr(null)
     }
   }
 }

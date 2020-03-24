@@ -2,7 +2,8 @@
 export const Names = {
   a: {
     loadUser: 'loadUser',
-    reloadUser: 'reloadUser'
+    reloadUser: 'reloadUser',
+    loadUsers: 'loadUsers'
   },
   m: {
     setUser: 'setUser',
