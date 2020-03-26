@@ -11,13 +11,16 @@ using Rema.Infrastructure.Models;
 
 namespace Rema.ServiceLayer.Services
 {
-  public class AdService
+  public interface IAdService
+  {
+    List<T> SearchAdUsers<T>(string userName) where T : class;
+
+  }
+  public class AdService: IAdService
   {
     public List<string> DomainsToSearch;
 
-    public AdService()
-    {
-    }
+    public AdService() { }
 
     public AdService(List<string> domainsToSearch)
     {
@@ -80,11 +83,19 @@ namespace Rema.ServiceLayer.Services
 
                 if (typeof(T) == typeof(AdUserViewModel))
                 {
+                  string name = result.DisplayName;
+                  if (name.StartsWith("admin.")) continue;  // keine admin user anzeigen
+
                   DirectoryEntry de = result.GetUnderlyingObject() as DirectoryEntry;
                   string mail = string.Empty;
+                  string tel = string.Empty;
+                  
                   if (null != de.Properties["mail"] && null != de.Properties["mail"].Value)
                     mail = de.Properties["mail"]?.Value?.ToString();
-                  found = new AdUserViewModel() { ActiveDirectoryID = result.Sid.Value, Name = result.DisplayName, Email = mail };
+
+                  if (null != de.Properties["telephoneNumber"] && null != de.Properties["telephoneNumber"].Value)
+                    tel = de.Properties["telephoneNumber"]?.Value?.ToString() ?? "";
+                  found = new AdUserViewModel() { ActiveDirectoryID = result.Sid.Value, Name = name, Email = mail, Phone = tel };
                 }
 
                 foundUsers.Add(found as T);

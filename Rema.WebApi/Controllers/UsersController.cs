@@ -22,8 +22,10 @@ namespace Rema.WebApi.Controllers
   [AuthorizeAd("Reader")]
   public class UsersController : BaseController
   {
-    public UsersController(RpDbContext context, IMapper mapper) : base(context, mapper)
+    private IAdService _adService;
+    public UsersController(RpDbContext context, IMapper mapper, IAdService adService) : base(context, mapper)
     {
+      this._adService = adService;
     }
 
     // GET: users
@@ -73,8 +75,7 @@ namespace Rema.WebApi.Controllers
 
       if (namePart.Length < 3) return new List<AdUserViewModel>();
 
-      var adService = new AdService(Startup.DomainsToSearch);
-      List<AdUserViewModel> adUsers = adService.SearchAdUsers<AdUserViewModel>(namePart);
+      List<AdUserViewModel> adUsers = _adService.SearchAdUsers<AdUserViewModel>(namePart);
 
       Request.Headers.TryGetValue("timestamp", out StringValues timestampValue);
       Response.Headers.Add("timestamp", timestampValue.ToString());

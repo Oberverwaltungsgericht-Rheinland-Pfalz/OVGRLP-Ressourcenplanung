@@ -15,9 +15,14 @@ namespace Rema.WebApi.MappingProfiles
       CreateMap<Allocation, AllocationViewModel>()
         .ForMember(dest => dest.RessourceId, opt => opt.MapFrom(src => src.Ressource.Id))
         .ForMember(dest => dest.ScheduleSeries, opt => opt.MapFrom(src => src.ScheduleSeriesGuid))
+        .ForMember(dest => dest.HintsForSuppliers, opt => opt.MapFrom(src => 
+          src.HintsForSuppliers.Select(e => 
+            new SimpleSupplierHint() { GroupId = e.Group.Id, Message = e.Message }
+          )))
         .ForMember(dest => dest.GadgetsIds, opt => opt.MapFrom(src => src.AllocationGadgets.Select(a => a.GadgetId)));
 
-      CreateMap<AllocationViewModel, Allocation>();
+      CreateMap<AllocationViewModel, Allocation>()
+        .ForMember(dest => dest.HintsForSuppliers, act => act.Ignore());
     }
   }
 }

@@ -260,6 +260,25 @@ namespace Rema.WebApi.Controllers
         return BadRequest();
       }
 
+      if (allocationVM.HintsForSuppliers.Any())
+        try
+        {
+          var searchedGroupIds = allocationVM.HintsForSuppliers.Select(g => g.GroupId);
+          var groups = await _context.SupplierGroups.Where(g => searchedGroupIds.Contains(g.Id)).ToListAsync();
+          foreach(SimpleSupplierHint hint in allocationVM.HintsForSuppliers)
+          {
+            var group = groups.Find(e => e.Id == hint.GroupId);
+            var newHintsList = allocation.HintsForSuppliers;  // list existiert nur virtuell als deserialisierung!
+            newHintsList.Add(new SupplierHint() { Group = group, Message = hint.Message });
+            allocation.HintsForSuppliers = newHintsList;
+          }
+        }
+        catch (Exception ex)
+        {
+          Log.Error(ex, "error while mapping supplier hints");
+          return BadRequest();
+        }
+
       try
       {
         allocation.Ressource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
@@ -271,7 +290,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var gadgets = _context.Gadgets.Include(e => e.SuppliedBy).Where(g => allocationVM.GadgetsIds.Contains(g.Id));
+        var gadgets = await _context.Gadgets.Include(e => e.SuppliedBy).Where(g => allocationVM.GadgetsIds.Contains(g.Id)).ToListAsync();
 
         allocation.AllocationGadgets = new List<AllocationGagdet>();
         foreach(var g in gadgets)

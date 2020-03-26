@@ -22,8 +22,11 @@ namespace Rema.WebApi.Controllers
   [ApiController]
   public class DebugController : BaseController
   {
-    public DebugController(RpDbContext context, IMapper mapper) : base(context, mapper)
+    private IAdService _adService;
+
+    public DebugController(RpDbContext context, IMapper mapper, IAdService adService) : base(context, mapper)
     {
+      this._adService = adService;
     }
 
     [Route("CurrentUserMembers")]
@@ -75,9 +78,7 @@ namespace Rema.WebApi.Controllers
     [AuthorizeAd("Admin")]
     public IEnumerable<string> GetAllAdUsers()
     {
-      var adService = new AdService(Startup.DomainsToSearch);
-
-      List<string> adUsers = adService.SearchAdUsers<string>("");
+      List<string> adUsers = _adService.SearchAdUsers<string>("");
 
       return adUsers;
     }
@@ -86,10 +87,8 @@ namespace Rema.WebApi.Controllers
     [AuthorizeAd("Admin")]
     public IEnumerable<AdUserViewModel> GetAdUsers(string namePart)
     {
-      var adService = new AdService(Startup.DomainsToSearch);
-
-      //List<string> adUsers = adService.SearchAdUsers<string>(namePart);
-      List<AdUserViewModel> adUsers = adService.SearchAdUsers<AdUserViewModel>(namePart);
+      //List<string> adUsers = _adService.SearchAdUsers<string>(namePart);
+      List<AdUserViewModel> adUsers = _adService.SearchAdUsers<AdUserViewModel>(namePart);
 
       return adUsers;
     }

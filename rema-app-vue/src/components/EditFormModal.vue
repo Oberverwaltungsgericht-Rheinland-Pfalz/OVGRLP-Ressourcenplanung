@@ -180,7 +180,7 @@ export default class EditFormModal extends Vue {
   private dateOfSeries: string = ''
   private eventAllocation: any = {}
   private refreshInputReferencePerson: number = 0
-  private referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '' }
+  private referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '', Phone: '' }
 
   public isRepeating: boolean = false
   public dialog: boolean = false

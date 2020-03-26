@@ -13,6 +13,7 @@ using Newtonsoft.Json.Serialization;
 using Rema.DbAccess;
 using Rema.DbAccess.Stores;
 using Rema.Infrastructure.Contracts.Stores;
+using Rema.ServiceLayer.Services;
 using Rema.WebApi.ViewModels;
 
 namespace Rema.WebApi
@@ -22,7 +23,6 @@ namespace Rema.WebApi
     public static Role Reader;
     public static Role Editor;
     public static Role Admin;
-    public static List<string> DomainsToSearch;
 
     public Startup(IConfiguration configuration)
     {
@@ -34,6 +34,9 @@ namespace Rema.WebApi
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+      List<string> DomainsToSearch = Configuration.GetSection("DomainsToSearch").Get<List<string>>();
+
+      services.AddSingleton<IAdService>(new AdService(DomainsToSearch));
       services.AddAutoMapper(typeof(Startup));
       services.AddHttpContextAccessor();
 
@@ -79,7 +82,6 @@ namespace Rema.WebApi
       Reader = new Role() { Level = 0, Name = "Reader", AdDescription = Configuration["Auth:Reader"] };
       Editor = new Role() { Level = 10, Name = "Editor", AdDescription = Configuration["Auth:Editor"] };
       Admin = new Role() { Level = 100, Name = "Admin", AdDescription = Configuration["Auth:Admin"] };
-      DomainsToSearch = Configuration.GetSection("DomainsToSearch").Get<List<string>>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

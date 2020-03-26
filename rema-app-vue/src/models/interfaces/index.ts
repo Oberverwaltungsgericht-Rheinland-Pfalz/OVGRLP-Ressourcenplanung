@@ -12,7 +12,7 @@ import { UserState } from './UserState'
 import { RootState } from './RootState'
 import { CounterState } from './CounterState'
 import { AdUsers } from './AdUsers'
-import { HintForSupplier } from './HintForSupplier'
+import { HintsForSuppliers } from './HintsForSuppliers'
 
 export {
   AcknowledgeState,
@@ -23,7 +23,7 @@ export {
   AllocationRequestView,
   ContactUser,
   GadgetModel,
-  HintForSupplier,
+  HintsForSuppliers,
   NewAllocationRequestModel,
   RessourceModel,
   SupplierGroupModel,
