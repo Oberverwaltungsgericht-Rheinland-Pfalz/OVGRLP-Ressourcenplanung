@@ -128,7 +128,7 @@
         <v-divider />
         <v-row>
           <v-col>
-            <input-reference-person @selected="referencePerson=$event" :key="'re'+refreshInputReferencePerson"/>
+            <input-reference-person @selected="setReferencePerson" :key="'re'+refreshInputReferencePerson"/>
           </v-col>
           <v-col>
             <v-text-field
@@ -184,7 +184,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { RessourceModel, AllocationModel, AdUsers } from '../../models/interfaces'
+import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 
@@ -202,7 +202,7 @@ export default class AllocationForm extends Vue {
   notes: string = '';
   selectedGadgets: number[] = [];
   telNumber: string = '';
-  referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '' }
+  referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '', Phone: '' }
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
   private refreshInputReferencePerson: number = 0
@@ -215,6 +215,7 @@ export default class AllocationForm extends Vue {
 
   public setReferencePerson (e:AdUsers) {
     this.referencePerson = e
+    this.telNumber = this.referencePerson.Phone
   }
   @Watch('dateFrom')
   public dateFromChange (val: string) {
@@ -242,22 +243,19 @@ export default class AllocationForm extends Vue {
 
   private async sendAllocation (status: number) {
     this.saveAllocation(status)
-
-    // const purposeId = await this.savePurpose()
-    // console.log('purposeid ' + purposeId)
-    // this.saveAllocation(status, purposeId)
-    /*
-    if (this.isRepeating) {
-      this.multipleDates.forEach(e => {
-        this.saveAllocation(status, purposeId, e)
-      })
-    } else {
-      this.saveAllocation(status, purposeId)
-    }
-    */
     this.close()
   }
 
+  private get GetHintsForSuppliers (): HintsForSuppliers[] {
+    let rVal: HintsForSuppliers[] = []
+    for (let key in this.groupTexts) {
+      let value = this.groupTexts[key]
+      if (!value) continue
+      let newHint: HintsForSuppliers = { GroupId: parseInt(key), Message: this.groupTexts[key] }
+      rVal.push(newHint)
+    }
+    return rVal
+  }
   private async saveAllocation (
     status: number,
     date?: string
@@ -273,7 +271,8 @@ export default class AllocationForm extends Vue {
       gadgetsIds: [...this.selectedGadgets],
       contactPhone: this.telNumber,
       ReferencePersonId: this.referencePerson.ActiveDirectoryID,
-      dates: ['']
+      dates: [''],
+      HintsForSuppliers: this.GetHintsForSuppliers
     }
 
     if (!this.isRepeating) {
@@ -344,8 +343,9 @@ export default class AllocationForm extends Vue {
     this.selectedGadgets = []
     this.multipleDates = []
     this.isRepeating = false
-    this.referencePerson = { ActiveDirectoryID: '', Name: '', Email: '' }
+    this.referencePerson = { ActiveDirectoryID: '', Name: '', Email: '', Phone: '' }
     this.refreshInputReferencePerson++
+    this.groupTextsInternal.splice(0, Infinity)
   }
 }
 </script>

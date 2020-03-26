@@ -32,7 +32,7 @@ export default class InputReferencePerson extends Vue {
   @Prop(Number) private userid!: number
   public entries: AdUsers[] = []
   public isLoading: boolean = false
-  public model: AdUsers = { Name: '', Email: '', ActiveDirectoryID: '' }
+  public model: AdUsers = { Name: '', Email: '', ActiveDirectoryID: '', Phone: '' }
   public search: string = ''
   public lastLoad: string = '0'
 
@@ -44,6 +44,7 @@ export default class InputReferencePerson extends Vue {
     this.model.Name = responseValues.Name
     this.model.Email = responseValues.Email
     this.model.ActiveDirectoryID = responseValues.ActiveDirectoryID
+    this.model.Phone = responseValues.Phone
   }
 
   @Watch('model')

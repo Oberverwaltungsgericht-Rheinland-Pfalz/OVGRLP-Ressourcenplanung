@@ -1,6 +1,6 @@
 import { SupplierGroupModel } from './SupplierModel'
 
-export interface HintForSupplier {
-    Group: SupplierGroupModel
+export interface HintsForSuppliers {
+    GroupId: number
     Message: string
 }
