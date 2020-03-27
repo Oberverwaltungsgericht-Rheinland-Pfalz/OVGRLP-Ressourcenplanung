@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import Vuex, { StoreOptions } from 'vuex'
 import { RootState } from '@/models/interfaces'
-import { counter } from './counter/index'
-import { acknowledges } from './Acknowledges/index'
 import { user } from './user/index'
 import {
   Gadget,
@@ -41,8 +39,6 @@ export const store: StoreOptions<RootState> = {
     version: packageInfo.version
   },
   modules: {
-    counter,
-    acknowledges,
     user
   },
   // Create Vuex Store and register database through Vuex ORM.
