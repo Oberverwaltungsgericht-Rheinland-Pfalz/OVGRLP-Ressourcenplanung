@@ -812,7 +812,11 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        if (string.IsNullOrEmpty(allocationVM.ReferencePersonId) && allocationVM.ReferencePersonId.Length > 12)
+        if (string.IsNullOrEmpty(allocationVM.ReferencePersonId))
+        {
+          oldAllocation.ReferencePerson = await _context.Users.FindAsync(this.RequestSender.Id);
+        }
+        else if (allocationVM.ReferencePersonId.Length > 12)
         {
           var referencePerson = await _context.Users.SingleOrDefaultAsync(e => e.ActiveDirectoryID == allocationVM.ReferencePersonId);
           oldAllocation.ReferencePerson = referencePerson;
@@ -828,6 +832,26 @@ namespace Rema.WebApi.Controllers
       {
         newRessource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
       }
+
+      oldAllocation.HintsForSuppliers = new List<SupplierHint>();
+      if (allocationVM.HintsForSuppliers.Any())
+        try
+        {
+          var searchedGroupIds = allocationVM.HintsForSuppliers.Select(g => g.GroupId);
+          var groups = await _context.SupplierGroups.Where(g => searchedGroupIds.Contains(g.Id)).ToListAsync();
+          foreach (SimpleSupplierHint hint in allocationVM.HintsForSuppliers)
+          {
+            var group = groups.Find(e => e.Id == hint.GroupId);
+            var newHintsList = oldAllocation.HintsForSuppliers;  // list existiert nur virtuell als deserialisierung!
+            newHintsList.Add(new SupplierHint() { Group = group, Message = hint.Message });
+            oldAllocation.HintsForSuppliers = newHintsList;
+          }
+        }
+        catch (Exception ex)
+        {
+          Log.Error(ex, "error while mapping supplier hints");
+          return BadRequest();
+        }
 
       oldAllocation.AllocationGadgets = oldAllocation.AllocationGadgets ?? new List<AllocationGagdet>();
       // Entfallene Hilfsmittel müssen aus allocationGadgets vom Allocation-Objekt entfernt werden
@@ -927,18 +951,6 @@ namespace Rema.WebApi.Controllers
 
       var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets);
       EmailTrigger.SendEmail(template, oldAllocation.ReferencePerson.Email, template.GetGroupEmails());
-      // Merge dictionarys
-/*      dictDeleted.ToList().ForEach(x => dictCreated[x.Key] = (dictCreated[x.Key] ?? "") + x.Value);
-      // Absage an Hilfsmittel Unterstützergruppen
-      foreach (var group in dictCreated)
-      {
-        EmailTrigger.SendEmail(
-          "Termin wurde geändert",
-          $@"Der Termin {oldAllocation.Title} der Ressource {oldAllocation.Ressource.Name} vom {oldAllocation.From.ToString("dddd, dd MMMM y HH:mm")} bis {oldAllocation.To.ToString("dddd, dd MMMM y HH:mm")} wurde storniert von {base.RequestSender.Name}.
-{group.Value}",
-          recipient: group.Key);
-      }
-*/
       return Ok();
     }
   }

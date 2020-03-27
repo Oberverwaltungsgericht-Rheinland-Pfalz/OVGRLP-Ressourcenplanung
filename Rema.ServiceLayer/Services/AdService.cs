@@ -84,7 +84,7 @@ namespace Rema.ServiceLayer.Services
                 if (typeof(T) == typeof(AdUserViewModel))
                 {
                   string name = result.DisplayName;
-                  if (name.StartsWith("admin.")) continue;  // keine admin user anzeigen
+                  if (name.StartsWith("Admin.")) continue;  // keine admin user anzeigen
 
                   DirectoryEntry de = result.GetUnderlyingObject() as DirectoryEntry;
                   string mail = string.Empty;
