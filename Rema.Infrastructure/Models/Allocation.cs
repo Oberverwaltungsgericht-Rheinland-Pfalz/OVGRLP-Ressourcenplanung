@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
@@ -58,6 +59,7 @@ namespace Rema.Infrastructure.Models
     
     [Column]
     protected string SerializedHints { get; set; }
+    public static readonly Expression<Func<Allocation, string>> SerializedHintsExpression = p => p.SerializedHints;
 
     [NotMapped]
     public IList<SupplierHint> HintsForSuppliers { get 

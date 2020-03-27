@@ -27,6 +27,7 @@ namespace Rema.DbAccess
       modelBuilder.Entity<Ressource>().HasIndex(e => e.Name);
       modelBuilder.Entity<SupplierGroup>().HasIndex(e => e.Title);
       modelBuilder.Entity<User>().HasIndex(e => e.Email);
+      modelBuilder.Entity<Allocation>().Property(Allocation.SerializedHintsExpression);
 
       modelBuilder.Entity<AllocationGagdet>()
         .HasKey(ag => new { ag.AllocationId, ag.GadgetId });

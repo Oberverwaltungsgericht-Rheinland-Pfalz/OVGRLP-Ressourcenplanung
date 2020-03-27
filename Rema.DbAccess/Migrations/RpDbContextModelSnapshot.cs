@@ -69,6 +69,9 @@ namespace Rema.DbAccess.Migrations
                     b.Property<Guid?>("ScheduleSeriesGuid")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("SerializedHints")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -178,14 +181,9 @@ namespace Rema.DbAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Title");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("SupplierGroups");
                 });
@@ -267,13 +265,6 @@ namespace Rema.DbAccess.Migrations
                     b.HasOne("Rema.Infrastructure.Models.SupplierGroup", "SuppliedBy")
                         .WithMany()
                         .HasForeignKey("SuppliedById");
-                });
-
-            modelBuilder.Entity("Rema.Infrastructure.Models.SupplierGroup", b =>
-                {
-                    b.HasOne("Rema.Infrastructure.Models.User", null)
-                        .WithMany("SupplierGroups")
-                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }
