@@ -39,11 +39,9 @@
 <script lang="ts">
 import dayjs from 'dayjs'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Names as Fnn } from '../store/Acknowledges/types'
 import { Allocation } from '../models'
 import { AllocationRequest, AllocationModel } from '../models/interfaces'
 import moment from 'moment'
-const namespace = 'acknowledges'
 
 @Component
 export default class MyAllocationsList extends Vue {

@@ -148,7 +148,6 @@ import DateTimePicker from '@/components/DateTimePicker.vue'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
-import { actions } from '../store/counter/actions'
 
 @Component({
   components: { DateTimePicker, DropDownTimePicker, InputReferencePerson }

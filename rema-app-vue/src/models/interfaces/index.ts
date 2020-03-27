@@ -10,7 +10,6 @@ import { SupplierGroupModel } from './SupplierModel'
 import { UserData } from './UserData'
 import { UserState } from './UserState'
 import { RootState } from './RootState'
-import { CounterState } from './CounterState'
 import { AdUsers } from './AdUsers'
 import { HintsForSuppliers } from './HintsForSuppliers'
 
@@ -29,6 +28,5 @@ export {
   SupplierGroupModel,
   UserData,
   UserState,
-  RootState,
-  CounterState
+  RootState
 }

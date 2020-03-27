@@ -901,7 +901,6 @@ namespace Rema.WebApi.Controllers
         oldAllocation.Notes = changedAllocation.Notes;
         oldAllocation.From = changedAllocation.From;
         oldAllocation.To = changedAllocation.To;
-        oldAllocation.ContactName = changedAllocation.ContactName;
         oldAllocation.ContactPhone = changedAllocation.ContactPhone;
         oldAllocation.Ressource = newRessource ?? oldAllocation.Ressource;
         // gadgets are added above
