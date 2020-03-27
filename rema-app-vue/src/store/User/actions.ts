@@ -22,6 +22,7 @@ export const actions: ActionTree<UserState, RootState> = {
     // commit(Names.m.setUser, user)
   },
   async [Names.a.loadUsers] ({ commit }, ids: number[]): Promise<any> {
+    ids = ids.filter(v => !isNaN(v))
     const referencePersonsUnique = [...new Set(ids)]
     const response = await fetch(`/api/Users/Names/${referencePersonsUnique.join('_')}`)
     const newContacts = await response.json()

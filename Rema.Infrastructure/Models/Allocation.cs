@@ -21,8 +21,6 @@ namespace Rema.Infrastructure.Models
     [Required]
     public string Title { get; set; }
 
-    public string ContactName { get; set; }
-
     public string ContactPhone { get; set; }
 
     [MaxLength(3000)]

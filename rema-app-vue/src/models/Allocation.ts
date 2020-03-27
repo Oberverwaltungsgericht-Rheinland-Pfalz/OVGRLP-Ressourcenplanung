@@ -1,5 +1,6 @@
 import { Model } from '@vuex-orm/core'
 import { Ressource, Gadget } from '.'
+import { HintsForSuppliers } from './interfaces/HintsForSuppliers'
 
 export class Allocation extends Model {
   // This is the name used as module name of the Vuex Store.
@@ -18,12 +19,9 @@ export class Allocation extends Model {
       ContactPhone: this.attr(null),
       IsAllDay: this.attr(true),
       Status: this.attr(0),
-      CreatedBy: this.attr(null),
       CreatedById: this.number(0),
       CreatedAt: this.attr(null),
       LastModified: this.attr(null),
-      LastModifiedBy: this.attr(''),
-      ApprovedBy: this.attr(null),
       ApprovedById: this.attr(null),
       ApprovedAt: this.attr(null),
       ReferencePerson: this.attr(''),

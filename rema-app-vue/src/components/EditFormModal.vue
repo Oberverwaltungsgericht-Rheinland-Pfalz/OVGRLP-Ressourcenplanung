@@ -85,7 +85,32 @@
           </v-col>
         </v-row>
         <v-divider />
-        <v-row>
+        <v-row v-for="(group, idx) in GadgetGroups" :key="idx + 'group'">
+          <v-col cols="6">
+            <v-select
+              v-model="selectedGadgets"
+              :items="getGadgets(group.Id)"
+              :label="'Hilfsmittel (' + group.Title + ')'"
+              item-text="Title"
+              item-value="Id"
+              :menu-props="{ top: true, offsetY: true }"
+              placeholder="Bitte wählen Sie Hilfmittel aus."
+              multiple
+              clearable
+            >
+            </v-select>
+          </v-col>
+          <v-col>
+            <v-text-field
+              v-model="groupTexts[group.Id]"
+              :label="'Nachricht für ' + group.Title"
+              placeholder="Nachrichttext"
+              required
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
+<!--        <v-row>
           <v-col v-for="(group, idx) in GadgetGroups" :key="idx + 'group'" cols="6">
             <v-select
               v-model="selectedGadgets"
@@ -100,11 +125,11 @@
             >
             </v-select>
           </v-col>
-        </v-row>
+        </v-row>  -->
         <v-divider />
         <v-row>
           <v-col>
-            <input-reference-person :userid="ReferencePersonId" @selected="referencePerson=$event" :key="'re'+refreshInputReferencePerson"/>
+            <input-reference-person :userid="ReferencePersonId" @selected="setReferencePerson" :key="'re'+refreshInputReferencePerson"/>
           </v-col>
           <v-col>
             <v-text-field
@@ -143,7 +168,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { AllocationRequestView, AdUsers } from '../models/interfaces'
+import { AllocationRequestView, AdUsers, HintsForSuppliers } from '../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
@@ -170,7 +195,6 @@ export default class EditFormModal extends Vue {
   private ReferencePersonId: number = 0
   private Status: number = 0
   private Id: number = 0
-  private CreatedBy: number = 0
   private CreatedById: number = 0
   private CreatedAt: string = ''
   private ScheduleSeries: string = ''
@@ -183,6 +207,38 @@ export default class EditFormModal extends Vue {
 
   public isRepeating: boolean = false
   public dialog: boolean = false
+  private groupTextsInternal: string[] = []
+
+  public setReferencePerson (e:AdUsers) {
+    this.referencePerson = e
+    this.telNumber = this.referencePerson.Phone
+  }
+
+  private get groupTexts () : string[] {
+    if (!this.groupTextsInternal.length) {
+      this.GadgetGroups.forEach((g:any) => {
+        this.groupTextsInternal[g.Id] = ''
+      })
+    }
+    return this.groupTextsInternal
+  }
+  private set groupTexts (input: string[]) {
+    this.groupTextsInternal.splice(0, Infinity, ...input)
+  }
+
+  /* public title4Id (id: number) : string {
+    return (Supplier.find(id) as any || { Title: '' }).Title
+  } */
+  private get GetHintsForSuppliers (): HintsForSuppliers[] {
+    let rVal: HintsForSuppliers[] = []
+    for (let key in this.groupTexts) {
+      let value = this.groupTexts[key]
+      if (!value) continue
+      let newHint: HintsForSuppliers = { GroupId: parseInt(key), Message: this.groupTexts[key] }
+      rVal.push(newHint)
+    }
+    return rVal
+  }
 
   @Watch('dialog')
   private async watchDialog (newVal:boolean) {
@@ -205,9 +261,12 @@ export default class EditFormModal extends Vue {
       this.selectedGadgets = all.GadgetsIds
       this.telNumber = all.ContactPhone
       this.Notes = all.Notes
+      for (let key in all.HintsForSuppliers as HintsForSuppliers[]) {
+        let obj = all.HintsForSuppliers[key] as HintsForSuppliers
+        this.groupTextsInternal[obj.GroupId] = obj.Message
+      }
 
       this.Status = all.Status
-      this.CreatedBy = all.CreatedBy
       this.CreatedById = all.CreatedById
       this.CreatedAt = all.CreatedAt
     }
@@ -269,8 +328,9 @@ export default class EditFormModal extends Vue {
     else data.ReferencePersonId = this.ReferencePersonId
 
     data.gadgetsIds = this.selectedGadgets
-    data.ContactPhone = this.telNumber
+    data.contactPhone = this.telNumber
     data.Notes = this.Notes
+    data.HintsForSuppliers = this.GetHintsForSuppliers
 
     if (this.isRepeating) data.ScheduleSeries = this.ScheduleSeries
     else data.ScheduleSeries = ''
