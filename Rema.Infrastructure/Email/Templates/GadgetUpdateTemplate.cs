@@ -108,6 +108,7 @@ Hilfsmittel:{UpdatedGroupGadgets}
 
 Notizen:
 {Notes}
+{HintsForSuppliersText}
 ";
     }
 

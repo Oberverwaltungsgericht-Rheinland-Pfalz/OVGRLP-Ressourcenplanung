@@ -42,6 +42,7 @@ Hilfsmittel:{GroupsGadgets}
 
 Notizen:
 {Notes}
+{HintsForSuppliersText}
 ";
     }
   }
