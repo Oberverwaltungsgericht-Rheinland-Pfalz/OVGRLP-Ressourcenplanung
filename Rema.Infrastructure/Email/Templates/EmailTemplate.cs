@@ -91,7 +91,22 @@ namespace Rema.Infrastructure.Email.Templates
       } 
     }
 
-  public override string ToString()
+    protected string HintsForSuppliersText
+    {
+      get
+      {
+        string rValue = string.Empty;
+        if (_allocation.HintsForSuppliers.Any()) rValue = $@"´{Environment.NewLine}Hinweise an Unterstützergruppen:{Environment.NewLine}{Environment.NewLine}";
+        foreach (var entry in _allocation.HintsForSuppliers)
+        {
+          rValue += $@"An Gruppe {entry.Group.Title}: {entry.Message}{Environment.NewLine}";
+        }
+
+        return rValue;
+      }
+    }
+
+    public override string ToString()
     {
       return $@"Folgender Eintrag wurde in der Ressourcenplanung {this.Type}.
 Von: {LastModifier}
@@ -115,6 +130,7 @@ Hilfsmittel:{GroupsGadgets}
 
 Notizen:
 {Notes}
+{HintsForSuppliersText}
 ";
     }
   }

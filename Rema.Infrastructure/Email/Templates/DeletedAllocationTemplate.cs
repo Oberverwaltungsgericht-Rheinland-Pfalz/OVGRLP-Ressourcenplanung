@@ -80,6 +80,7 @@ Hilfsmittel:{DeletedGroupGadgets}
 
 Notizen:
 {Notes}
+{HintsForSuppliersText}
 ";
     }
   }

@@ -44,6 +44,7 @@ Telefonnummer:
 
 Notizen:
 {Notes}
+{HintsForSuppliersText}
 ";
     }
   }
