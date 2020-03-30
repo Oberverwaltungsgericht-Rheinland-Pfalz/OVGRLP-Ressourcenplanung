@@ -4,15 +4,11 @@ import App from './App.vue'
 import router from './router'
 import store from '@/store/index'
 import './registerServiceWorker'
-import dayjs from 'dayjs'
-import 'dayjs/locale/de' // load on demand
 import vuetify from './plugins/vuetify'
 import '@mdi/font/css/materialdesignicons.css'
 
 import './plugins/moment'
 import moment from 'moment'
-
-dayjs.locale('de')
 
 Vue.config.productionTip = false
 
@@ -21,7 +17,7 @@ Vue.filter('toLocal', (dateVal: Date) =>
 )
 // new Date(dateVal).toLocaleTimeString())
 Vue.filter('toLocalDate', (dateVal: Date) =>
-  dayjs(dateVal).format(' DD.MM.YYYY')
+  moment(dateVal).format(' DD.MM.YYYY')
 )
 Vue.filter('status2string', (status: number) => statusEnums[status])
 Vue.filter('boolean2word', (bit: boolean) => (bit ? 'Ja' : 'Nein'))

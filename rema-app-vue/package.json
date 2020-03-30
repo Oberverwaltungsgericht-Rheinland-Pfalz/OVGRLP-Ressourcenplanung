@@ -13,7 +13,6 @@
     "@vuex-orm/plugin-axios": "^0.9.2",
     "axios": "^0.19.1",
     "d3": "^5.15.0",
-    "dayjs": "^1.8.19",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "register-service-worker": "^1.6.2",

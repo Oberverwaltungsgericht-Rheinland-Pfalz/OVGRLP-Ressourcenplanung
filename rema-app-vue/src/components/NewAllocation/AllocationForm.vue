@@ -187,54 +187,35 @@ import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
+import AllocationFormService from '../../services/AllocationFormServices'
+import { mixins } from 'vue-class-component'
 
 @Component({
   components: {
     DateTimePicker, DropDownTimePicker, InputReferencePerson
   }
 })
-export default class AllocationForm extends Vue {
-  title: String = '';
-  ressourceId: number | any = null;
-  dateFrom: string = '';
-  dateTo: string = '';
-  fullday: boolean = false;
-  notes: string = '';
-  selectedGadgets: number[] = [];
-  telNumber: string = '';
-  referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '', Phone: '' }
+export default class AllocationForm extends mixins(AllocationFormService) {
+  public title: String = '';
+  public ressourceId: number | any = null;
+  public dateFrom: string = '';
+  public dateTo: string = '';
+  public fullday: boolean = false;
+  public notes: string = '';
+  public selectedGadgets: number[] = [];
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
-  private refreshInputReferencePerson: number = 0
-
   public isRepeating: boolean = false
 
   private timeFrom: string = '08:00'
   private timeTo: string = '17:00'
-  private groupTextsInternal: string[] = []
 
-  public setReferencePerson (e:AdUsers) {
-    this.referencePerson = e
-    this.telNumber = this.referencePerson.Phone
-  }
   @Watch('dateFrom')
   public dateFromChange (val: string) {
     if (!this.dateTo || this.dateTo.length === 0) {
       let datePart = val.split('T')[0]
       this.dateTo = datePart + 'T16:00'
     }
-  }
-
-  private get groupTexts () : string[] {
-    if (!this.groupTextsInternal.length) {
-      this.GadgetGroups.forEach((g:any) => {
-        this.groupTextsInternal[g.Id] = ''
-      })
-    }
-    return this.groupTextsInternal
-  }
-  private set groupTexts (input: string[]) {
-    this.groupTextsInternal.splice(0, Infinity, ...input)
   }
 
   private get permissionToEdit (): boolean {
@@ -246,16 +227,6 @@ export default class AllocationForm extends Vue {
     this.close()
   }
 
-  private get GetHintsForSuppliers (): HintsForSuppliers[] {
-    let rVal: HintsForSuppliers[] = []
-    for (let key in this.groupTexts) {
-      let value = this.groupTexts[key]
-      if (!value) continue
-      let newHint: HintsForSuppliers = { GroupId: parseInt(key), Message: this.groupTexts[key] }
-      rVal.push(newHint)
-    }
-    return rVal
-  }
   private async saveAllocation (
     status: number,
     date?: string
@@ -307,16 +278,6 @@ export default class AllocationForm extends Vue {
     if (!this.dateTo && !this.isRepeating && this.dateTo.length < 7) rValue = false
     if (this.isRepeating && !this.multipleDates.length) rValue = false
     return !rValue
-  }
-
-  private get Rooms () {
-    function compareNumbers (a: any, b: any) {
-      return (a.Name > b.Name) ? 1 : -1
-    }
-    return Ressource.all().sort(compareNumbers)
-  }
-  private get GadgetGroups () {
-    return Supplier.all()
   }
 
   private getGadgets (groupId: number) {

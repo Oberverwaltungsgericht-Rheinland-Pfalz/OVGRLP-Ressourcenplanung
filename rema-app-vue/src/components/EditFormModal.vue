@@ -173,11 +173,13 @@ import DateTimePicker from '@/components/DateTimePicker.vue'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
+import { mixins } from 'vue-class-component'
+import AllocationFormService from '../services/AllocationFormServices'
 
 @Component({
   components: { DateTimePicker, DropDownTimePicker, InputReferencePerson }
 })
-export default class EditFormModal extends Vue {
+export default class EditFormModal extends mixins(AllocationFormService) {
   @Prop(Number) private eventId!: number
 
   private title: String = ''
@@ -189,7 +191,6 @@ export default class EditFormModal extends Vue {
   private timeTo: string = ''
   private fullday: boolean = false
   private selectedGadgets: number[] = []
-  private telNumber: string = ''
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
   private ReferencePersonId: number = 0
@@ -202,43 +203,9 @@ export default class EditFormModal extends Vue {
   private dateToFocus: boolean = false
   private dateOfSeries: string = ''
   private eventAllocation: any = {}
-  private refreshInputReferencePerson: number = 0
-  private referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '', Phone: '' }
 
   public isRepeating: boolean = false
   public dialog: boolean = false
-  private groupTextsInternal: string[] = []
-
-  public setReferencePerson (e:AdUsers) {
-    this.referencePerson = e
-    this.telNumber = this.referencePerson.Phone
-  }
-
-  private get groupTexts () : string[] {
-    if (!this.groupTextsInternal.length) {
-      this.GadgetGroups.forEach((g:any) => {
-        this.groupTextsInternal[g.Id] = ''
-      })
-    }
-    return this.groupTextsInternal
-  }
-  private set groupTexts (input: string[]) {
-    this.groupTextsInternal.splice(0, Infinity, ...input)
-  }
-
-  /* public title4Id (id: number) : string {
-    return (Supplier.find(id) as any || { Title: '' }).Title
-  } */
-  private get GetHintsForSuppliers (): HintsForSuppliers[] {
-    let rVal: HintsForSuppliers[] = []
-    for (let key in this.groupTexts) {
-      let value = this.groupTexts[key]
-      if (!value) continue
-      let newHint: HintsForSuppliers = { GroupId: parseInt(key), Message: this.groupTexts[key] }
-      rVal.push(newHint)
-    }
-    return rVal
-  }
 
   @Watch('dialog')
   private async watchDialog (newVal:boolean) {
@@ -288,15 +255,6 @@ export default class EditFormModal extends Vue {
 
   private get wasRepeating () : boolean {
     return !!this.eventAllocation.ScheduleSeries
-  }
-  private get Rooms () {
-    function compareNumbers (a: any, b: any) {
-      return (a.Name > b.Name) ? 1 : -1
-    }
-    return Ressource.all().sort(compareNumbers)
-  }
-  private get GadgetGroups () {
-    return Supplier.all()
   }
 
   private get permissionToEdit (): boolean {

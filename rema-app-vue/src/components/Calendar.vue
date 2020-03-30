@@ -71,6 +71,7 @@
               <p><strong>Notizen: </strong>{{selectedEvent.Notes}}</p>
               <p><strong>Kontaktperson: </strong>{{ReferenceUserName(selectedEvent.Contact)}}</p>
               <p><strong>Hilfsmittel: </strong><span v-html="selectedEvent.Gadgets"></span></p>
+              <p><span v-html="selectedEvent.Hints"></span></p>
             </v-card-text>
             <v-card-actions>
               <v-btn text color="secondary" @click="selectedOpen = false">Schließen</v-btn>
@@ -84,13 +85,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { AllocationRequestView, GadgetModel, ContactUser } from '../models/interfaces'
+import { AllocationRequestView, GadgetModel, ContactUser, HintsForSuppliers } from '../models/interfaces'
 import DateTimePicker from '@/components/DateTimePicker.vue'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/user/types'
 
-import dayjs from 'dayjs'
-import { Allocation, Gadget } from '../models'
+import { Allocation, Gadget, Supplier } from '../models'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
 
@@ -102,9 +102,10 @@ export default class Calendar extends Vue {
   private ContactUsers!: ContactUser[]
   @Action(Names.a.loadUsers, { namespace: 'user' })
   private loadUsers: any;
+
   private viewType: boolean = true
-  private today: string = dayjs().format('YYYY-MM-DD')
-  private focus: string = dayjs().format('YYYY-MM-DD')
+  private today: string = moment().format('YYYY-MM-DD')
+  private focus: string = moment().format('YYYY-MM-DD')
   private typeToLabel: object = {
     month: 'Monat',
     week: 'Woche',
@@ -128,6 +129,7 @@ export default class Calendar extends Vue {
   public set type (v: string) {
     this.viewType = Boolean(v)
   }
+
   public get filteredItems () {
     let isEmpty = !Allocation.all().length
     if (isEmpty) return []
@@ -160,7 +162,7 @@ export default class Calendar extends Vue {
   }
   public get title () {
     const { start, end } = this
-    if (!start || !end) return dayjs().format('MMMM YYYY')
+    if (!start || !end) return moment().format('MMMM YYYY')
 
     const startMonth = this.monthFormatter(start)
     const endMonth = this.monthFormatter(end)
@@ -278,8 +280,8 @@ function transfer2Calendar (v: any) {
     rVal.schedule = `ganztägig`
     rVal.name = (v.Ressource || {}).Name + ' in ' + v.Title
   } else {
-    rVal.start = v.From.substring(0, 16).replace('T', ' ') // dayjs(v.From).format('YYYY-MM-DD hh:mm'),
-    rVal.end = v.To.substring(0, 16).replace('T', ' ') // dayjs(v.To).format('YYYY-MM-DD hh:mm'),
+    rVal.start = v.From.substring(0, 16).replace('T', ' ')
+    rVal.end = v.To.substring(0, 16).replace('T', ' ')
     rVal.schedule = `
       Von ${moment(v.From).format('LT')} 
       bis ${moment(v.To).format('LT')}`
@@ -293,6 +295,11 @@ function transfer2Calendar (v: any) {
   rVal.Original = v
   rVal.RessourceName = (v.Ressource || {}).Name
 
+  rVal.Hints = ''
+  v.HintsForSuppliers.forEach((e: HintsForSuppliers) => {
+    rVal.Hints += `<strong>${GetGroupName(e.GroupId)}</strong>: ${e.Message} <br/>`
+  })
+
   rVal.Gadgets = '<br>'
   if (Gadget.all().length) {
     v.GadgetsIds.map((e:any) => (Gadget.find(e) as any).Title)
@@ -301,6 +308,9 @@ function transfer2Calendar (v: any) {
   rVal.Gadgets.slice(0, -1)
 
   return rVal
+}
+function GetGroupName (id : number) : string {
+  return (Supplier.find(id) as any || { Title: '' }).Title
 }
 </script>
 
