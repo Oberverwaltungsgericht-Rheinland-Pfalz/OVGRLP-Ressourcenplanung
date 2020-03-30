@@ -37,7 +37,6 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation } from '../models'
 import { AllocationRequest, AllocationModel } from '../models/interfaces'

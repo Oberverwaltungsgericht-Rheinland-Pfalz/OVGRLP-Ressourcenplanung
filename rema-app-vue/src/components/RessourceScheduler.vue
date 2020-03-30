@@ -34,7 +34,7 @@ import _ from 'lodash'
 import * as d3 from 'd3'
 import Ressource from '../models/Ressource'
 import Allocation from '../models/Allocation'
-import dayjs from 'dayjs'
+import moment from 'moment'
 
 export default {
   data () {
@@ -70,10 +70,10 @@ export default {
           from: v.From,
           to: v.To
         }
-        const today = dayjs(new Date())
-        const start = dayjs(v.From)
+        const today = moment(new Date())
+        const start = moment(v.From)
         const diff = start.diff(today, 'hour') // 3600
-        const durationTime = dayjs(v.To).diff(start, 'minute') // 60
+        const durationTime = moment(v.To).diff(start, 'minutes') // 60
 
         rValue.startAfter = diff * 3600
         if (v.IsAllDay) rValue.duration = 864e2
