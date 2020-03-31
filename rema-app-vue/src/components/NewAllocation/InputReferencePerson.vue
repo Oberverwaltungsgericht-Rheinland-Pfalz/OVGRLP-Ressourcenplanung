@@ -53,30 +53,29 @@ export default class InputReferencePerson extends Vue {
   }
 
   @Watch('search')
-  public searchValueChanged (val: string, oldvalue: string) {
+  public async searchValueChanged (val: string, oldvalue: string) {
     let loadStart = Date.now()
     // Lazily load input items
     if (!val) return
     if (val.length < 4) return
     if (val[val.length - 1] === ')') return
     let timestamp = Date.now() + ''
-    fetch(`/api/Users/adUser/${this.search}`, { headers: { timestamp } })
-      .then(response => {
-        timestamp = response.headers.get('timestamp') || ''
-        return response.json()
+
+    try {
+      const response = await fetch(`/api/Users/adUser/${this.search}`, { headers: { timestamp } })
+      timestamp = response.headers.get('timestamp') || ''
+      const responseBody = await response.json()
+      if (!responseBody) return
+      if (this.lastLoad > timestamp) return
+      this.entries.splice(0, Infinity)
+      responseBody.forEach((e: AdUsers) => {
+        this.entries.push(e)
       })
-      .then(res => {
-        if (!res) return
-        if (this.lastLoad > timestamp) return
-        while (this.entries.length) this.entries.pop()
-        res.forEach((e: AdUsers) => {
-          this.entries.push(e)
-        })
-      })
-      .catch(err => {
-        console.log(err)
-      })
-      .finally(() => (this.isLoading = false))
+    } catch (ex) {
+      console.log(ex)
+    } finally {
+      this.isLoading = false
+    }
   }
 }
 </script>
