@@ -29,7 +29,9 @@
             </v-card>
           </v-dialog>
           <v-spacer/>
-          <v-switch v-model="viewType" inset :label="typeToLabel[type]"></v-switch>
+          <v-radio-group v-model="currentview" row>
+            <v-radio v-for="n in types" :key="'ansicht'+n" :label="typeName(n)" :value="n"/>
+          </v-radio-group>
         </v-toolbar>
       </v-sheet>
 
@@ -42,7 +44,7 @@
           :event-color="getEventColor"
           :event-margin-bottom="3"
           :now="today"
-          :type="type"
+          :type="currentview"
           :weekdays="[1, 2, 3, 4, 5, 6, 0]"
           :short-weekdays="false"
           @click:event="showEvent"
@@ -103,15 +105,11 @@ export default class Calendar extends Vue {
   @Action(Names.a.loadUsers, { namespace: 'user' })
   private loadUsers: any;
 
-  private viewType: boolean = true
   private today: string = moment().format('YYYY-MM-DD')
   private focus: string = moment().format('YYYY-MM-DD')
-  private typeToLabel: object = {
-    month: 'Monat',
-    week: 'Woche',
-    day: 'Tag',
-    '4day': '4 Tage'
-  }
+
+  private types: string[] =['month', 'week', 'day', '4day']
+  private currentview: string = 'month'
   private start: any = null
   private end: any = null
   private selectedEvent: object = {}
@@ -120,14 +118,16 @@ export default class Calendar extends Vue {
   private titleFilter: string[] = []
   private showFilterModal: boolean = false
 
+  public typeName (s: string) {
+    switch (s) {
+      case 'month': return 'Monat'
+      case 'week': return 'Woche'
+      case 'day': return 'Tag'
+      case '4day': return '4 Tage'
+    }
+  }
   public get permissionToEdit (): Boolean {
     return this.$store.state.user.role >= 10
-  }
-  public get type (): string {
-    return this.viewType ? 'month' : 'day'
-  }
-  public set type (v: string) {
-    this.viewType = Boolean(v)
   }
 
   public get filteredItems () {
@@ -174,11 +174,12 @@ export default class Calendar extends Vue {
 
     const startDay = start.day + this.nth(start.day)
     const endDay = end.day + this.nth(end.day)
+    const isoWeek = moment(start).format('W')
 
-    switch (this.type) {
+    switch (this.currentview) {
       case 'month':
         return `${startMonth} ${startYear}`
-      case 'week':
+      case 'week': return `Woche ${isoWeek}`
       case '4day':
         return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
       case 'day':
@@ -229,7 +230,7 @@ export default class Calendar extends Vue {
 
   public viewDay ({ date }: any) {
     this.focus = date
-    this.type = 'day'
+    this.currentview = 'day'
   }
   public getEventColor (event: any) {
     return event.color
