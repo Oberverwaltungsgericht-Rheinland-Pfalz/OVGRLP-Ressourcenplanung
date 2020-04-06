@@ -242,7 +242,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        requestedUser = await _context.Users.FindAsync(this.RequestSender.Id);
+        requestedUser = base.RequestSender;
       }
       catch (Exception ex)
       {
@@ -359,9 +359,7 @@ namespace Rema.WebApi.Controllers
         }
         else
         {
-          // find 
-          var referencePerson = await _context.Users.SingleOrDefaultAsync(e=> e.ActiveDirectoryID == allocationVM.ReferencePersonId);
-          allocation.ReferencePerson = referencePerson;
+          allocation.ReferencePerson = _userManagementService.GetOrInsertUserFromDB(allocationVM.ReferencePersonId);
         }
       }
       catch (Exception ex)
@@ -814,12 +812,11 @@ namespace Rema.WebApi.Controllers
       {
         if (string.IsNullOrEmpty(allocationVM.ReferencePersonId))
         {
-          oldAllocation.ReferencePerson = await _context.Users.FindAsync(this.RequestSender.Id);
+          oldAllocation.ReferencePerson = base.RequestSender;
         }
         else if (allocationVM.ReferencePersonId.Length > 12)
         {
-          var referencePerson = await _context.Users.SingleOrDefaultAsync(e => e.ActiveDirectoryID == allocationVM.ReferencePersonId);
-          oldAllocation.ReferencePerson = referencePerson;
+          oldAllocation.ReferencePerson = _userManagementService.GetOrInsertUserFromDB(allocationVM.ReferencePersonId); ;
         }
       }
       catch (Exception ex)

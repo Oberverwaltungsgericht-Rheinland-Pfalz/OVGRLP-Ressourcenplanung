@@ -2,7 +2,7 @@
   <v-autocomplete
     v-model="model"
     :items="entries"
-    :loading="isLoading"
+    :loading="isLoadingBool"
     :search-input.sync="search"
     color="black"
     item-text="Name"
@@ -31,10 +31,11 @@ import { warn } from 'vue-class-component/lib/util'
 export default class InputReferencePerson extends Vue {
   @Prop(Number) private userid!: number
   public entries: AdUsers[] = []
-  public isLoading: boolean = false
+  public isLoading: number = 0
   public model: AdUsers = { Name: '', Email: '', ActiveDirectoryID: '', Phone: '' }
   public search: string = ''
   public lastLoad: string = '0'
+  public requestCounter: number = 0
 
   public async mounted () {
     if (!this.userid) return
@@ -45,6 +46,10 @@ export default class InputReferencePerson extends Vue {
     this.model.Email = responseValues.Email
     this.model.ActiveDirectoryID = responseValues.ActiveDirectoryID
     this.model.Phone = responseValues.Phone
+  }
+
+  public get isLoadingBool () {
+    return this.isLoading ? 'blue' : false
   }
 
   @Watch('model')
@@ -59,9 +64,18 @@ export default class InputReferencePerson extends Vue {
     if (!val) return
     if (val.length < 4) return
     if (val[val.length - 1] === ')') return
+
+    setTimeout(this.fetchAdUsers, 400, ++this.requestCounter)
+  }
+
+  public async fetchAdUsers (counter: number) {
     let timestamp = Date.now() + ''
+    if (counter < this.requestCounter) return
+
+    this.lastLoad = timestamp
 
     try {
+      this.isLoading++
       const response = await fetch(`/api/Users/adUser/${this.search}`, { headers: { timestamp } })
       timestamp = response.headers.get('timestamp') || ''
       const responseBody = await response.json()
@@ -74,7 +88,7 @@ export default class InputReferencePerson extends Vue {
     } catch (ex) {
       console.log(ex)
     } finally {
-      this.isLoading = false
+      this.isLoading--
     }
   }
 }
