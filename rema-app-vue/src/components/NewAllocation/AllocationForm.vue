@@ -44,23 +44,13 @@
             <v-col v-show="!fullday" :cols="6"><strong>Bis: </strong><drop-down-time-picker v-model="timeTo"/></v-col>
             <v-col>
               <div v-show="isRepeating">
-                <v-menu
-                  ref="showMultipleDatesMenu"
+                <v-menu ref="showMultipleDatesMenu" :close-on-content-click="false" :return-value.sync="multipleDates" transition="scale-transition" offset-y min-width="290px"
                   v-model="showMultipleDatesMenu"
-                  :close-on-content-click="false"
-                  :return-value.sync="multipleDates"
-                  transition="scale-transition"
-                  offset-y
-                  min-width="290px"
                 >
                   <template v-slot:activator="{ on }">
-                    <v-combobox
-                      v-model="multipleDates"
-                      multiple chips small-chips readonly
+                    <v-combobox multiple chips small-chips readonly prepend-icon="event" v-on="on"
                       label="Gewählte Termine"
-                      prepend-icon="event"
-                      v-on="on"
-                    >
+                      v-model="multipleDates">
                       <template v-slot:selection="data">
                         <v-chip>{{data.item | toLocalDate}} <v-icon right @click="removeDate(data.item)">close</v-icon></v-chip>
                       </template>
@@ -77,27 +67,40 @@
           </template>
         </v-row>
         <v-row v-if="!isRepeating"> <!-- single date row -->
-          <v-col cols="5">
-            <!-- Datum von -->
-            <date-time-picker
-              label="von"
-              defaultTime="08:00"
-              defaultTimeFullDay="00:00"
-              v-model="dateFrom"
-              :with-time="!fullday"
-              placeholder="Bitte wählen Sie ein Datum aus."
-            />
+          <v-col cols="3">
+            <v-menu ref="fromMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
+            v-model="fromMenu">
+            <template v-slot:activator="{ on }">
+              <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
+              label="Von"
+              :value="dateFormatted(dateFrom)"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" no-title @input="fromMenu = false">
+              <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen</v-btn>
+            </v-date-picker>
+          </v-menu>
           </v-col>
-          <v-col cols="5">
-            <!-- Datum bis -->
-            <date-time-picker
-              label="bis"
-              defaultTime="16:00"
-              defaultTimeFullDay="23:59"
-              v-model="dateTo"
-              :with-time="!fullday"
-              placeholder="Bitte wählen Sie ein Datum aus."
-            />
+          <v-col cols="3" class="time-col">
+            <drop-down-time-picker v-show="!fullday" v-model="timeFrom"/>
+          </v-col>
+
+          <v-col cols="3">
+            <v-menu ref="toMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
+            v-model="toMenu">
+            <template v-slot:activator="{ on }">
+              <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
+              label="Bis"
+              :value="dateFormatted(dateTo)"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="dateTo" :min="dateToMin" locale="de" no-title @input="toMenu = false">
+              <v-btn text color="primary" @click="toMenu = false" block>Abbrechen</v-btn>
+            </v-date-picker>
+          </v-menu>
+          </v-col>
+          <v-col cols="3" class="time-col">
+            <drop-down-time-picker v-show="!fullday" v-model="timeTo" min="timeToMin"/>
           </v-col>
         </v-row>
         <v-divider />
@@ -185,38 +188,25 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../../models/interfaces'
-import DateTimePicker from '@/components/DateTimePicker.vue'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import AllocationFormService from '../../services/AllocationFormServices'
 import { mixins } from 'vue-class-component'
+import moment from 'moment'
 
 @Component({
   components: {
-    DateTimePicker, DropDownTimePicker, InputReferencePerson
+    DropDownTimePicker, InputReferencePerson
   }
 })
 export default class AllocationForm extends mixins(AllocationFormService) {
-  public title: String = '';
-  public ressourceId: number | any = null;
-  public dateFrom: string = '';
-  public dateTo: string = '';
-  public fullday: boolean = false;
-  public notes: string = '';
-  public selectedGadgets: number[] = [];
+  public title: String = ''
+  public ressourceId: number | any = null
+  public fullday: boolean = false
+  public notes: string = ''
+  public selectedGadgets: number[] = []
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
   public isRepeating: boolean = false
-
-  private timeFrom: string = '08:00'
-  private timeTo: string = '17:00'
-
-  @Watch('dateFrom')
-  public dateFromChange (val: string) {
-    if (!this.dateTo || this.dateTo.length === 0) {
-      let datePart = val.split('T')[0]
-      this.dateTo = datePart + 'T16:00'
-    }
-  }
 
   private get permissionToEdit (): boolean {
     return this.$store.state.user.role >= 10
