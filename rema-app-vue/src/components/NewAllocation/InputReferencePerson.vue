@@ -20,13 +20,10 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel, AdUsers } from '../../models/interfaces'
-import DateTimePicker from '@/components/DateTimePicker.vue'
 import { warn } from 'vue-class-component/lib/util'
 
 @Component({
-  components: {
-    DateTimePicker, DropDownTimePicker
-  }
+  components: { DropDownTimePicker }
 })
 export default class InputReferencePerson extends Vue {
   @Prop(Number) private userid!: number

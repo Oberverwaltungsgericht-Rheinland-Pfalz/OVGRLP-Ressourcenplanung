@@ -49,39 +49,57 @@
             <v-col v-show="!fullday" :cols="6">
               <strong>Bis: </strong><drop-down-time-picker v-model="timeTo"/>
             </v-col>
-            <v-col>
-              <div v-show="isRepeating">
-                <v-icon>event</v-icon>
-                  <!-- Serientermindatum -->
-                  <label class="date-label">
-                    Datum im Serientermin
-                    <input v-if="dateFromFocus" type="date" :value="dateOfSeries" @change="changeDateSeries" @blur="dateFromFocus=false" ref="dateSeries" autofocus>
-                    <span v-else @click="dateFromFocus=true" class="span-input">{{dateOfSeries | toLocalDate}}</span>
-                  </label> &emsp;
-              </div>
+            <v-col v-show="isRepeating" class="no-top-padding"><!-- Serientermindatum -->
+                <v-menu ref="menu1" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
+                v-model="menu1">
+                <template v-slot:activator="{ on }">
+                  <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
+                  label="Datum im Serientermin"
+                  :value="dateFormatted(dateOfSeries)"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="dateOfSeries" :min="dateMin" locale="de" no-title @input="menu1 = false">
+                  <v-btn text color="primary" @click="menu1 = false" block>Abbrechen</v-btn>
+                </v-date-picker>
+              </v-menu>
             </v-col>
           </template>
         </v-row>
         <v-row v-if="!isRepeating"> <!-- single date row -->
-          <v-col cols="6">
-            <v-icon>event</v-icon>
-            <!-- Datum von -->
-            <label class="date-label">
-              von
-              <input v-if="dateFromFocus" type="date" :value="dateFrom" @change="changeDateFrom" @blur="dateFromFocus=false" autofocus>
-              <span v-else @click="dateFromFocus=true" class="span-input">{{dateFrom | toLocalDate}}</span>
-            </label> &emsp;
-            <drop-down-time-picker v-model="timeFrom"/>
+          <v-col cols="3">
+            <v-menu ref="fromMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
+            v-model="fromMenu">
+            <template v-slot:activator="{ on }">
+              <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
+              label="Von"
+              :value="dateFormatted(dateFrom)"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" no-title @input="fromMenu = false">
+              <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen</v-btn>
+            </v-date-picker>
+          </v-menu>
           </v-col>
-          <v-col cols="6">
-            <v-icon>event</v-icon>
-            <!-- Datum bis -->
-            <label class="date-label">
-              von
-              <input v-if="dateToFocus" type="date" :value="dateTo" @change="changeDateTo" @blur="dateToFocus=false" autofocus>
-              <span v-else @click="dateToFocus=true" class="span-input">{{dateTo | toLocalDate}}</span>
-            </label> &emsp;
-            <drop-down-time-picker v-model="timeTo"/>
+          <v-col cols="3" class="time-col">
+            <drop-down-time-picker v-show="!fullday" v-model="timeTo"/>
+          </v-col>
+
+          <v-col cols="3">
+            <v-menu ref="toMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
+            v-model="toMenu">
+            <template v-slot:activator="{ on }">
+              <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
+              label="Bis"
+              :value="dateFormatted(dateTo)"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="dateTo" :min="dateToMin" locale="de" no-title @input="toMenu = false">
+              <v-btn text color="primary" @click="toMenu = false" block>Abbrechen</v-btn>
+            </v-date-picker>
+          </v-menu>
+          </v-col>
+          <v-col cols="3" class="time-col">
+            <drop-down-time-picker v-show="!fullday" v-model="timeTo" min="timeToMin"/>
           </v-col>
         </v-row>
         <v-divider />
@@ -109,23 +127,6 @@
             ></v-text-field>
           </v-col>
         </v-row>
-
-<!--        <v-row>
-          <v-col v-for="(group, idx) in GadgetGroups" :key="idx + 'group'" cols="6">
-            <v-select
-              v-model="selectedGadgets"
-              :items="getGadgets(group.Id)"
-              :label="'Hilfsmittel (' + group.Title + ')'"
-              item-text="Title"
-              item-value="Id"
-              :menu-props="{ top: true, offsetY: true }"
-              placeholder="Bitte wählen Sie Hilfmittel aus."
-              multiple
-              clearable
-            >
-            </v-select>
-          </v-col>
-        </v-row>  -->
         <v-divider />
         <v-row>
           <v-col>
@@ -169,26 +170,23 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { AllocationRequestView, AdUsers, HintsForSuppliers } from '../models/interfaces'
-import DateTimePicker from '@/components/DateTimePicker.vue'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import { mixins } from 'vue-class-component'
 import AllocationFormService from '../services/AllocationFormServices'
+import moment from 'moment'
 
 @Component({
-  components: { DateTimePicker, DropDownTimePicker, InputReferencePerson }
+  components: { DropDownTimePicker, InputReferencePerson }
 })
 export default class EditFormModal extends mixins(AllocationFormService) {
   @Prop(Number) private eventId!: number
 
+  private menu1: boolean = false
   private title: String = ''
   private Notes: string = ''
   private ressourceId: number | any = null
-  private dateFrom: string = ''
-  private timeFrom: string =''
-  private dateTo: string = ''
-  private timeTo: string = ''
   private fullday: boolean = false
   private selectedGadgets: number[] = []
   private multipleDates: string[] = []
@@ -240,9 +238,6 @@ export default class EditFormModal extends mixins(AllocationFormService) {
   }
   private changeDateFrom (e:any) {
     if (e.target.value) { this.dateFrom = e.target.value.substring(0, 10) }
-  }
-  private changeDateSeries (e:any) {
-    if (e.target.value) { this.dateOfSeries = e.target.value.substring(0, 10) }
   }
   private changeDateTo (e:any) {
     if (e.target.value) { this.dateTo = e.target.value.substring(0, 10) }
@@ -312,12 +307,17 @@ export default class EditFormModal extends mixins(AllocationFormService) {
 }
 </script>
 
-<style lang="stylus" scoped>
-.span-input
-  border-bottom 1px solid black
-  padding 3px
+<style lang="stylus">
 .no-top-padding
   padding-top 0
 .no-bottom-padding
   padding-bottom 0 !important
+.time-col
+  font-size 16px
+  padding-top 1.35em
+  padding-bottom 0em
+
+  option:disabled
+    background-color #8b000078
+
 </style>

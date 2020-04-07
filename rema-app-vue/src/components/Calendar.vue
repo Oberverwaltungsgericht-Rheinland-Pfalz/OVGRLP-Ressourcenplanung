@@ -88,7 +88,6 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AllocationRequestView, GadgetModel, ContactUser, HintsForSuppliers } from '../models/interfaces'
-import DateTimePicker from '@/components/DateTimePicker.vue'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/user/types'
 

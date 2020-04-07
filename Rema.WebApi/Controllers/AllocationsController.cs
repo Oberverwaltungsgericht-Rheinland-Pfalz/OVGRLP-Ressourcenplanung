@@ -906,6 +906,19 @@ namespace Rema.WebApi.Controllers
         }
       }
 
+      try
+      {
+        if (allocationVM.IsAllDay)
+        {
+          oldAllocation.From = oldAllocation.From.Date + new TimeSpan(0, 0, 0);
+          oldAllocation.To = oldAllocation.To.Date + new TimeSpan(23, 59, 00);
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while set correct times for all day");
+      }
+
       // Änderungen sind nur für Bearbeiter und darüber hinaus erlaubt, außer wenn Anfrage noch nicht genehmigt
       bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || 
                       (oldAllocation.CreatedBy.Id == base.RequestSenderVM.Id && oldAllocation.Status == MeetingStatus.Pending);

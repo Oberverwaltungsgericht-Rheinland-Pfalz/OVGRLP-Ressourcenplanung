@@ -2,7 +2,7 @@
   <span class="ddtp-border">
     <span class="ddtp-inner-border">
       <select v-model="hour">
-        <option v-for="n in hours" :key="n+'t1'" :value="n">{{n | toTwo}}</option>
+        <option v-for="n in hours" :key="n+'t1'" :disabled="isDisabledHour(n)" :value="n">{{n | toTwo}}</option>
       </select>
 
       <strong>:&ensp;</strong>
@@ -32,6 +32,8 @@ import { Component, Prop } from 'vue-property-decorator'
 })
 export default class DropDownTimePicker extends Vue {
   @Prop({ default: '00:00' }) value!: string;
+  @Prop({ default: '00:00' }) min!: string
+  @Prop({ default: '23:59' }) max!: string
 
   private precise: boolean = isPrecise(this.value)
   private hourInternal: number = 0
@@ -44,6 +46,13 @@ export default class DropDownTimePicker extends Vue {
   private mounted () {
     this.hourInternal = parseInt(!this.value ? '0' : this.value.substring(0, 2))
     this.minuteInternal = parseInt(!this.value ? '0' : this.value.substring(3, 5))
+  }
+
+  isDisabledHour (hour: number) {
+    let minHour = this.min.split(':')[0]
+    if (parseInt(minHour) > hour) return true
+    let maxHour = this.max.split(':')[0]
+    if (parseInt(maxHour) < hour) return true
   }
 
   get outputValue () :string {
