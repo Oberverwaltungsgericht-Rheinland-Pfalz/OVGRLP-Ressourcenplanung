@@ -141,95 +141,6 @@ namespace Rema.WebApi.Controllers
       return Ok();
     }
 
-    /* // Gerade keine Anforderung
-    [HttpPut("ChangeAllocationSeries/{id}")]
-    public async Task<IActionResult> ChangeAllocationSeries(AllocationViewModel allocationVM)
-    {
-      Log.Information("PUT ChangeAllocationSeries/{id}: {allocation}", allocationVM.Id, allocationVM);
-
-      Allocation allocation;
-      try
-      {
-        allocation = _mapper.Map<AllocationViewModel, Allocation>(allocationVM);
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while mapping allocation");
-        return BadRequest();
-      }
-
-      bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || allocation.CreatedBy.Id == base.RequestSenderVM.Id;
-      if (!hasRight)
-      {
-        Log.Warning("User {user} was restricted to change allocation {allocation}", base.RequestSenderVM, allocation);
-        return new UnauthorizedResult();
-      }
-
-      var datesList = new List<Allocation>();
-      try
-      {
-        datesList = await _context.Allocations.Where(s => s.ScheduleSeriesGuid == allocation.ScheduleSeriesGuid).ToListAsync();
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while querying scheduleSeries allocations");
-        return Conflict();
-      }
-
-      Ressource ressource = null;
-      try
-      {
-        ressource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting ressource");
-      }
-
-      User referencePerson = null;
-      try
-      {
-        referencePerson = await _context.Users.FindAsync(allocationVM.ReferencePersonId);
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting referencePerson");
-      }
-
-      try
-      {
-        foreach(var all in datesList)
-        {
-          all.Title = allocation.Title;
-          all.Notes = allocation.Notes;
-          all.ReferencePerson = referencePerson;
-          all.ContactName = allocation.ContactName;
-          all.ContactPhone = allocation.ContactPhone;
-          all.Ressource = ressource;
-          all.LastModified = DateTime.Now;
-          all.LastModifiedBy = base.RequestSender;
-          _context.Entry(all).State = EntityState.Modified;
-        }
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while set modified values for allocation");
-        return Conflict();
-      }
-
-      try
-      {
-        await _context.SaveChangesAsync();
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while save allocation");
-        return Conflict();
-      }
-
-      return Ok();
-    }
-    */
 
     // POST: allocation
     [HttpPost]
@@ -353,11 +264,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        if (string.IsNullOrEmpty(allocationVM.ReferencePersonId))
-        {
-          allocation.ReferencePerson = requestedUser;
-        }
-        else
+        if (!string.IsNullOrEmpty(allocationVM.ReferencePersonId))
         {
           allocation.ReferencePerson = _userManagementService.GetOrInsertUserFromDB(allocationVM.ReferencePersonId);
         }
@@ -391,7 +298,7 @@ namespace Rema.WebApi.Controllers
           .FirstOrDefaultAsync(i => i.Id == allocation.Id);
         allocation = await _context.Allocations.FindAsync(allocation.Id);
         var template = new NewAllocationTemplate(allocation, yourRequest);
-        EmailTrigger.SendEmail(template, allocation.ReferencePerson.Email, template.GetGroupEmails());
+        EmailTrigger.SendEmail(template, allocation?.ReferencePerson.Email, template.GetGroupEmails());
       }
       catch (Exception ex)
       {
@@ -533,14 +440,10 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        if (string.IsNullOrEmpty(allocationsVM.ReferencePersonId))
-        {
-          allocations.ForEach(e => e.ReferencePerson = requestedUser);
-        }
-        else
+        if (!string.IsNullOrEmpty(allocationsVM.ReferencePersonId))
         {
           var referencePerson = await _context.Users.SingleOrDefaultAsync(e => e.ActiveDirectoryID == allocationsVM.ReferencePersonId);
-          allocations.ForEach(e => e.ReferencePerson = requestedUser);
+          allocations.ForEach(e => e.ReferencePerson = referencePerson);
         }
       }
       catch (Exception ex)
@@ -568,7 +471,7 @@ namespace Rema.WebApi.Controllers
       try
       {
         var title = allocationsVM.Title;
-        var recipient = allocations[0].ReferencePerson.Email;
+        var recipient = allocations[0]?.ReferencePerson.Email;
         var ressourceName = allocations[0].Ressource.Name;
         string list = "";
         foreach(var all in allocations) {
@@ -631,56 +534,10 @@ namespace Rema.WebApi.Controllers
       }
 
       var template = new DeletedAllocationTemplate(allocation);
-      EmailTrigger.SendEmail(template, allocation.ReferencePerson.Email, template.GetGroupEmails());
+      EmailTrigger.SendEmail(template, allocation?.ReferencePerson.Email, template.GetGroupEmails());
       return Ok();
     }
-
-    /*
-    //TODO: Aktuell wird hier garnicht gefiltert 
-    [HttpGet("filter/{filter}")]
-    public async Task<ActionResult<IEnumerable<object>>> GetAllocations(AllocationFilter filter)
-    {
-
-      Log.Information("GET allocations/filter/{filter}", filter);
-
-      try
-      {
-        var all = await _context.Allocations
-          .Include(g => g.Ressource)
-          .Include(g => g.ApprovedBy)
-          .Include(g => g.CreatedBy)
-          .Include(g => g.LastModifiedBy)
-          .Include(g => g.ReferencePerson)
-          .ToListAsync();
-
-        // return all.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
-        var p = (from a in _context.Allocations
-                 select new
-                 {
-                   Id = a.Id,
-                   From = a.From,
-                   To = a.To,
-                   IsAllDay = a.IsAllDay,
-                   Status = a.Status,
-                   Ressource_id = a.Ressource.Id,
-                   CreatedBy = a.CreatedBy,
-                   CreatedAt = a.CreatedAt,
-                   LastModified = a.LastModified,
-                   LastModifiedBy = a.LastModifiedBy.Id,
-                   ApprovedBy = a.ApprovedBy.Id,
-                   ApprovedAt = a.ApprovedAt,
-                   ReferencePerson = a.ReferencePerson.Id
-                 }).ToList();
-        return Ok(p);
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting filtered allocation");
-        return NotFound();
-      }
-    }
-    */
-    
+   
     // PUT: allocations/editRequest
     [HttpPut("editRequest/")]
     public async Task<ActionResult<Boolean>> EditRequest(AllocationRequestEdition editedRequest)
@@ -747,7 +604,7 @@ namespace Rema.WebApi.Controllers
           template = new StatusChangedTemplate(allocation, "abgelehnt");
         }
         if (template != null)
-          EmailTrigger.SendEmail(template, allocation.ReferencePerson.Email, new List<string>());
+          EmailTrigger.SendEmail(template, allocation?.ReferencePerson.Email, new List<string>());
       }
 
       catch (Exception ex)
@@ -810,11 +667,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        if (string.IsNullOrEmpty(allocationVM.ReferencePersonId))
-        {
-          oldAllocation.ReferencePerson = base.RequestSender;
-        }
-        else if (allocationVM.ReferencePersonId.Length > 12)
+        if (!string.IsNullOrEmpty(allocationVM.ReferencePersonId) && allocationVM.ReferencePersonId.Length > 12)
         {
           oldAllocation.ReferencePerson = _userManagementService.GetOrInsertUserFromDB(allocationVM.ReferencePersonId); ;
         }
@@ -960,7 +813,7 @@ namespace Rema.WebApi.Controllers
       }
 
       var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets);
-      EmailTrigger.SendEmail(template, oldAllocation.ReferencePerson.Email, template.GetGroupEmails());
+      EmailTrigger.SendEmail(template, oldAllocation?.ReferencePerson.Email, template.GetGroupEmails());
       return Ok();
     }
   }
