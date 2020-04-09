@@ -40,7 +40,15 @@ namespace Rema.Infrastructure.Email.Templates
     public Ressource Ressource => this._allocation.Ressource;
     protected string RessourceName => this.Ressource.Name;
     protected string Title => this._allocation.Title;
-    protected string ReferencePerson => $@"{this._allocation.ReferencePerson.Organisation} \ {this._allocation.ReferencePerson.Name}";
+    protected string ReferencePerson { get {
+      if (this._allocation.ReferencePerson == null) return "";
+      var referencePerson =  $@"{this._allocation.ReferencePerson.Organisation} \ {this._allocation.ReferencePerson.Name}";
+
+      return $@"Ansprechpartner:
+{referencePerson}";
+      }
+    }
+    
     protected string Notes => this._allocation.Notes;
     protected string ContactPhone => this._allocation.ContactPhone;
     protected string ReserveTime { get {

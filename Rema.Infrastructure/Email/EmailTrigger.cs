@@ -16,7 +16,7 @@ namespace Rema.Infrastructure.Email
     }
     public static void SendEmail(EmailTemplate template, string recipient, IList<string> groups)
     {
-      groups.Add(recipient);
+      if (recipient != null) groups.Add(recipient);
       var uniqueList = groups.Distinct().ToList();
       foreach (var emailAdress in uniqueList)
       {
