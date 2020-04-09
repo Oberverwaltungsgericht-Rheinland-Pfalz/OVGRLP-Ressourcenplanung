@@ -184,13 +184,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch, Mixins } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../../models/interfaces'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import AllocationFormService from '../../services/AllocationFormServices'
-import { mixins } from 'vue-class-component'
 import moment from 'moment'
 
 @Component({
@@ -198,7 +197,7 @@ import moment from 'moment'
     DropDownTimePicker, InputReferencePerson
   }
 })
-export default class AllocationForm extends mixins(AllocationFormService) {
+export default class AllocationForm extends Mixins(AllocationFormService) {
   public title: String = ''
   public ressourceId: number | any = null
   public fullday: boolean = false
@@ -287,7 +286,7 @@ export default class AllocationForm extends mixins(AllocationFormService) {
     this.telNumber = ''
     this.dateFrom = ''
     this.dateTo = ''
-    this.timeTo = '16:00'
+    this.timeTo = '17:00'
     this.timeFrom = '08:00'
     this.fullday = false
     this.ressourceId = null

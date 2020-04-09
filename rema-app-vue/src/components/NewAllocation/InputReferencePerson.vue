@@ -20,7 +20,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel, AdUsers } from '../../models/interfaces'
-import { warn } from 'vue-class-component/lib/util'
 
 @Component({
   components: { DropDownTimePicker }

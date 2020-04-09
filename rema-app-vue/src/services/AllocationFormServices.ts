@@ -1,7 +1,7 @@
 
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../models/interfaces'
-import { Gadget, Ressource, Supplier, Allocation } from '../models'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+import { AdUsers, HintsForSuppliers } from '../models/interfaces'
+import { Ressource, Supplier } from '../models'
 import moment from 'moment'
 
 @Component
@@ -26,9 +26,10 @@ export default class AllocationFormService extends Vue {
     if (this.dateFrom > this.dateTo) {
       this.dateTo = this.dateFrom
     }
-    if (this.dateFrom === this.dateTo && (this.timeFrom > this.timeTo)) {
+    if (this.dateFrom === this.dateTo && (this.timeFrom > this.timeTo)) { // geht nicht
+      debugger
       if (this.timeTo.endsWith('59')) this.timeFrom = this.timeFrom.split(':')[0] + ':45'
-      else this.timeTo = this.timeTo.split(':')[0] + parseInt(this.timeTo.split(':')[1]) + 1
+      else this.timeTo = this.timeFrom.split(':')[0] + ':' + (parseInt(this.timeTo.split(':')[1]) + 1)
     }
   }
 
