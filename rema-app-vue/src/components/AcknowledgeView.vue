@@ -66,29 +66,43 @@
             </v-col>
             <v-col cols="3">{{ viewAllocation.Notices }}</v-col>
           </v-row>
-          <v-row v-show="moveEdit">
+          <v-row v-if="moveEdit">
             <v-col cols="12">
               <h2 :class="{ 'valid-range': timesInvalid }">Neuer Zeitraum</h2>
             </v-col>
             <v-col cols="3">
-              <strong>Von:</strong>
+              <v-menu ref="fromMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
+                v-model="fromMenu">
+                <template v-slot:activator="{ on }">
+                  <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
+                  label="Von"
+                  :value="dateFormatted(editFrom)"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="editFrom" :min="dateMin" locale="de" no-title @input="fromMenu = false">
+                  <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen</v-btn>
+                </v-date-picker>
+              </v-menu>
             </v-col>
             <v-col cols="3">
-              <input
-                type="datetime-local"
-                v-model="editFrom"
-                :class="{ 'invalid-date': !editFrom }"
-              />
+              <drop-down-time-picker v-model="editFromTime"/>
             </v-col>
             <v-col cols="3">
-              <strong>Bis:</strong>
+              <v-menu ref="toMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
+                v-model="toMenu">
+                <template v-slot:activator="{ on }">
+                  <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
+                  label="Bis"
+                  :value="dateFormatted(editTo)"
+                  ></v-text-field>
+                </template>
+                <v-date-picker v-model="editTo" :min="dateMin" locale="de" no-title @input="toMenu = false">
+                  <v-btn text color="primary" @click="toMenu = false" block>Abbrechen</v-btn>
+                </v-date-picker>
+              </v-menu>
             </v-col>
             <v-col cols="3">
-              <input
-                type="datetime-local"
-                v-model="editTo"
-                :class="{ 'invalid-date': !editTo }"
-              />
+              <drop-down-time-picker v-model="editToTime"/>
             </v-col>
           </v-row>
         </v-container>
@@ -98,21 +112,14 @@
           </v-col>
         </v-row>
         <v-row v-for="(i, idx) in possibleCollisions" v-bind:key="idx + 'cols'">
-          <v-col cols="4"
-            >{{ i.From | toLocal }} - {{ i.To | toLocal }}</v-col
-          >
+          <v-col cols="4">{{ i.From | toLocal }} - {{ i.To | toLocal }}</v-col>
           <v-col cols="4">{{ i.Title }}</v-col>
           <v-col cols="4">{{ i.Status | status2string }}</v-col>
         </v-row>
       </v-card-text>
       <v-card-actions>
         <div class="flex-grow-1"></div>
-        <v-btn
-          color="green darken-1"
-          :disabled="moveEdit"
-          text
-          @click="acknowledge"
-        >
+        <v-btn color="green darken-1" :disabled="moveEdit" text @click="acknowledge">
           <v-icon v-html="'done'"></v-icon>Bestätigen
         </v-btn>
         <v-btn color="red darken-1" :disabled="moveEdit" text @click="reject">
@@ -136,20 +143,16 @@
 
 <script lang="ts">
 import { State, Action, Getter, Mutation } from 'vuex-class'
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Mixins } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/user/types'
-import {
-  AllocationRequest,
-  AllocationRequestView,
-  UserData,
-  ContactUser,
-  AllocationModel
-} from '../models/interfaces'
+import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
+import AllocationFormService from '@/services/AllocationFormServices'
+import { AllocationRequest, AllocationRequestView, UserData, ContactUser, AllocationModel } from '../models/interfaces'
 import { Allocation } from '../models'
 const namespace = 'user'
 
-@Component
-export default class AcknowledgeView extends Vue {
+@Component({ components: { DropDownTimePicker } })
+export default class AcknowledgeView extends Mixins(AllocationFormService) {
   @State('ContactUsers', { namespace })
   private ContactUsers!: ContactUser[]
   @Mutation(Fnn.m.addContactUser, { namespace })
@@ -160,7 +163,9 @@ export default class AcknowledgeView extends Vue {
   @Prop(Object) private viewAllocation!: AllocationRequestView // = {} as AllocationRequestView
   private moveEdit: boolean = false
   private editFrom: string = ''
+  private editFromTime: string = ''
   private editTo: string = ''
+  private editToTime: string = ''
 
   public get timesInvalid (): boolean {
     if (!this.editFrom || !this.editTo) return true
@@ -223,8 +228,10 @@ export default class AcknowledgeView extends Vue {
     this.moveEdit = !this.moveEdit
 
     if (this.moveEdit) {
-      this.editFrom = this.viewAllocation.From
-      this.editTo = this.viewAllocation.To
+      this.editFrom = this.viewAllocation.From.substr(0, 10)
+      this.editFromTime = this.viewAllocation.From.substr(11, 5)
+      this.editTo = this.viewAllocation.To.substr(0, 10)
+      this.editToTime = this.viewAllocation.To.substr(11, 5)
       return
     }
     const changedAllocation: AllocationModel = {
