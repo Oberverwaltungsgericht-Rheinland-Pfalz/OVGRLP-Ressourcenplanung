@@ -27,7 +27,6 @@ export default class AllocationFormService extends Vue {
       this.dateTo = this.dateFrom
     }
     if (this.dateFrom === this.dateTo && (this.timeFrom > this.timeTo)) { // geht nicht
-      debugger
       if (this.timeTo.endsWith('59')) this.timeFrom = this.timeFrom.split(':')[0] + ':45'
       else this.timeTo = this.timeFrom.split(':')[0] + ':' + (parseInt(this.timeTo.split(':')[1]) + 1)
     }
