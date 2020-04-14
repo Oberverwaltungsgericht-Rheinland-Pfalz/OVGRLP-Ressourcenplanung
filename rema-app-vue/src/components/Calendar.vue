@@ -35,7 +35,7 @@
         </v-toolbar>
       </v-sheet>
 
-      <v-sheet height="600">
+      <v-sheet  height="600">
         <v-calendar
           ref="calendar"
           v-model="focus"
@@ -52,7 +52,7 @@
           @click:date="viewDay"
           @change="updateRange"
         ></v-calendar>
-        <v-menu
+        <v-menu v-if="selectedOpen"
           v-model="selectedOpen"
           :close-on-content-click="false"
           :activator="selectedElement"
