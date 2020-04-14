@@ -267,6 +267,10 @@ namespace Rema.WebApi.Controllers
         if (!string.IsNullOrEmpty(allocationVM.ReferencePersonId))
         {
           allocation.ReferencePerson = _userManagementService.GetOrInsertUserFromDB(allocationVM.ReferencePersonId);
+        } 
+        else if(allocationVM.Status == MeetingStatus.Pending)
+        {
+          allocation.ReferencePerson = requestedUser;
         }
       }
       catch (Exception ex)
@@ -444,6 +448,10 @@ namespace Rema.WebApi.Controllers
         {
           var referencePerson = await _context.Users.SingleOrDefaultAsync(e => e.ActiveDirectoryID == allocationsVM.ReferencePersonId);
           allocations.ForEach(e => e.ReferencePerson = referencePerson);
+        }
+        else if (allocationsVM.Status == MeetingStatus.Pending)
+        {
+          allocations.ForEach(e => e.ReferencePerson = requestedUser);
         }
       }
       catch (Exception ex)
