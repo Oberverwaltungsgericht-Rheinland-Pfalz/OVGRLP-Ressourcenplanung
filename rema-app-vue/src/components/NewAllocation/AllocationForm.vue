@@ -225,8 +225,8 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   ) {
     let newAllocation = {
       status: status,
-      from: this.dateFrom,
-      to: this.dateTo,
+      from: `${this.dateFrom}T${this.timeFrom}`,
+      to: `${this.dateTo}T${this.timeTo}`,
       title: this.title,
       notes: this.notes,
       isAllDay: this.fullday,

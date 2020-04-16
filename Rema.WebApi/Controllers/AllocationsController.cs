@@ -302,7 +302,7 @@ namespace Rema.WebApi.Controllers
           .FirstOrDefaultAsync(i => i.Id == allocation.Id);
         allocation = await _context.Allocations.FindAsync(allocation.Id);
         var template = new NewAllocationTemplate(allocation, yourRequest);
-        EmailTrigger.SendEmail(template, allocation?.ReferencePerson.Email, template.GetGroupEmails());
+        EmailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
       }
       catch (Exception ex)
       {
@@ -479,7 +479,7 @@ namespace Rema.WebApi.Controllers
       try
       {
         var title = allocationsVM.Title;
-        var recipient = allocations[0]?.ReferencePerson.Email;
+        var recipient = allocations[0]?.ReferencePerson?.Email;
         var ressourceName = allocations[0].Ressource.Name;
         string list = "";
         foreach(var all in allocations) {
@@ -542,7 +542,7 @@ namespace Rema.WebApi.Controllers
       }
 
       var template = new DeletedAllocationTemplate(allocation);
-      EmailTrigger.SendEmail(template, allocation?.ReferencePerson.Email, template.GetGroupEmails());
+      EmailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
       return Ok();
     }
    
@@ -612,7 +612,7 @@ namespace Rema.WebApi.Controllers
           template = new StatusChangedTemplate(allocation, "abgelehnt");
         }
         if (template != null)
-          EmailTrigger.SendEmail(template, allocation?.ReferencePerson.Email, new List<string>());
+          EmailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, new List<string>());
       }
 
       catch (Exception ex)
@@ -821,7 +821,7 @@ namespace Rema.WebApi.Controllers
       }
 
       var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets);
-      EmailTrigger.SendEmail(template, oldAllocation?.ReferencePerson.Email, template.GetGroupEmails());
+      EmailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails());
       return Ok();
     }
   }
