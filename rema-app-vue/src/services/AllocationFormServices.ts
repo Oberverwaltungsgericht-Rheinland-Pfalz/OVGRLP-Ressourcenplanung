@@ -16,6 +16,7 @@ export default class AllocationFormService extends Vue {
   public toMenu: boolean = false
   public timeFrom: string = '08:00'
   public timeTo: string = '17:00'
+  public checkForm: boolean = false
 
   @Watch('dateFrom')
   @Watch('dateTo')
@@ -32,6 +33,8 @@ export default class AllocationFormService extends Vue {
     }
   }
 
+  // abstract
+  public get formInvalid ():boolean { return true }
   public get dateMin () {
     return moment().format('YYYY-MM-DD')
   }
@@ -54,6 +57,17 @@ export default class AllocationFormService extends Vue {
     }
     return Ressource.all().sort(compareNumbers)
   }
+
+  public isFormInvalid () {
+    this.checkForm = true
+    if (this.formInvalid) {
+      this.$dialog.message.warning('Bitte füllen sie alle Pflichtfelder richtig aus', {
+        position: 'center-center'
+      })
+      return true
+    }
+  }
+
   public dateFormatted (dateValue: string): string {
     if (!dateValue) return ''
     if (dateValue) return moment(dateValue).format('DD.MM.YYYY')

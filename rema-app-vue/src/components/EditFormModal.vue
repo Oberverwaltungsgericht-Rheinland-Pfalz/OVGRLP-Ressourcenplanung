@@ -16,6 +16,7 @@
               v-model="title"
               label="Titel"
               required
+              :error="!title && checkForm"
               placeholder="Der Termin benötigt einen Titel"
             ></v-text-field>
           </v-col>
@@ -23,6 +24,7 @@
             <v-select
               v-model="ressourceId"
               :items="Rooms"
+              :error="!ressourceId && checkForm"
               item-text="Name"
               item-value="Id"
               clearable
@@ -155,7 +157,6 @@
       <div class="flex-grow-1"></div>
       <v-btn
         v-if="permissionToEdit"
-        :disabled="formInvalid"
         color="green darken-1" text
         @click="saveAllocation"
         ><v-icon>save</v-icon> Speichern</v-btn>
@@ -270,6 +271,8 @@ export default class EditFormModal extends mixins(AllocationFormService) {
     return !rValue
   }
   public async saveAllocation () {
+    if (this.isFormInvalid()) return
+
     let data = {} as any
     data.Id = this.eventId
 

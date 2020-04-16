@@ -12,8 +12,9 @@
           <v-col>
             <v-text-field
               v-model="title"
-              label="Titel"
+              label="Titel *"
               required
+              :error="!title && checkForm"
               placeholder="Bitte geben Sie einen Titel für den Termin an."
             ></v-text-field>
           </v-col>
@@ -24,8 +25,9 @@
               item-text="Name"
               item-value="Id"
               clearable
+              :error="!ressourceId && checkForm"
               placeholder="Bitte wählen Sie einen Raum aus."
-              label="Raum"
+              label="Raum *"
               :menu-props="{ offsetY: true }"
             />
           </v-col>
@@ -72,7 +74,8 @@
             v-model="fromMenu">
             <template v-slot:activator="{ on }">
               <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
-              label="Von"
+              label="Von *"
+              :error="!dateFrom && checkForm"
               :value="dateFormatted(dateFrom)"
               ></v-text-field>
             </template>
@@ -90,8 +93,9 @@
             v-model="toMenu">
             <template v-slot:activator="{ on }">
               <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
-              label="Bis"
+              label="Bis *"
               :value="dateFormatted(dateTo)"
+              :error="!dateTo && checkForm"
               ></v-text-field>
             </template>
             <v-date-picker v-model="dateTo" :min="dateToMin" locale="de" no-title @input="toMenu = false">
@@ -162,7 +166,6 @@
       <div class="flex-grow-1"></div>
       <v-btn
         v-if="permissionToEdit"
-        :disabled="formInvalid"
         color="green darken-1"
         text
         @click="sendAllocation(1)"
@@ -170,7 +173,6 @@
       >
       <v-btn
         v-else
-        :disabled="formInvalid"
         color="green darken-1"
         text
         @click="sendAllocation(0)"
@@ -212,6 +214,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   }
 
   private async sendAllocation (status: number) {
+    if (this.isFormInvalid()) return
     this.saveAllocation(status)
     this.close()
   }
@@ -266,6 +269,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     if (!this.dateFrom && !this.isRepeating) rValue = false
     if (!this.dateTo && !this.isRepeating && this.dateTo.length < 7) rValue = false
     if (this.isRepeating && !this.multipleDates.length) rValue = false
+    if (this.dateTo === this.dateFrom && (this.timeFrom >= this.timeTo)) rValue = false
     return !rValue
   }
 
@@ -281,6 +285,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   }
 
   private clearAll () {
+    this.checkForm = false
     this.title = ''
     this.notes = ''
     this.telNumber = ''
