@@ -83,7 +83,7 @@
           </v-menu>
           </v-col>
           <v-col cols="3" class="time-col">
-            <drop-down-time-picker v-show="!fullday" v-model="timeTo"/>
+            <drop-down-time-picker v-show="!fullday" v-model="timeFrom"/>
           </v-col>
 
           <v-col cols="3">
@@ -267,6 +267,7 @@ export default class EditFormModal extends mixins(AllocationFormService) {
     if (!this.timeTo && !this.fullday) rValue = false
     if (!this.timeFrom && !this.fullday) rValue = false
     if (!this.ReferencePersonId) rValue = false
+    if (this.dateTo === this.dateFrom && (this.timeFrom >= this.timeTo)) rValue = false
 
     return !rValue
   }

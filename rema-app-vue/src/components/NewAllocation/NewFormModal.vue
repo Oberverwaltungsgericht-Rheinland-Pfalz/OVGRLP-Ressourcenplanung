@@ -6,7 +6,7 @@
       </v-btn>
     </template>
 
-    <AllocationForm v-on:close="dialog=false"></AllocationForm>
+    <AllocationForm v-if="dialog" v-on:close="dialog=false"></AllocationForm>
   </v-dialog>
 </template>
 
