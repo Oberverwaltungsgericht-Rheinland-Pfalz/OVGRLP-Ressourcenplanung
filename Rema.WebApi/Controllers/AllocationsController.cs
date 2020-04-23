@@ -147,7 +147,6 @@ namespace Rema.WebApi.Controllers
     public async Task<ActionResult<AllocationViewModel>> PostAllocation(AllocationViewModel allocationVM)
     {
       Log.Information("POST allocation: {allocation}", allocationVM);
-
       Allocation allocation;
       User requestedUser;
 

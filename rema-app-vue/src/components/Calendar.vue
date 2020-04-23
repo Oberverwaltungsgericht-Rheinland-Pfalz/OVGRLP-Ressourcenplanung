@@ -90,6 +90,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AllocationRequestView, GadgetModel, ContactUser, HintsForSuppliers } from '../models/interfaces'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/user/types'
+import { deleteAllocation } from '../services/AllocationApiService'
 
 import { Allocation, Gadget, Supplier } from '../models'
 import EditFormModal from './EditFormModal.vue'
@@ -157,7 +158,7 @@ export default class Calendar extends Vue {
     return Allocation.query()
       .with('Ressource')
       .with('Gadget')
-      .get().map((v:any) => v.Ressource).map((v:any) => v.Name)
+      .get().map((v:any) => v.Ressource).map((v:any) => (v || { Name: '' }).Name)
   }
   public get title () {
     const { start, end } = this
@@ -220,11 +221,9 @@ export default class Calendar extends Vue {
     })
 
     if (confirmation !== true) return
-
-    const responseDeleteAllocation = await Allocation.api().delete(
-      `allocations/${id}`,
-      { delete: id }
-    )
+    let success = await deleteAllocation(id)
+    if (success) this.$dialog.message.success('Eintrag gelöscht', { position: 'center-left' })
+    else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
   }
 
   public viewDay ({ date }: any) {

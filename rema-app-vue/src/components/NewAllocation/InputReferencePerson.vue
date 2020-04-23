@@ -20,6 +20,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel, AdUsers } from '../../models/interfaces'
+import { getUser } from '../../services/UserApiService'
 
 @Component({
   components: { DropDownTimePicker }
@@ -35,13 +36,17 @@ export default class InputReferencePerson extends Vue {
 
   public async mounted () {
     if (!this.userid) return
-    const response = await fetch(`/api/Users/${this.userid}`)
-    let responseValues = await response.json() as AdUsers
-    this.search = responseValues.Name
-    this.model.Name = responseValues.Name
-    this.model.Email = responseValues.Email
-    this.model.ActiveDirectoryID = responseValues.ActiveDirectoryID
-    this.model.Phone = responseValues.Phone
+
+    const responseUser = await getUser(this.userid)
+    if (responseUser != null) {
+      this.search = responseUser.Name
+      this.model.Name = responseUser.Name
+      this.model.Email = responseUser.Email
+      this.model.ActiveDirectoryID = responseUser.ActiveDirectoryID
+      this.model.Phone = responseUser.Phone
+    } else {
+      this.$dialog.error({ text: 'Benutzer konnte nicht geladen werden', title: 'Fehler' })
+    }
   }
 
   public get isLoadingBool () {

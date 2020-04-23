@@ -176,6 +176,7 @@ import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import { mixins } from 'vue-class-component'
 import AllocationFormService from '../services/AllocationFormServices'
+import { refreshAllocations, editAllocation } from '../services/AllocationApiService'
 import moment from 'moment'
 
 @Component({
@@ -300,11 +301,12 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       data.to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
     }
 
-    const response = await Allocation.api().put(`allocations/edit/${this.eventId}`,
-      data
-    )
+    let success = await editAllocation(data)
+    if (success) this.$dialog.message.success('Bearbeitung gespeichert', { position: 'center-left' })
+    else this.$dialog.error({ text: 'Bearbeitung speichern fehlgeschlagen', title: 'Fehler' })
+
     await Allocation.update(data)
-    Allocation.api().get('allocations')
+    await refreshAllocations()
     this.$emit('updateview')
     this.dialog = false
   }

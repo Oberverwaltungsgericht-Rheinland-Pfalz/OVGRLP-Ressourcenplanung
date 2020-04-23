@@ -57,10 +57,6 @@
               <strong>Telefonnummer:</strong>
             </v-col>
             <v-col cols="3">{{ viewAllocation.ContactTel }}</v-col>
-            <!--<v-col cols="3">
-              <strong>Beschreibung:</strong>
-            </v-col>
-            <v-col cols="3">{{ viewAllocation.Description }}</v-col>-->
             <v-col cols="3">
               <strong>Notizen:</strong>
             </v-col>
@@ -149,6 +145,7 @@ import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import AllocationFormService from '@/services/AllocationFormServices'
 import { AllocationRequest, AllocationRequestView, UserData, ContactUser, AllocationModel } from '../models/interfaces'
 import { Allocation } from '../models'
+import { editAllocationStatus, refreshAllocations } from '../services/AllocationApiService'
 const namespace = 'user'
 
 @Component({ components: { DropDownTimePicker } })
@@ -243,22 +240,15 @@ export default class AcknowledgeView extends Mixins(AllocationFormService) {
   }
 
   public async saveStatus (task: AllocationModel, status: number) {
-    const editedRequest = { Id: task.Id, status, From: task.From, To: task.To }
-    const response = await fetch(`/api/allocations/editRequest`, {
-      method: 'PUT', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, cors, *same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(editedRequest)
-    })
-    Allocation.update({
+    let success = editAllocationStatus(task.Id, status, task.From, task.To)
+    if (success) this.$dialog.message.success('Bearbeitung erfolgreich', { position: 'center-left' })
+    else this.$dialog.error({ text: 'Bearbeitung konnte nicht gespeichert werden', title: 'Fehler' })
+
+    /* Allocation.update({
       where: task.Id,
       data: { From: task.From, To: task.To, Status: status }
-    })
-    Allocation.api().get('allocations')
+    }) */
+    await refreshAllocations()
     this.$emit('input', false)
   }
 }

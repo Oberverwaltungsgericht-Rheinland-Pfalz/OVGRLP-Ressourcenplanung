@@ -41,6 +41,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation } from '../models'
 import { AllocationRequest, AllocationModel } from '../models/interfaces'
 import moment from 'moment'
+import { deleteAllocation } from '../services/AllocationApiService'
 
 @Component
 export default class MyAllocationsList extends Vue {
@@ -101,19 +102,11 @@ export default class MyAllocationsList extends Vue {
     if (confirmation !== true) return
 
     const isLastAllocation = this.isLastAllocation(item.PurposeId)
-
-    try {
-      const responseDeleteAllocation = await Allocation.api().delete(
-        `allocations/${item.Id}`,
-        { delete: item.Id }
-      )
-    } catch (e) {
-      await this.$dialog.error({
-        text: 'Löschen fehlgeschlagen',
-        title: 'Warning'
-      })
-    }
+    let success = await deleteAllocation(item.Id)
+    if (success) this.$dialog.message.success('Löschung erfolgreich', { position: 'center-left' })
+    else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
   }
+
   private isLastAllocation (purposeID: number): boolean {
     const purposes = this.Requests.filter(
       (v: VisibleAllocation) => v.PurposeId === purposeID

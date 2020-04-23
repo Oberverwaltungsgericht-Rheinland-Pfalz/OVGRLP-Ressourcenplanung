@@ -192,7 +192,9 @@ import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../../models/interfaces'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import AllocationFormService from '../../services/AllocationFormServices'
+import CreateAllocationApiService from '../../services/CreateApiService'
 import moment from 'moment'
+import { submitAllocation, submitAllocations, refreshAllocations } from '../../services/AllocationApiService'
 
 @Component({
   components: {
@@ -238,24 +240,23 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
       HintsForSuppliers: this.GetHintsForSuppliers
     }
 
+    var success : boolean = false
     if (!this.isRepeating) {
-      await Allocation.api().post('allocations', newAllocation)
+      success = await submitAllocation(newAllocation)
+      if (success) this.$dialog.message.success('Speichern erfolgreich', { position: 'center-left' })
+      else this.$dialog.error({ text: 'Speichern fehlgeschlagen', title: 'Fehler' })
     } else {
       newAllocation.from = this.timeFrom
       newAllocation.to = this.timeTo
       newAllocation.dates = this.multipleDates
 
-      const response = await fetch(`/api/Allocations/PostAllocations`, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, cors, *same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newAllocation)
-      }).catch(() => this.$dialog.error({ text: 'Speichern fehlgeschlagen', title: 'Warning' }))
-      await Allocation.api().get('allocations')
+      success = await submitAllocations(newAllocation)
+    }
+    if (success) {
+      this.$dialog.message.success('Speichern erfolgreich', { position: 'center-left' })
+      await refreshAllocations()
+    } else {
+      this.$dialog.error({ text: 'Speichern fehlgeschlagen', title: 'Fehler' })
     }
   }
 

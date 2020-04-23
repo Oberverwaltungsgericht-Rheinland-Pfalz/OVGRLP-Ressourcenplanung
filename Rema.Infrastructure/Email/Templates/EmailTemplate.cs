@@ -21,12 +21,17 @@ namespace Rema.Infrastructure.Email.Templates
     public abstract string Subject { get; }
     public virtual IList<string> GetGroupEmails()
     {
-      var rList = new List<string>();
+      var rList = new HashSet<string>();
       foreach (var allocationGadget in _allocation.AllocationGadgets)
       {
         rList.Add(allocationGadget.Gadget.SuppliedBy.GroupEmail);
       }
-      return rList;
+      foreach (var hint in _allocation.HintsForSuppliers)
+      {
+        rList.Add(hint.Group.GroupEmail);
+      }
+
+      return rList.ToList();
     }
 
     public static string CREATED = "erstellt";
