@@ -79,6 +79,7 @@ import {
   Gadget
 } from '../../models'
 import { SupplierGroupModel, GadgetModel } from '../../models/interfaces'
+import { submitGadget, editGadget, deleteGadget } from '../../services/GadgetApiService'
 
 @Component({
   filters: {
@@ -143,12 +144,16 @@ export default class SupplierManagement extends Vue {
       SuppliedBy: this.editSupplier
     }
     if (this.dialog === 2) {
-      const response = await Gadget.api().put(`gadgets/${this.editId}`, data)
+      let success = await editGadget(data)
+      if (success) this.$dialog.message.success('Hilfsmittel gespeichert', { position: 'center-left' })
+      else this.$dialog.error({ text: 'Hilfsmittel speichern fehlgeschlagen', title: 'Fehler' })
       await Gadget.update(data)
     } else {
       const group = Supplier.find(this.editSupplier)
 
-      await Gadget.api().post('gadgets', data)
+      let success = await submitGadget(data)
+      if (success) this.$dialog.message.success('Hilfsmittel gespeichert', { position: 'center-left' })
+      else this.$dialog.error({ text: 'Hilfsmittel speichern fehlgeschlagen', title: 'Fehler' })
     }
     this.closeModal()
   }
@@ -172,14 +177,9 @@ export default class SupplierManagement extends Vue {
     })
 
     if (confirmation === true) {
-      try {
-        let response = await Gadget.api().delete(`gadgets/${item.Id}`, { delete: item.Id })
-      } catch (e) {
-        await this.$dialog.error({
-          text: 'Löschen fehlgeschlagen',
-          title: 'Warning'
-        })
-      }
+      let success = await deleteGadget(item.Id)
+      if (success) this.$dialog.message.success('Hilfsmittel gelöscht', { position: 'center-left' })
+      else this.$dialog.error({ text: 'Hilfsmittel löschen fehlgeschlagen', title: 'Fehler' })
     }
   }
 }

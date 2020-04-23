@@ -51,6 +51,8 @@ import { AllocationRequest, AllocationRequestView, UserData, ContactUser, Alloca
 import AcknowledgeView from './AcknowledgeView.vue'
 import { Allocation, Gadget, Ressource, Supplier } from '../models'
 import { Names } from '../store/user/types'
+import { refreshAllocations } from '../services/AllocationApiService'
+import { refreshGadgets } from '../services/GadgetApiService'
 
 const namespace = 'user'
 
@@ -134,10 +136,10 @@ export default class AcknowledgeList extends Vue {
       }))
   }
   public refreshAllocations () {
-    Gadget.api().get('gadgets')
+    refreshAllocations()
     Supplier.api().get('suppliergroups')
     Ressource.api().get('ressources')
-    Allocation.api().get('allocations')
+    refreshAllocations()
   }
   public async fillContactUsers () {
     const referencePersons = this.UnAcknowledgedAllocations.map((v: any) => v.ReferencePersonId)

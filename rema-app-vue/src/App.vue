@@ -124,6 +124,7 @@ import { Gadget, Ressource, Supplier, Allocation } from './models'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'
+import { refreshAllocations } from './services/AllocationApiService'
 
 @Component({
   components: { NewFormModal }
@@ -159,10 +160,12 @@ export default class App extends Vue {
       }
     })
 
-    Gadget.api().get('gadgets')
-    Supplier.api().get('suppliergroups')
-    Ressource.api().get('ressources')
-    Allocation.api().get('allocations')
+    let promise1 = Gadget.api().get('gadgets')
+    let promise2 = Supplier.api().get('suppliergroups')
+    let promise3 = Ressource.api().get('ressources')
+    let promise4 = refreshAllocations()
+
+    Promise.all([promise1, promise2, promise3, promise4])
   }
 }
 </script>
