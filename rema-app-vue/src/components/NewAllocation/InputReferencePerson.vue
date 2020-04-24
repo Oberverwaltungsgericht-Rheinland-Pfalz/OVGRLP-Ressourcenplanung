@@ -60,10 +60,8 @@ export default class InputReferencePerson extends Vue {
 
   @Watch('search')
   public async searchValueChanged (val: string, oldvalue: string) {
-    let loadStart = Date.now()
     // Lazily load input items
-    if (!val) return
-    if (val.length < 4) return
+    if (!val || val.length < 4) return
     if (val[val.length - 1] === ')') return
 
     setTimeout(this.fetchAdUsers, 400, ++this.requestCounter)

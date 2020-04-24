@@ -51,11 +51,22 @@ namespace Rema.WebApi
       services.AddScoped<IRessourceStore, RessourceStore>();
       services.AddScoped<ISupplierGroupStore, SupplierGroupStore>();
 
-      services.AddDbContext<RpDbContext>(
+
+#if DEBUG
+        services.AddDbContext<RpDbContext>(
         options =>
+        {
+          options
+          .EnableSensitiveDataLogging()
+          .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+        });
+#else
+      services.AddDbContext<RpDbContext>(
+      options =>
         {
           options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
         });
+#endif
 
       // Register the Swagger generator, defining 1 or more Swagger documents
       services.AddSwaggerGen(c =>
@@ -79,7 +90,7 @@ namespace Rema.WebApi
       });
 
       //besser: mit konfiguratiosklasse
-      Reader = new Role() { Level = 0, Name = "Reader", AdDescription = Configuration["Auth:Reader"] };
+      Reader = new Role() { Level = 1, Name = "Reader", AdDescription = Configuration["Auth:Reader"] };
       Editor = new Role() { Level = 10, Name = "Editor", AdDescription = Configuration["Auth:Editor"] };
       Admin = new Role() { Level = 100, Name = "Admin", AdDescription = Configuration["Auth:Admin"] };
     }

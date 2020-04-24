@@ -1,9 +1,11 @@
 <template>
   <v-app>
+    <v-progress-linear v-if="loading" style="z-index: 99;" absolute top indeterminate color="blue"/>
     <v-system-bar fixed app>
       Raumplanung (Version {{ $store.state.version }})
     </v-system-bar>
     <v-navigation-drawer
+      v-if="showNav"
       persistent
       :mini-variant="miniVariant"
       :clipped="clipped"
@@ -33,7 +35,7 @@
       <v-layout justify-space-between wrap align-center>
         <div class="text-center">
           <new-form-modal />&ensp;
-          <v-menu v-if="!drawer" offset-y open-on-hover>
+          <v-menu v-if="!drawer && showNav" offset-y open-on-hover>
             <template v-slot:activator="{ on }">
               <v-btn color="primary" dark v-on="on">
                 <v-icon>more_vert</v-icon>Navigation
@@ -146,7 +148,11 @@ export default class App extends Vue {
   private right: boolean = true
   private title: string = 'NJZ Raumplanung'
   private items: RemaRouteConfig[] = []
+  private loading: boolean = true
 
+  public get showNav () : boolean {
+    return this.userData.roleNames.length > 0
+  }
   public async created () {
     await this.loadUser()
     ;(this.$router as any).options.routes.forEach((route: any) => {
@@ -166,6 +172,7 @@ export default class App extends Vue {
     let promise4 = refreshAllocations()
 
     Promise.all([promise1, promise2, promise3, promise4])
+    this.loading = false
   }
 }
 </script>
