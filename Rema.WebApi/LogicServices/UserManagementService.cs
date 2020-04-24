@@ -25,7 +25,7 @@ namespace Rema.WebApi.LogicServices
 
     private bool IsUserInDb(out User user, string activeDirectoryId)
     {
-      var dbUser = _context.Users/*.AsNoTracking()*/.FirstOrDefault(p => p.ActiveDirectoryID == activeDirectoryId);
+      var dbUser = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == activeDirectoryId);
       user = dbUser;
       return dbUser != null;
     }
@@ -41,7 +41,7 @@ namespace Rema.WebApi.LogicServices
       var adUserObj = GetUserByActiveDirectoryId(adID);
       UpdateOrInsert(dbUser, adUserObj, false);
 
-      var updatedUser = _context.Users/*.AsNoTracking()*/.FirstOrDefault(p => p.ActiveDirectoryID == adID);
+      var updatedUser = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == adID);
       return updatedUser;
     }
 
@@ -51,7 +51,7 @@ namespace Rema.WebApi.LogicServices
       var adUserObj = GetUserByActiveDirectoryId(adID);
       UpdateOrInsert(dbUser, adUserObj, isInDb);
 
-      var updatedUser = _context.Users/*.AsNoTracking()*/.FirstOrDefault(p => p.ActiveDirectoryID == adID);
+      var updatedUser = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == adID);
 
       return updatedUser;
     }
@@ -70,7 +70,6 @@ namespace Rema.WebApi.LogicServices
           fromAd.Id = fromDb.Id;
           _context.Entry(fromDb).CurrentValues.SetValues(fromAd);
           _context.SaveChanges();
-         // _context.Entry(fromDb).State = EntityState.Detached;
         }
       }
       catch (Exception ex)
@@ -88,16 +87,10 @@ namespace Rema.WebApi.LogicServices
       //If you omit this, it will end up getting every attribute with a value,
       //which is unnecessary.
       user.RefreshCache(new[] { "givenName", "sn", "mail", "displayName", "company", "name" });
-      /*
-      foreach(System.DirectoryServices.PropertyValueCollection p in user.Properties) {
-        Debug.WriteLine(p.PropertyName);
-        Debug.WriteLine(p.Value);
-      }
-      */
 
       var firstName = user.Properties["givenName"].Value;
       var lastName = user.Properties["sn"].Value;
-      var mail = (string)user.Properties["mail"].Value;
+      var mail = (string)user.Properties["mail"].Value ?? "support@ovg.jm.rlp.de"; // todo: falls nutzer keine Email in Ad hat, sollte Ausnahme sein. Bessere Lösung finden
       var displayName = user.Properties["displayName"].Value;
       var company = (string)user.Properties["company"].Value;
       var name = (string)user.Properties["name"].Value;

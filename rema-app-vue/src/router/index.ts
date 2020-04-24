@@ -17,15 +17,13 @@ export default new Router({
       authLevel: 0,
       component: () => import('@/views/Calendar.vue')
     } as RemaRouteConfig,
-    /*  {
-          path: '/multi-select',
-          name: 'multiselector',
-          icon: 'calendar_today',
-          // route level code-splitting
-          // this generates a separate chunk (about.[hash].js) for this route
-          // which is lazy-loaded when the route is visited.
-          component: () => import( './views/MutliDates.vue')
-     //   } as MyRouteConfig, */
+    {
+      path: '/overview',
+      name: 'Terminübersicht',
+      icon: 'storage',
+      authLevel: 1,
+      component: () => import('@/components/AllList.vue')
+    } as RemaRouteConfig,
     {
       path: '/acknowledge',
       name: 'Anfragenverwaltung',
@@ -38,7 +36,7 @@ export default new Router({
       path: '/mylist',
       name: 'Ihre Anfragen',
       icon: 'calendar_view_day',
-      authLevel: 0,
+      authLevel: 1,
       component: () => import('@/components/MyList.vue')
     } as RemaRouteConfig,
     {
@@ -54,14 +52,14 @@ export default new Router({
       path: '/occupancy',
       name: 'Scheduler',
       icon: 'schedule',
-      authLevel: 0,
+      authLevel: 1,
       component: () => import('@/views/Occupancy.vue')
     } as RemaRouteConfig,
     {
       path: '/supports',
       name: 'Aufgaben',
       icon: 'group_work',
-      authLevel: 0,
+      authLevel: 1,
       beforeEnter: (to, from, next) => requireAuth(0, to, from, next),
       component: () => import('@/views/Supporters.vue')
     } as RemaRouteConfig
@@ -91,4 +89,4 @@ function requireAuth (level: number, to: any, from: any, next: any) {
   }
 }
 
-// const roles = { admin: 100, editor: 10 }
+// const roles = { admin: 100, editor: 10, reader: 1, 'unknown':0 }

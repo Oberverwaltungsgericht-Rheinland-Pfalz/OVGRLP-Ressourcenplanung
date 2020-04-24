@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" scrollable persistent max-width="1200px">
     <template v-slot:activator="{ on }">
-      <v-btn color="success" dark v-on="on">
+      <v-btn v-if="permissionToEdit" color="success" dark v-on="on">
         <v-icon>add</v-icon>Termin anlegen
       </v-btn>
     </template>
@@ -21,6 +21,11 @@ export default class NewFormModal extends Vue {
   public dialog: boolean = false;
   public get title () {
     return 'Neue Terminanfrage stellen / Termin eintragen'
+  }
+  public get permissionToEdit (): boolean {
+    // feature: wenn Anfragen möglich sein sollen
+    // ändern so das alle eine mit mind. Leserechten Anfragen stellen können
+    return this.$store.state.user.role >= 10
   }
 }
 </script>
