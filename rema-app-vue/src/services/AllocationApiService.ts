@@ -4,10 +4,10 @@ export async function editAllocationStatus (Id: number, status: number, From: st
   const editedRequest = { Id, status, From, To }
   try {
     const response = await fetch(`/api/allocations/editRequest`, {
-      method: 'PUT', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, cors, *same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
+      method: 'PUT',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -22,10 +22,10 @@ export async function editAllocationStatus (Id: number, status: number, From: st
 export async function submitAllocations (newAllocations: object): Promise<boolean> {
   try {
     const response = await fetch(`/api/Allocations/PostAllocations`, {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, cors, *same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json'
       },

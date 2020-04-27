@@ -85,7 +85,7 @@ namespace Rema.WebApi.Controllers
         return NotFound();
       }
     }
-
+/*
     // PUT: allocations/5
     [HttpPut("{id}")]
     public async Task<IActionResult> PutAllocation(long id, AllocationViewModel allocationVM)
@@ -139,7 +139,7 @@ namespace Rema.WebApi.Controllers
       }
 
       return Ok();
-    }
+    } */
 
 
     // POST: allocation
@@ -504,6 +504,7 @@ namespace Rema.WebApi.Controllers
 
     // DELETE: allocations/5
     [HttpDelete("{id}")]
+    [AuthorizeAd("Editor")]
     public async Task<ActionResult<Allocation>> DeleteAllocation(long id)
     {
       Allocation allocation;
@@ -530,6 +531,14 @@ namespace Rema.WebApi.Controllers
         return NotFound();
       }
 
+      bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) ||
+          (allocation.CreatedBy.Id == base.RequestSenderVM.Id && allocation.Status == MeetingStatus.Pending);
+      if (!hasRight)
+      {
+        Log.Warning("User {user} was restricted to change allocation {allocation}", base.RequestSenderVM, allocation);
+        return new UnauthorizedResult();
+      }
+
       try
       {
         _context.Allocations.Remove(allocation);
@@ -547,6 +556,7 @@ namespace Rema.WebApi.Controllers
    
     // PUT: allocations/editRequest
     [HttpPut("editRequest/")]
+    [AuthorizeAd("Editor")]
     public async Task<ActionResult<Boolean>> EditRequest(AllocationRequestEdition editedRequest)
     {
       // Todo: klären ob eine Absage gleichbedeutend mit einer Löschung ist
@@ -624,6 +634,7 @@ namespace Rema.WebApi.Controllers
     
     // PUT: allocations/{editAllocation}
     [HttpPut("edit/{editAllocation}")]
+    [AuthorizeAd("Editor")]
     public async Task<ActionResult<Boolean>> EditAllocation(AllocationViewModel allocationVM)
     {
       Log.Information("PUT allocations/editAllocation: {allocationModel}", allocationVM);

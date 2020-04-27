@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" scrollable persistent max-width="1200px">
     <template v-slot:activator="{ on }">
-      <v-btn v-if="permissionToEdit" color="success" dark v-on="on">
+      <v-btn v-show="permissionToEdit" color="success" dark v-on="on">
         <v-icon>add</v-icon>Termin anlegen
       </v-btn>
     </template>

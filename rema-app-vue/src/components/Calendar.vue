@@ -62,11 +62,11 @@
             <v-toolbar :color="selectedEvent.color" dark>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
-              <v-btn @click="deleteAllocation" fab small outlined><v-icon small>delete</v-icon>
-              </v-btn><span>&emsp;</span>
-              <edit-form-modal v-if="selectedOpen" :eventId="selectedEvent.id" @updateview="selectedOpen = false">
-                <v-icon small>edit</v-icon>
-              </edit-form-modal>
+                <v-btn v-show="permissionToEdit" @click="deleteAllocation" fab small outlined><v-icon small>delete</v-icon>
+                </v-btn><span>&emsp;</span>
+                <edit-form-modal v-if="selectedOpen && permissionToEdit" :eventId="selectedEvent.id" @updateview="selectedOpen = false">
+                  <v-icon small>edit</v-icon>
+                </edit-form-modal>
             </v-toolbar>
             <v-card-text>
               <p>{{selectedEvent.schedule}}</p>
