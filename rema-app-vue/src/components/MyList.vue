@@ -63,8 +63,11 @@ export default class MyAllocationsList extends Vue {
     return allocations.length
   }
   public get Requests (): VisibleAllocation[] {
+    let myId = this.$store.state.user.id
     const allocations = Allocation.query().withAll()
-      .where('CreatedById', this.$store.state.user.id)
+      .where((record : any, query: any) => {
+        query.where('CreatedById', myId).orWhere('ReferencePersonId', `${myId}`)
+      })
       .where((a: any) => {
         return !this.hideOld || Date.parse(a.To) > Date.now()
       })

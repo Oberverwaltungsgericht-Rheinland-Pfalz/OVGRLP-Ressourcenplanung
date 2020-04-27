@@ -142,7 +142,9 @@ export default class AcknowledgeList extends Vue {
     refreshAllocations()
   }
   public async fillContactUsers () {
-    const referencePersons = this.UnAcknowledgedAllocations.map((v: any) => v.ReferencePersonId)
+    let referencePersons = this.UnAcknowledgedAllocations.map((v: any) => v.ReferencePersonId)
+    referencePersons = [...new Set(referencePersons)] // remove duplicates
+    referencePersons = referencePersons.filter((v: number) => v !== 0) // remove 0
     let hasAllUsernames = referencePersons.every((id: number) => this.ContactUsers.find((v: ContactUser) => v.Id === id))
 
     if (!hasAllUsernames) this.loadUsers(referencePersons)
