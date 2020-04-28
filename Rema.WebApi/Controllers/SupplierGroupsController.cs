@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Rema.DbAccess;
 using Rema.Infrastructure.Models;
+using Rema.ServiceLayer.Interfaces;
 using Rema.WebApi.Filter;
 using Serilog;
 
@@ -18,8 +19,10 @@ namespace Rema.WebApi.Controllers
   [AuthorizeAd("Reader")]
   public class SupplierGroupsController : BaseController
   {
-    public SupplierGroupsController(RpDbContext context, IMapper mapper) : base(context, mapper)
+    public ISupplierGroupsService _groupsService;
+    public SupplierGroupsController(RpDbContext context, IMapper mapper, ISupplierGroupsService groupsService) : base(context, mapper)
     {
+      this._groupsService = groupsService;
     }
 
     // GET: suppliergroups
@@ -27,16 +30,9 @@ namespace Rema.WebApi.Controllers
     public async Task<ActionResult<IEnumerable<SupplierGroup>>> GetSupplierGroups()
     {
       Log.Information("GET suppliergroups");
-
-      try
-      {
-        return await _context.SupplierGroups.ToListAsync();
-      }
-      catch(Exception ex)
-      {
-        Log.Error(ex, "error while getting suppliergroups");
-        return NotFound();
-      }
+      var groups = await _groupsService.GetSupplierGroups();
+      if (groups == null) return NotFound();
+      return groups.ToList();
     }
 
     // GET: suppliergroups/5
@@ -45,20 +41,9 @@ namespace Rema.WebApi.Controllers
     {
       Log.Information("GET suppliergroups/{id}", id);
 
-      try
-      {
-        var supplierGroup = await _context.SupplierGroups.FindAsync(id);
-        if (supplierGroup == null)
-        {
-          return NotFound();
-        }
-        return supplierGroup;
-      }
-      catch(Exception ex)
-      {
-        Log.Error(ex, "error while getting suppliergroup");
-        return NotFound();
-      }
+      var group = await _groupsService.GetSupplierGroup(id);
+      if (group == null) return NotFound();
+      return group;
     }
 
     // PUT: suppliergroups/5
@@ -72,18 +57,9 @@ namespace Rema.WebApi.Controllers
       {
         return BadRequest();
       }
-
-      try
-      { 
-        _context.Entry(supplierGroup).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while saving changed suppliergroup");
-        return Conflict();
-      }
+      var success = await _groupsService.PutSupplierGroup(supplierGroup);
+      if (success) return NoContent();
+      else return Conflict();
     }
 
     // POST: suppliergroups
@@ -92,18 +68,9 @@ namespace Rema.WebApi.Controllers
     public async Task<ActionResult<SupplierGroup>> PostSupplierGroup(SupplierGroup supplierGroup)
     {
       Log.Information("POST suppliergroups: {supplierGroup}", supplierGroup);
-
-      try
-      {
-        _context.SupplierGroups.Add(supplierGroup);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction("GetSupplierGroup", new { id = supplierGroup.Id }, supplierGroup);
-      }
-      catch(Exception ex)
-      {
-        Log.Error(ex, "error while saving new suppliergroup");
-        return Conflict();
-      }
+      var success = await _groupsService.PostSupplierGroup(supplierGroup);
+      if (!success) return Conflict();
+      return CreatedAtAction("GetSupplierGroup", new { id = supplierGroup.Id }, supplierGroup);
     }
 
     // DELETE: suppliergroups/5
@@ -113,33 +80,9 @@ namespace Rema.WebApi.Controllers
     {
       Log.Information("DELETE suppliergroup/{id}", id);
 
-      SupplierGroup supplierGroup;
-
-      try
-      {
-        supplierGroup = await _context.SupplierGroups.FindAsync(id);
-        if (supplierGroup == null)
-        {
-          return NotFound();
-        }
-      }
-      catch(Exception ex)
-      {
-        Log.Error(ex, "error while getting suppliergroup");
-        return NotFound();
-      }
-
-      try
-      {
-        _context.SupplierGroups.Remove(supplierGroup);
-        await _context.SaveChangesAsync();
-        return NoContent();
-      }
-      catch(Exception ex)
-      {
-        Log.Error(ex, "error while remoning suppliergrup");
-        return Conflict();
-      }
+      var success = await _groupsService.DeleteSupplierGroup(id);
+      if (!success) return NotFound();
+      return NoContent();
     }
   }
 }
