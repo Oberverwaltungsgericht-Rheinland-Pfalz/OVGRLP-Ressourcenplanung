@@ -8,7 +8,7 @@ using Rema.Infrastructure.LDAP;
 using Rema.Infrastructure.Models;
 using Rema.WebApi.ViewModels;
 
-namespace Rema.ServiceLayer
+namespace Rema.ServiceLayer.Interfaces
 {
   public interface IUserService
   {

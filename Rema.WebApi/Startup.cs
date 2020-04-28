@@ -14,6 +14,7 @@ using Rema.DbAccess;
 using Rema.DbAccess.Stores;
 using Rema.Infrastructure.Contracts.Stores;
 using Rema.ServiceLayer;
+using Rema.ServiceLayer.Interfaces;
 using Rema.ServiceLayer.Services;
 using Rema.WebApi.ViewModels;
 
@@ -53,9 +54,10 @@ namespace Rema.WebApi
       services.AddScoped<ISupplierGroupStore, SupplierGroupStore>();
 
       services.AddScoped<IUserService, UsersService>();
+      services.AddScoped<ISupplierGroupsService, SupplierGroupsService>();
 
 #if DEBUG
-        services.AddDbContext<RpDbContext>(
+      services.AddDbContext<RpDbContext>(
         options =>
         {
           options

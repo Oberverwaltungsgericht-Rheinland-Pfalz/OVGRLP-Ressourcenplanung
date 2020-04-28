@@ -13,4 +13,12 @@
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="WebApi\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rema.WebApi\Rema.WebApi.csproj" />
+  </ItemGroup>
+
 </Project>

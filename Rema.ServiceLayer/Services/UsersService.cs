@@ -9,6 +9,7 @@ using Rema.Infrastructure.LDAP;
 using Rema.Infrastructure.Models;
 using Rema.WebApi.ViewModels;
 using Serilog;
+using Rema.ServiceLayer.Interfaces;
 
 namespace Rema.ServiceLayer.Services
 {

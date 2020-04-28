@@ -15,6 +15,7 @@ using Rema.ServiceLayer.Services;
 using Microsoft.Extensions.Primitives;
 using Rema.Infrastructure.Contracts.Services;
 using Rema.ServiceLayer;
+using Rema.ServiceLayer.Interfaces;
 
 namespace Rema.WebApi.Controllers
 {
@@ -116,16 +117,7 @@ namespace Rema.WebApi.Controllers
       }
     }
 
-    // GET: users/contact/?namepart=NAMEPART
-    [HttpGet("contact")]
-    public ActionResult<ContactUser> GetContactUser(string namepart)
-    {
-      Log.Information("GET users/contact/?namepart=NAMEPART: {namepart}", namepart);
-      // lookup ldap for user
-      // return list of users as contactUser
-      return null;
-    }
-
+    /* Benutzer werden nicht manuell bearbeitet. Sie werden vom Webserver bei Bedarf angelegt und geändert. Eine Löschung ist nicht vorgesehen
     // PUT: users/5
     [HttpPut("{id}")]
     [AuthorizeAd("Admin")]
@@ -170,7 +162,7 @@ namespace Rema.WebApi.Controllers
         return Conflict();
       }
     }
-
+    
     // DELETE: users/5
     [HttpDelete("{id}")]
     [AuthorizeAd("Admin")]
@@ -206,5 +198,6 @@ namespace Rema.WebApi.Controllers
         return Conflict();
       }
     }
+    */
   }
 }
