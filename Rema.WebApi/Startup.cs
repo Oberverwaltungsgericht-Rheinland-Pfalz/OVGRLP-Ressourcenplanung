@@ -13,6 +13,7 @@ using Newtonsoft.Json.Serialization;
 using Rema.DbAccess;
 using Rema.DbAccess.Stores;
 using Rema.Infrastructure.Contracts.Stores;
+using Rema.ServiceLayer;
 using Rema.ServiceLayer.Services;
 using Rema.WebApi.ViewModels;
 
@@ -51,6 +52,7 @@ namespace Rema.WebApi
       services.AddScoped<IRessourceStore, RessourceStore>();
       services.AddScoped<ISupplierGroupStore, SupplierGroupStore>();
 
+      services.AddScoped<IUserService, UsersService>();
 
 #if DEBUG
         services.AddDbContext<RpDbContext>(
