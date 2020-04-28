@@ -13,6 +13,8 @@ using Rema.WebApi.ViewModels;
 using Serilog;
 using Rema.ServiceLayer.Services;
 using Microsoft.Extensions.Primitives;
+using Rema.Infrastructure.Contracts.Services;
+using Rema.ServiceLayer;
 
 namespace Rema.WebApi.Controllers
 {
@@ -22,10 +24,12 @@ namespace Rema.WebApi.Controllers
   [AuthorizeAd("Reader")]
   public class UsersController : BaseController
   {
-    private IAdService _adService;
-    public UsersController(RpDbContext context, IMapper mapper, IAdService adService) : base(context, mapper)
+    private readonly IAdService _adService;
+    private readonly IUserService _userService;
+    public UsersController(RpDbContext context, IMapper mapper, IAdService adService, IUserService userService) : base(context, mapper)
     {
       this._adService = adService;
+      this._userService = userService;
     }
 
     // GET: users
@@ -33,6 +37,7 @@ namespace Rema.WebApi.Controllers
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
       Log.Information("GET users");
+
       try
       {
         return await _context.Users.ToListAsync();
@@ -50,21 +55,12 @@ namespace Rema.WebApi.Controllers
     {
       Log.Information("GET users/{id}", id);
 
-      try
+      var returnUser = await _userService.GetUser(_context.Users, id);
+      if (returnUser == null)
       {
-        var user = await _context.Users.FindAsync(id);
-        if (user == null)
-        {
-          return NotFound();
-        }
-        var returnUser = new AdUserViewModel() { ActiveDirectoryID = user.ActiveDirectoryID, Email = user.Email, Name = user.Name};
-        return returnUser;
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting user");
         return NotFound();
       }
+      return returnUser;
     }
 
     // GET: adUser/name/5
@@ -88,63 +84,20 @@ namespace Rema.WebApi.Controllers
     {
       Log.Information("GET users/name/{id}", id);
 
-      User user;
-      try
-      {
-        user = await _context.Users.FindAsync(id);
-        if (user == null)
-        {
-          return NotFound();
-        }
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting user");
-        return NotFound();
-      }
-
-      try
-      {
-        var userVM = _mapper.Map<User, ContactUser>(user);
-        return userVM;
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while mapping user");
-        return Conflict();
-      }
+      var userObject = await _userService.GetUserName(_context.Users, _mapper , id);
+      if (userObject == null) return NotFound();
+      return userObject;
     }
+
     // GET: users/names/[] array as underline separated numbers
     [HttpGet("names/{ids}")]
     public async Task<ActionResult<List<ContactUser>>> GetUserNames(string ids)
     {
       Log.Information("GET users/names/{id}", ids);
       var idArray = ids.Split('_').Select(e => long.Parse(e));
-      IList<User> users;
-      try
-      {
-        users = await _context.Users.Where(e => idArray.Contains(e.Id)).ToListAsync();
-        if (users == null)
-        {
-          return NotFound();
-        }
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting user");
-        return NotFound();
-      }
-
-      try
-      {
-        var userVM = users.Select(_mapper. Map<User, ContactUser>).ToList();
-        return userVM;
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while mapping user");
-        return Conflict();
-      }
+      var userVM = await _userService.GetUserNames(_context.Users, _mapper, idArray);
+      if (userVM == null) return NotFound();
+      return userVM;
     }
 
     // GET: users/me
@@ -175,6 +128,7 @@ namespace Rema.WebApi.Controllers
 
     // PUT: users/5
     [HttpPut("{id}")]
+    [AuthorizeAd("Admin")]
     public async Task<IActionResult> PutUser(long id, User user)
     {
       Log.Information("PUT users/{id}: {user}", id, user);
@@ -199,6 +153,7 @@ namespace Rema.WebApi.Controllers
 
     // POST: users
     [HttpPost]
+    [AuthorizeAd("Admin")]
     public async Task<ActionResult<User>> PostUser(User user)
     {
       Log.Information("POST users: {user}", user);
@@ -218,6 +173,7 @@ namespace Rema.WebApi.Controllers
 
     // DELETE: users/5
     [HttpDelete("{id}")]
+    [AuthorizeAd("Admin")]
     public async Task<ActionResult<User>> DeleteUser(long id)
     {
       Log.Information("DELETE users/{id}", id);

@@ -56,7 +56,8 @@
           </v-menu>
         </div>
         <v-spacer></v-spacer>
-        <h3>Raumplanung - {{ currentPath }}</h3>
+        <h3 v-if="!loading"><span id="bigTitle">Raumplanung - </span>{{ currentPath }}</h3>
+        <h3 v-else>Programm wird gestartet...</h3>
         <v-spacer></v-spacer>
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
@@ -109,7 +110,7 @@
     </v-app-bar>
 
     <v-content>
-      <v-container fluid>
+      <v-container v-if="!loading" fluid>
         <router-view />
       </v-container>
     </v-content>
@@ -154,6 +155,11 @@ export default class App extends Vue {
     return this.userData.roleNames.length > 0
   }
   public async created () {
+    let promise1 = Gadget.api().get('gadgets')
+    let promise2 = Supplier.api().get('suppliergroups')
+    let promise3 = Ressource.api().get('ressources')
+    let promise4 = refreshAllocations()
+
     await this.loadUser()
     ;(this.$router as any).options.routes.forEach((route: any) => {
       if (this.$store.state.user.role >= route.authLevel) {
@@ -166,11 +172,6 @@ export default class App extends Vue {
       }
     })
 
-    let promise1 = Gadget.api().get('gadgets')
-    let promise2 = Supplier.api().get('suppliergroups')
-    let promise3 = Ressource.api().get('ressources')
-    let promise4 = refreshAllocations()
-
     Promise.all([promise1, promise2, promise3, promise4])
     this.loading = false
   }
@@ -178,7 +179,11 @@ export default class App extends Vue {
 </script>
 
 <style lang="stylus" scoped>
-.action-avatar {
-  cursor: pointer;
-}
+.action-avatar
+  cursor pointer
+
+@media (max-width: 768px)
+  #bigTitle
+   display none
+
 </style>

@@ -75,7 +75,7 @@ export default class AllList extends Vue {
       ...v,
       // @ts-ignore
       Status: this.$options.filters.status2string(v.Status),
-      Ressource: v.Ressource.Name
+      Ressource: (v.Ressource || { Name: '' }).Name
     }))
   }
 }
