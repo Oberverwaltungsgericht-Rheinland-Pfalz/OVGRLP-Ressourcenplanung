@@ -10,8 +10,8 @@ using Rema.DbAccess;
 namespace Rema.DbAccess.Migrations
 {
     [DbContext(typeof(RpDbContext))]
-    [Migration("20200225092147_scheduleSeries_added")]
-    partial class scheduleSeries_added
+    [Migration("20200429075105_Initial_0-9-6")]
+    partial class Initial_096
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,9 +33,6 @@ namespace Rema.DbAccess.Migrations
 
                     b.Property<long?>("ApprovedById")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("ContactName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactPhone")
                         .HasColumnType("nvarchar(max)");
@@ -70,6 +67,9 @@ namespace Rema.DbAccess.Migrations
 
                     b.Property<Guid?>("ScheduleSeriesGuid")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SerializedHints")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -180,14 +180,9 @@ namespace Rema.DbAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<long?>("UserId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Title");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("SupplierGroups");
                 });
@@ -269,13 +264,6 @@ namespace Rema.DbAccess.Migrations
                     b.HasOne("Rema.Infrastructure.Models.SupplierGroup", "SuppliedBy")
                         .WithMany()
                         .HasForeignKey("SuppliedById");
-                });
-
-            modelBuilder.Entity("Rema.Infrastructure.Models.SupplierGroup", b =>
-                {
-                    b.HasOne("Rema.Infrastructure.Models.User", null)
-                        .WithMany("SupplierGroups")
-                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }
