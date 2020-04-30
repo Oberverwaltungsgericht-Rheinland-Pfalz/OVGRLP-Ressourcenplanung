@@ -32,9 +32,6 @@ namespace Rema.DbAccess.Migrations
                     b.Property<long?>("ApprovedById")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("ContactName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ContactPhone")
                         .HasColumnType("nvarchar(max)");
 
