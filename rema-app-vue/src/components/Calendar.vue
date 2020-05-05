@@ -29,13 +29,17 @@
             </v-card>
           </v-dialog>
           <v-spacer/>
+          <label id="showWe">
+            <v-icon v-if="showWE">visibility</v-icon>
+            <v-icon v-else>visibility_off</v-icon>&ensp;WE<input hidden v-model="showWE" type="checkbox"/>
+            </label>
           <v-radio-group v-model="currentview" row>
             <v-radio v-for="n in types" :key="'ansicht'+n" :label="typeName(n)" :value="n"/>
           </v-radio-group>
         </v-toolbar>
       </v-sheet>
 
-      <v-sheet  height="600">
+      <v-sheet id="calendar-sheet" height="600">
         <v-calendar
           ref="calendar"
           v-model="focus"
@@ -45,7 +49,7 @@
           :event-margin-bottom="3"
           :now="today"
           :type="currentview"
-          :weekdays="[1, 2, 3, 4, 5, 6, 0]"
+          :weekdays="weekdays"
           :short-weekdays="false"
           @click:event="showEvent"
           @click:more="viewDay"
@@ -117,7 +121,11 @@ export default class Calendar extends Vue {
   private selectedOpen: Boolean = false
   private titleFilter: string[] = []
   private showFilterModal: boolean = false
+  private showWE: boolean = true
 
+  public get weekdays (): number[] {
+    return this.showWE ? [1, 2, 3, 4, 5, 6, 0] : [1, 2, 3, 4, 5]
+  }
   public typeName (s: string) {
     switch (s) {
       case 'month': return 'Monat'
@@ -316,4 +324,13 @@ function GetGroupName (id : number) : string {
 <style lang="stylus" >
 #pad-bot-twenty
   padding-bottom 20em
+
+#showWe
+  margin-top -1.5em
+  padding-right .5em
+  i
+    color: #82b1ff !important;
+#calendar-sheet
+  .v-calendar-monthly .pl-1 > strong
+    display none
 </style>
