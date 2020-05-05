@@ -2,6 +2,7 @@
 const Agent = require('agentkeepalive')
 
 module.exports = {
+  chainWebpack: config => config.optimization.minimize(false),
   transpileDependencies: ['vuetify'],
   devServer: {
     port: 5002,

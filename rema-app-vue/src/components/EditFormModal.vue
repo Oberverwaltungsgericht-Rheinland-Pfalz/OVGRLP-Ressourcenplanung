@@ -267,7 +267,6 @@ export default class EditFormModal extends mixins(AllocationFormService) {
     if (!this.dateOfSeries && this.isRepeating) rValue = false
     if (!this.timeTo && !this.fullday) rValue = false
     if (!this.timeFrom && !this.fullday) rValue = false
-    if (!this.ReferencePersonId) rValue = false
     if (this.dateTo === this.dateFrom && (this.timeFrom >= this.timeTo)) rValue = false
 
     return !rValue

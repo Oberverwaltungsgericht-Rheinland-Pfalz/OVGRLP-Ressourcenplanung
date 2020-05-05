@@ -192,7 +192,6 @@ import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../../models/interfaces'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import AllocationFormService from '../../services/AllocationFormServices'
-import CreateAllocationApiService from '../../services/CreateApiService'
 import moment from 'moment'
 import { submitAllocation, submitAllocations, refreshAllocations } from '../../services/AllocationApiService'
 
