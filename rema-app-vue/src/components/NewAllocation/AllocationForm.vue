@@ -210,10 +210,6 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   private showMultipleDatesMenu: boolean = false
   public isRepeating: boolean = false
 
-  private get permissionToEdit (): boolean {
-    return this.$store.state.user.role >= 10
-  }
-
   private async sendAllocation (status: number) {
     if (this.isFormInvalid()) return
     this.saveAllocation(status)

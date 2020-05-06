@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" scrollable persistent max-width="1200px">
     <template v-slot:activator="{ on }">
-      <v-btn v-on="on" fab small outlined>
+      <v-btn v-on="on" fab small outlined v-show="!show">
         <slot></slot>
       </v-btn>
     </template>
@@ -184,6 +184,7 @@ import moment from 'moment'
 })
 export default class EditFormModal extends mixins(AllocationFormService) {
   @Prop(Number) private eventId!: number
+  @Prop(Boolean) private show! : boolean
 
   private menu1: boolean = false
   private title: String = ''
@@ -207,8 +208,15 @@ export default class EditFormModal extends mixins(AllocationFormService) {
   public isRepeating: boolean = false
   public dialog: boolean = false
 
+  private mounted () {
+    this.dialog = this.show
+  }
+  @Watch('show')
+  public toggle (newVal: boolean) {
+    this.dialog = newVal
+  }
   @Watch('dialog')
-  private async watchDialog (newVal:boolean) {
+  public async watchDialog (newVal:boolean) {
     if (newVal) {
       let all : any = Allocation.find(this.eventId)
       this.eventAllocation = all
@@ -252,10 +260,6 @@ export default class EditFormModal extends mixins(AllocationFormService) {
 
   private get wasRepeating () : boolean {
     return !!this.eventAllocation.ScheduleSeries
-  }
-
-  private get permissionToEdit (): boolean {
-    return this.$store.state.user.role >= 10
   }
 
   public get formInvalid () {

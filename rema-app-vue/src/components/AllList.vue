@@ -28,8 +28,12 @@
       <template v-slot:item.LastModified="{ item }">{{item.LastModified | toLocal}}</template>
       <template v-slot:item.From="{ item }">{{item.From | toLocal}}</template>
       <template v-slot:item.To="{ item }">{{item.To | toLocal}}</template>
-      <template v-slot:item.action="{ item }">
-        <v-icon @click="deleteItem(item)">delete</v-icon>
+      <template v-if="permissionToEdit" v-slot:item.action="{ item }">
+        <v-icon @click="deleteItem(item)">delete</v-icon>&emsp;
+        <v-icon @click="editItem(item.Id)">edit</v-icon>
+        <edit-form-modal v-if="selectedOpen == item.Id" :show="true" :eventId="item.Id" @updateview="selectedOpen = -1">
+<span/>
+        </edit-form-modal>
       </template>
     </v-data-table>
     <h3 v-else>Es liegen keine Terminanfragen von Ihnen vor</h3>
@@ -42,12 +46,17 @@ import { Allocation } from '../models'
 import { AllocationRequest, AllocationModel } from '../models/interfaces'
 import moment from 'moment'
 import { deleteAllocation } from '../services/AllocationApiService'
+import EditFormModal from './EditFormModal.vue'
 
-@Component
+@Component({
+  components: { EditFormModal }
+})
 export default class AllList extends Vue {
   private search: string = ''
   private hideOld: boolean = true
+  private selectedOpen: number = -1
   private headers: object[] = [
+    { text: 'Bearbeiten', value: 'action', sortable: false },
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Status', value: 'Status' },
     { text: 'Raum', value: 'Ressource' },
@@ -55,6 +64,9 @@ export default class AllList extends Vue {
     { text: 'Bis', value: 'To' },
     { text: 'Zuletzt geändert', value: 'LastModified' }
   ];
+  public editItem (id: number) {
+    this.selectedOpen = id
+  }
   public get hasItems () {
     const allocations = Allocation.query()
       .withAll()
@@ -77,6 +89,33 @@ export default class AllList extends Vue {
       Status: this.$options.filters.status2string(v.Status),
       Ressource: (v.Ressource || { Name: '' }).Name
     }))
+  }
+
+  private async deleteItem (item: VisibleAllocation) {
+    const confirmation = await this.$dialog.confirm({
+      text: `Möchten sie diese Buchung ${item.Title} wirklich löschen?`,
+      title: 'Löschen bestätigen',
+      persistent: true,
+      actions: [
+        { text: 'Nein', color: 'blue', key: false },
+        { text: 'Löschen', color: 'red', key: true }
+      ]
+    })
+
+    if (confirmation !== true) return
+
+    const isLastAllocation = this.isLastAllocation(item.PurposeId)
+    let success = await deleteAllocation(item.Id)
+    if (success) this.$dialog.message.success('Löschung erfolgreich', { position: 'center-left' })
+    else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
+  }
+
+  private isLastAllocation (purposeID: number): boolean {
+    const purposes = this.Requests.filter(
+      (v: VisibleAllocation) => v.PurposeId === purposeID
+    )
+    if (purposes.length <= 1) return true
+    return false
   }
 }
 

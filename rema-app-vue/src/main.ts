@@ -35,6 +35,14 @@ Vue.filter('simpleDateTime', (date: string) => {
     return `${time} ${day}`
   }
 })
+Vue.mixin({
+  computed: {
+    permissionToEdit (): Boolean {
+      // @ts-ignore
+      return this.$store.state.user.role >= 10
+    }
+  }
+})
 
 new Vue({
   router,
