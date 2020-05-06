@@ -134,10 +134,6 @@ export default class Calendar extends Vue {
       case '4day': return '4 Tage'
     }
   }
-  public get permissionToEdit (): Boolean {
-    return this.$store.state.user.role >= 10
-  }
-
   public get filteredItems () {
     let isEmpty = !Allocation.all().length
     if (isEmpty) return []

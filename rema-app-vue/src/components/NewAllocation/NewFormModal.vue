@@ -22,10 +22,5 @@ export default class NewFormModal extends Vue {
   public get title () {
     return 'Neue Terminanfrage stellen / Termin eintragen'
   }
-  public get permissionToEdit (): boolean {
-    // feature: wenn Anfragen möglich sein sollen
-    // ändern so das alle eine mit mind. Leserechten Anfragen stellen können
-    return this.$store.state.user.role >= 10
-  }
 }
 </script>
