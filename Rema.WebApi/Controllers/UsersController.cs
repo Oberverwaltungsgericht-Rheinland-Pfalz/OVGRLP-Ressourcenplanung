@@ -108,7 +108,7 @@ namespace Rema.WebApi.Controllers
       Log.Information("GET users/me");
       try
       {
-        return RequestSenderVM;
+        return RequestSenderVMInitial();
       }
       catch (Exception ex)
       {

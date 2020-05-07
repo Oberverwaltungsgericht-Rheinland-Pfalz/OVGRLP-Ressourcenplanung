@@ -8,15 +8,10 @@
     </v-card-title>
     <v-card-text>
       <v-container>
+
         <v-row>
           <v-col>
-            <v-text-field
-              v-model="title"
-              label="Titel *"
-              required
-              :error="!title && checkForm"
-              placeholder="Bitte geben Sie einen Titel für den Termin an."
-            ></v-text-field>
+            <title-proposal v-model="title" :error="!title && checkForm" />
           </v-col>
           <v-col>
             <v-select
@@ -194,10 +189,11 @@ import InputReferencePerson from '@/components/NewAllocation/InputReferencePerso
 import AllocationFormService from '../../services/AllocationFormServices'
 import moment from 'moment'
 import { submitAllocation, submitAllocations, refreshAllocations } from '../../services/AllocationApiService'
+import TitleProposal from '../TitleProposal.vue'
 
 @Component({
   components: {
-    DropDownTimePicker, InputReferencePerson
+    DropDownTimePicker, InputReferencePerson, TitleProposal
   }
 })
 export default class AllocationForm extends Mixins(AllocationFormService) {
