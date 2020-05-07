@@ -31,12 +31,16 @@ namespace Rema.WebApi.Controllers
     public async Task<ActionResult<IEnumerable<AllocationViewModel>>> GetAllocations()
     {
       Log.Information("GET allocations");
+      var today = DateTime.Now;
+      today = today.AddMonths(-1);
+      var firstDayOfLastMonth = today.AddDays(-today.Day + 1);  // first day of last month
 
       List<Allocation> allocations;
 
       try
       {
         allocations = await _context.Allocations
+          .Where(g => g.From > firstDayOfLastMonth)
           .Include(g => g.Ressource)
           .Include(g => g.ApprovedBy)
           .Include(g => g.CreatedBy)
@@ -265,7 +269,7 @@ namespace Rema.WebApi.Controllers
       {
         if (!string.IsNullOrEmpty(allocationVM.ReferencePersonId))
         {
-          allocation.ReferencePerson = _userManagementService.GetOrInsertUserFromDB(allocationVM.ReferencePersonId);
+          allocation.ReferencePerson = _userManagementService.GetAndUpdateOrInsertUserFromDB(allocationVM.ReferencePersonId);
         } 
         else if(allocationVM.Status == MeetingStatus.Pending)
         {
@@ -687,7 +691,7 @@ namespace Rema.WebApi.Controllers
       {
         if (!string.IsNullOrEmpty(allocationVM.ReferencePersonId) && allocationVM.ReferencePersonId.Length > 12)
         {
-          oldAllocation.ReferencePerson = _userManagementService.GetOrInsertUserFromDB(allocationVM.ReferencePersonId); ;
+          oldAllocation.ReferencePerson = _userManagementService.GetAndUpdateOrInsertUserFromDB(allocationVM.ReferencePersonId); ;
         }
       }
       catch (Exception ex)

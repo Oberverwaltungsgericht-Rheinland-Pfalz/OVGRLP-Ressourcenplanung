@@ -46,13 +46,13 @@ namespace Rema.WebApi.Controllers
     {
       get
       {
-        if (_user == null) 
+        if (_user == null)
         {
           var requester = this.HttpContext.User;
           var identity = (WindowsIdentity)requester.Identity;
           var adID = identity.User.Value;
 
-          _user = _userManagementService.GetAndUpdateOrInsertUserFromDB(adID);
+          _user = _userManagementService.GetAndUpdateUserFromDB(adID);
           //        _user = GetUserFromHttpContext(this.HttpContext);  
           //        SaveUser(_user);
           // todo: check who to add new user informations
@@ -61,6 +61,21 @@ namespace Rema.WebApi.Controllers
       }
     }
 
+    public UserViewModel RequestSenderVMInitial()
+    {
+      if (_userViewModel == null)
+      {
+        if (_user == null)
+        {
+          var requester = this.HttpContext.User;
+          var identity = (WindowsIdentity)requester.Identity;
+          var adID = identity.User.Value;
 
+          _user = _userManagementService.GetAndUpdateOrInsertUserFromDB(adID);
+        }
+        _userViewModel = _mapper.Map<User, UserViewModel>(_user);
+      }
+      return _userViewModel;
+    }
   }
 }

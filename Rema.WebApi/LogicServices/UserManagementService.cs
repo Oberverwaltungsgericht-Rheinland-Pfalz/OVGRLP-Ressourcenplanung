@@ -30,7 +30,23 @@ namespace Rema.WebApi.LogicServices
       return dbUser != null;
     }
 
-    public User GetOrInsertUserFromDB(string adID)
+    /**
+     * Liefert Benutzerobjekt zurück, falls noch nicht in DB ohne ID
+     * letzteres sollte nur passieren in der Sekunde in welcher 
+     * Nutzer noch nicht gespeichert wurde
+     */
+    public User GetUser(string adID)
+    {
+      var isInDb = IsUserInDb(out User dbUser, adID);
+      if (isInDb)
+      {
+        return dbUser;
+      }
+      var adUserObj = GetUserByActiveDirectoryId(adID);
+      return adUserObj;
+    }
+
+    public User GetAndUpdateUserFromDB(string adID)
     {
       var isInDb = IsUserInDb(out User dbUser, adID);
       if (isInDb)
@@ -39,7 +55,19 @@ namespace Rema.WebApi.LogicServices
       }
 
       var adUserObj = GetUserByActiveDirectoryId(adID);
-      UpdateOrInsert(dbUser, adUserObj, false);
+      try
+      {
+        if (adUserObj.Email != dbUser.Email || adUserObj.Name != dbUser.Name || adUserObj.Organisation != dbUser.Organisation) // update
+        {
+          adUserObj.Id = dbUser.Id;
+          _context.Entry(dbUser).CurrentValues.SetValues(adUserObj);
+          _context.SaveChanges();
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "An error occured while storing or updating the user to the database.");
+      }
 
       var updatedUser = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == adID);
       return updatedUser;
@@ -77,7 +105,6 @@ namespace Rema.WebApi.LogicServices
         Log.Error(ex, "An error occured while storing or updating the user to the database.");
       }
     }
-    
 
     public User GetUserByActiveDirectoryId(string activeDirectoryID)
     {
