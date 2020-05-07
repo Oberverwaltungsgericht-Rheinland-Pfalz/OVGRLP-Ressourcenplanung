@@ -13,7 +13,7 @@ import moment from 'moment'
 Vue.config.productionTip = false
 
 Vue.filter('toLocal', (dateVal: Date) =>
-  moment(dateVal).format('l') + ' ' + moment(dateVal).format('LT')
+  moment(dateVal).format('DD.MM.YYYY') + ' ' + moment(dateVal).format('LT')
 )
 // new Date(dateVal).toLocaleTimeString())
 Vue.filter('toLocalDate', (dateVal: Date) =>

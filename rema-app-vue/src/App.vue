@@ -152,6 +152,7 @@ export default class App extends Vue {
   private loading: boolean = true
 
   public get showNav () : boolean {
+    if (this.loading) return false
     return this.userData.roleNames.length > 0
   }
   public async created () {
@@ -172,7 +173,7 @@ export default class App extends Vue {
       }
     })
 
-    Promise.all([promise1, promise2, promise3, promise4])
+    await Promise.all([promise1, promise2, promise3, promise4])
     this.loading = false
   }
 }
