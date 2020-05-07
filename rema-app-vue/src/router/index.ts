@@ -32,14 +32,14 @@ export default new Router({
       beforeEnter: (to, from, next) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')
     } as RemaRouteConfig,
-    /*   {
-      path: '/mylist',
-      name: 'Ihre Anfragen',
-      icon: 'calendar_view_day',
-      authLevel: 1,
-      component: () => import('@/components/MyList.vue')
-    } as RemaRouteConfig,
- */ {
+    /*     {
+         path: '/mylist',
+         name: 'Ihre Anfragen',
+         icon: 'calendar_view_day',
+         authLevel: 1,
+         component: () => import('@/components/MyList.vue')
+       } as RemaRouteConfig,
+   */ {
       path: '/ressources',
       name: 'Administration',
       icon: 'dvr',

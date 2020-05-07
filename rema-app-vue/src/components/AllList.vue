@@ -5,15 +5,20 @@
       :headers="headers"
       :items="Requests"
       :search="search"
-      sort-by="calories"
-      class="elevation-1"
+      sort-by="From"
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
-          <v-toolbar-title>Von Ihnen gestellte Anfragen</v-toolbar-title>
+          <label class="blue-icon">
+            <input hidden type="checkbox" v-model="hideOld" />
+            Vergangene Termine &ensp;<v-icon v-if="!hideOld">visibility</v-icon>
+            <v-icon v-else>visibility_off</v-icon>
+          </label>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <label>
-            <input type="checkbox" v-model="hideOld" /> vergangene Termine ausblenden
+          <label class="blue-icon">
+            <input hidden type="checkbox" v-model="hideNotMine" />
+            Zeige nur meine Termine &ensp;<v-icon v-if="!hideNotMine">check_box_outline_blank</v-icon>
+            <v-icon v-else>check_box</v-icon>
           </label>
           <v-spacer></v-spacer>
           <v-text-field
@@ -54,6 +59,7 @@ import EditFormModal from './EditFormModal.vue'
 export default class AllList extends Vue {
   private search: string = ''
   private hideOld: boolean = true
+  private hideNotMine: boolean = false
   private selectedOpen: number = -1
   private headers: object[] = [
     { text: 'Bearbeiten', value: 'action', sortable: false },
@@ -74,7 +80,12 @@ export default class AllList extends Vue {
     return allocations.length
   }
   public get Requests (): VisibleAllocation[] {
+    let myId = this.$store.state.user.id
+
     const allocations = Allocation.query().withAll()
+      .where((record : any, query: any) => {
+        if (this.hideNotMine) { query.where('CreatedById', myId).orWhere('ReferencePersonId', `${myId}`) }
+      })
       .where((a: any) => {
         return !this.hideOld || Date.parse(a.To) > Date.now()
       })
@@ -134,4 +145,7 @@ interface VisibleAllocation {
 .appointment-open-list:nth-of-type(2n) {
   background-color: lightgrey;
 }
+
+.blue-icon i
+  color #82b1ff !important
 </style>

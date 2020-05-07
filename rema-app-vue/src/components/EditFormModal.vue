@@ -12,13 +12,7 @@
       <v-container class="no-bottom-padding">
         <v-row>
           <v-col>
-            <v-text-field
-              v-model="title"
-              label="Titel"
-              required
-              :error="!title && checkForm"
-              placeholder="Der Termin benötigt einen Titel"
-            ></v-text-field>
+            <title-proposal v-model="title" :error="!title && checkForm" />
           </v-col>
           <v-col>
             <v-select
@@ -178,9 +172,10 @@ import { mixins } from 'vue-class-component'
 import AllocationFormService from '../services/AllocationFormServices'
 import { refreshAllocations, editAllocation } from '../services/AllocationApiService'
 import moment from 'moment'
+import TitleProposal from './TitleProposal.vue'
 
 @Component({
-  components: { DropDownTimePicker, InputReferencePerson }
+  components: { DropDownTimePicker, InputReferencePerson, TitleProposal }
 })
 export default class EditFormModal extends mixins(AllocationFormService) {
   @Prop(Number) private eventId!: number

@@ -5,15 +5,15 @@
       :headers="headers"
       :items="Requests"
       :search="search"
-      sort-by="calories"
-      class="elevation-1"
+      sort-by="From"
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
           <v-toolbar-title>Von Ihnen gestellte Anfragen</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <label>
-            <input type="checkbox" v-model="hideOld" /> vergangene Termine ausblenden
+          <label class="blue-icon">
+            <input hidden type="checkbox" v-model="hideOld" />vergangene Termine &ensp;<v-icon v-if="!hideOld">visibility</v-icon>
+            <v-icon v-else>visibility_off</v-icon>
           </label>
           <v-spacer></v-spacer>
           <v-text-field
