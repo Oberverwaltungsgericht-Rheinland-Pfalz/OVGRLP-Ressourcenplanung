@@ -3,7 +3,9 @@ using System.Security.Principal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
+using Rema.DbAccess;
 using Rema.WebApi.Controllers;
+using Rema.WebApi.LogicServices;
 using Rema.WebApi.ViewModels;
 
 namespace Rema.WebApi.Filter
@@ -12,35 +14,27 @@ namespace Rema.WebApi.Filter
   {
     private readonly IConfiguration _configuration;
     private readonly string _permission;
+    protected UserManagementService _userManagementService;
+    protected RpDbContext _context;
 
-    public static List<Role> Roles
-    {
-      get =>
-          new List<Role>() { Startup.Reader, Startup.Editor, Startup.Admin };
-    }
-    
-    public AuthorizeAdActionFilter(string permission, IConfiguration configuration)
+   
+    public AuthorizeAdActionFilter(RpDbContext context, string permission, IConfiguration configuration)
     {
       _configuration = configuration;
       _permission = permission;
+      _userManagementService = new UserManagementService(context);
     }
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-      var requiredRole = Roles.Find(e => e.Name.Equals(_permission));
       var user = context.HttpContext.User;
       var identity = (WindowsIdentity)user.Identity;
-      var baseController = (BaseController)context.Controller;
+      var requiredRole = Startup.Roles.Find(e => e.Name.Equals(_permission));
 
-      foreach (var group in identity.Groups)
-      {
-        string groupTitle = group.Translate(typeof(NTAccount)).ToString();
-        var role = Roles.Find(e => e.AdDescription.Equals(groupTitle));
-        if (role != null)
-        {
-          baseController.RequestSenderVM.Roles.Add(role);
-        }
-      }
+      var roles = _userManagementService.SearchUserGroups(identity);
+      
+      var baseController = (BaseController)context.Controller;
+      baseController.RequestSenderVM.Roles = roles;
 
       if (baseController.RequestSenderVM.Roles.Exists(e => e.HasRole(requiredRole)))
         return;
