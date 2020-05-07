@@ -25,6 +25,11 @@ namespace Rema.WebApi
     public static Role Reader;
     public static Role Editor;
     public static Role Admin;
+    public static List<Role> Roles
+    {
+      get =>
+          new List<Role>() { Startup.Reader, Startup.Editor, Startup.Admin };
+    }
 
     public Startup(IConfiguration configuration)
     {

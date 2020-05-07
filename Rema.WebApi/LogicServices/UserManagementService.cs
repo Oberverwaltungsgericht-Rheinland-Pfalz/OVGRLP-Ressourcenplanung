@@ -11,13 +11,14 @@ using Rema.ServiceLayer.Services;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 using System.Threading.Tasks;
+using Rema.WebApi.ViewModels;
 
 namespace Rema.WebApi.LogicServices
 {
   public class UserManagementService
   {
     private RpDbContext _context;
- 
+
     public UserManagementService(RpDbContext context)
     {
       this._context = context;
@@ -46,18 +47,19 @@ namespace Rema.WebApi.LogicServices
       return adUserObj;
     }
 
-    public User GetAndUpdateUserFromDB(string adID)
+    public User GetAndUpdateOrInsertUserFromDB(string adID)
     {
       var isInDb = IsUserInDb(out User dbUser, adID);
-      if (isInDb)
-      {
-        return dbUser;
-      }
-
       var adUserObj = GetUserByActiveDirectoryId(adID);
+
       try
       {
-        if (adUserObj.Email != dbUser.Email || adUserObj.Name != dbUser.Name || adUserObj.Organisation != dbUser.Organisation) // update
+        if (!isInDb)  // insert
+        {
+          _context.Users.Add(adUserObj);
+          _context.SaveChanges();
+        }
+        else if (adUserObj.Email != dbUser.Email || adUserObj.Name != dbUser.Name || adUserObj.Organisation != dbUser.Organisation) // update
         {
           adUserObj.Id = dbUser.Id;
           _context.Entry(dbUser).CurrentValues.SetValues(adUserObj);
@@ -68,42 +70,9 @@ namespace Rema.WebApi.LogicServices
       {
         Log.Error(ex, "An error occured while storing or updating the user to the database.");
       }
-
-      var updatedUser = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == adID);
-      return updatedUser;
-    }
-
-    public User GetAndUpdateOrInsertUserFromDB(string adID)
-    {
-      var isInDb = IsUserInDb(out User dbUser, adID);
-      var adUserObj = GetUserByActiveDirectoryId(adID);
-      UpdateOrInsert(dbUser, adUserObj, isInDb);
-
       var updatedUser = _context.Users.FirstOrDefault(p => p.ActiveDirectoryID == adID);
 
       return updatedUser;
-    }
-    private void UpdateOrInsert(User fromDb, User fromAd, bool isInDb)
-    {
-      try
-      {
-        if (!isInDb)  // insert
-        {
-          _context.Users.Add(fromAd);
-          _context.SaveChanges();
-         // _context.Entry(fromAd).State = EntityState.Detached;
-        }
-        else if(fromAd.Email != fromDb.Email || fromAd.Name != fromDb.Name || fromAd.Organisation != fromDb.Organisation) // update
-        {
-          fromAd.Id = fromDb.Id;
-          _context.Entry(fromDb).CurrentValues.SetValues(fromAd);
-          _context.SaveChanges();
-        }
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "An error occured while storing or updating the user to the database.");
-      }
     }
 
     public User GetUserByActiveDirectoryId(string activeDirectoryID)
@@ -129,6 +98,21 @@ namespace Rema.WebApi.LogicServices
         Organisation = company,
         ActiveDirectoryID = activeDirectoryID
       };
+    }
+
+    public List<Role> SearchUserGroups(WindowsIdentity identity)
+    {
+      var roles = new List<Role>();
+      foreach (var group in identity.Groups)
+      {
+        string groupTitle = group.Translate(typeof(NTAccount)).ToString();
+        var role = Startup.Roles.Find(e => e.AdDescription.Equals(groupTitle));
+        if (role != null)
+        {
+          roles.Add(role);
+        }
+      }
+      return roles;
     }
   }
 }
