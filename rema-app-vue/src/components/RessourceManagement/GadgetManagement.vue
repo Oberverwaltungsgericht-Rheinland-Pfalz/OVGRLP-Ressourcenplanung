@@ -179,7 +179,7 @@ export default class SupplierManagement extends Vue {
     if (confirmation === true) {
       let success = await deleteGadget(item.Id)
       if (success) this.$dialog.message.success('Hilfsmittel gelöscht', { position: 'center-left' })
-      else this.$dialog.error({ text: 'Hilfsmittel löschen fehlgeschlagen', title: 'Fehler' })
+      else this.$dialog.error({ text: 'Es können nur Hilfsmittel gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.', title: 'Löschen fehlgeschlagen' })
     }
   }
 }

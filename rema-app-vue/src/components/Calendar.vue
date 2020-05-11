@@ -161,7 +161,6 @@ export default class Calendar extends Vue {
   public get possibleTitles () {
     return Allocation.query()
       .with('Ressource')
-      .with('Gadget')
       .get().map((v:any) => v.Ressource).map((v:any) => (v || { Name: '' }).Name)
   }
   public get title () {

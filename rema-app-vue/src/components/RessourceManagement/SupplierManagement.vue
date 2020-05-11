@@ -157,8 +157,8 @@ export default class SupplierManagement extends Vue {
         let response = await Supplier.api().delete(`suppliergroups/${item.Id}`, { delete: item.Id })
       } catch (e) {
         await this.$dialog.error({
-          text: 'Löschen fehlgeschlagen',
-          title: 'Warning'
+          text: 'Es können nur Gruppen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.',
+          title: 'Löschen fehlgeschlagen'
         })
       }
     }

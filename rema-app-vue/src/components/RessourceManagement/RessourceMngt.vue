@@ -178,8 +178,8 @@ export default class RessourceManagement extends Vue {
         let response = await Ressource.api().delete(`ressources/${item.Id}`, { delete: item.Id })
       } catch (e) {
         await this.$dialog.error({
-          text: 'Löschen fehlgeschlagen',
-          title: 'Warning'
+          text: 'Es können nur Ressourcen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.',
+          title: 'Löschen fehlgeschlagen'
         })
       }
     }
