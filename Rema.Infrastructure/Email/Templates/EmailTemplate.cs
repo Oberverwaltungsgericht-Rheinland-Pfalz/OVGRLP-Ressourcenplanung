@@ -96,9 +96,9 @@ namespace Rema.Infrastructure.Email.Templates
           rValue += $"{System.Environment.NewLine}{System.Environment.NewLine}Organisation {group.Key.Title}:\n";
           foreach(var gadget in group.Value)
           {
-            rValue += $"{gadget}";
+            rValue += $"{gadget}, ";
           }
-          rValue.Remove(rValue.Length - 1, 1);
+          rValue = rValue.Remove(rValue.Length - 2, 1);
         }
         return rValue;
       } 

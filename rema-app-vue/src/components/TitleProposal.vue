@@ -1,13 +1,13 @@
 <template>
-  <v-autocomplete
+  <v-combobox
     v-model="internalModel"
-    :items="titleEntries"
     :search-input.sync="search"
-    color="black"
-    label="Titel*"
-    :error="error"
     placeholder="Bitte tippen Sie einen Titel für den Termin ein."
-  ></v-autocomplete>
+    :items="titleEntries"
+    label="Titel*"
+    color="black"
+    :error="error"
+  ></v-combobox>
 </template>
 
 <script lang="ts">
