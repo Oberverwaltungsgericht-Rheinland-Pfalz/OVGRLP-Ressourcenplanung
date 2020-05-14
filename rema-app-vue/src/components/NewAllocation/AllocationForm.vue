@@ -53,7 +53,7 @@
                       </template>
                     </v-combobox>
                   </template>
-                  <v-date-picker v-model="multipleDates" locale="de" multiple no-title scrollable>
+                  <v-date-picker v-model="multipleDates" locale="de" multiple no-title scrollable :min="dateMin">
                     <v-spacer></v-spacer>
                     <v-btn text color="primary" @click="showMultipleDatesMenu = false">Abbrechen</v-btn>
                     <v-btn text color="primary" @click="$refs.showMultipleDatesMenu.save(multipleDates)">OK</v-btn>

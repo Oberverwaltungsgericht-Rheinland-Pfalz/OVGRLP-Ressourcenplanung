@@ -280,7 +280,7 @@ function transfer2Calendar (v: any) {
   if (v.IsAllDay) {
     rVal.start = v.From.substring(0, 10)
     rVal.schedule = `ganztägig`
-    rVal.name = (v.Ressource || {}).Name + ': ' + v.Title
+    rVal.name = (v.Ressource || {}).Name + ' - ' + v.Title
   } else {
     rVal.start = v.From.substring(0, 16).replace('T', ' ')
     rVal.end = v.To.substring(0, 16).replace('T', ' ')

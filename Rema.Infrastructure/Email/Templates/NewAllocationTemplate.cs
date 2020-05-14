@@ -19,7 +19,7 @@ namespace Rema.Infrastructure.Email.Templates
     }
 
     private string _bookingType;
-    public override string Subject => $"[Ressourcenplanungssystem] Termin {_bookingType} wurde erstellt";
+    public override string Subject => $"Termin {_bookingType} wurde erstellt";
 
     public override string ToString()
     {

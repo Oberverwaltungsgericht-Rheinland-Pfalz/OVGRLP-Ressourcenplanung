@@ -163,16 +163,8 @@ export default class SupplierManagement extends Vue {
       title: 'Löschen bestätigen',
       persistent: true,
       actions: [
-        {
-          text: 'Nein',
-          color: 'blue',
-          key: false
-        },
-        {
-          text: 'Löschen',
-          color: 'red',
-          key: true
-        }
+        { text: 'Nein', color: 'blue', key: false },
+        { text: 'Löschen', color: 'red', key: true }
       ]
     })
 
