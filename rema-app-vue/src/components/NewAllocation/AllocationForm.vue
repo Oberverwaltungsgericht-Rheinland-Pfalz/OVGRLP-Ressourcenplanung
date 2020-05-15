@@ -257,6 +257,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   }
   public get formInvalid () {
     let rValue = true
+    if (!this.title) rValue = false
     if (!this.ressourceId) rValue = false
     if (!this.dateFrom && !this.isRepeating) rValue = false
     if (!this.dateTo && !this.isRepeating && this.dateTo.length < 7) rValue = false

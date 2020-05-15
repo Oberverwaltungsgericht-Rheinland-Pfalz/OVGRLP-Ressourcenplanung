@@ -140,7 +140,7 @@
 <script lang="ts">
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue, Mixins } from 'vue-property-decorator'
-import { Names as Fnn } from '../store/user/types'
+import { Names as Fnn } from '../store/User/types'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import AllocationFormService from '@/services/AllocationFormServices'
 import { AllocationRequest, AllocationRequestView, UserData, ContactUser, AllocationModel } from '../models/interfaces'
