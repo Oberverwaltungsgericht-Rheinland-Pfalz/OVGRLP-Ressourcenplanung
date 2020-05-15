@@ -445,6 +445,26 @@ namespace Rema.WebApi.Controllers
         Log.Error(ex, "error while set correct times for all day");
       }
 
+      if (allocationsVM.HintsForSuppliers.Any())
+        try
+        {
+          var searchedGroupIds = allocationsVM.HintsForSuppliers.Select(g => g.GroupId);
+          var groups = await _context.SupplierGroups.Where(g => searchedGroupIds.Contains(g.Id)).ToListAsync();
+
+          var hintsList = new List<SupplierHint>();
+          foreach (SimpleSupplierHint hint in allocationsVM.HintsForSuppliers)
+          {
+            var group = groups.Find(e => e.Id == hint.GroupId);
+            hintsList.Add(new SupplierHint() { Group = group, Message = hint.Message });
+          }
+          allocations.ForEach(e => e.HintsForSuppliers = hintsList);
+        }
+        catch (Exception ex)
+        {
+          Log.Error(ex, "error while mapping supplier hints");
+          return BadRequest();
+        }
+
       try
       {
         if (!string.IsNullOrEmpty(allocationsVM.ReferencePersonId))

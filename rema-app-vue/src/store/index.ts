@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex, { StoreOptions } from 'vuex'
 import { RootState } from '@/models/interfaces'
-import { user } from './user/index'
+import { user } from './User/index'
 import {
   Gadget,
   Ressource,

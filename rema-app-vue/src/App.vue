@@ -121,7 +121,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import Router from 'vue-router'
 import { State, Action, Getter, Mutation } from 'vuex-class'
-import { Names as Fnn } from './store/user/types'
+import { Names as Fnn } from './store/User/types'
 import { UserData } from './models/interfaces'
 import { Gadget, Ressource, Supplier, Allocation } from './models'
 import { Getters } from '@vuex-orm/core'

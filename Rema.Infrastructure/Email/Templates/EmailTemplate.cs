@@ -109,7 +109,7 @@ namespace Rema.Infrastructure.Email.Templates
       get
       {
         string rValue = string.Empty;
-        if (_allocation.HintsForSuppliers.Any()) rValue = $@"´{Environment.NewLine}Hinweise an Unterstützergruppen:{Environment.NewLine}{Environment.NewLine}";
+        if (_allocation.HintsForSuppliers.Any()) rValue = $@"{Environment.NewLine}Hinweise an Unterstützergruppen:{Environment.NewLine}{Environment.NewLine}";
         foreach (var entry in _allocation.HintsForSuppliers)
         {
           rValue += $@"An Gruppe {entry.Group.Title}: {entry.Message}{Environment.NewLine}";

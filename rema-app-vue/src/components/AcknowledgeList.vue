@@ -51,7 +51,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AllocationRequest, AllocationRequestView, UserData, ContactUser, AllocationModel } from '../models/interfaces'
 import AcknowledgeView from './AcknowledgeView.vue'
 import { Allocation, Gadget, Ressource, Supplier } from '../models'
-import { Names } from '../store/user/types'
+import { Names } from '../store/User/types'
 import { refreshAllocations } from '../services/AllocationApiService'
 import { refreshGadgets } from '../services/GadgetApiService'
 
