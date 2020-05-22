@@ -156,6 +156,7 @@
           </v-col>
         </v-row>
       </v-container>
+      <collision-detection :viewAllocation="RessourceChecker"/>
     </v-card-text>
     <v-card-actions>
       <div class="flex-grow-1"></div>
@@ -184,16 +185,17 @@
 import { Component, Prop, Vue, Watch, Mixins } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../../models/interfaces'
+import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers, ShortAllocationView } from '../../models/interfaces'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import AllocationFormService from '../../services/AllocationFormServices'
 import moment from 'moment'
 import { submitAllocation, submitAllocations, refreshAllocations } from '../../services/AllocationApiService'
 import TitleProposal from '../TitleProposal.vue'
+import CollisionDetection from '../CollisionDetection.vue'
 
 @Component({
   components: {
-    DropDownTimePicker, InputReferencePerson, TitleProposal
+    DropDownTimePicker, InputReferencePerson, TitleProposal, CollisionDetection
   }
 })
 export default class AllocationForm extends Mixins(AllocationFormService) {
@@ -210,6 +212,20 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     if (this.isFormInvalid()) return
     this.saveAllocation(status)
     this.close()
+  }
+
+  public get RessourceChecker () : ShortAllocationView {
+    let from, to
+    let dates = null
+    if (this.isRepeating) {
+      from = 'T' + (this.fullday ? '00:00' : this.timeFrom)
+      to = 'T' + (this.fullday ? '23:59' : this.timeTo)
+      dates = this.multipleDates
+    } else {
+      from = this.dateFrom + 'T' + (this.fullday ? '00:00' : this.timeFrom)
+      to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
+    }
+    return { Id: 0, From: from, To: to, RessourceId: this.ressourceId, dates }
   }
 
   private async saveAllocation (

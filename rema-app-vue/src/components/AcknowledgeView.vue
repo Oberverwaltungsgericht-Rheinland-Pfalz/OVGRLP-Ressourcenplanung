@@ -102,16 +102,7 @@
             </v-col>
           </v-row>
         </v-container>
-        <v-row v-if="hasCollisions">
-          <v-col cols="12">
-            <h2>Mögliche Kollisionen</h2>
-          </v-col>
-        </v-row>
-        <v-row v-for="(i, idx) in possibleCollisions" v-bind:key="idx + 'cols'">
-          <v-col cols="4">{{ i.From | toLocal }} - {{ i.To | toLocal }}</v-col>
-          <v-col cols="4">{{ i.Title }}</v-col>
-          <v-col cols="4">{{ i.Status | status2string }}</v-col>
-        </v-row>
+        <collision-detection :viewAllocation="viewAllocation"/>
       </v-card-text>
       <v-card-actions>
         <div class="flex-grow-1"></div>
@@ -146,10 +137,11 @@ import AllocationFormService from '@/services/AllocationFormServices'
 import { AllocationRequest, AllocationRequestView, UserData, ContactUser, AllocationModel } from '../models/interfaces'
 import { Allocation } from '../models'
 import { editAllocationStatus, refreshAllocations } from '../services/AllocationApiService'
+import CollisionDetection from './CollisionDetection.vue'
 const namespace = 'user'
 
-@Component({ components: { DropDownTimePicker } })
-export default class AcknowledgeView extends Mixins(AllocationFormService) {
+@Component({ components: { DropDownTimePicker, CollisionDetection } })
+export default class AcknowledgeView extends Vue {
   @State('ContactUsers', { namespace })
   private ContactUsers!: ContactUser[]
   @Mutation(Fnn.m.addContactUser, { namespace })
@@ -157,7 +149,7 @@ export default class AcknowledgeView extends Mixins(AllocationFormService) {
   @Mutation(Fnn.m.reserveContactUser, { namespace })
   private reserveContactUser: any
   @Prop(Boolean) private readonly value!: boolean
-  @Prop(Object) private viewAllocation!: AllocationRequestView // = {} as AllocationRequestView
+  @Prop(Object) private viewAllocation!: AllocationRequestView
   private moveEdit: boolean = false
   private editFrom: string = ''
   private editFromTime: string = ''
@@ -175,7 +167,6 @@ export default class AcknowledgeView extends Mixins(AllocationFormService) {
       return
     }
     this.$emit('input', false)
-    // this.viewAllocation = {} as AllocationRequestView
   }
   public get UnAcknowledgedAllocations (): Allocation[] {
     return Allocation.query()
@@ -183,31 +174,6 @@ export default class AcknowledgeView extends Mixins(AllocationFormService) {
       .get()
   }
 
-  public get possibleCollisions (): Allocation[] {
-    const start = Date.parse(this.viewAllocation.From)
-    const end = Date.parse(this.viewAllocation.To)
-    const id = this.viewAllocation.Id
-    const rValues = Allocation.query()
-      .withAll()
-      .where('Status', (s: number) => s !== 2)
-      // @ts-ignore
-      .where('Ressource_id', this.viewAllocation.Ressource_id)
-      .where((a: any) => {
-        const aTo = Date.parse(a.To)
-        const aFrom = Date.parse(a.From)
-        const rVal =
-          (a.Id !== id && aTo >= start && aTo <= end) ||
-          (aFrom >= start && aFrom <= end) ||
-          (aFrom <= start && aTo >= end)
-
-        return rVal
-      })
-      .get()
-    return rValues
-  }
-  public get hasCollisions () {
-    return this.possibleCollisions.length > 0
-  }
   public contactUserName (id: number): string {
     // acts as filter, because it causes errors as filter
     return (

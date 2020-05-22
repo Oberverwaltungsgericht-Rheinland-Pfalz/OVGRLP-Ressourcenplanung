@@ -1,6 +1,6 @@
 
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import { AdUsers, HintsForSuppliers } from '../models/interfaces'
+import { AdUsers, HintsForSuppliers, AllocationRequestView } from '../models/interfaces'
 import { Ressource, Supplier } from '../models'
 import moment from 'moment'
 
