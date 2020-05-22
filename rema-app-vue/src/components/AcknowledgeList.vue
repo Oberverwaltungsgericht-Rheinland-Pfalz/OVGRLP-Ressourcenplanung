@@ -70,11 +70,11 @@ export default class AcknowledgeList extends Vue {
   @Action(Names.a.loadUsers, { namespace: 'user' })
   private loadUsers: any;
 
-  private dialog: boolean = false;
-  private viewAllocation: AllocationRequestView = {} as AllocationRequestView;
+  private dialog: boolean = false
+  private viewAllocation: AllocationRequestView = {} as AllocationRequestView
   private hideOld: boolean = true
 
-  private search: string = '';
+  private search: string = ''
   private headers: object[] = [
     { text: 'Bearbeiten', value: 'action', sortable: false },
     { text: 'Bezeichnung', value: 'Title' },
@@ -85,7 +85,7 @@ export default class AcknowledgeList extends Vue {
     { text: 'Ansprechpartner', value: 'Contact' },
     { text: 'Anfragedatum', value: 'CreateDate' },
     { text: 'Letzte Veränderung', value: 'DateTime' }
-  ];
+  ]
 
   public get hasItems () {
     const allocations = Allocation.query()

@@ -1,7 +1,7 @@
 import { AcknowledgeState } from './AcknowledgeState'
 import { AllocationModel, AllocationShortModel } from './AllocationModel'
 import { AllocationRequest } from './AllocationRequest'
-import { AllocationRequestView } from './AllocationRequestView'
+import { AllocationRequestView, ShortAllocationView } from './AllocationRequestView'
 import { ContactUser } from './ContactUser'
 import { GadgetModel } from './GadgetModel'
 import { NewAllocationRequestModel } from './NewAllocationRequestModel'
@@ -20,6 +20,7 @@ export {
   AllocationShortModel,
   AllocationRequest,
   AllocationRequestView,
+  ShortAllocationView,
   ContactUser,
   GadgetModel,
   HintsForSuppliers,

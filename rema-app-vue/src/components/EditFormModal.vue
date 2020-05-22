@@ -144,6 +144,7 @@
             <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined></v-textarea>
           </v-col>
         </v-row>
+        <collision-detection :viewAllocation="RessourceChecker"/>
         <v-row><v-col class="no-top-padding"><span class="right-head">Terminstatus: {{Status | status2string}}</span></v-col></v-row>
       </v-container>
     </v-card-text>
@@ -164,7 +165,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { AllocationRequestView, AdUsers, HintsForSuppliers } from '../models/interfaces'
+import { ShortAllocationView, AdUsers, HintsForSuppliers } from '../models/interfaces'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
@@ -173,9 +174,10 @@ import AllocationFormService from '../services/AllocationFormServices'
 import { refreshAllocations, editAllocation } from '../services/AllocationApiService'
 import moment from 'moment'
 import TitleProposal from './TitleProposal.vue'
+import CollisionDetection from './CollisionDetection.vue'
 
 @Component({
-  components: { DropDownTimePicker, InputReferencePerson, TitleProposal }
+  components: { DropDownTimePicker, InputReferencePerson, TitleProposal, CollisionDetection }
 })
 export default class EditFormModal extends mixins(AllocationFormService) {
   @Prop(Number) private eventId!: number
@@ -240,6 +242,17 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       this.CreatedById = all.CreatedById
       this.CreatedAt = all.CreatedAt
     }
+  }
+  public get RessourceChecker () : ShortAllocationView {
+    let from, to
+    if (this.isRepeating) {
+      from = this.dateOfSeries + 'T' + (this.fullday ? '00:00' : this.timeFrom)
+      to = this.dateOfSeries + 'T' + (this.fullday ? '23:59' : this.timeTo)
+    } else {
+      from = this.dateFrom + 'T' + (this.fullday ? '00:00' : this.timeFrom)
+      to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
+    }
+    return { Id: this.Id, From: from, To: to, RessourceId: this.ressourceId, dates: null }
   }
   private changeDateFrom (e:any) {
     if (e.target.value) { this.dateFrom = e.target.value.substring(0, 10) }

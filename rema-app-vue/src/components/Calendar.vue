@@ -91,7 +91,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { AllocationRequestView, GadgetModel, ContactUser, HintsForSuppliers } from '../models/interfaces'
+import { GadgetModel, ContactUser, HintsForSuppliers } from '../models/interfaces'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/User/types'
 import { deleteAllocation } from '../services/AllocationApiService'
