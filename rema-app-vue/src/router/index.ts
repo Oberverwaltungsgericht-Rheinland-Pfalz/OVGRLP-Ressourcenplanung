@@ -46,6 +46,22 @@ export default new Router({
       authLevel: 100,
       beforeEnter: (to, from, next) => requireAuth(100, to, from, next),
       component: () => import('@/views/Ressources.vue')
+    } as RemaRouteConfig,
+    {
+      path: '/roomlist',
+      name: 'Raumübersicht',
+      icon: 'art_track',
+      authLevel: 1,
+      beforeEnter: (to, from, next) => requireAuth(1, to, from, next),
+      component: () => import('@/components/RoomView.vue')
+    } as RemaRouteConfig,
+    {
+      path: '/gadgetlist',
+      name: 'Hilfsmittelübersicht',
+      icon: 'library_add',
+      authLevel: 1,
+      beforeEnter: (to, from, next) => requireAuth(1, to, from, next),
+      component: () => import('@/components/GadgetView.vue')
     } as RemaRouteConfig
     /*
     {
