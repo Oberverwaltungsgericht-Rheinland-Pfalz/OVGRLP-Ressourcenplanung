@@ -1,3 +1,11 @@
+## VueWebApp v1.0.0+20221
+
+### Änderungen
+
+* Raumübersicht eingefügt
+* Hilfsmittelübersicht eingefügt
+
+
 <a name="VueWebApp_v1.0.0+20204"></a>
 ## VueWebApp v1.0.0+20204
 
