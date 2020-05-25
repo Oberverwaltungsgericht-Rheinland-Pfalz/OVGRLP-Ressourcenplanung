@@ -277,16 +277,24 @@ export default class Calendar extends Vue {
 }
 function transfer2Calendar (v: any) {
   let rVal:any = {}
+  let longDate = v.From.substr(0, 10) !== v.To.substr(0, 10)
   if (v.IsAllDay) {
     rVal.start = v.From.substring(0, 10)
     rVal.schedule = `ganztägig`
     rVal.name = (v.Ressource || {}).Name + ' - ' + v.Title
+
+    if (longDate) {
+      rVal.start = v.From.substring(0, 16).replace('T', ' ')
+      rVal.end = v.To.substring(0, 16).replace('T', ' ')
+      rVal.schedule = `Von ${moment(v.From).format('DD.MM.YYYY')} bis ${moment(v.To).format('DD.MM.YYYY')} ganztägig`
+    }
   } else {
     rVal.start = v.From.substring(0, 16).replace('T', ' ')
     rVal.end = v.To.substring(0, 16).replace('T', ' ')
     rVal.schedule = `
       Von ${moment(v.From).format('LT')} 
       bis ${moment(v.To).format('LT')}`
+    if (longDate) rVal.schedule += ` zwischen dem ${moment(v.From).format('DD.MM.YYYY')} und ${moment(v.To).format('DD.MM.YYYY')}`
     rVal.name = `${(v.Ressource || {}).Name} ab ${moment(v.From).format('LT')}: ${v.Title}`
   }
 
