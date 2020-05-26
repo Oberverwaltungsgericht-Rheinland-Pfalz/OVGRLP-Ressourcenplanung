@@ -7,6 +7,7 @@
       hide-default-footer
       height="75vh"
       fixed-header
+      sort-by="SuppliedBy"
     >
       <template v-slot:item.SuppliedBy="{ item }">{{
         item.SuppliedBy | supplierName
