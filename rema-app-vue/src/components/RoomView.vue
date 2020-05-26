@@ -3,7 +3,7 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      sort-by="calories"
+      sort-by="Name"
       :disable-pagination="true"
       hide-default-footer
       height="75vh"
