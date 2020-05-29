@@ -4,6 +4,7 @@
 
 * Filtern der Terminliste nach Unterstützergruppen
 * Vollansicht eines Termins aus der Terminliste
+* Mögliche Terminüberschneidungen der selben Ressource werden beim Terminanlegen und editieren angezeigt
 
 ## VueWebApp v1.0.0+20221
 
