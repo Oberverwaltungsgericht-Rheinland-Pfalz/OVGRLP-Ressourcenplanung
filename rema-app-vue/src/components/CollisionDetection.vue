@@ -23,8 +23,8 @@ export default class CollisionDetection extends Vue {
   @Prop(Object) private viewAllocation!: ShortAllocationView
 
   public get possibleCollisions (): Allocation[] {
-    const start = Date.parse(this.viewAllocation.From)
-    const end = Date.parse(this.viewAllocation.To)
+    let start = Date.parse(this.viewAllocation.From)
+    let end = Date.parse(this.viewAllocation.To)
     const id = this.viewAllocation.Id
 
     const rValues = Allocation.query()
@@ -34,26 +34,27 @@ export default class CollisionDetection extends Vue {
       .where((a: any) => {
         if (a.Id === id) return false
         let rVal = false
+        const aTo = Date.parse(a.To)
+        const aFrom = Date.parse(a.From)
         if (this.viewAllocation.dates == null) {
-          let aTo = Date.parse(a.To)
-          let aFrom = Date.parse(a.From)
-          rVal = (aTo >= start && aTo <= end) ||
-            (aFrom >= start && aFrom <= end) ||
-            (aFrom <= start && aTo >= end)
+          let hitBegin = (aTo >= start && aTo <= end)
+          let hitEnd = (aFrom >= start && aFrom <= end)
+          let hitBetween = (aFrom <= start && aTo >= end)
+          rVal = hitBegin || hitEnd || hitBetween
         } else {
           // uhrzeiten von to u from, datums von dates
           rVal = this.viewAllocation.dates.filter(b => {
-            let aTo = Date.parse(a.To)
-            let aFrom = Date.parse(a.From)
-            rVal = (aTo >= start && aTo <= end) ||
-            (aFrom >= start && aFrom <= end) ||
-            (aFrom <= start && aTo >= end)
+            start = Date.parse(b + this.viewAllocation.From)
+            end = Date.parse(b + this.viewAllocation.To)
+            let hitBegin = (aTo >= start && aTo <= end)
+            let hitEnd = (aFrom >= start && aFrom <= end)
+            let hitBetween = (aFrom <= start && aTo >= end)
+            return hitBegin || hitEnd || hitBetween
           }).length > 0
         }
 
         return rVal
-      })
-      .get()
+      }).get()
     return rValues
   }
   public get hasCollisions () {
