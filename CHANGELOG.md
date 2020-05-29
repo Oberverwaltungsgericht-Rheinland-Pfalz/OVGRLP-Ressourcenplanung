@@ -1,3 +1,10 @@
+## VueWebApp v1.0.0+20225
+
+### Änderungen
+
+* Filtern der Terminliste nach Unterstützergruppen
+* Vollansicht eines Termins aus der Terminliste
+
 ## VueWebApp v1.0.0+20221
 
 ### Änderungen

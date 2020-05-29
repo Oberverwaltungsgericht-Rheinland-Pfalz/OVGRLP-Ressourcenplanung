@@ -114,7 +114,6 @@
               :menu-props="{ top: true, offsetY: true }"
               placeholder="Bitte wählen Sie Hilfmittel aus."
               multiple
-              clearable
             >
             </v-select>
           </v-col>

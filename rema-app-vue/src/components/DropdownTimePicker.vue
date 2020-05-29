@@ -1,16 +1,16 @@
 <template>
   <span class="ddtp-border">
     <span class="ddtp-inner-border">
-      <select v-model="hour">
+      <select v-model="hour" :disabled="readonly">
         <option v-for="n in hours" :key="n+'t1'" :disabled="isDisabledHour(n)" :value="n">{{n | toTwo}}</option>
       </select>
 
       <strong>:&ensp;</strong>
 
-      <select v-model="minute" v-show="precise">
+      <select v-model="minute" v-show="precise" :disabled="readonly">
         <option v-for="n in minutes" :key="n+'m1'" :value="n">{{n | toTwo}}</option>
       </select>
-      <select v-model="minute" v-show="!precise">
+      <select v-model="minute" v-show="!precise" :disabled="readonly">
         <option v-for="n of quarters" :key="n+'q1'" :value="n">{{n | toTwo}}</option>
       </select>
     </span>
@@ -31,9 +31,10 @@ import { Component, Prop } from 'vue-property-decorator'
   }
 })
 export default class DropDownTimePicker extends Vue {
-  @Prop({ default: '00:00' }) value!: string;
+  @Prop({ default: '00:00' }) value!: string
   @Prop({ default: '00:00' }) min!: string
   @Prop({ default: '23:59' }) max!: string
+  @Prop(Boolean) readonly!: boolean
 
   private precise: boolean = isPrecise(this.value)
   private hourInternal: number = 0
