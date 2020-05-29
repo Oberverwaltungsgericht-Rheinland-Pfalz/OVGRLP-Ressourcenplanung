@@ -1,11 +1,12 @@
 <template>
-  <v-layout column>
+  <v-layout id="all-list" column>
     <v-data-table
       v-if="hasItems"
       :headers="headers"
       :items="Requests"
       :search="search"
       sort-by="From"
+      @click:row="rowClicked"
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
@@ -20,7 +21,7 @@
             Zeige nur meine Termine &ensp;<v-icon v-if="!hideNotMine">check_box_outline_blank</v-icon>
             <v-icon v-else>check_box</v-icon>
           </label>
-          <v-spacer></v-spacer>
+          <v-spacer/>
           <v-text-field
             v-model="search"
             append-icon="search"
@@ -28,26 +29,40 @@
             single-line
             hide-details
           />
+          <v-spacer/>
+          <v-select
+              v-model="selectedGroup"
+              :items="GroupItems"
+              item-text="Title"
+              return-object
+              clearable
+              placeholder=""
+              label="Hilfsmittel-Abteilung"
+              :menu-props="{ offsetY: true }"
+              class="select-group"
+            />
         </v-toolbar>
       </template>
       <template v-slot:item.LastModified="{ item }">{{item.LastModified | toLocal}}</template>
       <template v-slot:item.From="{ item }">{{item.From | toLocal}}</template>
       <template v-slot:item.To="{ item }">{{item.To | toLocal}}</template>
       <template v-if="permissionToEdit" v-slot:item.action="{ item }">
-        <v-icon @click="deleteItem(item)">delete</v-icon>&emsp;
-        <v-icon @click="editItem(item.Id)">edit</v-icon>
+        <v-icon @click.stop="deleteItem(item)">delete</v-icon>&emsp;
+        <v-icon @click.stop="editItem(item.Id)">edit</v-icon>
         <edit-form-modal v-if="selectedOpen == item.Id" :show="true" :eventId="item.Id" @updateview="selectedOpen = -1">
 <span/>
         </edit-form-modal>
       </template>
     </v-data-table>
     <h3 v-else>Es liegen keine Terminanfragen von Ihnen vor</h3>
+    <edit-form-modal v-if="displayView" @close="displayView=false" :show="true" readonly :eventId="displayId">
+    <span/></edit-form-modal>
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Allocation } from '../models'
+import { Allocation, Gadget, Supplier } from '../models'
 import { AllocationRequest, AllocationModel } from '../models/interfaces'
 import moment from 'moment'
 import { deleteAllocation } from '../services/AllocationApiService'
@@ -57,6 +72,9 @@ import EditFormModal from './EditFormModal.vue'
   components: { EditFormModal }
 })
 export default class AllList extends Vue {
+  private displayView: boolean = false
+  private displayId: number=0
+  private selectedGroup: selectableGroup | null = null
   private search: string = ''
   private hideOld: boolean = true
   private hideNotMine: boolean = false
@@ -86,6 +104,14 @@ export default class AllList extends Vue {
       .where((record : any, query: any) => {
         if (this.hideNotMine) { query.where('CreatedById', myId).orWhere('ReferencePersonId', `${myId}`) }
       })
+      .where((record : any, query: any) => {
+        if (this.selectedGroup) {
+          query.where('GadgetsIds',
+            (gadgetArray: number[]) => gadgetArray.filter(
+              // @ts-ignore
+              (x: number) => this.selectedGroup.gadgetIds.includes(x)).length)
+        }
+      })
       .where((a: any) => {
         return !this.hideOld || Date.parse(a.To) > Date.now()
       })
@@ -100,6 +126,24 @@ export default class AllList extends Vue {
       Status: this.$options.filters.status2string(v.Status),
       Ressource: (v.Ressource || { Name: '' }).Name
     }))
+  }
+  public get GroupItems (): object[] {
+    var groups = new Map()
+
+    Allocation.query().withAll().get().forEach((e:any) => e.GadgetsIds.forEach((f: number) => {
+      let groupId = (Gadget.find(f) as any).SuppliedBy
+      let group = Supplier.find(groupId) as any
+      if (!groups.has(groupId)) {
+        let filterObj: selectableGroup = { Id: group.Id, Title: (group.Title || ''), gadgetIds: [f] }
+        groups.set(groupId, filterObj)
+      } else {
+        let filterObj = groups.get(groupId)
+        filterObj.gadgetIds.push(f)
+      }
+    }))
+    let rawValues = [...groups.values()]
+    let returnValues = rawValues.map((e: selectableGroup) => ({ Id: e.Id, Title: e.Title, gadgetIds: [...new Set(e.gadgetIds)] }))
+    return returnValues
   }
 
   private async deleteItem (item: VisibleAllocation) {
@@ -128,6 +172,16 @@ export default class AllList extends Vue {
     if (purposes.length <= 1) return true
     return false
   }
+  private rowClicked (element: any) {
+    this.displayId = element.Id
+    this.displayView = true
+  }
+}
+
+interface selectableGroup {
+  Id: number
+  Title: string
+  gadgetIds: Array<number>
 }
 
 interface VisibleAllocation {
@@ -148,4 +202,12 @@ interface VisibleAllocation {
 
 .blue-icon i
   color #82b1ff !important
+</style>
+
+<style lang="stylus">
+#all-list
+  .select-group .v-input__slot
+    margin-bottom 0
+  .select-group .v-text-field__details
+    display none
 </style>

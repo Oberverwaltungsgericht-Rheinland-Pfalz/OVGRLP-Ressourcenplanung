@@ -7,6 +7,7 @@
     label="Titel*"
     color="black"
     :error="error"
+    :disabled="readonly"
   ></v-combobox>
 </template>
 
@@ -20,6 +21,7 @@ import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../
 export default class TitleProposal extends Vue {
   @Prop(String) private readonly value!: string
   @Prop(Boolean) private readonly error!: boolean
+  @Prop(Boolean) private readonly readonly!: boolean
 
   public internalModel: string = ''
   public search: string = ''

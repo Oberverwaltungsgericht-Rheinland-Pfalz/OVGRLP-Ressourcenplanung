@@ -6,13 +6,14 @@
       </v-btn>
     </template>
     <v-card>
-    <v-card-title class="headline">Termin bearbeiten</v-card-title>
+    <v-card-title v-if="!readonly" class="headline">Termin bearbeiten</v-card-title>
+    <v-card-title v-else class="headline">Termin ansehen</v-card-title>
 
     <v-card-text class="no-bottom-padding">
       <v-container class="no-bottom-padding">
         <v-row>
           <v-col>
-            <title-proposal v-model="title" :error="!title && checkForm" />
+            <title-proposal v-model="title" :error="!title && checkForm" :readonly="readonly"/>
           </v-col>
           <v-col>
             <v-select
@@ -25,25 +26,26 @@
               placeholder="Bitte wählen Sie einen Raum aus."
               label="Raum"
               :menu-props="{ offsetY: true }"
+              :disabled="readonly"
             />
           </v-col>
         </v-row>
         <v-divider />
         <v-row>
           <v-col v-if="wasRepeating" :cols="6" class="no-top-padding no-bottom-padding">
-            <v-checkbox v-model="isRepeating" label="Belassen in Terminserie"></v-checkbox>
+            <v-checkbox v-model="isRepeating" label="Belassen in Terminserie" :disabled="readonly"></v-checkbox>
           </v-col>
           <v-col :cols="6" class="no-top-padding no-bottom-padding">
-            <v-checkbox v-model="fullday" label="ganztägig"></v-checkbox>
+            <v-checkbox v-model="fullday" label="ganztägig" :disabled="readonly"></v-checkbox>
           </v-col>
 
           <template v-if="isRepeating">
             <v-col v-show="!fullday" :cols="6">
               <strong>Von: </strong>
-              <drop-down-time-picker v-model="timeFrom"/>
+              <drop-down-time-picker v-model="timeFrom" :readonly="readonly"/>
             </v-col>
             <v-col v-show="!fullday" :cols="6">
-              <strong>Bis: </strong><drop-down-time-picker v-model="timeTo"/>
+              <strong>Bis: </strong><drop-down-time-picker v-model="timeTo" :readonly="readonly"/>
             </v-col>
             <v-col v-show="isRepeating" class="no-top-padding"><!-- Serientermindatum -->
                 <v-menu ref="menu1" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
@@ -54,7 +56,7 @@
                   :value="dateFormatted(dateOfSeries)"
                   ></v-text-field>
                 </template>
-                <v-date-picker v-model="dateOfSeries" :min="dateMin" locale="de" no-title @input="menu1 = false">
+                <v-date-picker v-model="dateOfSeries" :min="dateMin" locale="de" no-title @input="menu1 = false" :readonly="readonly">
                   <v-btn text color="primary" @click="menu1 = false" block>Abbrechen</v-btn>
                 </v-date-picker>
               </v-menu>
@@ -71,13 +73,13 @@
               :value="dateFormatted(dateFrom)"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" no-title @input="fromMenu = false">
+            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" no-title @input="fromMenu = false" :readonly="readonly">
               <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen</v-btn>
             </v-date-picker>
           </v-menu>
           </v-col>
           <v-col cols="3" class="time-col">
-            <drop-down-time-picker v-show="!fullday" v-model="timeFrom"/>
+            <drop-down-time-picker v-show="!fullday" v-model="timeFrom" :readonly="readonly"/>
           </v-col>
 
           <v-col cols="3">
@@ -89,13 +91,13 @@
               :value="dateFormatted(dateTo)"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="dateTo" :min="dateToMin" locale="de" no-title @input="toMenu = false">
+            <v-date-picker v-model="dateTo" :min="dateToMin" locale="de" no-title @input="toMenu = false" :readonly="readonly">
               <v-btn text color="primary" @click="toMenu = false" block>Abbrechen</v-btn>
             </v-date-picker>
           </v-menu>
           </v-col>
           <v-col cols="3" class="time-col">
-            <drop-down-time-picker v-show="!fullday" v-model="timeTo" min="timeToMin"/>
+            <drop-down-time-picker v-show="!fullday" v-model="timeTo" min="timeToMin" :readonly="readonly"/>
           </v-col>
         </v-row>
         <v-divider />
@@ -110,7 +112,7 @@
               :menu-props="{ top: true, offsetY: true }"
               placeholder="Bitte wählen Sie Hilfmittel aus."
               multiple
-              clearable
+              :disabled="readonly"
             >
             </v-select>
           </v-col>
@@ -119,14 +121,14 @@
               v-model="groupTexts[group.Id]"
               :label="'Nachricht für ' + group.Title"
               placeholder="Nachrichttext"
-              required
+              required :disabled="readonly"
             ></v-text-field>
           </v-col>
         </v-row>
         <v-divider />
         <v-row>
           <v-col>
-            <input-reference-person :userid="ReferencePersonId" @selected="setReferencePerson" :key="'re'+refreshInputReferencePerson"/>
+            <input-reference-person :userid="ReferencePersonId" @selected="setReferencePerson" :key="'re'+refreshInputReferencePerson" :readonly="readonly"/>
           </v-col>
           <v-col>
             <v-text-field
@@ -134,14 +136,14 @@
               type="tel"
               label="Telefonnummer"
               placeholder="Bitte geben Sie eine Telefonnummer an."
-              required
+              required :disabled="readonly"
             ></v-text-field>
           </v-col>
         </v-row>
         <v-divider />
         <v-row>
           <v-col>
-            <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined></v-textarea>
+            <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined :disabled="readonly"></v-textarea>
           </v-col>
         </v-row>
         <collision-detection :viewAllocation="RessourceChecker"/>
@@ -151,12 +153,13 @@
     <v-card-actions>
       <div class="flex-grow-1"></div>
       <v-btn
-        v-if="permissionToEdit"
+        v-if="permissionToEdit && !readonly "
         color="green darken-1" text
         @click="saveAllocation"
         ><v-icon>save</v-icon> Speichern</v-btn>
       <v-btn color="red darken-1" text @click="dialog = false">
-        <v-icon>cancel</v-icon> Abbrechen</v-btn>
+        <v-icon>cancel</v-icon>
+         <span v-if="readonly">Schließen</span><span v-else>Schließen</span></v-btn>
     </v-card-actions>
   </v-card>
 
@@ -182,6 +185,7 @@ import CollisionDetection from './CollisionDetection.vue'
 export default class EditFormModal extends mixins(AllocationFormService) {
   @Prop(Number) private eventId!: number
   @Prop(Boolean) private show! : boolean
+  @Prop(Boolean) private readonly! : boolean
 
   private menu1: boolean = false
   private title: String = ''
@@ -241,6 +245,8 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       this.Status = all.Status
       this.CreatedById = all.CreatedById
       this.CreatedAt = all.CreatedAt
+    } else {
+      this.$emit('close')
     }
   }
   public get RessourceChecker () : ShortAllocationView {

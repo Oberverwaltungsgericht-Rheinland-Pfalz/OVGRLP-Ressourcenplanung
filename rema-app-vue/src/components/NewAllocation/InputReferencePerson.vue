@@ -12,6 +12,7 @@
     placeholder="Bitte Namen teilweise eintippen"
     prepend-icon="mdi-database-search"
     :return-object="true"
+    :disabled="readonly"
   ></v-autocomplete>
 </template>
 
@@ -27,6 +28,7 @@ import { getUser } from '../../services/UserApiService'
 })
 export default class InputReferencePerson extends Vue {
   @Prop(Number) private userid!: number
+  @Prop(Boolean) private readonly!: boolean
   public entries: AdUsers[] = []
   public isLoading: number = 0
   public model: AdUsers = { Name: '', Email: '', ActiveDirectoryID: '', Phone: '' }

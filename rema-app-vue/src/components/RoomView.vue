@@ -62,13 +62,13 @@ export default class Roomview extends Vue {
     { text: 'Details', value: 'SpecialsDescription' }
   ];
 
-  private clicked (a1: any, a2: any) {
+  private clicked (element: any) {
     this.dialog = 1
-    this.editId = a1.Id
-    this.editTitle = a1.Name
-    this.editType = a1.Type
-    this.editDescription = a1.FunctionDescription
-    this.editDetails = a1.SpecialsDescription
+    this.editId = element.Id
+    this.editTitle = element.Name
+    this.editType = element.Type
+    this.editDescription = element.FunctionDescription
+    this.editDetails = element.SpecialsDescription
   }
   private get items () {
     return Ressource.all()
