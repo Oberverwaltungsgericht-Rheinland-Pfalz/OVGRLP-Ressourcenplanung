@@ -4,10 +4,9 @@ using System.Text;
 
 namespace Rema.Infrastructure.Models
 {
-  // keine Datenbanktabelle
-  public class SupplierHint
+  public class SimpleSupplierHint
   {
-    public SupplierGroup Group { get; set; }
+    public long GroupId { get; set; }
     public string Message { get; set; }
   }
 }
