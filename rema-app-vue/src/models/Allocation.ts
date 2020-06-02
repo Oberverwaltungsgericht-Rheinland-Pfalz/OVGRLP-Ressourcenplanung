@@ -1,6 +1,5 @@
 import { Model } from '@vuex-orm/core'
 import { Ressource, Gadget } from '.'
-import { HintsForSuppliers } from './interfaces/HintsForSuppliers'
 
 export class Allocation extends Model {
   // This is the name used as module name of the Vuex Store.

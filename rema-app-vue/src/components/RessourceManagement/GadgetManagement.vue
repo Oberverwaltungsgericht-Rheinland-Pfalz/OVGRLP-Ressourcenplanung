@@ -78,7 +78,6 @@ import {
   Ressource,
   Gadget
 } from '../../models'
-import { SupplierGroupModel, GadgetModel } from '../../models/interfaces'
 import { submitGadget, editGadget, deleteGadget } from '../../services/GadgetApiService'
 
 @Component({
@@ -92,7 +91,7 @@ export default class SupplierManagement extends Vue {
   private dialog: number = 0
   private editId: number = 0
   private editTitle: string = ''
-  private editSupplier: string = ''
+  private editSupplier: number = 0
 
   private nameRules = [(v: string) => !!v || 'Name is required']
   private valid: boolean = false
@@ -129,9 +128,9 @@ export default class SupplierManagement extends Vue {
     this.dialog = 0
     this.editId = 0
     this.editTitle = ''
-    this.editSupplier = ''
+    this.editSupplier = 0
   }
-  private editItem (item: GadgetModel) {
+  private editItem (item: WebApi.GadgetViewModel) {
     this.editId = item.Id
     this.editTitle = item.Title
     this.editSupplier = item.SuppliedBy
@@ -157,7 +156,7 @@ export default class SupplierManagement extends Vue {
     }
     this.closeModal()
   }
-  private async deleteItem (item: GadgetModel) {
+  private async deleteItem (item: WebApi.GadgetViewModel) {
     const confirmation = await this.$dialog.confirm({
       text: `Möchten sie dieses Hilfsmittel ${item.Title} wirklich löschen?`,
       title: 'Löschen bestätigen',

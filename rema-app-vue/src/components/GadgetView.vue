@@ -17,7 +17,6 @@
   </template>
 
 <script lang="ts">
-import { SupplierGroupModel, GadgetModel, RessourceModel } from '../models/interfaces'
 import { submitGadget, editGadget, deleteGadget } from '../services/GadgetApiService'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Ressource, Gadget, Supplier } from '../models'

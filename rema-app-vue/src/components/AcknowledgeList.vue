@@ -48,7 +48,7 @@
 <script lang="ts">
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { AllocationRequest, AllocationRequestView, UserData, ContactUser, AllocationModel } from '../models/interfaces'
+import { AllocationRequest, AllocationRequestView, UserData } from '../models/interfaces'
 import AcknowledgeView from './AcknowledgeView.vue'
 import { Allocation, Gadget, Ressource, Supplier } from '../models'
 import { Names } from '../store/User/types'
@@ -62,7 +62,7 @@ const namespace = 'user'
 })
 export default class AcknowledgeList extends Vue {
   @State('ContactUsers', { namespace })
-  private ContactUsers!: ContactUser[];
+  private ContactUsers!: WebApi.ContactUser[];
   @Mutation('addContactUser', { namespace })
   private addContactUser: any;
   @Mutation('reserveContactUser', { namespace })
@@ -127,7 +127,7 @@ export default class AcknowledgeList extends Vue {
         Status: this.$options.filters.status2string(v.Status),
         Contact: (
           this.ContactUsers.find(
-            (w: ContactUser) => w.Id === v.ReferencePersonId
+            (w: WebApi.ContactUser) => w.Id === v.ReferencePersonId
           ) || { Title: '' }
         ).Title,
         Ressource: (v.Ressource || {}).Name,
@@ -146,7 +146,8 @@ export default class AcknowledgeList extends Vue {
     let referencePersons = this.UnAcknowledgedAllocations.map((v: any) => v.ReferencePersonId)
     referencePersons = [...new Set(referencePersons)] // remove duplicates
     referencePersons = referencePersons.filter((v: number) => v !== 0) // remove 0
-    let hasAllUsernames = referencePersons.every((id: number) => this.ContactUsers.find((v: ContactUser) => v.Id === id))
+    let hasAllUsernames = referencePersons.every((id: number) =>
+      this.ContactUsers.find((v: WebApi.ContactUser) => v.Id === id))
 
     if (!hasAllUsernames) this.loadUsers(referencePersons)
   }

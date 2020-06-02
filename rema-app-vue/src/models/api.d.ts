@@ -49,6 +49,15 @@ declare module WebApi {
         Dates: string[];
     }
 
+    // ..\Rema.WebApi\ViewModels\RessourceViewModel.cs
+    export interface RessourceViewModel {
+        Id: number;
+        Name: string;
+        FunctionDescription: string;
+        SpecialsDescription: string;
+        Type: string;
+    }
+
     // ..\Rema.WebApi\ViewModels\Role.cs
     export interface Role {
         Name: string;
@@ -82,6 +91,13 @@ declare module WebApi {
         Email: string;
     }
 
+    // ..\Rema.Infrastructure\Models\SupplierGroup.cs
+    export interface SupplierGroup {
+        Id: number;
+        Title: string;
+        GroupEmail: string;
+    }
+
     // ..\Rema.Infrastructure\Models\SimpleSupplierHint.cs
     export interface SimpleSupplierHint {
         GroupId: number;
@@ -102,27 +118,6 @@ declare module WebApi {
         Title: string;
         Email: string;
         Organisation: string;
-    }
-
-    // ..\Rema.Infrastructure\Requests\AllocationPurposeRequest.cs
-    export interface AllocationPurposeRequest {
-        Title: string;
-        Description: string;
-        Notes: string;
-        ContactPhone: string;
-        Gadgets: number[];
-    }
-
-    // ..\Rema.Infrastructure\Requests\AllocationRequest.cs
-    export interface AllocationRequest {
-        From: string;
-        To: string;
-        IsAllDay: Boolean;
-        RessourceId: number;
-        PurposeId: number;
-        CreatedByUserId: number;
-        CreatedAt: string;
-        ReferencePersonUserId: number;
     }
 
 }

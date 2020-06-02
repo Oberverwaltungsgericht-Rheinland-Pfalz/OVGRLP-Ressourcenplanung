@@ -44,7 +44,6 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Ressource } from '../models'
-import { RessourceModel } from '../models/interfaces'
 
 @Component({})
 export default class Roomview extends Vue {

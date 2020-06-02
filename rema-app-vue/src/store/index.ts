@@ -5,7 +5,6 @@ import { user } from './User/index'
 import {
   Gadget,
   Ressource,
-  VisibleAllocation,
   Supplier,
   Allocation
 } from '../models'
@@ -20,7 +19,6 @@ const database = new VuexORM.Database()
 // Register Models to Database.
 database.register(Gadget)
 database.register(Ressource)
-database.register(VisibleAllocation)
 database.register(Allocation)
 database.register(Supplier)
 

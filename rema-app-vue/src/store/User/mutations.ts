@@ -1,6 +1,6 @@
 import { MutationTree } from 'vuex'
 import { Names } from './types'
-import { ContactUser, UserState } from '@/models/interfaces'
+import { UserState } from '@/models/interfaces'
 
 export const mutations: MutationTree<UserState> = {
   [Names.m.clearUser] (state: any) {
@@ -12,20 +12,17 @@ export const mutations: MutationTree<UserState> = {
     state.organisation = ''
     state.lastUpdated = new Date()
   },
-  [Names.m.setUser] (state: any, userPayload: any) {
+  [Names.m.setUser] (state: UserState, userPayload: WebApi.UserViewModel) {
     state.id = userPayload.Id
     state.name = userPayload.Name
     state.email = userPayload.Email
     state.role = Math.max(...userPayload.Roles.map((e: any) => e.Level))
     state.roleNames = userPayload.Roles.reduce((last: string, e: any) => last + e.Name + ' ', '')
-    state.supplierGroups = userPayload.SupplierGroups
+    state.supplierGroups = userPayload.SupportGroupIds
     state.organisation = userPayload.Organisation
     state.lastUpdated = new Date()
-    /* for (const key in userPayload) {
-      if (userPayload.hasOwnProperty(key)) state[key] = userPayload[key]
-    } */
   },
-  [Names.m.addContactUser] (state: UserState, userPayload: ContactUser) {
+  [Names.m.addContactUser] (state: UserState, userPayload: WebApi.ContactUser) {
     const entryIdx = state.ContactUsers.findIndex((s) => s.Id === userPayload.Id)
     let deleteAnEntry = entryIdx < 0 ? 0 : 1
     state.ContactUsers.splice(entryIdx, deleteAnEntry, userPayload)

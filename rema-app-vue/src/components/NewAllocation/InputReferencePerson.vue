@@ -20,7 +20,6 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { RessourceModel, AllocationModel, AdUsers } from '../../models/interfaces'
 import { getUser } from '../../services/UserApiService'
 
 @Component({
@@ -29,9 +28,9 @@ import { getUser } from '../../services/UserApiService'
 export default class InputReferencePerson extends Vue {
   @Prop(Number) private userid!: number
   @Prop(Boolean) private readonly!: boolean
-  public entries: AdUsers[] = []
+  public entries: WebApi.AdUserViewModel[] = []
   public isLoading: number = 0
-  public model: AdUsers = { Name: '', Email: '', ActiveDirectoryID: '', Phone: '' }
+  public model: WebApi.AdUserViewModel = { Name: '', Email: '', ActiveDirectoryID: '', Phone: '' }
   public search: string = ''
   public lastLoad: string = '0'
   public requestCounter: number = 0
@@ -56,7 +55,7 @@ export default class InputReferencePerson extends Vue {
   }
 
   @Watch('model')
-  public userSet (val: AdUsers) {
+  public userSet (val: WebApi.AdUserViewModel) {
     this.$emit('selected', val)
   }
 
@@ -83,7 +82,7 @@ export default class InputReferencePerson extends Vue {
       if (!responseBody) return
       if (this.lastLoad > timestamp) return
       this.entries.splice(0, Infinity)
-      responseBody.forEach((e: AdUsers) => {
+      responseBody.forEach((e: WebApi.AdUserViewModel) => {
         this.entries.push(e)
       })
     } catch (ex) {

@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Rema.DbAccess;
 using Rema.Infrastructure.Models;
 using Rema.WebApi.Filter;
+using Rema.WebApi.MappingProfiles;
+using Rema.WebApi.ViewModels;
 using Serilog;
 
 namespace Rema.WebApi.Controllers
@@ -24,12 +26,15 @@ namespace Rema.WebApi.Controllers
 
     // GET: ressources
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Ressource>>> GetRessources()
+    public async Task<ActionResult<IEnumerable<RessourceViewModel>>> GetRessources()
     {
       Log.Information("GET ressources");
       try
       {
-        return await _context.Ressources.ToListAsync();
+        var ressources = await _context.Ressources.ToListAsync();
+        var ressourceVMs = ressources.Select<Ressource, RessourceViewModel>((e) => 
+          _mapper.Map<Ressource, RessourceViewModel>(e)).ToList();
+        return Ok(ressourceVMs);
       }
       catch(Exception ex)
       {
@@ -40,7 +45,7 @@ namespace Rema.WebApi.Controllers
 
     // GET: ressources/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Ressource>> GetRessource(long id)
+    public async Task<ActionResult<RessourceViewModel>> GetRessource(long id)
     {
       try
       {
@@ -49,7 +54,8 @@ namespace Rema.WebApi.Controllers
         {
           return NotFound();
         }
-        return Ok(ressource);
+        var ressourceView = _mapper.Map<RessourceViewModel>(ressource);
+        return Ok(ressourceView);
       }
       catch(Exception ex)
       {
@@ -61,7 +67,7 @@ namespace Rema.WebApi.Controllers
     // PUT: ressources/5
     [HttpPut("{id}")]
     [AuthorizeAd("Admin")]
-    public async Task<IActionResult> PutRessource(long id, Ressource ressource)
+    public async Task<IActionResult> PutRessource(long id, RessourceViewModel ressource)
     {
       Log.Information("PUT ressource/{id}: {ressource}", id, ressource);
       if (id != ressource.Id)
@@ -69,9 +75,10 @@ namespace Rema.WebApi.Controllers
         return BadRequest();
       }
 
+      var ressourceObj = _mapper.Map<RessourceViewModel, Ressource>(ressource);
       try
       {
-        _context.Entry(ressource).State = EntityState.Modified;
+        _context.Entry(ressourceObj).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         return NoContent();
       }
@@ -85,15 +92,16 @@ namespace Rema.WebApi.Controllers
     // POST: ressources
     [HttpPost]
     [AuthorizeAd("Admin")]
-    public async Task<ActionResult<Ressource>> PostRessource(Ressource ressource)
+    public async Task<ActionResult<RessourceViewModel>> PostRessource(RessourceViewModel ressource)
     {
       Log.Information("POST ressources: {ressource}", ressource);
 
+      var ressourceObj = _mapper.Map<RessourceViewModel, Ressource>(ressource);
       try
       {
-        _context.Ressources.Add(ressource);
+        _context.Ressources.Add(ressourceObj);
         await _context.SaveChangesAsync();
-        return CreatedAtAction("GetRessource", new { id = ressource.Id }, ressource);
+        return CreatedAtAction("GetRessource", new { id = ressource.Id }, ressourceObj);
       }
       catch(Exception ex)
       {
@@ -105,7 +113,7 @@ namespace Rema.WebApi.Controllers
     // DELETE: ressources/5
     [HttpDelete("{id}")]
     [AuthorizeAd("Admin")]
-    public async Task<ActionResult<Ressource>> DeleteRessource(long id)
+    public async Task<ActionResult> DeleteRessource(long id)
     {
       Log.Information("DELETE ressources/{id}", id);
 

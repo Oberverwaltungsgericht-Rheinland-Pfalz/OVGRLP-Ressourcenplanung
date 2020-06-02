@@ -15,7 +15,6 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { RessourceModel, AllocationModel, AdUsers, HintsForSuppliers } from '../models/interfaces'
 
 @Component({})
 export default class TitleProposal extends Vue {

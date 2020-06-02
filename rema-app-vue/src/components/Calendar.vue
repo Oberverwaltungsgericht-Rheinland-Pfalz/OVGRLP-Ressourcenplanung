@@ -91,7 +91,6 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { GadgetModel, ContactUser, HintsForSuppliers } from '../models/interfaces'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/User/types'
 import { deleteAllocation } from '../services/AllocationApiService'
@@ -105,7 +104,7 @@ import moment from 'moment'
 })
 export default class Calendar extends Vue {
   @State('ContactUsers', { namespace: 'user' })
-  private ContactUsers!: ContactUser[]
+  private ContactUsers!: WebApi.ContactUser[]
   @Action(Names.a.loadUsers, { namespace: 'user' })
   private loadUsers: any;
 
@@ -306,7 +305,7 @@ function transfer2Calendar (v: any) {
   rVal.RessourceName = (v.Ressource || {}).Name
 
   rVal.Hints = ''
-  v.HintsForSuppliers.forEach((e: HintsForSuppliers) => {
+  v.HintsForSuppliers.forEach((e: WebApi.SimpleSupplierHint) => {
     rVal.Hints += `<strong>${GetGroupName(e.GroupId)}</strong>: ${e.Message} <br/>`
   })
 

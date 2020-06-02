@@ -13,7 +13,6 @@ using Rema.WebApi.ViewModels;
 using Serilog;
 using Rema.ServiceLayer.Services;
 using Microsoft.Extensions.Primitives;
-using Rema.Infrastructure.Contracts.Services;
 using Rema.ServiceLayer;
 using Rema.ServiceLayer.Interfaces;
 

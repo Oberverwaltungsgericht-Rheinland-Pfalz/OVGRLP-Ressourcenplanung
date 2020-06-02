@@ -73,7 +73,6 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Ressource } from '../../models'
-import { RessourceModel } from '../../models/interfaces'
 
 @Component({})
 export default class RessourceManagement extends Vue {
@@ -145,7 +144,7 @@ export default class RessourceManagement extends Vue {
     return Ressource.all()
   }
 
-  private editItem (item: RessourceModel) {
+  private editItem (item: WebApi.RessourceViewModel) {
     this.editId = item.Id
     this.editTitle = item.Name
     this.editType = item.Type
@@ -154,7 +153,7 @@ export default class RessourceManagement extends Vue {
     this.dialog = 2
   }
 
-  private async deleteItem (item: RessourceModel) {
+  private async deleteItem (item: WebApi.RessourceViewModel) {
     const confirmation = await this.$dialog.confirm({
       text: `Möchten sie die Ressource ${item.Name} wirklich löschen?`,
       title: 'Löschen bestätigen',
@@ -185,7 +184,7 @@ export default class RessourceManagement extends Vue {
     }
   }
 
-  private saveNew (event: ViewRessource) {
+  private saveNew (event: WebApi.RessourceViewModel) {
     // Save to server here
     //  this.items.push({ ...this.newItem })
     this.showNewForm = false
@@ -202,10 +201,4 @@ export default class RessourceManagement extends Vue {
   }
 }
 
-interface ViewRessource {
-  Title: string;
-  Type: string;
-  FunctionDescription: string;
-  SpecialDescription: string;
-}
 </script>
