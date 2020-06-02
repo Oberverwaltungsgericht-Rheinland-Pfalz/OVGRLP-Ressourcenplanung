@@ -168,7 +168,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { ShortAllocationView, AdUsers, HintsForSuppliers } from '../models/interfaces'
+import { ShortAllocationView, HintsForSuppliers } from '../models/interfaces'
+/// <reference> ../models/api.d.t
+import { AdUserViewModel } from 'WebApi'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'

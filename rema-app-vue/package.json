@@ -6,13 +6,15 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "build-all": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./build.ps1"
+    "build-all": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./build.ps1",
+    "generate-api": "csharp-models-to-typescript --config=cs2ts-config.json"
   },
   "dependencies": {
     "@mdi/font": "^4.9.95",
     "@vuex-orm/core": "^0.34.1",
     "@vuex-orm/plugin-axios": "^0.9.2",
     "axios": "^0.19.2",
+    "csharp-models-to-typescript": "^0.18.0",
     "d3": "^5.15.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",

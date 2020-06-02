@@ -1,0 +1,24 @@
+{
+    "include": [
+        "../Rema.WebApi/ViewModels/**/*.cs",
+        "../Rema.Infrastructure/Models/MeetingStatus.cs",
+        "../Rema.Infrastructure/Models/User.cs",
+        "../Rema.Infrastructure/Models/SimpleSupplierHint.cs",
+        "../Rema.Infrastructure/LDAP/AdUserViewModel.cs",
+        "../Rema.Infrastructure/ViewModels/**.cs",
+        "../Rema.Infrastructure/Requests/**.cs"
+    ],
+    "exclude": [
+        "./models/foo/bar.cs"
+    ],
+    "namespace": "WebApi",
+    "output": "./src/models/api.d.ts",
+    "camelCase": false,
+    "camelCaseEnums": false,
+    "numericEnums": false,
+    "stringLiteralTypesInsteadOfEnums": false,
+    "customTypeTranslations": {
+        "ProductName": "string",
+        "ProductNumber": "string"
+    }
+}
