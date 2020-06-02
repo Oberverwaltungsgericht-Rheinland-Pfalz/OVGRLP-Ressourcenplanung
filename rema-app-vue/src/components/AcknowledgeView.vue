@@ -134,7 +134,7 @@ import { Component, Prop, Vue, Mixins } from 'vue-property-decorator'
 import { Names as Fnn } from '../store/User/types'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import AllocationFormService from '@/services/AllocationFormServices'
-import { AllocationRequest, AllocationRequestView, UserData, ContactUser, AllocationModel } from '../models/interfaces'
+import { AllocationRequest, AllocationRequestView } from '../models/interfaces'
 import { Allocation } from '../models'
 import { editAllocationStatus, refreshAllocations } from '../services/AllocationApiService'
 import CollisionDetection from './CollisionDetection.vue'
@@ -143,7 +143,7 @@ const namespace = 'user'
 @Component({ components: { DropDownTimePicker, CollisionDetection } })
 export default class AcknowledgeView extends Vue {
   @State('ContactUsers', { namespace })
-  private ContactUsers!: ContactUser[]
+  private ContactUsers!: WebApi.ContactUser[]
   @Mutation(Fnn.m.addContactUser, { namespace })
   private addContactUser: any
   @Mutation(Fnn.m.reserveContactUser, { namespace })
@@ -177,15 +177,15 @@ export default class AcknowledgeView extends Vue {
   public contactUserName (id: number): string {
     // acts as filter, because it causes errors as filter
     return (
-      this.ContactUsers.find((w: ContactUser) => w.Id === id) || { Title: '' }
+      this.ContactUsers.find((w: WebApi.ContactUser) => w.Id === id) || { Title: '' }
     ).Title
   }
   public async acknowledge () {
-    this.saveStatus(this.viewAllocation, 1)
+    this.saveStatus({ ...this.viewAllocation, status: 1 })
   }
   public reject () {
     // change appointment status to rejected
-    this.saveStatus(this.viewAllocation, 2)
+    this.saveStatus({ ...this.viewAllocation, status: 2 })
   }
   public async move () {
     this.moveEdit = !this.moveEdit
@@ -197,16 +197,17 @@ export default class AcknowledgeView extends Vue {
       this.editToTime = this.viewAllocation.To.substr(11, 5)
       return
     }
-    const changedAllocation: AllocationModel = {
-      ...this.viewAllocation,
+    const changedAllocation: WebApi.AllocationRequestEdition = {
+      Id: this.viewAllocation.Id,
+      status: 3,
       From: this.editFrom,
       To: this.editTo
     }
-    this.saveStatus(changedAllocation, 3)
+    this.saveStatus(changedAllocation)
   }
 
-  public async saveStatus (task: AllocationModel, status: number) {
-    let success = editAllocationStatus(task.Id, status, task.From, task.To)
+  public async saveStatus (task: WebApi.AllocationRequestEdition) {
+    let success = editAllocationStatus(task.Id, task.status, task.From || '', task.To || '')
     if (success) this.$dialog.message.success('Bearbeitung erfolgreich', { position: 'center-left' })
     else this.$dialog.error({ text: 'Bearbeitung konnte nicht gespeichert werden', title: 'Fehler' })
 

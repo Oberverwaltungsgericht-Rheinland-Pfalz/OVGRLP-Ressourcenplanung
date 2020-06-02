@@ -4,6 +4,6 @@ export interface UserData {
   email: string,
   role: string | number,
   roleNames: string,
-  organisation: string,
   supplierGroups: number[] | boolean
+  organisation: string
 }

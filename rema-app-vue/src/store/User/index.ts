@@ -10,8 +10,8 @@ export const state: UserState = {
   email: '',
   role: 0,
   roleNames: '',
-  supplierGroups: false,
   organisation: '',
+  supplierGroups: false,
   lastUpdated: false,
   ContactUsers: []
 }

@@ -1,4 +1,5 @@
 import Vue, { VNode } from 'vue'
+import './models/api'
 
 declare global {
   namespace JSX {

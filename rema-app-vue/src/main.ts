@@ -9,7 +9,6 @@ import '@mdi/font/css/materialdesignicons.css'
 
 import './plugins/moment'
 import moment from 'moment'
-import './models/api'
 
 Vue.config.productionTip = false
 

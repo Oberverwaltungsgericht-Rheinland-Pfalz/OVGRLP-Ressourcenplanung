@@ -39,8 +39,6 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation } from '../models'
-import { AllocationRequest, AllocationModel } from '../models/interfaces'
-import moment from 'moment'
 import { deleteAllocation } from '../services/AllocationApiService'
 
 @Component

@@ -1,6 +1,6 @@
 import { ActionTree } from 'vuex'
 import { Names } from './types'
-import { UserState, RootState, ContactUser } from '../../models/interfaces'
+import { UserState, RootState } from '../../models/interfaces'
 
 export const actions: ActionTree<UserState, RootState> = {
   async [Names.a.loadUser] ({ commit }): Promise<any> {
@@ -26,7 +26,7 @@ export const actions: ActionTree<UserState, RootState> = {
     const referencePersonsUnique = [...new Set(ids)]
     const response = await fetch(`/api/Users/Names/${referencePersonsUnique.join('_')}`)
     const newContacts = await response.json()
-    let userResponse = newContacts as ContactUser[]
+    let userResponse = newContacts as WebApi.ContactUser[]
     if (userResponse && userResponse != null) {
       for (let user of userResponse) {
         commit(Names.m.addContactUser, user)

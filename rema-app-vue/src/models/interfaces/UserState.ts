@@ -1,6 +1,6 @@
-import { UserData, ContactUser } from '.'
+import { UserData } from '.'
 
 export interface UserState extends UserData {
   lastUpdated: Date | boolean,
-  ContactUsers: ContactUser[]
+  ContactUsers: WebApi.ContactUser[]
 }

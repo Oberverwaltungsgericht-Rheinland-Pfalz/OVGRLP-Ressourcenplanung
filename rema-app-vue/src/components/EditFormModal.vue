@@ -168,9 +168,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { ShortAllocationView, HintsForSuppliers } from '../models/interfaces'
-/// <reference> ../models/api.d.t
-import { AdUserViewModel } from 'WebApi'
+import { ShortAllocationView } from '../models/interfaces'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
@@ -239,8 +237,8 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       this.selectedGadgets = all.GadgetsIds
       this.telNumber = all.ContactPhone
       this.Notes = all.Notes
-      for (let key in all.HintsForSuppliers as HintsForSuppliers[]) {
-        let obj = all.HintsForSuppliers[key] as HintsForSuppliers
+      for (let key in all.HintsForSuppliers as WebApi.SimpleSupplierHint[]) {
+        let obj = all.HintsForSuppliers[key] as WebApi.SimpleSupplierHint
         this.groupTextsInternal[obj.GroupId] = obj.Message
       }
 

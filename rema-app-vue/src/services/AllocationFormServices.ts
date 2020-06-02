@@ -1,12 +1,11 @@
 
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import { AdUsers, HintsForSuppliers, AllocationRequestView } from '../models/interfaces'
 import { Ressource, Supplier } from '../models'
 import moment from 'moment'
 
 @Component
 export default class AllocationFormService extends Vue {
-  public referencePerson: AdUsers = { ActiveDirectoryID: '', Name: '', Email: '', Phone: '' }
+  public referencePerson: WebApi.AdUserViewModel = { ActiveDirectoryID: '', Name: '', Email: '', Phone: '' }
   public telNumber: string = ''
   public groupTextsInternal: string[] = []
   public refreshInputReferencePerson: number = 0
@@ -46,7 +45,7 @@ export default class AllocationFormService extends Vue {
     if (this.dateFrom === this.dateTo) return this.timeFrom
     return '00:00'
   }
-  public setReferencePerson (e:AdUsers) {
+  public setReferencePerson (e:WebApi.AdUserViewModel) {
     this.referencePerson = e
     this.telNumber = this.referencePerson.Phone
   }
@@ -88,12 +87,15 @@ export default class AllocationFormService extends Vue {
   public set groupTexts (input: string[]) {
     this.groupTextsInternal.splice(0, Infinity, ...input)
   }
-  public get GetHintsForSuppliers (): HintsForSuppliers[] {
-    let rVal: HintsForSuppliers[] = []
+  public get GetHintsForSuppliers (): WebApi.SimpleSupplierHint[] {
+    let rVal: WebApi.SimpleSupplierHint[] = []
     for (let key in this.groupTexts) {
       let value = this.groupTexts[key]
       if (!value) continue
-      let newHint: HintsForSuppliers = { GroupId: parseInt(key), Message: this.groupTexts[key] }
+      let newHint: WebApi.SimpleSupplierHint = {
+        GroupId: parseInt(key),
+        Message: this.groupTexts[key]
+      }
       rVal.push(newHint)
     }
     return rVal

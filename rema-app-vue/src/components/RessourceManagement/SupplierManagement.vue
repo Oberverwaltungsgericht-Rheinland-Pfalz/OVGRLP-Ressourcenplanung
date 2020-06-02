@@ -69,7 +69,6 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { SupplierGroupModel } from '../../models/interfaces'
 import { Supplier, Ressource } from '../../models'
 
 @Component
@@ -110,7 +109,7 @@ export default class SupplierManagement extends Vue {
     this.editTitle = ''
     this.editEmail = ''
   }
-  private editItem (item: SupplierGroupModel) {
+  private editItem (item: WebApi.SupplierGroup) {
     this.editId = item.Id
     this.editTitle = item.Title
     this.editEmail = item.GroupEmail
@@ -133,7 +132,7 @@ export default class SupplierManagement extends Vue {
     }
     this.closeModal()
   }
-  private async deleteItem (item: SupplierGroupModel) {
+  private async deleteItem (item: WebApi.SupplierGroup) {
     const confirmation = await this.$dialog.confirm({
       text: `Möchten sie die Unterstützergruppe ${item.Title} wirklich löschen?`,
       title: 'Löschen bestätigen',
