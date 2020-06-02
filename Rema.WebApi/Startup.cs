@@ -11,8 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Rema.DbAccess;
-using Rema.DbAccess.Stores;
-using Rema.Infrastructure.Contracts.Stores;
 using Rema.ServiceLayer;
 using Rema.ServiceLayer.Interfaces;
 using Rema.ServiceLayer.Services;
@@ -51,12 +49,6 @@ namespace Rema.WebApi
       services.AddMvc(options => options.EnableEndpointRouting = false)
         .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
         .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
-
-      services.AddScoped<IGadgetStore, GadgetStore>();
-      services.AddScoped<IUserStore, UserStore>();
-      services.AddScoped<IAllocationStore, AllocationStore>();
-      services.AddScoped<IRessourceStore, RessourceStore>();
-      services.AddScoped<ISupplierGroupStore, SupplierGroupStore>();
 
       services.AddScoped<IUserService, UsersService>();
       services.AddScoped<ISupplierGroupsService, SupplierGroupsService>();
