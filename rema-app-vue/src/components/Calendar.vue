@@ -174,8 +174,8 @@ export default class Calendar extends Vue {
     const endYear = end.year
     const suffixYear = startYear === endYear ? '' : endYear
 
-    const startDay = start.day + this.nth(start.day)
-    const endDay = end.day + this.nth(end.day)
+    const startDay = start.day
+    const endDay = end.day
     const isoWeek = moment(start).format('W')
 
     switch (this.currentview) {
@@ -183,9 +183,13 @@ export default class Calendar extends Vue {
         return `${startMonth} ${startYear}`
       case 'week': return `Woche ${isoWeek}`
       case '4day':
-        return `${startMonth} ${startDay} ${startYear} - ${suffixMonth} ${endDay} ${suffixYear}`
+        if (startMonth === endMonth) {
+          return `${startDay}. - ${endDay}. ${startMonth} ${startYear}`
+        } else {
+          return `${startDay}. ${startMonth} ${startYear} - ${endDay}. ${suffixMonth} ${suffixYear}`
+        }
       case 'day':
-        return `${startMonth} ${startDay} ${startYear}`
+        return `${startDay}. ${startMonth} ${startYear}`
     }
     return ''
   }
@@ -267,11 +271,6 @@ export default class Calendar extends Vue {
     // now that we have the start and end dates on the calendar
     this.start = start
     this.end = end
-  }
-  public nth (d:number) {
-    return d > 3 && d < 21
-      ? 'th'
-      : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][d % 10]
   }
 }
 function transfer2Calendar (v: any) {
