@@ -4,6 +4,7 @@ import { AllocationRequestView, ShortAllocationView } from './AllocationRequestV
 import { UserData } from './UserData'
 import { UserState } from './UserState'
 import { RootState } from './RootState'
+import { SelectableGroup } from './SelectableGroup'
 
 export {
   AcknowledgeState,
@@ -12,5 +13,6 @@ export {
   ShortAllocationView,
   UserData,
   UserState,
-  RootState
+  RootState,
+  SelectableGroup
 }

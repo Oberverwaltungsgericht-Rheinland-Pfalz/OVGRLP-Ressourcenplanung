@@ -40,7 +40,7 @@ namespace Rema.WebApi.Controllers
       try
       {
         allocations = await _context.Allocations
-          .Where(g => g.From > firstDayOfLastMonth)
+          .Where(g => g.To > firstDayOfLastMonth)
           .Include(g => g.Ressource)
           .Include(g => g.ApprovedBy)
           .Include(g => g.CreatedBy)

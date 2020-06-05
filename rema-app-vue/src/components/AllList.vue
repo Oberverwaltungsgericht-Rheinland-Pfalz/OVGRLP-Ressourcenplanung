@@ -6,7 +6,6 @@
       :items="Requests"
       :search="search"
       sort-by="From"
-      @click:row="rowClicked"
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
@@ -43,28 +42,38 @@
             />
         </v-toolbar>
       </template>
-      <template v-slot:item.LastModified="{ item }">{{item.LastModified | toLocal}}</template>
-      <template v-slot:item.From="{ item }">{{item.From | toLocal}}</template>
-      <template v-slot:item.To="{ item }">{{item.To | toLocal}}</template>
-      <template v-if="permissionToEdit" v-slot:item.action="{ item }">
-        <v-icon @click.stop="deleteItem(item)">delete</v-icon>&emsp;
-        <v-icon @click.stop="editItem(item.Id)">edit</v-icon>
-        <edit-form-modal v-if="selectedOpen == item.Id" :show="true" :eventId="item.Id" @updateview="selectedOpen = -1">
-<span/>
-        </edit-form-modal>
+      <template v-slot:item="props">
+        <tr @click.stop="rowClicked(props.item.Id)" :class="{'mark-today': props.item.From.startsWith(today)}">
+          <td v-if="permissionToEdit" class="text-start">
+            <v-icon @click.stop="deleteItem(props.item)">delete</v-icon>&emsp;
+            <v-icon @click.stop="editItem(props.item.Id)">edit</v-icon>
+          </td>
+          <td class="text-start">{{props.item.Title}}<span v-if="selectedGroup">: [ {{showGadgets(props.item.Gadgets)}} ]</span></td>
+          <td class="text-start">{{props.item.Status}}</td>
+          <td class="text-start">{{props.item.Ressource}}</td>
+          <td class="text-start">{{props.item.From | toLocal}}</td>
+          <td class="text-start">{{props.item.To | toLocal}}</td>
+          <td class="text-start">{{props.item.LastModified | toLocal}}</td>
+        </tr>
       </template>
     </v-data-table>
     <h3 v-else>Es liegen keine Terminanfragen von Ihnen vor</h3>
-    <edit-form-modal v-if="displayView" @close="displayView=false" :show="true" readonly :eventId="displayId">
+
+    <edit-form-modal v-if="displayView" @close="displayView=false" show readonly :eventId="displayId" :key="'readonlyAlloc'">
     <span/></edit-form-modal>
+    <edit-form-modal v-if="selectedOpen !== -1" show :eventId="selectedOpen" :key="'editAlloc'"
+      @updateview="selectedOpen = -1"><span/>
+    </edit-form-modal>
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation, Gadget, Supplier } from '../models'
+import { SelectableGroup } from '../models/interfaces'
 import { deleteAllocation } from '../services/AllocationApiService'
 import EditFormModal from './EditFormModal.vue'
+import moment from 'moment'
 
 @Component({
   components: { EditFormModal }
@@ -72,7 +81,7 @@ import EditFormModal from './EditFormModal.vue'
 export default class AllList extends Vue {
   private displayView: boolean = false
   private displayId: number=0
-  private selectedGroup: selectableGroup | null = null
+  private selectedGroup: SelectableGroup | null = null
   private search: string = ''
   private hideOld: boolean = true
   private hideNotMine: boolean = false
@@ -86,8 +95,12 @@ export default class AllList extends Vue {
     { text: 'Bis', value: 'To' },
     { text: 'Zuletzt geändert', value: 'LastModified' }
   ];
-  public editItem (id: number) {
-    this.selectedOpen = id
+  private today: string = moment().format('YYYY-MM-DD')
+  public showGadgets (ar: []) {
+    let rVal = ar.map((e: any) => e.Title)
+    if (rVal.length === 1) return rVal[0]
+    let rString = rVal.join(', ')
+    return rString
   }
   public get hasItems () {
     const allocations = Allocation.query()
@@ -132,7 +145,7 @@ export default class AllList extends Vue {
       let groupId = (Gadget.find(f) as any).SuppliedBy
       let group = Supplier.find(groupId) as any
       if (!groups.has(groupId)) {
-        let filterObj: selectableGroup = { Id: group.Id, Title: (group.Title || ''), gadgetIds: [f] }
+        let filterObj: SelectableGroup = { Id: group.Id, Title: (group.Title || ''), gadgetIds: [f] }
         groups.set(groupId, filterObj)
       } else {
         let filterObj = groups.get(groupId)
@@ -140,7 +153,7 @@ export default class AllList extends Vue {
       }
     }))
     let rawValues = [...groups.values()]
-    let returnValues = rawValues.map((e: selectableGroup) => ({ Id: e.Id, Title: e.Title, gadgetIds: [...new Set(e.gadgetIds)] }))
+    let returnValues = rawValues.map((e: SelectableGroup) => ({ Id: e.Id, Title: e.Title, gadgetIds: [...new Set(e.gadgetIds)] }))
     return returnValues
   }
 
@@ -157,29 +170,24 @@ export default class AllList extends Vue {
 
     if (confirmation !== true) return
 
-    const isLastAllocation = this.isLastAllocation(item.PurposeId)
     let success = await deleteAllocation(item.Id)
     if (success) this.$dialog.message.success('Löschung erfolgreich', { position: 'center-left' })
     else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
   }
 
-  private isLastAllocation (purposeID: number): boolean {
-    const purposes = this.Requests.filter(
-      (v: VisibleAllocation) => v.PurposeId === purposeID
-    )
-    if (purposes.length <= 1) return true
-    return false
+  public editItem (id: number) {
+    this.selectedOpen = -1
+    this.$nextTick(() => {
+      this.selectedOpen = id
+    })
   }
-  private rowClicked (element: any) {
-    this.displayId = element.Id
-    this.displayView = true
+  private rowClicked (id: number) {
+    this.displayView = false
+    this.displayId = id
+    this.$nextTick(() => {
+      this.displayView = true
+    })
   }
-}
-
-interface selectableGroup {
-  Id: number
-  Title: string
-  gadgetIds: Array<number>
 }
 
 interface VisibleAllocation {
@@ -204,6 +212,8 @@ interface VisibleAllocation {
 
 <style lang="stylus">
 #all-list
+  .mark-today
+    background-color lightyellow
   .select-group .v-input__slot
     margin-bottom 0
   .select-group .v-text-field__details
