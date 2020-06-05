@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" scrollable persistent max-width="1200px">
+  <v-dialog v-model="dialog" scrollable :persistent="!readonly" max-width="1200px">
     <template v-slot:activator="{ on }">
       <v-btn v-on="on" fab small outlined v-show="!show">
         <slot></slot>
