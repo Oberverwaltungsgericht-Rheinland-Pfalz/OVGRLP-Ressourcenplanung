@@ -75,7 +75,7 @@
                   :value="dateFormatted(editFrom)"
                   ></v-text-field>
                 </template>
-                <v-date-picker v-model="editFrom" :min="dateMin" locale="de" no-title @input="fromMenu = false">
+                <v-date-picker v-model="editFrom" :min="dateMin" locale="de" :first-day-of-week="1" no-title @input="fromMenu = false">
                   <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen</v-btn>
                 </v-date-picker>
               </v-menu>
@@ -92,7 +92,7 @@
                   :value="dateFormatted(editTo)"
                   ></v-text-field>
                 </template>
-                <v-date-picker v-model="editTo" :min="dateMin" locale="de" no-title @input="toMenu = false">
+                <v-date-picker v-model="editTo" :min="dateMin" locale="de" :first-day-of-week="1" no-title @input="toMenu = false">
                   <v-btn text color="primary" @click="toMenu = false" block>Abbrechen</v-btn>
                 </v-date-picker>
               </v-menu>
@@ -130,7 +130,8 @@
 
 <script lang="ts">
 import { State, Action, Getter, Mutation } from 'vuex-class'
-import { Component, Prop, Vue, Mixins } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { mixins } from 'vue-class-component'
 import { Names as Fnn } from '../store/User/types'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import AllocationFormService from '@/services/AllocationFormServices'
@@ -141,7 +142,7 @@ import CollisionDetection from './CollisionDetection.vue'
 const namespace = 'user'
 
 @Component({ components: { DropDownTimePicker, CollisionDetection } })
-export default class AcknowledgeView extends Vue {
+export default class AcknowledgeView extends mixins(AllocationFormService) {
   @State('ContactUsers', { namespace })
   private ContactUsers!: WebApi.ContactUser[]
   @Mutation(Fnn.m.addContactUser, { namespace })

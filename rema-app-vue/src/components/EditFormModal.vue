@@ -56,7 +56,7 @@
                   :value="dateFormatted(dateOfSeries)"
                   ></v-text-field>
                 </template>
-                <v-date-picker v-model="dateOfSeries" :min="dateMin" locale="de" no-title @input="menu1 = false" :readonly="readonly">
+                <v-date-picker v-model="dateOfSeries" :min="dateMin" locale="de" :first-day-of-week="1" no-title @input="menu1 = false" :readonly="readonly">
                   <v-btn text color="primary" @click="menu1 = false" block>Abbrechen</v-btn>
                 </v-date-picker>
               </v-menu>
@@ -73,7 +73,7 @@
               :value="dateFormatted(dateFrom)"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" no-title @input="fromMenu = false" :readonly="readonly">
+            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" :first-day-of-week="1" no-title @input="fromMenu = false" :readonly="readonly">
               <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen</v-btn>
             </v-date-picker>
           </v-menu>
@@ -91,7 +91,7 @@
               :value="dateFormatted(dateTo)"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="dateTo" :min="dateToMin" locale="de" no-title @input="toMenu = false" :readonly="readonly">
+            <v-date-picker v-model="dateTo" :min="dateToMin" locale="de" :first-day-of-week="1" no-title @input="toMenu = false" :readonly="readonly">
               <v-btn text color="primary" @click="toMenu = false" block>Abbrechen</v-btn>
             </v-date-picker>
           </v-menu>

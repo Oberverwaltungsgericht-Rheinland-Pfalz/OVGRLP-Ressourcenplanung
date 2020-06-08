@@ -53,7 +53,7 @@
                       </template>
                     </v-combobox>
                   </template>
-                  <v-date-picker v-model="multipleDates" locale="de" multiple no-title scrollable :min="dateMin">
+                  <v-date-picker v-model="multipleDates" locale="de" multiple :first-day-of-week="1" no-title scrollable :min="dateMin">
                     <v-spacer></v-spacer>
                     <v-btn text color="primary" @click="showMultipleDatesMenu = false">Abbrechen</v-btn>
                     <v-btn text color="primary" @click="$refs.showMultipleDatesMenu.save(multipleDates)">OK</v-btn>
@@ -74,7 +74,7 @@
               :value="dateFormatted(dateFrom)"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" no-title @input="fromMenu = false">
+            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" :first-day-of-week="1" no-title @input="fromMenu = false">
               <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen</v-btn>
             </v-date-picker>
           </v-menu>
@@ -93,7 +93,7 @@
               :error="!dateTo && checkForm"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="dateTo" :min="dateToMin" locale="de" no-title @input="toMenu = false">
+            <v-date-picker v-model="dateTo" :min="dateToMin" locale="de" :first-day-of-week="1" no-title @input="toMenu = false">
               <v-btn text color="primary" @click="toMenu = false" block>Abbrechen</v-btn>
             </v-date-picker>
           </v-menu>
