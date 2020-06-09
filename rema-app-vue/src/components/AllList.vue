@@ -213,7 +213,7 @@ interface VisibleAllocation {
 <style lang="stylus">
 #all-list
   .mark-today
-    background-color lightyellow
+    background-color lightblue
   .select-group .v-input__slot
     margin-bottom 0
   .select-group .v-text-field__details
