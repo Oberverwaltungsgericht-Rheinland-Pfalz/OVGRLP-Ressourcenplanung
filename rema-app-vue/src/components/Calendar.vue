@@ -42,6 +42,7 @@
       <v-sheet id="calendar-sheet" height="600">
         <v-calendar
           ref="calendar"
+          :event-name="formatEventText"
           v-model="focus"
           color="primary"
           :events="filteredItems"
@@ -122,6 +123,17 @@ export default class Calendar extends Vue {
   private showFilterModal: boolean = false
   private showWE: boolean = true
 
+  public formatEventText (e:any): string {
+    if (this.currentview === 'month') return e.input.name
+    let start = e.input.start.endsWith('00') ? e.input.start.substring(10, 13) : e.input.start.substring(10, 16)
+    let end = ''
+    if (e.input.end) end = e.input.end.endsWith('00') ? e.input.end.substring(10, 13) : e.input.end.substring(10, 16)
+    if (e.input.longDate) {
+      return `<strong>${e.input.name}</strong><br>${moment(e.input.start).format('DD.MM.YYYY')} ${start} Uhr -<br> ${moment(e.input.end).format('DD.MM.YYYY')} ${end} Uhr`
+    } else {
+      return `<strong>${e.input.name}</strong><br>${start} Uhr - ${end} Uhr`
+    }
+  }
   public get weekdays (): number[] {
     return this.showWE ? [1, 2, 3, 4, 5, 6, 0] : [1, 2, 3, 4, 5]
   }
@@ -275,15 +287,15 @@ export default class Calendar extends Vue {
 }
 function transfer2Calendar (v: any) {
   let rVal:any = {}
-  let longDate = v.From.substr(0, 10) !== v.To.substr(0, 10)
+  rVal.longDate = v.From.substr(0, 10) !== v.To.substr(0, 10)
   if (v.IsAllDay) {
     rVal.start = v.From.substring(0, 10)
     rVal.schedule = `ganztägig`
     rVal.name = (v.Ressource || {}).Name + ' - ' + v.Title
 
-    if (longDate) {
-      rVal.start = v.From.substring(0, 16).replace('T', ' ')
-      rVal.end = v.To.substring(0, 16).replace('T', ' ')
+    if (rVal.longDate) {
+      rVal.start = v.From.substring(0, 10).replace('T', ' ')
+      rVal.end = v.To.substring(0, 10).replace('T', ' ')
       rVal.schedule = `Von ${moment(v.From).format('DD.MM.YYYY')} bis ${moment(v.To).format('DD.MM.YYYY')} ganztägig`
     }
   } else {
@@ -292,7 +304,7 @@ function transfer2Calendar (v: any) {
     rVal.schedule = `
       Von ${moment(v.From).format('LT')} 
       bis ${moment(v.To).format('LT')}`
-    if (longDate) rVal.schedule += ` zwischen dem ${moment(v.From).format('DD.MM.YYYY')} und ${moment(v.To).format('DD.MM.YYYY')}`
+    if (rVal.longDate) rVal.schedule += ` zwischen dem ${moment(v.From).format('DD.MM.YYYY')} und ${moment(v.To).format('DD.MM.YYYY')}`
     rVal.name = `${(v.Ressource || {}).Name} ab ${moment(v.From).format('LT')}: ${v.Title}`
   }
 
@@ -300,7 +312,7 @@ function transfer2Calendar (v: any) {
   rVal.id = v.Id
   rVal.Notes = v.Notes
   rVal.Contact = v.ReferencePersonId
-  rVal.Original = v
+  // rVal.Original = v
   rVal.RessourceName = (v.Ressource || {}).Name
 
   rVal.Hints = ''
@@ -331,7 +343,4 @@ function GetGroupName (id : number) : string {
   padding-right .5em
   i
     color: #82b1ff !important;
-#calendar-sheet
-  .v-calendar-monthly .pl-1 > strong
-    display none
 </style>
