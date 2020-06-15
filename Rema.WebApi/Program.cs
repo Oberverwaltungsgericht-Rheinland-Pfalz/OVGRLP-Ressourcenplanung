@@ -3,6 +3,8 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using PdfSharpCore.Fonts;
+using PdfSharpCore.Utils;
 using Serilog;
 using Serilog.Events;
 
@@ -18,6 +20,8 @@ namespace Rema.WebApi
 
     public static void Main(string[] args)
     {
+      GlobalFontSettings.FontResolver = new FontResolver();
+
       Log.Logger = new LoggerConfiguration()
         .ReadFrom.Configuration(Configuration)
         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)

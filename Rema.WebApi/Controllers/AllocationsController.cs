@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
 using Rema.DbAccess;
 using Rema.Infrastructure.Email;
 using Rema.Infrastructure.Email.Templates;
@@ -24,6 +27,53 @@ namespace Rema.WebApi.Controllers
   {
     public AllocationsController(RpDbContext context, IMapper mapper) : base(context, mapper)
     {
+    }
+
+    [Route("print")]
+    [HttpGet("print/{id}")]
+    public async Task<FileStreamResult> GetPrint(long id)
+    {
+      Log.Information("GET print allocation");
+      Allocation allocation;
+
+      try
+      {
+        allocation = await _context.Allocations.FindAsync(id);  // orther props
+        if (allocation == null)
+        {
+          return null;
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting allocation");
+        return null;
+      }
+
+      string filename = DateTime.UtcNow.Ticks + "print.pdf";
+      try
+      {
+        var document = new PdfDocument();
+        var page = document.AddPage();
+        var gfx = XGraphics.FromPdfPage(page);
+        var font = new XFont("OpenSans", 20, XFontStyle.Bold);
+
+        gfx.DrawString(allocation.Title, font, XBrushes.Black, new XRect(20, 20, page.Width, page.Height), XStringFormats.Center);
+
+        document.Save(filename);
+
+        var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.DeleteOnClose);
+        return File(fs, "application/pdf", "FileDownloadName.pdf");
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "printing pdf");
+        return null;
+      }
+      finally
+      {
+        // System.IO.File.Delete(filename);
+      }
     }
 
     // GET: allocations
@@ -68,26 +118,32 @@ namespace Rema.WebApi.Controllers
       }
     }
 
+    private async Task<Allocation> RetrieveAllocation(long id)
+    {
+      try
+      {
+        var allocation = await _context.Allocations.FindAsync(id);
+        if (allocation == null)
+        {
+          return null;
+        }
+        return allocation;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting allocation");
+        return null;
+      }
+    }
     // GET: allocations/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Allocation>> GetAllocation(long id)
     {
       Log.Information("GET allocation/{id}", id);
 
-      try
-      {
-        var allocation = await _context.Allocations.FindAsync(id);
-        if (allocation == null)
-        {
-          return NotFound();
-        }
-        return Ok(allocation);
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting allocation");
-        return NotFound();
-      }
+      var allocation = await RetrieveAllocation(id);
+      if (allocation != null) return Ok(allocation);
+      return NotFound();
     }
 /*
     // PUT: allocations/5

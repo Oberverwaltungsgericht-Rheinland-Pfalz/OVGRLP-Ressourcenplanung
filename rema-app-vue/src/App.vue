@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-progress-linear v-if="loading" style="z-index: 99;" absolute top indeterminate color="blue"/>
+    <print-view-allocation/>
     <v-system-bar fixed app>
       Raumplanung (Version {{ $store.state.version }})
     </v-system-bar>
@@ -121,9 +122,10 @@ import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'
 import { refreshAllocations } from './services/AllocationApiService'
+import PrintViewAllocation from '@/components/PrintViewAllocation.vue'
 
 @Component({
-  components: { NewFormModal }
+  components: { NewFormModal, PrintViewAllocation }
 })
 export default class App extends Vue {
   public get currentPath () {
@@ -180,4 +182,9 @@ export default class App extends Vue {
   #bigTitle
    display none
 
+</style>
+
+<style lang="stylus">
+.alignRight
+  margin-left auto
 </style>
