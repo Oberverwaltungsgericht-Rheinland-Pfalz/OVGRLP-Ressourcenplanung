@@ -74,8 +74,3 @@ export default class Roomview extends Vue {
   }
 }
 </script>
-
-<style lang="stylus" scoped>
-.alignRight
-  margin-left auto
-</style>

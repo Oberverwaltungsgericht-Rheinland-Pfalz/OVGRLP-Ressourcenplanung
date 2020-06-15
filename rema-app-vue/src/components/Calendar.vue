@@ -343,4 +343,10 @@ function GetGroupName (id : number) : string {
   padding-right .5em
   i
     color: #82b1ff !important;
+
+html
+  *:not(#calendar-sheet)
+    color red !important
+  #calendar-sheet *
+    color green !important
 </style>

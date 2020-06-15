@@ -44,9 +44,10 @@
       </template>
       <template v-slot:item="props">
         <tr @click.stop="rowClicked(props.item.Id)" :class="{'mark-today': props.item.From.startsWith(today)}">
-          <td v-if="permissionToEdit" class="text-start">
-            <v-icon @click.stop="deleteItem(props.item)">delete</v-icon>&emsp;
-            <v-icon @click.stop="editItem(props.item.Id)">edit</v-icon>
+          <td class="text-start">
+            <v-icon v-if="permissionToEdit" @click.stop="deleteItem(props.item)">delete</v-icon>&emsp;
+            <v-icon @click.stop="printItem(props.item)">print</v-icon>&emsp;
+            <v-icon v-if="permissionToEdit" @click.stop="editItem(props.item.Id)">edit</v-icon>
           </td>
           <td class="text-start">{{props.item.Title}}<span v-if="selectedGroup">: [ {{showGadgets(props.item.Gadgets)}} ]</span></td>
           <td class="text-start">{{props.item.Status}}</td>
@@ -74,6 +75,7 @@ import { SelectableGroup } from '../models/interfaces'
 import { deleteAllocation } from '../services/AllocationApiService'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
+import print from 'print-js'
 
 @Component({
   components: { EditFormModal }
@@ -173,6 +175,12 @@ export default class AllList extends Vue {
     let success = await deleteAllocation(item.Id)
     if (success) this.$dialog.message.success('Löschung erfolgreich', { position: 'center-left' })
     else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
+  }
+  private async printItem (item: VisibleAllocation) {
+    console.dir(item)
+    // trigger with
+    //    this.$root.$emit('print-object', item)
+    print('api/Allocations/print/' + item.Id)
   }
 
   public editItem (id: number) {
