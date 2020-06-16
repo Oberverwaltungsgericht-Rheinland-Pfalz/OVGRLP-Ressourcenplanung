@@ -49,8 +49,7 @@ namespace Rema.Infrastructure.Email.Templates
       if (this._allocation.ReferencePerson == null) return "";
       var referencePerson =  $@"{this._allocation.ReferencePerson.Organisation} \ {this._allocation.ReferencePerson.Name}";
 
-      return $@"Ansprechpartner:
-{referencePerson}";
+      return referencePerson;
       }
     }
     

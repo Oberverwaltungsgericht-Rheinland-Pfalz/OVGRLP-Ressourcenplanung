@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PdfSharpCore.Drawing;
+using PdfSharpCore.Drawing.Layout;
 using PdfSharpCore.Pdf;
 using Rema.DbAccess;
 using Rema.Infrastructure.Email;
@@ -38,7 +39,13 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation = await _context.Allocations.FindAsync(id);  // orther props
+        allocation = await _context.Allocations
+          .Include(o => o.Ressource)
+          .Include(r => r.ReferencePerson)
+          .Include(r => r.LastModifiedBy)
+          .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
+          .FirstOrDefaultAsync(i => i.Id == id);
+
         if (allocation == null)
         {
           return null;
@@ -53,12 +60,26 @@ namespace Rema.WebApi.Controllers
       string filename = DateTime.UtcNow.Ticks + "print.pdf";
       try
       {
-        var document = new PdfDocument();
-        var page = document.AddPage();
-        var gfx = XGraphics.FromPdfPage(page);
-        var font = new XFont("OpenSans", 20, XFontStyle.Bold);
+        var template = new PrintTemplate(allocation);
+        
+        PdfDocument document = new PdfDocument();
 
-        gfx.DrawString(allocation.Title, font, XBrushes.Black, new XRect(20, 20, page.Width, page.Height), XStringFormats.Center);
+        PdfPage page = document.AddPage();
+        XGraphics gfx = XGraphics.FromPdfPage(page);
+        XFont font = new XFont("Calibri", 12, XFontStyle.Bold);
+        XTextFormatter tf = new XTextFormatter(gfx);
+
+        XRect rect = new XRect(40, 50, page.Width * 0.8, page.Height * 7.5);
+        gfx.DrawRectangle(XBrushes.White, rect);
+        tf.DrawString(template.ToString(), font, XBrushes.Black, rect, XStringFormats.TopLeft);
+
+
+        //var document = new PdfDocument();
+        //var page = document.AddPage();
+        //var gfx = XGraphics.FromPdfPage(page);
+        //var font = new XFont("OpenSans", 12, XFontStyle.Bold);
+
+        //gfx.DrawString(template.ToString(), font, XBrushes.Black, new XRect(20, 20, page.Width/10, /*page.Height*/ 25), XStringFormats.Center);
 
         document.Save(filename);
 
