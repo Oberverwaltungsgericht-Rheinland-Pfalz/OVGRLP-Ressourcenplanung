@@ -177,9 +177,6 @@ export default class AllList extends Vue {
     else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
   }
   private async printItem (item: VisibleAllocation) {
-    console.dir(item)
-    // trigger with
-    //    this.$root.$emit('print-object', item)
     print('api/Allocations/print/' + item.Id)
   }
 

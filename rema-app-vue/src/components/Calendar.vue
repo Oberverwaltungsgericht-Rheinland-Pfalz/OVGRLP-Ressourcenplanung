@@ -63,10 +63,11 @@
           :activator="selectedElement"
           offset-x
         >
-          <v-card color="grey lighten-4" min-width="350px" flat>
+          <v-card color="grey lighten-4" min-width="400px" flat>
             <v-toolbar :color="selectedEvent.color" dark>
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
+                <v-btn @click="printAllocation(selectedEvent.id)" fab small outlined><v-icon>print</v-icon></v-btn>
                 <v-btn v-show="permissionToEdit" @click="deleteAllocation" fab small outlined><v-icon small>delete</v-icon>
                 </v-btn><span>&emsp;</span>
                 <edit-form-modal v-if="selectedOpen && permissionToEdit" :eventId="selectedEvent.id" @updateview="selectedOpen = false">
@@ -99,6 +100,7 @@ import { deleteAllocation } from '../services/AllocationApiService'
 import { Allocation, Gadget, Supplier } from '../models'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
+import print from 'print-js'
 
 @Component({
   components: { EditFormModal }
@@ -218,6 +220,9 @@ export default class Calendar extends Vue {
     this.titleFilter.splice(0, Infinity)
   }
 
+  public printAllocation (id: number) {
+    print('api/Allocations/print/' + id)
+  }
   public async deleteAllocation () {
     const { id, name } = this.selectedEvent as any
     const confirmation = await this.$dialog.confirm({
@@ -342,11 +347,5 @@ function GetGroupName (id : number) : string {
   margin-top -1.5em
   padding-right .5em
   i
-    color: #82b1ff !important;
-
-html
-  *:not(#calendar-sheet)
-    color red !important
-  #calendar-sheet *
-    color green !important
+    color #82b1ff !important
 </style>

@@ -1,3 +1,11 @@
+## VueWebApp v1.3.0+20251
+
+### Änderungen
+
+* Termine können ausgedruckt werden
+* Datum und Uhrzeit werden bei Mehrtage-langen-terminen angezeigt
+* Aktueller Tag wird in Terminliste hervorgehoben
+
 ## VueWebApp v1.0.0+20225
 
 ### Änderungen
