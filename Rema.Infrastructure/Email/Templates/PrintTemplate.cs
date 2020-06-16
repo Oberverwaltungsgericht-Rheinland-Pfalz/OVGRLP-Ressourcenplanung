@@ -17,19 +17,21 @@ namespace Rema.Infrastructure.Email.Templates
     public override string ToString()
     {
       return $@"Termineintrag in der Ressourcenplanung.
-Von: {LastModifier}
 
-Raum:
-{RessourceName} 
+Erstellt durch: {this._allocation.CreatedBy.Name}
+Zuletzt geändert durch: {LastModifier}
+Zuletzt geändert am: {this._allocation.LastModified.ToString("dddd, dd MMMM y")}
+
+Ansprechpartner:
+{ReferencePerson}
+
+Raum: {RessourceName} 
 
 Titel:
 {Title}
 
 Reservierung:
 {ReserveTime}
-
-Ansprechpartner:
-{ReferencePerson}
 
 Telefonnummer:
 {ContactPhone}
