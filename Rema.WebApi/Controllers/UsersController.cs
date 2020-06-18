@@ -105,6 +105,9 @@ namespace Rema.WebApi.Controllers
     public ActionResult<UserViewModel> GetCurrentUser()
     {
       Log.Information("GET users/me");
+
+      // todo: if-bedingungen; Sende nur IF config-parameter = true
+      Response.Headers.Add("Requests-Allowed", "true");
       try
       {
         return RequestSenderVMInitial();

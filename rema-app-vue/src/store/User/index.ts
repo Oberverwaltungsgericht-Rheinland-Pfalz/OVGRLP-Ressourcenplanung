@@ -13,7 +13,8 @@ export const state: UserState = {
   organisation: '',
   supplierGroups: false,
   lastUpdated: false,
-  ContactUsers: []
+  ContactUsers: [],
+  isRequestable: false
 }
 
 export const user: Module<UserState, RootState> = {

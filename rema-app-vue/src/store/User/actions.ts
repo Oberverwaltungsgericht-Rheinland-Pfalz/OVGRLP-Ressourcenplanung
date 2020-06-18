@@ -14,6 +14,8 @@ export const actions: ActionTree<UserState, RootState> = {
       }
     })
     const responseObj = await response.json()
+    let requestable = response.headers.get('Requests-Allowed') || ''
+    commit(Names.m.setRequestable, requestable)
     commit(Names.m.setUser, responseObj)
   },
   async [Names.a.reloadUser] ({ commit, dispatch }): Promise<any> {
