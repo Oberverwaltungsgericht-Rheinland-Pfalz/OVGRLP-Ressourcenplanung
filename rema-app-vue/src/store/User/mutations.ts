@@ -31,5 +31,8 @@ export const mutations: MutationTree<UserState> = {
     const hasEntry = state.ContactUsers.find((s) => s.Id === id && s.Title)
     if (hasEntry) return
     state.ContactUsers.push({ Id: id, Title: '', Email: '', Organisation: '' })
+  },
+  [Names.m.setRequestable] (state: UserState, requestable: boolean) {
+    state.isRequestable = requestable
   }
 }

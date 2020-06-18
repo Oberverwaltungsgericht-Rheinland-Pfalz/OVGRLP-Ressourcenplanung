@@ -191,6 +191,7 @@ import moment from 'moment'
 import { submitAllocation, submitAllocations, refreshAllocations } from '../../services/AllocationApiService'
 import TitleProposal from '../TitleProposal.vue'
 import CollisionDetection from '../CollisionDetection.vue'
+import { State, Action, Getter, Mutation } from 'vuex-class'
 
 @Component({
   components: {
@@ -206,6 +207,8 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
   public isRepeating: boolean = false
+  @State('isRequestable', { namespace: 'user' })
+  private requestsAllowed!: boolean
 
   private async sendAllocation (status: number) {
     if (this.isFormInvalid()) return
