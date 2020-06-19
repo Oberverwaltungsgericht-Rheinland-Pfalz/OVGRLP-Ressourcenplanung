@@ -29,10 +29,8 @@
             </v-card>
           </v-dialog>
           <v-spacer/>
-          <label id="showWe">
-            <v-icon v-if="showWE">visibility</v-icon>
-            <v-icon v-else>visibility_off</v-icon>&ensp;WE<input hidden v-model="showWE" type="checkbox"/>
-            </label>
+
+          <v-checkbox class="showWe" v-model="showWE" :label="'WE'" on-icon="visibility" off-icon="visibility_off"></v-checkbox>
           <v-radio-group v-model="currentview" row>
             <v-radio v-for="n in types" :key="'ansicht'+n" :label="typeName(n)" :value="n"/>
           </v-radio-group>
@@ -343,9 +341,7 @@ function GetGroupName (id : number) : string {
 #pad-bot-twenty
   padding-bottom 20em
 
-#showWe
-  margin-top -1.5em
-  padding-right .5em
-  i
-    color #82b1ff !important
+.showWe
+  margin-right .5em
+
 </style>

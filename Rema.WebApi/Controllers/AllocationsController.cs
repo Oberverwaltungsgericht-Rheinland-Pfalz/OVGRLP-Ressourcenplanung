@@ -34,7 +34,7 @@ namespace Rema.WebApi.Controllers
     [HttpGet("print/{id}")]
     public async Task<FileStreamResult> GetPrint(long id)
     {
-      Log.Information("GET print allocation");
+      Log.Information("GET print allocation id:"+id);
       Allocation allocation;
 
       try
@@ -88,7 +88,7 @@ namespace Rema.WebApi.Controllers
       }
       catch (Exception ex)
       {
-        Log.Error(ex, "printing pdf");
+        Log.Error(ex, "printing pdf for id: "+id);
         return null;
       }
       finally
