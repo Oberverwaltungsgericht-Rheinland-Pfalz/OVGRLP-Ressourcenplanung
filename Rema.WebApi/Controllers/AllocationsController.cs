@@ -26,8 +26,10 @@ namespace Rema.WebApi.Controllers
   [AuthorizeAd("Reader")]
   public class AllocationsController : BaseController
   {
-    public AllocationsController(RpDbContext context, IMapper mapper) : base(context, mapper)
+    private readonly IEmailTrigger _emailTrigger;
+    public AllocationsController(RpDbContext context, IMapper mapper, IEmailTrigger emailTrigger) : base(context, mapper)
     {
+      this._emailTrigger = emailTrigger;
     }
 
     [Route("print")]
@@ -43,6 +45,7 @@ namespace Rema.WebApi.Controllers
           .Include(o => o.Ressource)
           .Include(r => r.ReferencePerson)
           .Include(r => r.LastModifiedBy)
+          .Include(r => r.CreatedBy)
           .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
           .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -382,7 +385,7 @@ namespace Rema.WebApi.Controllers
           .FirstOrDefaultAsync(i => i.Id == allocation.Id);
         allocation = await _context.Allocations.FindAsync(allocation.Id);
         var template = new NewAllocationTemplate(allocation, yourRequest);
-        EmailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
+        this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
       }
       catch (Exception ex)
       {
@@ -592,7 +595,7 @@ namespace Rema.WebApi.Controllers
         var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";
 
         var template = new NewAllocationTemplate(allocations, requestType);
-        EmailTrigger.SendEmail(template, recipient, template.GetGroupEmails());
+        this._emailTrigger.SendEmail(template, recipient, template.GetGroupEmails());
       }
       catch (Exception ex)
       {
@@ -651,7 +654,7 @@ namespace Rema.WebApi.Controllers
       }
 
       var template = new DeletedAllocationTemplate(allocation);
-      EmailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
+      this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
       return Ok();
     }
    
@@ -722,7 +725,7 @@ namespace Rema.WebApi.Controllers
           template = new StatusChangedTemplate(allocation, "abgelehnt");
         }
         if (template != null)
-          EmailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, new List<string>());
+          this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, new List<string>());
       }
 
       catch (Exception ex)
@@ -932,7 +935,7 @@ namespace Rema.WebApi.Controllers
       }
 
       var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets);
-      EmailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails());
+      this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails());
       return Ok();
     }
   }

@@ -7,7 +7,7 @@ namespace Rema.Infrastructure.Email.Templates
 {
   public class PrintTemplate : EmailTemplate
   {
-    public PrintTemplate (Allocation allocation) : base(allocation)
+    public PrintTemplate(Allocation allocation) : base(allocation)
     {
     }
     private string _newStatus { get; set; }
@@ -18,7 +18,7 @@ namespace Rema.Infrastructure.Email.Templates
     {
       return $@"Termineintrag in der Ressourcenplanung.
 
-Erstellt durch: {this._allocation.CreatedBy.Name}
+Erstellt durch: {this._allocation.CreatedBy?.Name}
 Zuletzt geändert durch: {LastModifier}
 Zuletzt geändert am: {this._allocation.LastModified.ToString("dddd, dd MMMM y")}
 

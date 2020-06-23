@@ -1,28 +1,38 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
+using Microsoft.Extensions.Configuration;
 using Rema.Infrastructure.Email.Templates;
 
 namespace Rema.Infrastructure.Email
 {
-  public static class EmailTrigger
+  public interface IEmailTrigger
   {
-    public static void SendEmail(string subject, string body, string recipient)
+    public void SendEmail(EmailTemplate template, string recipient, IList<string> groups);
+  }
+
+  public class EmailTrigger: IEmailTrigger
+  {
+    private readonly EmailSettings _emailSettings;
+
+    public EmailTrigger(EmailSettings emailSettings)
     {
-      SmtpClient smtp = new SmtpClient("outlook.jmrlp.de");
-      smtp.EnableSsl = false;
-      smtp.Port = 25;
-      smtp.Send("support@ovg.jm.rlp.de", recipient, $"[Ressourcenplanungssystem] {subject}", body);
-    }
-    public static void SendEmail(EmailTemplate template, string recipient, IList<string> groups)
+      this._emailSettings = emailSettings;
+    } 
+
+    public void SendEmail(EmailTemplate template, string recipient, IList<string> groups)
     {
-      if (recipient != null) groups.Add(recipient);
+      if (recipient != null)
+      {
+        groups.Add(recipient);
+      }
+
       var uniqueList = groups.Distinct().ToList();
       foreach (var emailAdress in uniqueList)
       {
-        SmtpClient smtp = new SmtpClient("outlook.jmrlp.de");
-        smtp.EnableSsl = false;
-        smtp.Port = 25;
+        SmtpClient smtp = new SmtpClient(this._emailSettings.Domain);
+        smtp.EnableSsl = this._emailSettings.EnableSSL;
+        smtp.Port = this._emailSettings.Port;
         /*Some SMTP servers require that the client be authenticated before the server sends email on its behalf. Set this property to true when 
          * this SmtpClient object should, if requested by the server, authenticate using the default credentials of the currently logged on user. 
          * For client applications, this is the desired behavior in most scenarios.

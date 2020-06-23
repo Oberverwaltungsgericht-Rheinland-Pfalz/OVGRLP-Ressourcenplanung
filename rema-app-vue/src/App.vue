@@ -119,7 +119,7 @@ import { UserData } from './models/interfaces'
 import { Gadget, Ressource, Supplier, Allocation } from './models'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
-import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'
+// import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'
 import { refreshAllocations } from './services/AllocationApiService'
 
 @Component({
@@ -141,7 +141,7 @@ export default class App extends Vue {
   private miniVariant: boolean = false
   private right: boolean = true
   private title: string = 'NJZ Raumplanung'
-  private items: RemaRouteConfig[] = []
+  private items: object[] = []
   private loading: boolean = true
 
   public get showNav () : boolean {

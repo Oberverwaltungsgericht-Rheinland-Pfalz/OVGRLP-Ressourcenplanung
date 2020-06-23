@@ -15,6 +15,7 @@ using Rema.ServiceLayer.Services;
 using Microsoft.Extensions.Primitives;
 using Rema.ServiceLayer;
 using Rema.ServiceLayer.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Rema.WebApi.Controllers
 {
@@ -26,10 +27,12 @@ namespace Rema.WebApi.Controllers
   {
     private readonly IAdService _adService;
     private readonly IUserService _userService;
-    public UsersController(RpDbContext context, IMapper mapper, IAdService adService, IUserService userService) : base(context, mapper)
+    private readonly IConfiguration _configuration;
+    public UsersController(RpDbContext context, IMapper mapper, IAdService adService, IUserService userService, IConfiguration configuration) : base(context, mapper)
     {
       this._adService = adService;
       this._userService = userService;
+      this._configuration = configuration;
     }
 
     // GET: users
@@ -107,7 +110,12 @@ namespace Rema.WebApi.Controllers
       Log.Information("GET users/me");
 
       // todo: if-bedingungen; Sende nur IF config-parameter = true
-      Response.Headers.Add("Requests-Allowed", "true");
+      var isRequestable = this._configuration.GetValue<Boolean>("Requestable");
+      if (isRequestable)
+      {
+        Response.Headers.Add("Requests-Allowed", "true");
+      }
+
       try
       {
         return RequestSenderVMInitial();

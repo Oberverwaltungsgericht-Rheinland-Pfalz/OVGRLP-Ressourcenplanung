@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Rema.DbAccess;
+using Rema.Infrastructure.Email;
 using Rema.ServiceLayer;
 using Rema.ServiceLayer.Interfaces;
 using Rema.ServiceLayer.Services;
@@ -41,6 +42,11 @@ namespace Rema.WebApi
     {
       List<string> DomainsToSearch = Configuration.GetSection("DomainsToSearch").Get<List<string>>();
 
+      EmailSettings emailSettings = new EmailSettings();
+      Configuration.GetSection("Email").Bind(emailSettings);
+      services.AddSingleton<EmailSettings>(emailSettings);
+
+      services.AddScoped<IEmailTrigger, EmailTrigger>();
       services.AddSingleton<IAdService>(new AdService(DomainsToSearch));
       services.AddAutoMapper(typeof(Startup));
       services.AddHttpContextAccessor();
