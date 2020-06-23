@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router, { RouteConfig } from 'vue-router'
 import store from '@/store/index'
-import { RemaRouteConfig } from '@/models/interfaces/RemaRouteConfig'
+// import { RemaRouteConfig } from '@/models/interfaces/RemaRouteConfig'
 
 Vue.use(Router)
 
@@ -16,53 +16,46 @@ export default new Router({
       icon: 'business',
       authLevel: 0,
       component: () => import('@/views/Calendar.vue')
-    } as RemaRouteConfig,
+    } as any,
     {
       path: '/overview',
       name: 'Terminübersicht',
       icon: 'storage',
       authLevel: 1,
       component: () => import('@/components/AllList.vue')
-    } as RemaRouteConfig,
+    } as any,
     {
       path: '/acknowledge',
       name: 'Anfragenverwaltung',
       icon: 'storage',
       authLevel: 10,
-      beforeEnter: (to, from, next) => requireAuth(10, to, from, next),
+      beforeEnter: (to: any, from: any, next: any) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')
-    } as RemaRouteConfig,
-    /*     {
-         path: '/mylist',
-         name: 'Ihre Anfragen',
-         icon: 'calendar_view_day',
-         authLevel: 1,
-         component: () => import('@/components/MyList.vue')
-       } as RemaRouteConfig,
-   */ {
-      path: '/ressources',
-      name: 'Administration',
-      icon: 'dvr',
-      authLevel: 100,
-      beforeEnter: (to, from, next) => requireAuth(100, to, from, next),
-      component: () => import('@/views/Ressources.vue')
-    } as RemaRouteConfig,
+    } as any,
+     {
+       path: '/ressources',
+       name: 'Administration',
+       icon: 'dvr',
+       authLevel: 100,
+       beforeEnter: (to: any, from: any, next: any) => requireAuth(100, to, from, next),
+       component: () => import('@/views/Ressources.vue')
+     } as any,
     {
       path: '/roomlist',
       name: 'Raumübersicht',
       icon: 'art_track',
       authLevel: 1,
-      beforeEnter: (to, from, next) => requireAuth(1, to, from, next),
+      beforeEnter: (to: any, from: any, next: any) => requireAuth(1, to, from, next),
       component: () => import('@/components/RoomView.vue')
-    } as RemaRouteConfig,
+    } as any,
     {
       path: '/gadgetlist',
       name: 'Hilfsmittelübersicht',
       icon: 'library_add',
       authLevel: 1,
-      beforeEnter: (to, from, next) => requireAuth(1, to, from, next),
+      beforeEnter: (to :any, from: any, next: any) => requireAuth(1, to, from, next),
       component: () => import('@/components/GadgetView.vue')
-    } as RemaRouteConfig
+    } as any
     /*
     {
       path: '/occupancy',

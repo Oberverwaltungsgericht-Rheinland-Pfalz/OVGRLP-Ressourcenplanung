@@ -16,7 +16,7 @@ namespace Rema.ServiceLayer.Services
     List<T> SearchAdUsers<T>(string userName) where T : class;
 
   }
-  public class AdService: IAdService
+  public class AdService : IAdService
   {
     public List<string> DomainsToSearch;
 
@@ -89,7 +89,7 @@ namespace Rema.ServiceLayer.Services
                   DirectoryEntry de = result.GetUnderlyingObject() as DirectoryEntry;
                   string mail = string.Empty;
                   string tel = string.Empty;
-                  
+
                   if (null != de.Properties["mail"] && null != de.Properties["mail"].Value)
                     mail = de.Properties["mail"]?.Value?.ToString();
 
