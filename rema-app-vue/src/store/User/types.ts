@@ -10,6 +10,7 @@ export const Names = {
     clearUser: 'clearUser',
     reserveContactUser: 'reserveContactUser',
     setRequestable: 'setRequestable',
+    setCalendarFrom: 'setCalendarFrom',
     setUser: 'setUser'
   }
 }
