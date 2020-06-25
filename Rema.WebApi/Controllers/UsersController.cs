@@ -116,6 +116,12 @@ namespace Rema.WebApi.Controllers
         Response.Headers.Add("Requests-Allowed", "true");
       }
 
+      int scrollToHour = this._configuration.GetValue<int>("ScrollToHour");
+      if (scrollToHour != 0)
+      {
+        Response.Headers.Add("Calendar-From", scrollToHour.ToString());
+      }
+
       try
       {
         return RequestSenderVMInitial();

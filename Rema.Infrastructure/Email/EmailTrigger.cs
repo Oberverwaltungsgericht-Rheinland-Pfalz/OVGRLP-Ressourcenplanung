@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using Microsoft.Extensions.Configuration;
 using Rema.Infrastructure.Email.Templates;
+using Serilog;
 
 namespace Rema.Infrastructure.Email
 {
@@ -44,7 +46,17 @@ namespace Rema.Infrastructure.Email
         credentials when connecting to the server. If the UseDefaultCredentials property is set to false and the Credentials property has not 
         been set, then mail is sent to the server anonymously.*/
         // client.UseDefaultCredentials = true;
-        smtp.Send("support@ovg.jm.rlp.de", emailAdress, $"[Ressourcenplanungssystem] {template.Subject}", template.ToString());
+
+        try
+        {
+          Log.Information("Sending email to "+ emailAdress);
+          smtp.Send("support@ovg.jm.rlp.de", emailAdress, $"[Ressourcenplanungssystem] {template.Subject}", template.ToString());
+        }
+        catch (Exception ex)
+        {
+          Log.Error(ex, $"error while sending email to {emailAdress}");
+          return;
+        }
       }
     }
   }

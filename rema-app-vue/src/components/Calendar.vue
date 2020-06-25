@@ -49,6 +49,7 @@
           :now="today"
           :type="currentview"
           :weekdays="weekdays"
+          :first-interval="CalendarFrom"
           :short-weekdays="false"
           @click:event="showEvent"
           @click:more="viewDay"
@@ -106,8 +107,10 @@ import print from 'print-js'
 export default class Calendar extends Vue {
   @State('ContactUsers', { namespace: 'user' })
   private ContactUsers!: WebApi.ContactUser[]
+  @State('calendarFrom', { namespace: 'user' })
+  private CalendarFrom!: number
   @Action(Names.a.loadUsers, { namespace: 'user' })
-  private loadUsers: any;
+  private loadUsers: any
 
   private today: string = moment().format('YYYY-MM-DD')
   private focus: string = moment().format('YYYY-MM-DD')

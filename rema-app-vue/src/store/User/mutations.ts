@@ -34,5 +34,8 @@ export const mutations: MutationTree<UserState> = {
   },
   [Names.m.setRequestable] (state: UserState, requestable: boolean) {
     state.isRequestable = requestable
+  },
+  [Names.m.setCalendarFrom] (state: UserState, calendarHourFrom: number) {
+    state.calendarFrom = calendarHourFrom
   }
 }

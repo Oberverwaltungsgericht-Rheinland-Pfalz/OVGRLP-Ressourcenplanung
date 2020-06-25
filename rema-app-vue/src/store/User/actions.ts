@@ -15,6 +15,9 @@ export const actions: ActionTree<UserState, RootState> = {
     })
     const responseObj = await response.json()
     let requestable = response.headers.get('Requests-Allowed') || ''
+    let showCalendarFrom = response.headers.get('Calendar-From') || 0
+
+    commit(Names.m.setCalendarFrom, showCalendarFrom)
     commit(Names.m.setRequestable, requestable)
     commit(Names.m.setUser, responseObj)
   },
