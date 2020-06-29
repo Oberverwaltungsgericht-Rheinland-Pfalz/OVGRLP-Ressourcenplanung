@@ -35,6 +35,7 @@
             <v-radio v-for="n in types" :key="'ansicht'+n" :label="typeName(n)" :value="n"/>
           </v-radio-group>
         </v-toolbar>
+
       </v-sheet>
 
       <v-sheet id="calendar-sheet" height="600">
@@ -127,14 +128,16 @@ export default class Calendar extends Vue {
   private showWE: boolean = true
 
   public formatEventText (e:any): string {
-    if (this.currentview === 'month') return e.input.name
+    // if (this.currentview === 'month') return e.input.name
     let start = e.input.start.endsWith('00') ? e.input.start.substring(10, 13) : e.input.start.substring(10, 16)
     let end = ''
     if (e.input.end) end = e.input.end.endsWith('00') ? e.input.end.substring(10, 13) : e.input.end.substring(10, 16)
+    //  if (e.input.name) return 'x'
     if (e.input.longDate) {
-      return `<strong>${e.input.name}</strong><br>${moment(e.input.start).format('DD.MM.YYYY')} ${start} Uhr -<br> ${moment(e.input.end).format('DD.MM.YYYY')} ${end} Uhr`
+      return `<span class="input-name"><strong>${e.input.name}</strong><br>
+      <span class="not-bold">${moment(e.input.start).format('DD.MM.YYYY')} ${start} Uhr -<br> ${moment(e.input.end).format('DD.MM.YYYY')} ${end} Uhr</span></span>`
     } else {
-      return `<strong>${e.input.name}</strong><br>${start} Uhr - ${end} Uhr`
+      return `<span class="input-name"><strong>${e.input.name}</strong><br><span class="not-bold">${start} Uhr - ${end} Uhr</span></span>`
     }
   }
   public get weekdays (): number[] {
@@ -346,5 +349,13 @@ function GetGroupName (id : number) : string {
 
 .showWe
   margin-right .5em
+
+.pl-1 > strong, .input-name
+    visibility visible
+
+.pl-1
+  visibility hidden
+.not-bold
+  font-weight normal
 
 </style>
