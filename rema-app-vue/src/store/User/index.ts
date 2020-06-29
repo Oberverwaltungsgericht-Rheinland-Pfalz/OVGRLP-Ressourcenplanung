@@ -14,7 +14,8 @@ export const state: UserState = {
   supplierGroups: false,
   lastUpdated: false,
   ContactUsers: [],
-  isRequestable: false
+  isRequestable: false,
+  calendarFrom: 0
 }
 
 export const user: Module<UserState, RootState> = {
