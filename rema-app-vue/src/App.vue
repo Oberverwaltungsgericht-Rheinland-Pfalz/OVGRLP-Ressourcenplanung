@@ -97,16 +97,23 @@
                 {{ userData.organisation }}
               </v-list-item-title>
             </v-list-item>
+            <v-list-item>
+              <v-list-item-title>
+                <v-icon></v-icon>
+                Termine reservierbar:
+                {{ isRequestable }}
+              </v-list-item-title>
+            </v-list-item>
           </v-list>
         </v-menu>
       </v-layout>
     </v-app-bar>
 
-    <v-content>
+    <v-main>
       <v-container v-if="!loading" fluid>
         <router-view />
       </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
@@ -144,6 +151,9 @@ export default class App extends Vue {
   private items: object[] = []
   private loading: boolean = true
 
+  public get isRequestable () : string {
+    return this.$store.state.user.isRequestable ? 'Ja' : 'Nein'
+  }
   public get showNav () : boolean {
     if (this.loading) return false
     return this.userData.roleNames.length > 0

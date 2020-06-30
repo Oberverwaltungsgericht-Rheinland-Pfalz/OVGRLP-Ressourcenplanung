@@ -1,5 +1,6 @@
 <template>
   <v-layout column>
+    <h3 v-if="!$store.state.user.isRequestable" style="color:red;text-align: center;">Die Anfrageverwaltung ist deaktiviert</h3>
     <v-data-table
       v-if="hasItems"
       :headers="headers"

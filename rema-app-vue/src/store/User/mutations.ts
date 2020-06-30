@@ -33,7 +33,7 @@ export const mutations: MutationTree<UserState> = {
     state.ContactUsers.push({ Id: id, Title: '', Email: '', Organisation: '' })
   },
   [Names.m.setRequestable] (state: UserState, requestable: boolean) {
-    state.isRequestable = requestable
+    state.isRequestable = requestable && state.role > 0
   },
   [Names.m.setCalendarFrom] (state: UserState, calendarHourFrom: number) {
     state.calendarFrom = calendarHourFrom
