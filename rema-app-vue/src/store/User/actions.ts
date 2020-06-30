@@ -18,8 +18,8 @@ export const actions: ActionTree<UserState, RootState> = {
     let showCalendarFrom = response.headers.get('Calendar-From') || 0
 
     commit(Names.m.setCalendarFrom, showCalendarFrom)
-    commit(Names.m.setRequestable, requestable)
     commit(Names.m.setUser, responseObj)
+    commit(Names.m.setRequestable, requestable)
   },
   async [Names.a.reloadUser] ({ commit, dispatch }): Promise<any> {
     commit(Names.m.clearUser)
