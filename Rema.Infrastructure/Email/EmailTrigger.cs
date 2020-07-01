@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Configuration;
 using Rema.Infrastructure.Email.Templates;
@@ -29,12 +30,21 @@ namespace Rema.Infrastructure.Email
         groups.Add(recipient);
       }
 
+      var senderEmail = "support@ovg.jm.rlp.de";
       var uniqueList = groups.Distinct().ToList();
       foreach (var emailAdress in uniqueList)
       {
         SmtpClient smtp = new SmtpClient(this._emailSettings.Domain);
         smtp.EnableSsl = this._emailSettings.EnableSSL;
         smtp.Port = this._emailSettings.Port;
+
+        if (this._emailSettings.useIISAccount)
+        {
+          senderEmail = this._emailSettings.EmailUsername;
+          smtp.UseDefaultCredentials = false;
+          smtp.Credentials = new NetworkCredential(this._emailSettings.EmailUsername, this._emailSettings.EmailPassword);
+        }
+
         /*Some SMTP servers require that the client be authenticated before the server sends email on its behalf. Set this property to true when 
          * this SmtpClient object should, if requested by the server, authenticate using the default credentials of the currently logged on user. 
          * For client applications, this is the desired behavior in most scenarios.
@@ -50,7 +60,7 @@ namespace Rema.Infrastructure.Email
         try
         {
           Log.Information("Sending email to "+ emailAdress);
-          smtp.Send("support@ovg.jm.rlp.de", emailAdress, $"[Ressourcenplanungssystem] {template.Subject}", template.ToString());
+          smtp.Send(senderEmail, emailAdress, $"[Raumplanung] {template.Subject}", template.ToString());
         }
         catch (Exception ex)
         {
