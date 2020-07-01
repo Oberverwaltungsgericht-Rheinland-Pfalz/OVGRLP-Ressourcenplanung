@@ -30,6 +30,9 @@ Raum: {RessourceName}
 Titel:
 {Title}
 
+Status:
+{Status}
+
 Reservierung:
 {ReserveTime}
 

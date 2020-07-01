@@ -161,10 +161,22 @@ export default class Calendar extends Vue {
       })
   }
   public get itemsFormated () {
-    let formatedItems = Allocation.query()
-      .with('Ressource')
-      .with('Gadget')
-      .get()
+    var roleLvl = this.$store.state.user.role
+    let myId = this.$store.state.user.id
+
+    var formatedItems = []
+    if (roleLvl >= 10) {
+      formatedItems = Allocation.query()
+        .with('Ressource')
+        .with('Gadget')
+        .get()
+    } else {
+      formatedItems = Allocation.query()
+        .where((al: any) => (al.Status === 1 || al.Status === 3) || al.CreatedById === myId || al.ReferencePersonId === myId)
+        .with('Ressource')
+        .with('Gadget')
+        .get()
+    }
     this.loadUsers(formatedItems.map((e:any) => e.ReferencePersonId))
     return formatedItems.map(transfer2Calendar)
   }
@@ -317,7 +329,13 @@ function transfer2Calendar (v: any) {
     rVal.name = `${(v.Ressource || {}).Name} ab ${moment(v.From).format('LT')}: ${v.Title}`
   }
 
-  rVal.color = 'success'
+  if (v.Status === 1 || v.Status === 3) {
+    rVal.color = 'success'
+  } else if (v.Status === 2) {
+    rVal.color = 'warning'
+  } else {
+    rVal.color = 'info'
+  }
   rVal.id = v.Id
   rVal.Notes = v.Notes
   rVal.Contact = v.ReferencePersonId
@@ -353,7 +371,7 @@ function GetGroupName (id : number) : string {
 .pl-1 > strong, .input-name
     visibility visible
 
-.pl-1
+.pl-1:not(.v-event-more)
   visibility hidden
 .not-bold
   font-weight normal

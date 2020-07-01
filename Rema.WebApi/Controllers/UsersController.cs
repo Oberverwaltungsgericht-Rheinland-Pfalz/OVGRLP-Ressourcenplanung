@@ -122,6 +122,12 @@ namespace Rema.WebApi.Controllers
         Response.Headers.Add("Calendar-From", scrollToHour.ToString());
       }
 
+      var siteTitle = this._configuration.GetValue<string>("SiteTitle");
+      if (!string.IsNullOrEmpty(siteTitle))
+      {
+        Response.Headers.Add("Site-Title", siteTitle.ToString());
+      }
+
       try
       {
         return RequestSenderVMInitial();

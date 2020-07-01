@@ -15,9 +15,10 @@
           <v-toolbar-title>Wartende Anfragen</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <label class="blue-icon">
-            <input hidden type="checkbox" v-model="hideOld" />vergangene Termine &ensp;<v-icon v-if="!hideOld">visibility</v-icon>
+            <input hidden type="checkbox" v-model="hideOld" />vergangene Termine bleiben ausgeblendet&ensp;<v-icon v-if="!hideOld">visibility</v-icon>
             <v-icon v-else>visibility_off</v-icon>
           </label>
+
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -117,7 +118,7 @@ export default class AcknowledgeList extends Vue {
     this.fillContactUsers()
     return this.UnAcknowledgedAllocations
       .filter((a: any) => {
-        return !this.hideOld || Date.parse(a.To) > Date.now()
+        return Date.parse(a.To) > Date.now()
       })
       .map((v: any) => ({
         Id: v.Id,

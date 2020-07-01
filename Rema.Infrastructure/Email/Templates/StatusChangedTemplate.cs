@@ -29,6 +29,9 @@ Titel:
 
 Ihre Buchungsanfrage wurde {_newStatus}
 
+Status:
+{Status}
+
 Reservierung:
 {ReserveTime}
 
