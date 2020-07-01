@@ -53,6 +53,18 @@ namespace Rema.Infrastructure.Email.Templates
       }
     }
     
+    protected string Status { get
+      {
+        switch (this._allocation.Status)
+        {
+          case MeetingStatus.Pending: return "Entwurf";
+          case MeetingStatus.Approved: return "Bestätigt";
+          case MeetingStatus.Moved: return "Verschoben";
+          case MeetingStatus.Clarification: return "Abgelehnt";
+          default: return "";
+        }
+      } 
+    }
     protected string Notes => this._allocation.Notes;
     protected string ContactPhone => this._allocation.ContactPhone;
     protected string ReserveTime { get {

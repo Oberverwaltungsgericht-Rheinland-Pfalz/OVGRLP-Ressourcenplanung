@@ -16,6 +16,8 @@ export const actions: ActionTree<UserState, RootState> = {
     const responseObj = await response.json()
     let requestable = response.headers.get('Requests-Allowed') || ''
     let showCalendarFrom = response.headers.get('Calendar-From') || 0
+    let siteTitle = response.headers.get('Site-Title') || 'Raumplanung'
+    document.title = siteTitle
 
     commit(Names.m.setCalendarFrom, showCalendarFrom)
     commit(Names.m.setUser, responseObj)
