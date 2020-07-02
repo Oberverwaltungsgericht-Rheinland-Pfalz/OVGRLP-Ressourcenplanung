@@ -17,14 +17,19 @@ namespace Rema.Infrastructure.Email
   public class EmailTrigger: IEmailTrigger
   {
     private readonly EmailSettings _emailSettings;
+    private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
 
-    public EmailTrigger(EmailSettings emailSettings)
+    public EmailTrigger(EmailSettings emailSettings, IConfiguration configuration)
     {
       this._emailSettings = emailSettings;
+      this._configuration = configuration;
     } 
 
     public void SendEmail(EmailTemplate template, string recipient, IList<string> groups)
     {
+      // var sendEmails = this._configuration.GetValue<Boolean>("SendEmails");
+      // if (!sendEmails) return;
+      
       if (recipient != null)
       {
         groups.Add(recipient);

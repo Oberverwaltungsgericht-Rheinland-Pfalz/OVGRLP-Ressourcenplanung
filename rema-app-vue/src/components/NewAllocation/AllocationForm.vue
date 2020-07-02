@@ -65,7 +65,7 @@
         </v-row>
         <v-row v-if="!isRepeating"> <!-- single date row -->
           <v-col cols="3">
-            <v-menu ref="fromMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
+            <v-menu ref="fromMenu" transition="scale-transition" offset-y max-width="290px" min-width="290px"
             v-model="fromMenu">
             <template v-slot:activator="{ on }">
               <v-text-field persistent-hint prepend-icon="event" v-on="on" readonly
@@ -74,8 +74,8 @@
               :value="dateFormatted(dateFrom)"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" :first-day-of-week="1" no-title @input="fromMenu = false">
-              <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen</v-btn>
+            <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" :first-day-of-week="1" no-title >
+              <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen x</v-btn>
             </v-date-picker>
           </v-menu>
           </v-col>

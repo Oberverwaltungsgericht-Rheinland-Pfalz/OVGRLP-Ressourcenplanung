@@ -793,6 +793,8 @@ namespace Rema.WebApi.Controllers
         if (!string.IsNullOrEmpty(allocationVM.ReferencePersonId) && allocationVM.ReferencePersonId.Length > 12)
         {
           oldAllocation.ReferencePerson = _userManagementService.GetAndUpdateOrInsertUserFromDB(allocationVM.ReferencePersonId); ;
+        } else if (string.IsNullOrEmpty(allocationVM.ReferencePersonId))   {
+          oldAllocation.ReferencePerson = null;
         }
       }
       catch (Exception ex)
