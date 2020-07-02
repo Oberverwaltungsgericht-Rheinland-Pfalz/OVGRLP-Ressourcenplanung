@@ -196,6 +196,7 @@ export default class Calendar extends Vue {
     const { start, end } = this
     if (!start || !end) return moment().format('MMMM YYYY')
 
+    const isoWeek = moment(start.date).format('W')
     const startMonth = this.monthFormatter(start)
     const endMonth = this.monthFormatter(end)
     const suffixMonth = startMonth === endMonth ? '' : endMonth
@@ -206,7 +207,6 @@ export default class Calendar extends Vue {
 
     const startDay = start.day
     const endDay = end.day
-    const isoWeek = moment(start).format('W')
 
     switch (this.currentview) {
       case 'month':
