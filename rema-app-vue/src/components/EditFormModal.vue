@@ -229,6 +229,7 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       this.ScheduleSeries = all.ScheduleSeries
       this.fullday = all.IsAllDay
       this.ReferencePersonId = all.ReferencePersonId
+      this.referencePerson.ActiveDirectoryID = all.ReferencePersonId
       this.dateOfSeries = all.From.substring(0, 10)
       this.dateFrom = all.From.substring(0, 10)
       this.timeFrom = all.From.substring(11, 16)
@@ -299,8 +300,13 @@ export default class EditFormModal extends mixins(AllocationFormService) {
     data.RessourceId = this.ressourceId
     data.IsAllDay = this.fullday
 
-    if (this.referencePerson.ActiveDirectoryID) data.ReferencePersonId = this.referencePerson.ActiveDirectoryID
-    else data.ReferencePersonId = this.ReferencePersonId
+    if (this.referencePerson.ActiveDirectoryID) {
+      data.ReferencePersonId = this.referencePerson.ActiveDirectoryID
+    } else if (!this.referencePerson.ActiveDirectoryID && this.ReferencePersonId) {
+      data.ReferencePersonId = ''
+    } else {
+      data.ReferencePersonId = this.ReferencePersonId
+    }
 
     data.gadgetsIds = this.selectedGadgets
     data.contactPhone = this.telNumber

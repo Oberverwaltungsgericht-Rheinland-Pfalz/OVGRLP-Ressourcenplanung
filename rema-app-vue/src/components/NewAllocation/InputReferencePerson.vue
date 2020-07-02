@@ -13,6 +13,7 @@
     prepend-icon="mdi-database-search"
     :return-object="true"
     :disabled="readonly"
+    clearable
   ></v-autocomplete>
 </template>
 
@@ -56,7 +57,11 @@ export default class InputReferencePerson extends Vue {
 
   @Watch('model')
   public userSet (val: WebApi.AdUserViewModel) {
-    this.$emit('selected', val)
+    if (!val) {
+      this.$emit('selected', { ActiveDirectoryID: '', Name: '', Email: '', Phone: '' } as WebApi.AdUserViewModel)
+    } else {
+      this.$emit('selected', val)
+    }
   }
 
   @Watch('search')
