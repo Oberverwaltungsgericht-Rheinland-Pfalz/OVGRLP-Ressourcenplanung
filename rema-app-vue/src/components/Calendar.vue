@@ -31,7 +31,7 @@
           <v-spacer/>
 
           <v-checkbox class="showWe" v-model="showWE" :label="'WE'" on-icon="visibility" off-icon="visibility_off"></v-checkbox>
-          <v-radio-group v-model="currentview" row>
+          <v-radio-group v-model="currentview" row @change="scrollToTime">
             <v-radio v-for="n in types" :key="'ansicht'+n" :label="typeName(n)" :value="n"/>
           </v-radio-group>
         </v-toolbar>
@@ -44,13 +44,13 @@
           :event-name="formatEventText"
           v-model="focus"
           color="primary"
+          :categories="calendarCategories"
           :events="filteredItems"
           :event-color="getEventColor"
           :event-margin-bottom="3"
           :now="today"
           :type="currentview"
           :weekdays="weekdays"
-          :first-interval="CalendarFrom"
           :short-weekdays="false"
           @click:event="showEvent"
           @click:more="viewDay"
@@ -96,7 +96,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/User/types'
 import { deleteAllocation } from '../services/AllocationApiService'
-
 import { Allocation, Gadget, Supplier } from '../models'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
@@ -112,6 +111,7 @@ export default class Calendar extends Vue {
   private CalendarFrom!: number
   @Action(Names.a.loadUsers, { namespace: 'user' })
   private loadUsers: any
+  private calendarCategories: any = null
 
   private today: string = moment().format('YYYY-MM-DD')
   private focus: string = moment().format('YYYY-MM-DD')
@@ -264,10 +264,17 @@ export default class Calendar extends Vue {
     if (success) this.$dialog.message.success('Eintrag gelöscht', { position: 'center-left' })
     else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
   }
-
+  public scrollToTime () {
+    this.$nextTick(() => {
+      // @ts-ignore
+      this.$refs.calendar.scrollToTime(this.CalendarFrom.length > 1 ? this.CalendarFrom + ':00' : '0' + this.CalendarFrom + ':00')
+    })
+  }
   public viewDay ({ date }: any) {
     this.focus = date
     this.currentview = 'day'
+
+    this.scrollToTime()
   }
   public getEventColor (event: any) {
     return event.color
@@ -304,6 +311,8 @@ export default class Calendar extends Vue {
     // now that we have the start and end dates on the calendar
     this.start = start
     this.end = end
+
+    this.scrollToTime()
   }
 }
 function transfer2Calendar (v: any) {

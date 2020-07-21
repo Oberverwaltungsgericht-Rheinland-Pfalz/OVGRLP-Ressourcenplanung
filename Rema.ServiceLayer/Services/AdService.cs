@@ -59,51 +59,45 @@ namespace Rema.ServiceLayer.Services
 
     public List<T> SearchAdUsers<T>(string userName) where T : class
     {
-      var foundUsers = new List<T>();
-      List<string> searchDomainList = this.DomainsToSearch;
+      List<T> foundUsers = new List<T>();
+      bool modelType = typeof(T) == typeof(AdUserViewModel);
 
-      DomainCollection domains = Forest.GetCurrentForest().Domains;
-      foreach (Domain dom in domains)
+      foreach (string domain in this.DomainsToSearch)
       {
-        if (null == searchDomainList || searchDomainList.Count == 0 || searchDomainList.Contains(dom.Name))
+        Console.WriteLine(domain);
+        PrincipalContext ctx = new PrincipalContext(ContextType.Domain, domain);
+
+        UserPrincipal qbeUser = new UserPrincipal(ctx);
+        qbeUser.Name = "*" + userName + "*";
+        qbeUser.Enabled = true;
+
+        // create your principal searcher passing in the QBE principal    
+        PrincipalSearcher srch = new PrincipalSearcher(qbeUser);
+
+        // find all matches
+        foreach (var found in srch.FindAll())
         {
-          using (var context = new PrincipalContext(ContextType.Domain, dom.Name))
+          // do whatever here - "found" is of type "Principal"
+          UserPrincipal userFound = found as UserPrincipal;
+          if (userFound.SamAccountName.StartsWith("Admin.", StringComparison.OrdinalIgnoreCase)) continue;
+
+          object user = userFound.DisplayName;
+
+          if (userFound != null && modelType)
           {
-            UserPrincipal userPrin = new UserPrincipal(context);
-            userPrin.Enabled = true;   // nur aktive Nutzer
-            if (!string.IsNullOrEmpty(userName))
-              userPrin.DisplayName = "*" + userName + "*";
-
-            using (var searcher = new PrincipalSearcher(userPrin))
+            user = new AdUserViewModel()
             {
-              var ds = searcher.GetUnderlyingSearcher() as DirectorySearcher;
-              foreach (var result in searcher.FindAll())
-              {
-                object found = result.DisplayName;
-
-                if (typeof(T) == typeof(AdUserViewModel))
-                {
-                  string name = result.DisplayName;
-                  if (name.StartsWith("Admin.")) continue;  // keine admin user anzeigen
-
-                  DirectoryEntry de = result.GetUnderlyingObject() as DirectoryEntry;
-                  string mail = string.Empty;
-                  string tel = string.Empty;
-
-                  if (null != de.Properties["mail"] && null != de.Properties["mail"].Value)
-                    mail = de.Properties["mail"]?.Value?.ToString();
-
-                  if (null != de.Properties["telephoneNumber"] && null != de.Properties["telephoneNumber"].Value)
-                    tel = de.Properties["telephoneNumber"]?.Value?.ToString() ?? "";
-                  found = new AdUserViewModel() { ActiveDirectoryID = result.Sid.Value, Name = name, Email = mail, Phone = tel };
-                }
-
-                foundUsers.Add(found as T);
-              }
-            }
+              ActiveDirectoryID = userFound.Sid.Value,
+              Name = userFound.DisplayName,
+              Email = userFound.EmailAddress,
+              Phone = userFound.VoiceTelephoneNumber
+            };
           }
+
+          foundUsers.Add(user as T);
         }
       }
+
       return foundUsers;
     }
   }
