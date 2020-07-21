@@ -109,20 +109,24 @@ namespace Rema.WebApi.Controllers
       today = today.AddMonths(-1);
       var firstDayOfLastMonth = today.AddDays(-today.Day + 1);  // first day of last month
 
-      List<Allocation> allocations;
+      IQueryable<Allocation> query;
 
       try
       {
-        allocations = await _context.Allocations
-          .Where(g => g.To > firstDayOfLastMonth)
-          .Include(g => g.Ressource)
+        query = _context.Allocations
+          .Where(g => g.To > firstDayOfLastMonth);
+
+        query.Include(g => g.Ressource)
           .Include(g => g.ApprovedBy)
-          .Include(g => g.CreatedBy)
+          .Load();
+
+        query.Include(g => g.CreatedBy)
           .Include(g => g.AllocationGadgets)
-          .Include(g => g.LastModifiedBy)
+          .Load();
+
+        query.Include(g => g.LastModifiedBy)
           .Include(g => g.ReferencePerson)
-          .Include(g => g.ReferencePerson)
-          .ToListAsync();
+          .Load();
       }
       catch (Exception ex)
       {
@@ -132,12 +136,106 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var allMapped = allocations.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e));
-        return Ok(allMapped);
+        var allMapped = await query.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e)).ToListAsync();
+        var json = Ok(allMapped);
+        return json;
       }
       catch (Exception ex)
       {
         Log.Error(ex, "error while mapping allocations");
+        return NotFound();
+      }
+    }
+
+    [HttpGet]
+    [Route("timespan/m/{year}/{month}")]
+    public async Task<ActionResult<IEnumerable<AllocationViewModel>>> GetAllocationsMonth(long year, long month)
+    {
+      Log.Information("GET allocations timespan month");
+
+      // get the first day of the month
+      DateTime first = new DateTime((int)year, (int)month, 1);
+
+      // subtract 6 days so the last few allocations are displayed
+      first = first.AddDays(-6);
+
+      // Get the last day of the month
+      DateTime last = new DateTime((int)year, (int)month, DateTime.DaysInMonth((int)year, (int)month));
+
+      // add 6 days so the last few allocations are displayed
+      last = last.AddDays(6);
+
+      Console.WriteLine("First Date: {0}", first);
+      Console.WriteLine("Last Date: {0}", last);
+
+      IQueryable<Allocation> query;
+
+      try
+      {
+        query = _context.Allocations
+          .Where(g => (g.To >= first && g.To <= last) || (g.From <= last && g.From >= first) || (g.From <= first && g.To >= last));
+
+        query.Include(g => g.Ressource)
+          .Include(g => g.ApprovedBy)
+          .Load();
+
+        query.Include(g => g.CreatedBy)
+          .Include(g => g.AllocationGadgets)
+          .Load();
+
+        query.Include(g => g.LastModifiedBy)
+          .Include(g => g.ReferencePerson)
+          .Load();
+
+        var allMapped = await query.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e)).ToListAsync();
+        var json = Ok(allMapped);
+        return json;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting allocations");
+        return NotFound();
+      }
+    }
+
+    [HttpGet]
+    [Route("timespan/w/{year}/{week}")]
+    public async Task<ActionResult<IEnumerable<AllocationViewModel>>> GetAllocationsWeek(long year, long week)
+    {
+      Log.Information("GET allocations timespan week");
+
+      IQueryable<Allocation> query;
+
+      DateTime first = System.Globalization.ISOWeek.ToDateTime((int)year, (int)week, DayOfWeek.Monday);
+      DateTime last = first.AddDays(6);
+
+      Console.WriteLine("First Date: {0}", first);
+      Console.WriteLine("Last Date: {0}", last);
+
+      try
+      {
+        query = _context.Allocations
+          .Where(g => (g.To >= first && g.To <= last) || (g.From <= last && g.From >= first) || (g.From <= first && g.To >= last));
+
+        query.Include(g => g.Ressource)
+          .Include(g => g.ApprovedBy)
+          .Load();
+
+        query.Include(g => g.CreatedBy)
+          .Include(g => g.AllocationGadgets)
+          .Load();
+
+        query.Include(g => g.LastModifiedBy)
+          .Include(g => g.ReferencePerson)
+          .Load();
+
+        var allMapped = await query.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e)).ToListAsync();
+        var json = Ok(allMapped);
+        return json;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while getting allocations");
         return NotFound();
       }
     }

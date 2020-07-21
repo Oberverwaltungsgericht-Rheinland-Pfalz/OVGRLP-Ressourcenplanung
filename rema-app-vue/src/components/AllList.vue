@@ -106,7 +106,6 @@ export default class AllList extends Vue {
   }
   public get hasItems () {
     const allocations = Allocation.query()
-      .withAll()
       .get()
     return allocations.length
   }
@@ -114,21 +113,10 @@ export default class AllList extends Vue {
     let myId = this.$store.state.user.id
 
     const allocations = Allocation.query().withAll()
-      .where((al: any) => (al.Status === 1 || al.Status === 3) || al.CreatedById === myId || al.ReferencePersonId === myId)
-      .where((record : any, query: any) => {
-        if (this.hideNotMine) { query.where('CreatedById', myId).orWhere('ReferencePersonId', `${myId}`) }
-      })
-      .where((record : any, query: any) => {
-        if (this.selectedGroup) {
-          query.where('GadgetsIds',
-            (gadgetArray: number[]) => gadgetArray.filter(
-              // @ts-ignore
-              (x: number) => this.selectedGroup.gadgetIds.includes(x)).length)
-        }
-      })
-      .where((a: any) => {
-        return !this.hideOld || Date.parse(a.To) > Date.now()
-      })
+      .where((al: any) => (!this.hideNotMine && (al.Status === 1 || al.Status === 3)) || al.CreatedById === myId || al.ReferencePersonId === myId)
+      .where('To', (value: any) => (!this.hideOld || Date.parse(value) > Date.now()))
+      .where('GadgetsIds', (values: number[]) => (!this.selectedGroup || values.length > 0))
+      .where('GadgetsIds', (values: number[]) => !this.selectedGroup || (this.selectedGroup && this.selectedGroup.gadgetIds.some((e: number) => values.includes(e))))
       .orderBy('From')
       .get()
 
