@@ -79,6 +79,7 @@
               <p><strong>Kontaktperson: </strong>{{ReferenceUserName(selectedEvent.Contact)}}</p>
               <p><strong>Hilfsmittel: </strong><span v-html="selectedEvent.Gadgets"></span></p>
               <p><span v-html="selectedEvent.Hints"></span></p>
+              <span v-if="!selectedEvent.Contact"><strong>Erfasst von:</strong> {{ReferenceUserName(selectedEvent.Creator)}}</span>
             </v-card-text>
             <v-card-actions>
               <v-btn text color="secondary" @click="selectedOpen = false">Schließen</v-btn>
@@ -346,7 +347,8 @@ function transfer2Calendar (v: any) {
   rVal.id = v.Id
   rVal.Notes = v.Notes
   rVal.Contact = v.ReferencePersonId
-  // rVal.Original = v
+  if (!rVal.Contact) rVal.Creator = v.CreatedById
+
   rVal.RessourceName = (v.Ressource || {}).Name
 
   rVal.Hints = ''
