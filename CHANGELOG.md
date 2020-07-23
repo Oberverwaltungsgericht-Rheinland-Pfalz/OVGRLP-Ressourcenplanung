@@ -1,3 +1,12 @@
+## VueWebApp v1.4.0+20301
+
+### Änderungen
+
+* Performance optimierung in Terminliste
+* Tagesansicht beginnt standardmäßig bei 6 Uhr
+* Anfragen für Termine sind möglich
+* E-Mail Versand konfigurierbar
+
 ## VueWebApp v1.3.0+20251
 
 ### Änderungen

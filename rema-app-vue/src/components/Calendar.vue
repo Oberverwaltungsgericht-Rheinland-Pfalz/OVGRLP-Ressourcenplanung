@@ -44,7 +44,6 @@
           :event-name="formatEventText"
           v-model="focus"
           color="primary"
-          :categories="calendarCategories"
           :events="filteredItems"
           :event-color="getEventColor"
           :event-margin-bottom="3"
@@ -111,7 +110,6 @@ export default class Calendar extends Vue {
   private CalendarFrom!: number
   @Action(Names.a.loadUsers, { namespace: 'user' })
   private loadUsers: any
-  private calendarCategories: any = null
 
   private today: string = moment().format('YYYY-MM-DD')
   private focus: string = moment().format('YYYY-MM-DD')
