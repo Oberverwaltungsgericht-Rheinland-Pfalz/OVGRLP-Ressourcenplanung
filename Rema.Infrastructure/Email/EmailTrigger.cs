@@ -27,9 +27,11 @@ namespace Rema.Infrastructure.Email
 
     public void SendEmail(EmailTemplate template, string recipient, IList<string> groups)
     {
-      // var sendEmails = this._configuration.GetValue<Boolean>("SendEmails");
-      // if (!sendEmails) return;
-      
+      if (!this._emailSettings.SendEmails)
+      {
+        Log.Information("email sending to deaktivated");
+        return;
+      }
       if (recipient != null)
       {
         groups.Add(recipient);

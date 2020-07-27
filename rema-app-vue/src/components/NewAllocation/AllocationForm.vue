@@ -75,7 +75,7 @@
               ></v-text-field>
             </template>
             <v-date-picker v-model="dateFrom" :min="dateMin" locale="de" :first-day-of-week="1" no-title >
-              <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen x</v-btn>
+              <v-btn text color="primary" @click="fromMenu = false" block>Abbrechen</v-btn>
             </v-date-picker>
           </v-menu>
           </v-col>
