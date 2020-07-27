@@ -906,6 +906,7 @@ namespace Rema.WebApi.Controllers
         newRessource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
       }
 
+      var oldHintsGroupIds = oldAllocation.HintsForSuppliers.Select(e => e.Group.Id);
       oldAllocation.HintsForSuppliers = new List<SupplierHint>();
       if (allocationVM.HintsForSuppliers.Any())
         try
@@ -982,6 +983,13 @@ namespace Rema.WebApi.Controllers
         }
       }
 
+      // Prüfung der Nachrichten an Unterstützergruppen und auswahl der betroffenen Gruppen
+      var newHintsGroupIds = allocationVM.HintsForSuppliers.Select(e => e.GroupId);
+      var hintGroupMails = await _context.SupplierGroups
+        .Where(e => oldHintsGroupIds.Contains(e.Id) || newHintsGroupIds.Contains(e.Id))
+        .Select(e => e.GroupEmail)
+        .ToListAsync();
+
       try
       {
         if (allocationVM.IsAllDay)
@@ -1036,7 +1044,7 @@ namespace Rema.WebApi.Controllers
       }
 
       var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets);
-      this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails());
+      this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails(hintGroupMails));
       return Ok();
     }
   }
