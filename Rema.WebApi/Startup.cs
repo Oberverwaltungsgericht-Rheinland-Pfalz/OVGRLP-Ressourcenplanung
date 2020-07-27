@@ -43,6 +43,7 @@ namespace Rema.WebApi
       List<string> DomainsToSearch = Configuration.GetSection("DomainsToSearch").Get<List<string>>();
 
       EmailSettings emailSettings = new EmailSettings();
+      emailSettings.SendEmails = this.Configuration.GetValue<Boolean>("SendEmails");
       Configuration.GetSection("Email").Bind(emailSettings);
       services.AddSingleton<EmailSettings>(emailSettings);
 

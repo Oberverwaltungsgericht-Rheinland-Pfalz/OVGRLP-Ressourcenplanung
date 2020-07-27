@@ -13,5 +13,6 @@ namespace Rema.Infrastructure.Email
     public Boolean EnableSSL { get; set; }
     public int Port { get; set; }
     public string EmailSenderAddress { get; set; }
+    public Boolean SendEmails { get; set; }
   }
 }
