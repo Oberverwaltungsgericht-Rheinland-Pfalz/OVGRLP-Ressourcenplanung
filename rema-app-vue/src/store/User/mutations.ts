@@ -37,5 +37,8 @@ export const mutations: MutationTree<UserState> = {
   },
   [Names.m.setCalendarFrom] (state: UserState, calendarHourFrom: number) {
     state.calendarFrom = calendarHourFrom
+  },
+  [Names.m.setHideCalendarFrom] (state: UserState, hideCalendarFrom: boolean) {
+    state.hideCalendarFrom = hideCalendarFrom
   }
 }

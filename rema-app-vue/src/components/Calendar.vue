@@ -51,6 +51,7 @@
           :type="currentview"
           :weekdays="weekdays"
           :short-weekdays="false"
+          :first-interval="HideCalendarFrom ? CalendarFrom : 0"
           @click:event="showEvent"
           @click:more="viewDay"
           @click:date="viewDay"
@@ -109,6 +110,8 @@ export default class Calendar extends Vue {
   private ContactUsers!: WebApi.ContactUser[]
   @State('calendarFrom', { namespace: 'user' })
   private CalendarFrom!: number
+  @State('hideCalendarFrom', { namespace: 'user' })
+  private HideCalendarFrom!: boolean
   @Action(Names.a.loadUsers, { namespace: 'user' })
   private loadUsers: any
 

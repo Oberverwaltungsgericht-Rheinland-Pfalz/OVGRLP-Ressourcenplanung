@@ -121,6 +121,11 @@ namespace Rema.WebApi.Controllers
       {
         Response.Headers.Add("Calendar-From", scrollToHour.ToString());
       }
+      var hideEarly = this._configuration.GetValue<bool>("HideEarly");
+      if (hideEarly)
+      {
+        Response.Headers.Add("Calendar-From-Hide", "true");
+      }
 
       var siteTitle = this._configuration.GetValue<string>("SiteTitle");
       if (!string.IsNullOrEmpty(siteTitle))
