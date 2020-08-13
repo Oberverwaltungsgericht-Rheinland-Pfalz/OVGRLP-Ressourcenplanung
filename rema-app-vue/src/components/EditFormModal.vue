@@ -128,7 +128,7 @@
         <v-divider />
         <v-row>
           <v-col>
-            <input-reference-person :userid="ReferencePersonId" @selected="setReferencePerson" :key="'re'+refreshInputReferencePerson" :readonly="readonly"/>
+            <input-reference-person v-if="dialog" :userid="ReferencePersonId" @selected="setReferencePerson" :key="'re'+refreshInputReferencePerson" :readonly="readonly"/>
           </v-col>
           <v-col>
             <v-text-field
