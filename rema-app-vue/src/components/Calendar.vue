@@ -179,7 +179,9 @@ export default class Calendar extends Vue {
         .with('Gadget')
         .get()
     }
-    this.loadUsers(formatedItems.map((e:any) => e.ReferencePersonId))
+    let userIds2Load = formatedItems.map((e:any) => e.ReferencePersonId)
+    userIds2Load.push(...formatedItems.map((e: any) => e.CreatedById))
+    this.loadUsers(userIds2Load)
     return formatedItems.map(transfer2Calendar)
   }
   public ReferenceUserName (id:number) {
