@@ -1,6 +1,6 @@
 {
   "name": "rema-app-vue",
-  "version": "1.4.4+20331", 
+  "version": "1.4.5+20332", 
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
