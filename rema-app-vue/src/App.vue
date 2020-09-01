@@ -59,6 +59,14 @@
         <h3 v-if="!loading"><span id="bigTitle">Raumplanung - </span>{{ currentPath }}</h3>
         <h3 v-else>Programm wird gestartet...</h3>
         <v-spacer></v-spacer>
+        <v-avatar id="helplink"
+          align-self-end
+          color="blue"
+          v-on="on"
+          class="action-avatar"
+        >
+        <v-icon id="helpicon">help_outline</v-icon>
+        </v-avatar>
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
             <v-avatar
@@ -128,6 +136,7 @@ import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 // import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'
 import { refreshAllocations } from './services/AllocationApiService'
+import handbook from '../public/Raumplanung Handbuch_v1.0.1.pdf'
 
 @Component({
   components: { NewFormModal }
@@ -189,7 +198,10 @@ export default class App extends Vue {
 @media (max-width: 768px)
   #bigTitle
    display none
-
+#helplink
+  margin-right .5em
+#helpicon
+  color white
 </style>
 
 <style lang="stylus">
