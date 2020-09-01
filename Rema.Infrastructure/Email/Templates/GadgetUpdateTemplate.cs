@@ -45,7 +45,7 @@ namespace Rema.Infrastructure.Email.Templates
         if (dictDeleted.TryGetValue(group, out string oldTitles))
           dictDeleted[group] = $"{oldTitles}, {gadget.Gadget.Title}";
         else
-          dictDeleted.Add(group, $"{System.Environment.NewLine}#Folgende Hilfsmittel werden nicht mehr benötigt: {gadget.Gadget.Title}");
+          dictDeleted.Add(group, $"{System.Environment.NewLine}-Folgende Hilfsmittel werden nicht mehr benötigt: {gadget.Gadget.Title}");
       }
 
       // wegen neuer Hilfsmittel benachrichtigen
@@ -55,7 +55,7 @@ namespace Rema.Infrastructure.Email.Templates
         if (dictCreated.TryGetValue(group, out string oldTitles))
           dictCreated[group] = $"{oldTitles}, {alGadget.Gadget.Title}";
         else
-          dictCreated.Add(group, $"{System.Environment.NewLine}#Folgende Hilfsmittel werden zusätzlich benötigt: {alGadget.Gadget.Title}");
+          dictCreated.Add(group, $"{System.Environment.NewLine}-Folgende Hilfsmittel werden zusätzlich benötigt: {alGadget.Gadget.Title}");
       }
       return (dictDeleted, dictCreated);
     }
