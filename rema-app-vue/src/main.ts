@@ -9,6 +9,17 @@ import '@mdi/font/css/materialdesignicons.css'
 
 import './plugins/moment'
 import moment from 'moment'
+import mermaid from 'mermaid'
+
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'forest'
+/*  gantt: { axisFormatter: [
+    ['%Y-%m-%d', (d:any) => {
+      return d.getDay() === 1
+    }]
+  ] } */
+})
 
 Vue.config.productionTip = false
 

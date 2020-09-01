@@ -32,6 +32,14 @@ export default new Router({
       beforeEnter: (to: any, from: any, next: any) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')
     } as any,
+    {
+      path: '/schedule',
+      name: 'Ressourcenplanung',
+      icon: 'storage',
+      authLevel: 0,
+      beforeEnter: (to: any, from: any, next: any) => requireAuth(0, to, from, next),
+      component: () => import('@/views/Schedules.vue')
+    } as any,
      {
        path: '/ressources',
        name: 'Administration',
