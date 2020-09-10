@@ -62,7 +62,6 @@
         <v-avatar id="helplink"
           align-self-end
           color="blue"
-          v-on="on"
           class="action-avatar"
         >
         <v-icon id="helpicon">help_outline</v-icon>
@@ -136,7 +135,7 @@ import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 // import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'
 import { refreshAllocations } from './services/AllocationApiService'
-import handbook from '../public/Raumplanung Handbuch_v1.0.1.pdf'
+// import handbook from '../public/Raumplanung Handbuch_v1.0.1.pdf'
 
 @Component({
   components: { NewFormModal }

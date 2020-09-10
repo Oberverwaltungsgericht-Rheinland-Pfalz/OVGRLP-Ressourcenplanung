@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import SchedulerComponent from '../components/Scheduler/Scheduler.vue'
+import SchedulerComponent from '../components/Scheduler/Scheduler2.vue'
 
 @Component({
   components: { SchedulerComponent }
