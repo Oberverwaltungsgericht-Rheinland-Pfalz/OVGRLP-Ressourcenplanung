@@ -1,33 +1,40 @@
 <template>
   <v-layout column>
-    <h3><strong @click="yesterday"> &lt; </strong> &emsp; {{today | toLocalDate}} &emsp; <strong @click="tomorrow">></strong></h3>
+    <v-row class="text-center">
+      <v-col cols="2">
+        <v-text-field type="text" placeholder="Namensfilter" v-model="nameFilter"/>
+        <span v-if="hideEmptyRessources" @click="hideEmptyRessources = false"><v-icon>blur_circular</v-icon></span>
+        <span v-else @click="hideEmptyRessources = true"><v-icon>blur_linear</v-icon></span>
+      </v-col>
+      <v-col cols="6">
+        <v-btn @click="yesterday" fab text small><v-icon>arrow_back_ios</v-icon></v-btn>
+        <v-menu ref="todayMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
+          v-model="daypickerOpen">
+          <template v-slot:activator="{ on }">
+            <v-btn outlined v-on="on">{{today | toLocalDate}}</v-btn>
+          </template>
+          <v-date-picker v-model="pickedDate" locale="de" :first-day-of-week="1" no-title @input="daypickerOpen = false">
+            <v-btn text color="primary" @click="daypickerOpen = false" block>Abbrechen</v-btn>
+          </v-date-picker>
+        </v-menu>
+
+        <v-btn @click="tomorrow" fab text small><v-icon>arrow_forward_ios</v-icon></v-btn></v-col>
+      <v-col cols="2">
+        <span v-if="hideLateEarly" @click="hideLateEarly = false"><v-icon>visibility_off</v-icon></span>
+        <span v-else @click="hideLateEarly = true"><v-icon>visibility</v-icon></span>
+      </v-col>
+    </v-row>
+    <v-row>&ensp;</v-row>
 
     <table class="fixed" CELLSPACING=0>
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" /><col width="40px" />
-      <col width="40px" />
+      <col v-for="(v, idx0) in 25" :key="'cnt224'+idx0" width="40px" />
       <tr>
-        <th></th>
-        <th>00</th><th>01</th><th>02</th><th>03</th>
-        <th>04</th><th>05</th><th>06</th><th>07</th>
-        <th>08</th><th>09</th><th>10</th><th>11</th>
-        <th>12</th><th>13</th><th>14</th><th>15</th>
-        <th>16</th><th>17</th><th>18</th><th>19</th>
-        <th>20</th><th>21</th><th>22</th><th>23</th>
+        <th>Name</th>
+        <th v-for="(v, idx0) in 24" :key="'thhours'+idx0" v-show="!(hideLateEarly && (idx0 < startHour || idx0 > endHour))">{{(v-1) | 2digits}}</th>
       </tr>
       <tr v-for="(r, idx1) in ressources" :key="'res'+idx1">
-          <td class="right-space">{{r.Name}}</td>
-          <td v-for="(h2, idx2) in r.hours" :key="idx1+'row'+idx2" :class="{'s': h2}"></td>
+          <td class="right-space first-cell">{{r.Name}}</td>
+          <td v-show="!(hideLateEarly && (idx2 < startHour || idx2 > endHour))" v-for="(h2, idx2) in r.hours" :key="idx1+'row'+idx2" :class="{'s': h2}"></td>
       </tr>
     </table>
     {{ressources}}
@@ -48,23 +55,31 @@ export default class Scheduler extends Vue {
   private selectedGroup: SelectableGroup | null = null
   private search: string = ''
   private hideOld: boolean = true
-  private hideNotMine: boolean = false
+  private hideLateEarly: boolean = false
   private selectedOpen: number = -1
   private hours: number = 24
+  private startHour: number = 8
+  private endHour: number = 17
+  private nameFilter: string = ''
+  private hideEmptyRessources: boolean = false
 
+  private daypickerOpen: boolean = false
   private today: string = moment().format('YYYY-MM-DD')
-  private todayNum: number = Date.now()
+  private get pickedDate (): string {
+    return this.today
+  }
+  private set pickedDate (v: string) {
+    this.today = moment(v).format('YYYY-MM-DD')
+  }
   private tomorrow () {
     this.today = moment(this.today).add(1, 'd').format('YYYY-MM-DD')
-    this.todayNum = moment(this.today).valueOf()
   }
   private yesterday () {
     this.today = moment(this.today).add(-1, 'd').format('YYYY-MM-DD')
-    this.todayNum = moment(this.today).valueOf()
   }
   private get ressources ():Array<object> {
     let rArray = []
-    let start = this.todayNum
+    let start = moment(this.today).valueOf()
     let end = moment(this.today).add(1, 'day').valueOf()
     // [{id, name, done24:[]}]
     const allocations = Allocation.query().withAll()
@@ -122,4 +137,11 @@ td
   border-top 1px solid black
 td.right-space
   padding-right 1em
+td
+  border-right 1px solid #b2b2b2
+.first-cell
+  padding-top .25em
+  padding-bottom .25em
+  padding-left: .25em
+  padding-right 0.1em !important
 </style>
