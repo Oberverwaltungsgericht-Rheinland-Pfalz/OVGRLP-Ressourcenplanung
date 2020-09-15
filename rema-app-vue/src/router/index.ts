@@ -35,7 +35,7 @@ export default new Router({
     {
       path: '/schedule',
       name: 'Ressourcen Übersicht',
-      icon: 'storage',
+      icon: 'blur_linear',
       authLevel: 100,
       beforeEnter: (to: any, from: any, next: any) => requireAuth(0, to, from, next),
       component: () => import('@/views/Schedules.vue')
