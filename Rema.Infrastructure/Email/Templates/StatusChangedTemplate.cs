@@ -14,7 +14,7 @@ namespace Rema.Infrastructure.Email.Templates
     }
     private string _newStatus { get; set; }
 
-    public override string Subject => $"Termin wurde {_newStatus}";
+    public override string Subject => $"Termin #{this._allocation.Id} wurde {_newStatus}";
 
     public override string ToString()
     {

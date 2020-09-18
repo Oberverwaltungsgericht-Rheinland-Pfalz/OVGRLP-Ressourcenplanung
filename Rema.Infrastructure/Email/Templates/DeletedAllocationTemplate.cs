@@ -12,7 +12,7 @@ namespace Rema.Infrastructure.Email.Templates
     {
       base.Type = "gelöscht";
     }
-    public override string Subject => "Termin wurde gelöscht";
+    public override string Subject => "Termin wurde gelöscht #"+this._allocation.Id;
 
     private Dictionary<SupplierGroup, string> GetGadgetGroups()
     {
