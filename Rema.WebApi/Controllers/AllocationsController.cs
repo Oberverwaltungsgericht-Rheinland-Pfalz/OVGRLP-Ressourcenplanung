@@ -472,7 +472,6 @@ namespace Rema.WebApi.Controllers
 
       var isBooking = allocation.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
       allocation.Status = isBooking ? allocationVM.Status : MeetingStatus.Pending;
-      var emailTitle = isBooking ? "Buchung wurde erstellt" : "Anfrage wurde erstellt";
       var yourRequest = isBooking ? "Buchung" : "Anfrage";
 
       try
@@ -689,10 +688,9 @@ namespace Rema.WebApi.Controllers
         }
 
         var isBooking = allocations[0].Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
-        var requestType = isBooking ? "erstellt" : "angefragt";
         var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";
 
-        var template = new NewAllocationTemplate(allocations, requestType);
+        var template = new NewAllocationTemplate(allocations, yourRequest);
         this._emailTrigger.SendEmail(template, recipient, template.GetGroupEmails());
       }
       catch (Exception ex)

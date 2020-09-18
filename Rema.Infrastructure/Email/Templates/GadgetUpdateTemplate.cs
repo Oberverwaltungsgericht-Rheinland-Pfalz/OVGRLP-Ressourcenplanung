@@ -17,7 +17,7 @@ namespace Rema.Infrastructure.Email.Templates
     private readonly IList<AllocationGagdet> _droppedGadgets;
     private readonly IList<AllocationGagdet> _createdGadgets;
 
-    public override string Subject => "Termin wurde geändert";
+    public override string Subject => "Termin wurde geändert #" + this._allocation.Id;
     public IList<string> GetGroupEmails(IList<string> additionalGroups = null)
     {
       (var dictDeleted, var dictCreated) = GetGadgetGroups();

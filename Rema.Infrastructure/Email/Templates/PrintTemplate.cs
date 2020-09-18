@@ -16,7 +16,7 @@ namespace Rema.Infrastructure.Email.Templates
 
     public override string ToString()
     {
-      return $@"Termineintrag in der Ressourcenplanung.
+      return $@"Termineintrag #{this._allocation.Id} in der Ressourcenplanung.
 
 Erstellt durch: {this._allocation.CreatedBy?.Name}
 Zuletzt geändert durch: {LastModifier}
