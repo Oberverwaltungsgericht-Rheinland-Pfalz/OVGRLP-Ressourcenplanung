@@ -63,8 +63,8 @@
           align-self-end
           color="blue"
           class="action-avatar"
-        >
-        <v-icon id="helpicon">help_outline</v-icon>
+          @click="openHandbook"
+        ><v-icon id="helpicon">help_outline</v-icon>
         </v-avatar>
         <v-menu offset-y>
           <template v-slot:activator="{ on }">
@@ -186,6 +186,10 @@ export default class App extends Vue {
 
     await Promise.all([promise1, promise2, promise3, promise4])
     this.loading = false
+  }
+
+  private openHandbook () {
+    window.open('/Raumplanung_Handbuch.pdf', '_blank')
   }
 }
 </script>
