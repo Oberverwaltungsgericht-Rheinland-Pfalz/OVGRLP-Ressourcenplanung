@@ -1,15 +1,15 @@
 <template>
   <div>
-    <scheduler-component />
+    <scheduler-overview />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import SchedulerComponent from '../components/Scheduler/Scheduler2.vue'
+import SchedulerOverview from '../components/Scheduler/SchedulerOverview.vue'
 
 @Component({
-  components: { SchedulerComponent }
+  components: { SchedulerOverview }
 })
 export default class Schedules extends Vue {}
 </script>

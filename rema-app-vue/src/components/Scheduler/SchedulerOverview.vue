@@ -3,8 +3,10 @@
     <v-row class="text-center">
       <v-col cols="2">
         <v-text-field type="text" placeholder="Namensfilter" v-model="nameFilter"/>
-        <span v-if="hideEmptyRessources" @click="hideEmptyRessources = false"><v-icon>blur_circular</v-icon></span>
-        <span v-else @click="hideEmptyRessources = true"><v-icon>blur_linear</v-icon></span>
+      </v-col>
+      <v-col cols="1">
+        <v-btn v-if="hideEmptyRessources" @click="hideEmptyRessources = false" title="Freie Ressourcen anzeigen"><v-icon>blur_circular</v-icon></v-btn>
+        <v-btn v-else @click="hideEmptyRessources = true" title="Freie Ressourcen ausblenden"><v-icon>blur_linear</v-icon></v-btn>
       </v-col>
       <v-col cols="6">
         <v-btn @click="yesterday" fab text small><v-icon>arrow_back_ios</v-icon></v-btn>
@@ -19,9 +21,9 @@
         </v-menu>
 
         <v-btn @click="tomorrow" fab text small><v-icon>arrow_forward_ios</v-icon></v-btn></v-col>
-      <v-col cols="2">
-        <span v-if="hideLateEarly" @click="hideLateEarly = false"><v-icon>visibility_off</v-icon></span>
-        <span v-else @click="hideLateEarly = true"><v-icon>visibility</v-icon></span>
+      <v-col cols="3">
+        <v-btn v-if="!shideLateEarly" @click="hideLateEarly = true" title="Nur Arbeitszeit"><v-icon>visibility_off</v-icon></v-btn>
+        <v-btn v-else @click="hideLateEarly = false" title="Alle Stunden anzeigen"><v-icon>visibility</v-icon></v-btn>
       </v-col>
     </v-row>
     <v-row>&ensp;</v-row>
@@ -34,28 +36,26 @@
       </tr>
       <tr v-for="(r, idx1) in ressources" :key="'res'+idx1">
           <td class="right-space first-cell">{{r.Name}}</td>
-          <td v-show="!(hideLateEarly && (idx2 < startHour || idx2 > endHour))" v-for="(h2, idx2) in r.hours" :key="idx1+'row'+idx2" :class="{'s': h2}"></td>
+          <td v-show="!(hideLateEarly && (idx2 < startHour || idx2 > endHour))" v-for="(h2, idx2) in r.Hours" :key="idx1+'row'+idx2" :class="{'s': h2}"></td>
       </tr>
     </table>
-    {{ressources}}
   </v-layout>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation, Gadget, Supplier, Ressource } from '../../models'
-import { SelectableGroup } from '../../models/interfaces'
+import { SelectableGroup, ScheduledRessource } from '../../models/interfaces'
 import { deleteAllocation } from '../../services/AllocationApiService'
 import moment from 'moment'
 
 @Component
-export default class Scheduler extends Vue {
+export default class SchedulerOverview extends Vue {
   private displayView: boolean = false
   private displayId: number=0
   private selectedGroup: SelectableGroup | null = null
-  private search: string = ''
   private hideOld: boolean = true
-  private hideLateEarly: boolean = false
+  private hideLateEarly: boolean = true
   private selectedOpen: number = -1
   private hours: number = 24
   private startHour: number = 8
@@ -83,14 +83,11 @@ export default class Scheduler extends Vue {
     let end = moment(this.today).add(1, 'day').valueOf()
     // [{id, name, done24:[]}]
     const allocations = Allocation.query().withAll()
-      // .where((al: any) => (!this.hideNotMine && (al.Status === 1 || al.Status === 3)) || al.CreatedById === myId || al.ReferencePersonId === myId)
       .where((al: any) => {
         let to = moment(al.To).valueOf()
         let from = moment(al.From).valueOf()
         return ((to < end) && to > start) || ((from > start) && from < end) || ((from < start) && to > end)
       })
-      // .where('To', (value: any) => (Date.parse(value) < this.todayNum + 36e5 * 24 * 1))
-      // .where('From', (value: any) => (Date.parse(value) > this.todayNum - 36e5 * 24 * 1))
       .orderBy('From')
       .get()
 
@@ -100,28 +97,44 @@ export default class Scheduler extends Vue {
     ressources.sort()
 
     for (let res of ressources) {
-      let newObj = { id: res.Id, Name: res.Name, hours: new Array(24) }
+      let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24) }
 
       let allocs = allocations.filter((e: any) => e.Ressource.Id === res.Id)
       for (let allo of allocs) {
         // @ts-ignore
         if (allo.IsAllDay) {
-          newObj.hours.fill(1)
+          newObj.Hours.fill(true)
           break
         }
 
         let idx = 0
-        for (let h of newObj.hours) {
+        for (let h of newObj.Hours) {
           let hourString = idx < 10 ? '0' + idx : idx
           // @ts-ignore
           let isSet = moment(`${this.today}T${hourString}:00:00`).isBetween(allo.From, allo.To, undefined, '[)')
-          if (isSet) newObj.hours[idx] = true
+          if (isSet) newObj.Hours[idx] = true
           idx++
         }
       }
       rArray.push(newObj)
     }
+    if (!this.hideEmptyRessources) this.addEmptyRessources(rArray)
+    if (this.nameFilter.length > 0) this.applyNameFilter(rArray)
+
     return rArray
+  }
+  public applyNameFilter (ar: ScheduledRessource[]) {
+    ar.splice(0, Infinity, ...ar.filter((x: ScheduledRessource) => x.Name.includes(this.nameFilter)))
+  }
+  public addEmptyRessources (ar: ScheduledRessource[]) {
+    let allRessources = Ressource.query().get()
+    let withoutExisting = allRessources.filter((a: any) => !ar.find((b: any) => a.Id === b.id))
+    for (let res of withoutExisting) {
+      // @ts-ignore
+      let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24) }
+      ar.push(newObj)
+    }
+    ar.sort((a: ScheduledRessource, b: ScheduledRessource) => Number(a.Name > b.Name) - 1)
   }
 }
 </script>
@@ -144,4 +157,6 @@ td
   padding-bottom .25em
   padding-left: .25em
   padding-right 0.1em !important
+table.fixed
+  border-bottom 1px solid black
 </style>
