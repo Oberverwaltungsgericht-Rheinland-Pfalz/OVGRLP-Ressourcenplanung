@@ -5,6 +5,7 @@ import { UserData } from './UserData'
 import { UserState } from './UserState'
 import { RootState } from './RootState'
 import { SelectableGroup } from './SelectableGroup'
+import {ScheduledRessource} from './ScheduledRessource'
 
 export {
   AcknowledgeState,
@@ -14,5 +15,6 @@ export {
   UserData,
   UserState,
   RootState,
+  ScheduledRessource,
   SelectableGroup
 }

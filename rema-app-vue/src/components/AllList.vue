@@ -49,7 +49,10 @@
             <v-icon @click.stop="printItem(props.item)">print</v-icon>&emsp;
             <v-icon v-if="permissionToEdit" @click.stop="editItem(props.item.Id)">edit</v-icon>
           </td>
-          <td class="text-start">{{props.item.Title}}<span v-if="selectedGroup">: [ {{showGadgets(props.item.Gadgets)}} ]</span></td>
+          <td class="text-start">{{props.item.Title}}
+            <v-chip v-show="selectedGroup" v-for="gadget in showGadgets(props.item)" :key="'gadget'+props.item.Id+gadget" class="ma-2" color="yellow">
+              {{gadget}}</v-chip>
+          </td>
           <td class="text-start">{{props.item.Status}}</td>
           <td class="text-start">{{props.item.Ressource}}</td>
           <td class="text-start">{{props.item.From | toLocal}}</td>
@@ -98,11 +101,14 @@ export default class AllList extends Vue {
     { text: 'Zuletzt geändert', value: 'LastModified' }
   ];
   private today: string = moment().format('YYYY-MM-DD')
-  public showGadgets (ar: []) {
-    let rVal = ar.map((e: any) => e.Title)
-    if (rVal.length === 1) return rVal[0]
-    let rString = rVal.join(', ')
-    return rString
+  public showGadgets (item: any): string[] {
+    let selectedGroupId = this.selectedGroup?.Id || 0
+    let rVal: string[] = []
+    item.Gadgets.filter((e: any) => e.SuppliedBy === selectedGroupId).forEach((e: any) => rVal.push(e.Title))
+    item.HintsForSuppliers.filter((e:any) => e.GroupId === selectedGroupId).forEach((e: any) => rVal.push(e.Message))
+    // if (rVal.length === 1) return rVal[0]
+    // let rString = rVal.join(', ')
+    return rVal
   }
   public get hasItems () {
     const allocations = Allocation.query()
