@@ -18,6 +18,14 @@ export default new Router({
       component: () => import('@/views/Calendar.vue')
     } as any,
     {
+      path: '/schedule',
+      name: 'Terminfinder',
+      icon: 'blur_linear',
+      authLevel: 100,
+      beforeEnter: (to: any, from: any, next: any) => requireAuth(0, to, from, next),
+      component: () => import('@/views/Schedules.vue')
+    } as any,
+    {
       path: '/overview',
       name: 'Terminübersicht',
       icon: 'storage',
@@ -31,14 +39,6 @@ export default new Router({
       authLevel: 10,
       beforeEnter: (to: any, from: any, next: any) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')
-    } as any,
-    {
-      path: '/schedule',
-      name: 'Terminfinder',
-      icon: 'blur_linear',
-      authLevel: 100,
-      beforeEnter: (to: any, from: any, next: any) => requireAuth(0, to, from, next),
-      component: () => import('@/views/Schedules.vue')
     } as any,
      {
        path: '/ressources',

@@ -184,7 +184,7 @@
 import { Component, Prop, Vue, Watch, Mixins } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { ShortAllocationView } from '../../models/interfaces'
+import { InitAllocation, ShortAllocationView } from '../../models/interfaces'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import AllocationFormService from '../../services/AllocationFormServices'
 import moment from 'moment'
@@ -199,6 +199,7 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
   }
 })
 export default class AllocationForm extends Mixins(AllocationFormService) {
+  @Prop(Object) private readonly initValues!: InitAllocation
   public title: String = ''
   public ressourceId: number | any = null
   public fullday: boolean = false
@@ -207,8 +208,14 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
   public isRepeating: boolean = false
-  @State('isRequestable', { namespace: 'user' })
-  private requestsAllowed!: boolean
+
+  beforeMount () {
+    if (this.initValues && this.initValues.RessourceId) {
+      this.ressourceId = this.initValues.RessourceId
+      this.timeFrom = this.initValues.From
+      this.dateFrom = this.initValues.Day
+    }
+  }
 
   private async sendAllocation (status: number) {
     if (this.isFormInvalid()) return

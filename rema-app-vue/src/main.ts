@@ -15,6 +15,7 @@ Vue.config.productionTip = false
 Vue.filter('toLocal', (dateVal: Date) =>
   moment(dateVal).format('DD.MM.YYYY') + ' ' + moment(dateVal).format('LT')
 )
+Vue.filter('onlyDay', (dateVal: Date) => moment(dateVal).format('DD.MM.'))
 // new Date(dateVal).toLocaleTimeString())
 Vue.filter('toLocalDate', (dateVal: Date) =>
   moment(dateVal).format(' DD.MM.YYYY')

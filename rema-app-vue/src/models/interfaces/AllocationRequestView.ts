@@ -24,3 +24,8 @@ export interface ShortAllocationView {
   RessourceId: string
   dates: string[] | null
 }
+export interface InitAllocation {
+  From: string
+  RessourceId: number
+  Day: string
+}
