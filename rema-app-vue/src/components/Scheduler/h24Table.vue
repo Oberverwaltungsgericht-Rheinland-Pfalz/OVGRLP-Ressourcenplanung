@@ -1,18 +1,18 @@
 <template>
-  <table class="fixed" CELLSPACING=0>
+  <table class="fixed" CELLSPACING=0 :class="{'new-allocations-in-table': allocationPossible}">
     <col v-for="(v, idx0) in (hours+1)" :key="'cnt224'+idx0" width="40px" />
     <tr>
       <th v-if="Day">{{Day | onlyDay}}</th>
       <th v-else>Name</th>
 
-      <th v-for="(v, idx0) in hours" :key="'thhours'+idx0" v-show="!(hideLateEarly && (idx0 < startHour || idx0 > endHour))">{{(v-1) | 2digits}}</th>
+      <th v-for="(v, idx0) in hours" :key="'thhours'+idx0" v-show="!(HideLateEarly && (idx0 < startHour || idx0 > endHour))">{{(v-1) | 2digits}}</th>
     </tr>
     <tr v-for="(r, idx1) in ressources" :key="'res'+idx1">
       <td class="right-space first-cell">{{r.Name}}</td>
       <td
         v-for="(h2, idx2) in r.Hours"
         :key="idx1+'row'+idx2"
-        v-show="!(hideLateEarly && (idx2 < startHour || idx2 > endHour))"
+        v-show="!(HideLateEarly && (idx2 < startHour || idx2 > endHour))"
         @click="createAllocation(h2,r.Id, idx2)"
         :class="{'s': h2, 'f': !h2}">
       </td>
@@ -29,12 +29,80 @@ import moment from 'moment'
 
 @Component
 export default class h24Table extends Vue {
-  @Prop(Array) private ressources!: ScheduledRessource[]
-  @Prop(Boolean) private hideLateEarly!: boolean
   @Prop(String) private Day!: string
+  @Prop(String) private NameFilter!: string
+  @Prop(Boolean) private HideLateEarly!: boolean
+  @Prop(Boolean) private HideEmptyRessources!: boolean
+
   private hours: number = 24
   private startHour: number = 8
   private endHour: number = 17
+
+  private get allocationPossible () {
+    return moment(moment().add(-1, 'days')).isBefore(this.Day) &&
+      // @ts-ignore
+      (this.$store.state.user.isRequestable || this.permissionToEdit)
+  }
+
+  private get ressources ():Array<object> {
+    let rArray = []
+    let start = moment(this.Day).valueOf()
+    let end = moment(this.Day).add(1, 'day').valueOf()
+    // [{id, name, done24:[]}]
+    const allocations = Allocation.query().withAll()
+      .where((al: any) => {
+        let to = moment(al.To).valueOf()
+        let from = moment(al.From).valueOf()
+        return ((to < end) && to > start) || ((from > start) && from < end) || ((from < start) && to > end)
+      })
+      .orderBy('From')
+      .get()
+
+    // aufteilen in ressourcen gruppen
+    let ressourcesAll = allocations.map((e:any) => e.Ressource)
+    let ressources = [...new Set(ressourcesAll)]
+    ressources.sort()
+
+    for (let res of ressources) {
+      let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24) }
+
+      let allocs = allocations.filter((e: any) => e.Ressource.Id === res.Id)
+      for (let allo of allocs) {
+        // @ts-ignore
+        if (allo.IsAllDay) {
+          newObj.Hours.fill(true)
+          break
+        }
+
+        let idx = 0
+        for (let h of newObj.Hours) {
+          let hourString = idx < 10 ? '0' + idx : idx
+          // @ts-ignore
+          let isSet = moment(`${this.Day}T${hourString}:00:00`).isBetween(allo.From, allo.To, undefined, '[)')
+          if (isSet) newObj.Hours[idx] = true
+          idx++
+        }
+      }
+      rArray.push(newObj)
+    }
+    if (!this.HideEmptyRessources) this.addEmptyRessources(rArray)
+    if (this.NameFilter && this.NameFilter.length) this.applyNameFilter(rArray)
+
+    return rArray
+  }
+  public applyNameFilter (ar: ScheduledRessource[]) {
+    ar.splice(0, Infinity, ...ar.filter((x: ScheduledRessource) => x.Name.toLowerCase().includes(this.NameFilter.toLowerCase())))
+  }
+  public addEmptyRessources (ar: ScheduledRessource[]) {
+    let allRessources = Ressource.query().get()
+    let withoutExisting = allRessources.filter((a: any) => !ar.find((b: any) => a.Id === b.Id))
+    for (let res of withoutExisting) {
+      // @ts-ignore
+      let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24) }
+      ar.push(newObj)
+    }
+    ar.sort((a: ScheduledRessource, b: ScheduledRessource) => Number(a.Name > b.Name) - 1)
+  }
 
   private createAllocation (blocked: boolean, id: number, hourNumber: number) {
     if (blocked) return
