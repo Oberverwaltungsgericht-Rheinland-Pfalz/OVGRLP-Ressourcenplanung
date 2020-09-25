@@ -863,6 +863,7 @@ namespace Rema.WebApi.Controllers
         return NotFound();
       }
 
+      bool ressourceChanged = false;
       Allocation changedAllocation;
       try
       {
@@ -901,6 +902,7 @@ namespace Rema.WebApi.Controllers
       Ressource newRessource = null;
       if(oldAllocation.Ressource.Id != allocationVM.RessourceId)
       {
+        ressourceChanged = true;
         newRessource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
       }
 
@@ -988,6 +990,12 @@ namespace Rema.WebApi.Controllers
         .Select(e => e.GroupEmail)
         .ToListAsync();
 
+      if (ressourceChanged || (allocationVM.IsAllDay != oldAllocation.IsAllDay) || (oldAllocation.From != changedAllocation.From) || (oldAllocation.To != changedAllocation.To)) {
+        var allHintsGroups = oldAllocation.HintsForSuppliers.Select(x => x.Group.GroupEmail).ToList();
+        var allGadgetGroups = oldAllocation.AllocationGadgets.Select(x => x.Gadget.SuppliedBy.GroupEmail).ToList();
+        hintGroupMails.Concat(allHintsGroups).Concat(allGadgetGroups);
+      }
+
       try
       {
         if (allocationVM.IsAllDay)
@@ -1041,8 +1049,8 @@ namespace Rema.WebApi.Controllers
         return Conflict();
       }
 
-      var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets);
-      this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails(hintGroupMails));
+      var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets, hintGroupMails);
+      this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails());
       return Ok();
     }
   }

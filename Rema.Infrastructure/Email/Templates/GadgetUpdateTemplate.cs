@@ -8,21 +8,23 @@ namespace Rema.Infrastructure.Email.Templates
 {
   public class GadgetUpdateTemplate : EmailTemplate
   {
-    public GadgetUpdateTemplate(Allocation allocation, IList<AllocationGagdet> createdGadgets, IList<AllocationGagdet> droppedGadgets) : base(allocation)
+    public GadgetUpdateTemplate(Allocation allocation, IList<AllocationGagdet> createdGadgets, IList<AllocationGagdet> droppedGadgets, IList<string> additionalGroups = null) : base(allocation)
     {
       base.Type = "geändert";
       _droppedGadgets = droppedGadgets;
       _createdGadgets = createdGadgets;
+      _additionalGroups = additionalGroups;
     }
     private readonly IList<AllocationGagdet> _droppedGadgets;
     private readonly IList<AllocationGagdet> _createdGadgets;
+    private readonly IList<string> _additionalGroups;
 
     public override string Subject => "Termin wurde geändert #" + this._allocation.Id;
-    public IList<string> GetGroupEmails(IList<string> additionalGroups = null)
+    public override IList<string> GetGroupEmails()
     {
       (var dictDeleted, var dictCreated) = GetGadgetGroups();
 
-      var rList = new HashSet<string>(additionalGroups);
+      var rList = new HashSet<string>(this._additionalGroups ?? new List<string>());
       foreach(var del in dictDeleted)
       {
         rList.Add(del.Key.GroupEmail);
