@@ -48,7 +48,7 @@ namespace Rema.Infrastructure.Email
 
         if (this._emailSettings.useIISAccount)
         {
-          senderEmail = this._emailSettings.EmailUsername;
+          senderEmail = this._emailSettings.EmailSenderAddress;
           smtp.UseDefaultCredentials = false;
           smtp.Credentials = new NetworkCredential(this._emailSettings.EmailUsername, this._emailSettings.EmailPassword);
         }
