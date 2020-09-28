@@ -320,8 +320,8 @@ function transfer2Calendar (v: any) {
     rVal.name = (v.Ressource || {}).Name + ' - ' + v.Title
 
     if (rVal.longDate) {
-      rVal.start = v.From.substring(0, 16).replace('T', ' ') // ,10) -> kleine Darstellung; ,16) maximal große Darstellung
-      rVal.end = v.To.substring(0, 16).replace('T', ' ') // ,10) -> kleine Darstellung; ,16) maximal große Darstellung
+      rVal.start = v.From.substring(0, 10).replace('T', ' ') // ,10) -> kleine Darstellung; ,16) maximal große Darstellung
+      rVal.end = v.To.substring(0, 10).replace('T', ' ') // ,10) -> kleine Darstellung; ,16) maximal große Darstellung
       rVal.schedule = `Von ${moment(v.From).format('DD.MM.YYYY')} bis ${moment(v.To).format('DD.MM.YYYY')} ganztägig`
     }
   } else {
