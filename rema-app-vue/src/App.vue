@@ -122,6 +122,7 @@
       </v-container>
     </v-main>
     <toasts/>
+    <confirm/>
   </v-app>
 </template>
 
@@ -135,12 +136,11 @@ import { Gadget, Ressource, Supplier, Allocation } from './models'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
 import Toasts from '@/components/Toasts.vue'
-// import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'
+import Confirm from '@/components/Confirm.vue'
 import { refreshAllocations } from './services/AllocationApiService'
-// import handbook from '../public/Raumplanung Handbuch_v1.0.1.pdf'
 
 @Component({
-  components: { NewFormModal, Toasts }
+  components: { NewFormModal, Toasts, Confirm }
 })
 export default class App extends Vue {
   public get currentPath () {

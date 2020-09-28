@@ -18,7 +18,7 @@
       </template>
       <template v-slot:item.action="{ item }">
         <v-icon @click="editItem(item)">edit</v-icon>
-        <v-icon @click="deleteItem(item)">delete</v-icon>
+        <v-icon @click="confirmDelete(item)">delete</v-icon>
       </template>
       <template v-slot:item.SuppliedBy="{ item }">{{
         item.SuppliedBy | supplierName
@@ -73,7 +73,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { ShowToast } from '../../models/interfaces'
+import { ShowToast, ConfirmData } from '../../models/interfaces'
 import {
   Supplier,
   Ressource,
@@ -158,28 +158,24 @@ export default class SupplierManagement extends Vue {
     }
     this.closeModal()
   }
-  private async deleteItem (item: WebApi.GadgetViewModel) {
-    const confirmation = await this.$dialog.confirm({
-      text: `Möchten sie dieses Hilfsmittel ${item.Title} wirklich löschen?`,
-      title: 'Löschen bestätigen',
-      persistent: true,
-      actions: [
-        { text: 'Nein', color: 'blue', key: false },
-        { text: 'Löschen', color: 'red', key: true }
-      ]
-    })
-
-    if (confirmation === true) {
-      let success = await deleteGadget(item.Id)
-      if (success) {
-        this.$root.$emit('notify-user', { text: 'Hilfsmittel gelöscht', color: 'success' } as ShowToast)
-      } else {
-        this.$root.$emit('notify-user', {
-          text: 'Es können nur Hilfsmittel gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.',
-          color: 'error',
-          timeout: 1e4
-        } as ShowToast)
-      }
+  private confirmDelete (item: WebApi.GadgetViewModel) {
+    let data: ConfirmData = { title: 'Löschen bestätigen',
+      content: `Möchten sie dieses Hilfsmittel ${item.Title} wirklich löschen?`,
+      callback: this.deleteItem,
+      id: item.Id
+    }
+    this.$root.$emit('user-confirm', data)
+  }
+  private async deleteItem (id: number) {
+    let success = await deleteGadget(id)
+    if (success) {
+      this.$root.$emit('notify-user', { text: 'Hilfsmittel gelöscht', color: 'success' } as ShowToast)
+    } else {
+      this.$root.$emit('notify-user', {
+        text: 'Es können nur Hilfsmittel gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.',
+        color: 'error',
+        timeout: 1e4
+      } as ShowToast)
     }
   }
 }
