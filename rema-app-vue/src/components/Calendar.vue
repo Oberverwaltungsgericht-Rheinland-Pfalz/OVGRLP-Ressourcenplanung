@@ -68,7 +68,7 @@
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
                 <v-btn @click="printAllocation(selectedEvent.id)" fab small outlined><v-icon>print</v-icon></v-btn>
-                <v-btn v-show="permissionToEdit" @click="deleteAllocation" fab small outlined><v-icon small>delete</v-icon>
+                <v-btn v-show="permissionToEdit" @click="confirmDelete" fab small outlined><v-icon small>delete</v-icon>
                 </v-btn><span>&emsp;</span>
                 <edit-form-modal v-if="selectedOpen && permissionToEdit" :eventId="selectedEvent.id" @updateview="selectedOpen = false">
                   <v-icon small>edit</v-icon>
@@ -98,7 +98,7 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/User/types'
 import { deleteAllocation } from '../services/AllocationApiService'
 import { Allocation, Gadget, Supplier } from '../models'
-import { ShowToast } from '../models/interfaces'
+import { ShowToast, ConfirmData } from '../models/interfaces'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
 import print from 'print-js'
@@ -244,27 +244,17 @@ export default class Calendar extends Vue {
   public printAllocation (id: number) {
     print('api/Allocations/print/' + id)
   }
+  private confirmDelete () {
+    const { id, name } = this.selectedEvent as any
+    let data: ConfirmData = { title: 'Löschen bestätigen',
+      content: `Möchten sie dem Termin ${name} wirklich löschen?`,
+      callback: this.deleteAllocation,
+      id
+    }
+    this.$root.$emit('user-confirm', data)
+  }
   public async deleteAllocation () {
     const { id, name } = this.selectedEvent as any
-    const confirmation = await this.$dialog.confirm({
-      text: `Möchten sie dem Termin ${name} wirklich löschen?`,
-      title: 'Löschen bestätigen',
-      persistent: true,
-      actions: [
-        {
-          text: 'Nein',
-          color: 'blue',
-          key: false
-        },
-        {
-          text: 'Löschen',
-          color: 'red',
-          key: true
-        }
-      ]
-    })
-
-    if (confirmation !== true) return
     let success = await deleteAllocation(id)
 
     if (success) this.$root.$emit('notify-user', { text: 'Eintrag gelöscht', color: 'success' } as ShowToast)

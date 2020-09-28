@@ -45,7 +45,7 @@
       <template v-slot:item="props">
         <tr @click.stop="rowClicked(props.item.Id)" :class="{'mark-today': props.item.From.startsWith(today)}">
           <td class="text-start">
-            <v-icon v-if="permissionToEdit" @click.stop="deleteItem(props.item)">delete</v-icon>&emsp;
+            <v-icon v-if="permissionToEdit" @click.stop="confirmDelete(props.item)">delete</v-icon>&emsp;
             <v-icon @click.stop="printItem(props.item)">print</v-icon>&emsp;
             <v-icon v-if="permissionToEdit" @click.stop="editItem(props.item.Id)">edit</v-icon>
           </td>
@@ -74,7 +74,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation, Gadget, Supplier } from '../models'
-import { SelectableGroup, ShowToast } from '../models/interfaces'
+import { SelectableGroup, ShowToast, ConfirmData } from '../models/interfaces'
 import { deleteAllocation } from '../services/AllocationApiService'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
@@ -100,14 +100,13 @@ export default class AllList extends Vue {
     { text: 'Bis', value: 'To' },
     { text: 'Zuletzt geändert', value: 'LastModified' }
   ];
+
   private today: string = moment().format('YYYY-MM-DD')
   public showGadgets (item: any): string[] {
     let selectedGroupId = this.selectedGroup?.Id || 0
     let rVal: string[] = []
     item.Gadgets.filter((e: any) => e.SuppliedBy === selectedGroupId).forEach((e: any) => rVal.push(e.Title))
     item.HintsForSuppliers.filter((e:any) => e.GroupId === selectedGroupId).forEach((e: any) => rVal.push(e.Message))
-    // if (rVal.length === 1) return rVal[0]
-    // let rString = rVal.join(', ')
     return rVal
   }
   public get hasItems () {
@@ -154,20 +153,16 @@ export default class AllList extends Vue {
     return returnValues
   }
 
-  private async deleteItem (item: VisibleAllocation) {
-    const confirmation = await this.$dialog.confirm({
-      text: `Möchten sie diese Buchung ${item.Title} wirklich löschen?`,
-      title: 'Löschen bestätigen',
-      persistent: true,
-      actions: [
-        { text: 'Nein', color: 'blue', key: false },
-        { text: 'Löschen', color: 'red', key: true }
-      ]
-    })
-
-    if (confirmation !== true) return
-
-    let success = await deleteAllocation(item.Id)
+  private confirmDelete (item: VisibleAllocation) {
+    let data: ConfirmData = { title: 'Löschen bestätigen',
+      content: `Möchten sie diese Buchung ${item.Title} wirklich löschen?`,
+      callback: this.deleteItem,
+      id: item.Id
+    }
+    this.$root.$emit('user-confirm', data)
+  }
+  private async deleteItem (id: number) {
+    let success = await deleteAllocation(id)
 
     if (success) this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)

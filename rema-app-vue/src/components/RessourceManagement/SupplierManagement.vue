@@ -18,7 +18,7 @@
       </template>
       <template v-slot:item.action="{ item }">
         <v-icon @click="editItem(item)">edit</v-icon>
-        <v-icon @click="deleteItem(item)">delete</v-icon>
+        <v-icon @click="openDialog(item)">delete</v-icon>
       </template>
     </v-data-table>
 
@@ -70,7 +70,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Supplier, Ressource } from '../../models'
-import { ShowToast } from '../../models/interfaces'
+import { ShowToast, ConfirmData } from '../../models/interfaces'
 
 @Component
 export default class SupplierManagement extends Vue {
@@ -133,36 +133,25 @@ export default class SupplierManagement extends Vue {
     }
     this.closeModal()
   }
-  private async deleteItem (item: WebApi.SupplierGroup) {
-    const confirmation = await this.$dialog.confirm({
-      text: `Möchten sie die Unterstützergruppe ${item.Title} wirklich löschen?`,
-      title: 'Löschen bestätigen',
-      persistent: true,
-      actions: [
-        {
-          text: 'Nein',
-          color: 'blue',
-          key: false
-        },
-        {
-          text: 'Löschen',
-          color: 'red',
-          key: true
-        }
-      ]
-    })
-
-    if (confirmation === true) {
-      try {
-        let response = await Supplier.api().delete(`suppliergroups/${item.Id}`, { delete: item.Id })
-      } catch (e) {
-        await this.$root.$emit('notify-user', {
-          text: `Löschen fehlgeschlagen
-          Es können nur Ressourcen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.`,
-          color: 'error',
-          timeout: 1e4
-        } as ShowToast)
-      }
+  private openDialog (item: WebApi.SupplierGroup) {
+    let data: ConfirmData = { title: 'Löschen bestätigen',
+      content: `Möchten sie die Unterstützergruppe ${item.Title} wirklich löschen?`,
+      callback: this.deleteItem,
+      id: item.Id
+    }
+    this.$root.$emit('user-confirm', data)
+  }
+  private async deleteItem (id: number) {
+    try {
+      let response = await Supplier.api().delete(`suppliergroups/${id}`, { delete: id })
+      this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)
+    } catch (e) {
+      await this.$root.$emit('notify-user', {
+        text: `Löschen fehlgeschlagen
+        Es können nur Ressourcen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.`,
+        color: 'error',
+        timeout: 1e4
+      } as ShowToast)
     }
   }
 }

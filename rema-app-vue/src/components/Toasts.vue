@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { ShowToast } from '../models/interfaces'
 
 @Component
@@ -35,6 +35,17 @@ export default class Toasts extends Vue {
 
     this.snackbar = true
   }
+  @Watch('snackbar')
+  public watchSnackbar (newV: boolean) {
+    if (newV) return
+
+    this.timeout = 3000
+    this.text = ''
+    this.multiline = true
+    this.color = 'primary'
+    this.center = false
+  }
+
   private created () {
     this.$root.$on('notify-user', this.openToast)
   }

@@ -1,6 +1,6 @@
 {
   "name": "rema-app-vue",
-  "version": "1.8.0+20394",
+  "version": "1.8.1+20401",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -31,7 +31,6 @@
     "vue-property-decorator": "^8.5.0",
     "vue-router": "^3.3.4",
     "vuetify": "^2.3.1",
-    "vuetify-dialog": "^2.0.11",
     "vuex": "^3.4.0",
     "vuex-class": "^0.3.2"
   },
