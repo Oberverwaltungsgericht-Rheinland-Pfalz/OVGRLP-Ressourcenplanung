@@ -107,9 +107,15 @@ export default class h24Table extends Vue {
   private createAllocation (blocked: boolean, id: number, hourNumber: number) {
     if (blocked) return
 
-    let isPast = !moment().isBefore(this.Day + ' ' + hourNumber)
-    if (isPast) return
-
+    // @ts-ignore
+    let slotString = this.Day + ' ' + this.$options.filters['2digits'](hourNumber) + ':00:00'
+    let isPast = !moment().isBefore(slotString)
+    if (isPast) {
+      this.$dialog.message.warning('Reservierung in der Vergangenheit', {
+        position: 'bottom-center'
+      })
+      return
+    }
     let request: InitAllocation = {
       // @ts-ignore
       From: this.$options.filters['2digits'](hourNumber) + ':00',
