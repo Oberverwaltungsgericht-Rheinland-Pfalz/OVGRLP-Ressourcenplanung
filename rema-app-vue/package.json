@@ -17,7 +17,7 @@
     "axios": "^0.19.2",
     "csharp-models-to-typescript": "^0.18.1",
     "d3": "^5.16.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "mermaid": "^8.7.0",
     "moment": "^2.26.0",
     "print-js": "^1.0.63",
