@@ -6,6 +6,7 @@ import { UserState } from './UserState'
 import { RootState } from './RootState'
 import { SelectableGroup } from './SelectableGroup'
 import {ScheduledRessource} from './ScheduledRessource'
+import {ShowToast} from './ShowToast'
 
 export {
   AcknowledgeState,
@@ -17,5 +18,6 @@ export {
   UserState,
   RootState,
   ScheduledRessource,
-  SelectableGroup
+  SelectableGroup,
+  ShowToast
 }

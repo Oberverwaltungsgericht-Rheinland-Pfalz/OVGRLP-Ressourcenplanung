@@ -98,6 +98,7 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/User/types'
 import { deleteAllocation } from '../services/AllocationApiService'
 import { Allocation, Gadget, Supplier } from '../models'
+import { ShowToast } from '../models/interfaces'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
 import print from 'print-js'
@@ -265,8 +266,9 @@ export default class Calendar extends Vue {
 
     if (confirmation !== true) return
     let success = await deleteAllocation(id)
-    if (success) this.$dialog.message.success('Eintrag gelöscht', { position: 'center-left' })
-    else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
+
+    if (success) this.$root.$emit('notify-user', { text: 'Eintrag gelöscht', color: 'success' } as ShowToast)
+    else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)
   }
   public scrollToTime () {
     this.$nextTick(() => {

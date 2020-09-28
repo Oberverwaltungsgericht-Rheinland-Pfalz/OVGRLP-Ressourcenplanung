@@ -1,6 +1,7 @@
 
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Ressource, Supplier } from '../models'
+import { ShowToast } from '../models/interfaces'
 import moment from 'moment'
 
 @Component
@@ -60,9 +61,7 @@ export default class AllocationFormService extends Vue {
   public isFormInvalid () {
     this.checkForm = true
     if (this.formInvalid) {
-      this.$dialog.message.warning('Bitte füllen sie alle Pflichtfelder richtig aus', {
-        position: 'center-center'
-      })
+      this.$root.$emit('notify-user', { text: 'Bitte füllen sie alle Pflichtfelder richtig aus', color: 'warning', center: true } as ShowToast)
       return true
     }
   }

@@ -20,6 +20,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
+import { ShowToast } from '../../models/interfaces'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { getUser } from '../../services/UserApiService'
 
@@ -47,7 +48,7 @@ export default class InputReferencePerson extends Vue {
       this.model.ActiveDirectoryID = responseUser.ActiveDirectoryID
       this.model.Phone = responseUser.Phone
     } else {
-      this.$dialog.error({ text: 'Benutzer konnte nicht geladen werden', title: 'Fehler' })
+      this.$root.$emit('notify-user', { text: 'Benutzer konnte nicht geladen werden', color: 'error' } as ShowToast)
     }
   }
 

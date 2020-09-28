@@ -23,7 +23,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation, Ressource } from '../../models'
-import { ScheduledRessource, InitAllocation } from '../../models/interfaces'
+import { ScheduledRessource, InitAllocation, ShowToast } from '../../models/interfaces'
 import { deleteAllocation } from '../../services/AllocationApiService'
 import moment from 'moment'
 
@@ -111,9 +111,8 @@ export default class h24Table extends Vue {
     let slotString = this.Day + ' ' + this.$options.filters['2digits'](hourNumber) + ':00:00'
     let isPast = !moment().isBefore(slotString)
     if (isPast) {
-      this.$dialog.message.warning('Reservierung in der Vergangenheit', {
-        position: 'bottom-center'
-      })
+      this.$root.$emit('notify-user', { text: 'Zeitpunkt liegt in der Vergangenheit', color: 'warning', center: false } as ShowToast)
+
       return
     }
     let request: InitAllocation = {
