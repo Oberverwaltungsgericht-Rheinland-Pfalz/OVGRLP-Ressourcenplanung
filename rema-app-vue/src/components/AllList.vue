@@ -74,7 +74,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation, Gadget, Supplier } from '../models'
-import { SelectableGroup } from '../models/interfaces'
+import { SelectableGroup, ShowToast } from '../models/interfaces'
 import { deleteAllocation } from '../services/AllocationApiService'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
@@ -168,8 +168,9 @@ export default class AllList extends Vue {
     if (confirmation !== true) return
 
     let success = await deleteAllocation(item.Id)
-    if (success) this.$dialog.message.success('Löschung erfolgreich', { position: 'center-left' })
-    else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
+
+    if (success) this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)
+    else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)
   }
   private async printItem (item: VisibleAllocation) {
     print('api/Allocations/print/' + item.Id)

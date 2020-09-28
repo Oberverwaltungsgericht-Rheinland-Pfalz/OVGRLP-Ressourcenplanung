@@ -70,6 +70,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Supplier, Ressource } from '../../models'
+import { ShowToast } from '../../models/interfaces'
 
 @Component
 export default class SupplierManagement extends Vue {
@@ -155,10 +156,12 @@ export default class SupplierManagement extends Vue {
       try {
         let response = await Supplier.api().delete(`suppliergroups/${item.Id}`, { delete: item.Id })
       } catch (e) {
-        await this.$dialog.error({
-          text: 'Es können nur Gruppen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.',
-          title: 'Löschen fehlgeschlagen'
-        })
+        await this.$root.$emit('notify-user', {
+          text: `Löschen fehlgeschlagen
+          Es können nur Ressourcen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.`,
+          color: 'error',
+          timeout: 1e4
+        } as ShowToast)
       }
     }
   }

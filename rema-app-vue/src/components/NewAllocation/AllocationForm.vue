@@ -184,7 +184,7 @@
 import { Component, Prop, Vue, Watch, Mixins } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { InitAllocation, ShortAllocationView } from '../../models/interfaces'
+import { InitAllocation, ShortAllocationView, ShowToast } from '../../models/interfaces'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import AllocationFormService from '../../services/AllocationFormServices'
 import moment from 'moment'
@@ -259,8 +259,8 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     var success : boolean = false
     if (!this.isRepeating) {
       success = await submitAllocation(newAllocation)
-      if (success) this.$dialog.message.success('Speichern erfolgreich', { position: 'center-left' })
-      else this.$dialog.error({ text: 'Speichern fehlgeschlagen', title: 'Fehler' })
+      if (success) this.$root.$emit('notify-user', { text: 'Speichern erfolgreich', color: 'success' } as ShowToast)
+      else this.$root.$emit('notify-user', { text: 'Speichern fehlgeschlagen', color: 'error' } as ShowToast)
     } else {
       newAllocation.from = this.timeFrom
       newAllocation.to = this.timeTo
@@ -269,10 +269,10 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
       success = await submitAllocations(newAllocation)
     }
     if (success) {
-      this.$dialog.message.success('Speichern erfolgreich', { position: 'center-left' })
+      this.$root.$emit('notify-user', { text: 'Speichern erfolgreich', color: 'success' } as ShowToast)
       await refreshAllocations()
     } else {
-      this.$dialog.error({ text: 'Speichern fehlgeschlagen', title: 'Fehler' })
+      this.$root.$emit('notify-user', { text: 'Speichern fehlgeschlagen' })
     }
   }
 

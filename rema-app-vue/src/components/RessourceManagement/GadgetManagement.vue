@@ -73,6 +73,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
+import { ShowToast } from '../../models/interfaces'
 import {
   Supplier,
   Ressource,
@@ -144,15 +145,16 @@ export default class SupplierManagement extends Vue {
     }
     if (this.dialog === 2) {
       let success = await editGadget(data)
-      if (success) this.$dialog.message.success('Hilfsmittel gespeichert', { position: 'center-left' })
-      else this.$dialog.error({ text: 'Hilfsmittel speichern fehlgeschlagen', title: 'Fehler' })
+      if (success) this.$root.$emit('notify-user', { text: 'Hilfsmittel gespeichert', color: 'success' } as ShowToast)
+      else this.$root.$emit('notify-user', { text: 'Hilfsmittel speichern fehlgeschlagen', color: 'error' } as ShowToast)
+
       await Gadget.update(data)
     } else {
       const group = Supplier.find(this.editSupplier)
 
       let success = await submitGadget(data)
-      if (success) this.$dialog.message.success('Hilfsmittel gespeichert', { position: 'center-left' })
-      else this.$dialog.error({ text: 'Hilfsmittel speichern fehlgeschlagen', title: 'Fehler' })
+      if (success) this.$root.$emit('notify-user', { text: 'Hilfsmittel gespeichert', color: 'success' } as ShowToast)
+      else this.$root.$emit('notify-user', { text: 'Hilfsmittel speichern fehlgeschlagen', color: 'error' } as ShowToast)
     }
     this.closeModal()
   }
@@ -169,8 +171,15 @@ export default class SupplierManagement extends Vue {
 
     if (confirmation === true) {
       let success = await deleteGadget(item.Id)
-      if (success) this.$dialog.message.success('Hilfsmittel gelöscht', { position: 'center-left' })
-      else this.$dialog.error({ text: 'Es können nur Hilfsmittel gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.', title: 'Löschen fehlgeschlagen' })
+      if (success) {
+        this.$root.$emit('notify-user', { text: 'Hilfsmittel gelöscht', color: 'success' } as ShowToast)
+      } else {
+        this.$root.$emit('notify-user', {
+          text: 'Es können nur Hilfsmittel gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.',
+          color: 'error',
+          timeout: 1e4
+        } as ShowToast)
+      }
     }
   }
 }

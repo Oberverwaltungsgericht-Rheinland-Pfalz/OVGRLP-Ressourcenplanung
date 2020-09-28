@@ -73,6 +73,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Ressource } from '../../models'
+import { ShowToast } from '../../models/interfaces'
 
 @Component({})
 export default class RessourceManagement extends Vue {
@@ -176,10 +177,12 @@ export default class RessourceManagement extends Vue {
       try {
         let response = await Ressource.api().delete(`ressources/${item.Id}`, { delete: item.Id })
       } catch (e) {
-        await this.$dialog.error({
-          text: 'Es können nur Ressourcen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.',
-          title: 'Löschen fehlgeschlagen'
-        })
+        await this.$root.$emit('notify-user', {
+          text: `Löschen fehlgeschlagen
+          Es können nur Ressourcen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.`,
+          color: 'error',
+          timeout: 1e4
+        } as ShowToast)
       }
     }
   }

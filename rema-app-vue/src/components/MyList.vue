@@ -39,6 +39,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation } from '../models'
+import { ShowToast } from '../models/interfaces' 
 import { deleteAllocation } from '../services/AllocationApiService'
 
 @Component
@@ -96,8 +97,9 @@ export default class MyAllocationsList extends Vue {
 
     const isLastAllocation = this.isLastAllocation(item.PurposeId)
     let success = await deleteAllocation(item.Id)
-    if (success) this.$dialog.message.success('Löschung erfolgreich', { position: 'center-left' })
-    else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
+    
+    if (success) this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)
+    else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)
   }
 
   private isLastAllocation (purposeID: number): boolean {

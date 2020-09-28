@@ -168,7 +168,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { ShortAllocationView } from '../models/interfaces'
+import { ShortAllocationView, ShowToast } from '../models/interfaces'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
@@ -325,8 +325,8 @@ export default class EditFormModal extends mixins(AllocationFormService) {
     }
 
     let success = await editAllocation(data)
-    if (success) this.$dialog.message.success('Bearbeitung gespeichert', { position: 'center-left' })
-    else this.$dialog.error({ text: 'Bearbeitung speichern fehlgeschlagen', title: 'Fehler' })
+    if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung gespeichert', color: 'success' } as ShowToast)
+    else this.$root.$emit('notify-user', { text: 'Bearbeitung speichern fehlgeschlagen', color: 'error' } as ShowToast)
 
     await Allocation.update(data)
     await refreshAllocations()

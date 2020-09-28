@@ -121,6 +121,7 @@
         <router-view />
       </v-container>
     </v-main>
+    <toasts/>
   </v-app>
 </template>
 
@@ -133,12 +134,13 @@ import { UserData } from './models/interfaces'
 import { Gadget, Ressource, Supplier, Allocation } from './models'
 import { Getters } from '@vuex-orm/core'
 import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
+import Toasts from '@/components/Toasts.vue'
 // import { RemaRouteConfig } from './models/interfaces/RemaRouteConfig'
 import { refreshAllocations } from './services/AllocationApiService'
 // import handbook from '../public/Raumplanung Handbuch_v1.0.1.pdf'
 
 @Component({
-  components: { NewFormModal }
+  components: { NewFormModal, Toasts }
 })
 export default class App extends Vue {
   public get currentPath () {

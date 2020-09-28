@@ -135,7 +135,7 @@ import { mixins } from 'vue-class-component'
 import { Names as Fnn } from '../store/User/types'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import AllocationFormService from '@/services/AllocationFormServices'
-import { AllocationRequest, AllocationRequestView } from '../models/interfaces'
+import { AllocationRequest, AllocationRequestView, ShowToast } from '../models/interfaces'
 import { Allocation } from '../models'
 import { editAllocationStatus, refreshAllocations } from '../services/AllocationApiService'
 import CollisionDetection from './CollisionDetection.vue'
@@ -209,8 +209,8 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
 
   public async saveStatus (task: WebApi.AllocationRequestEdition) {
     let success = editAllocationStatus(task.Id, task.status, task.From || '', task.To || '')
-    if (success) this.$dialog.message.success('Bearbeitung erfolgreich', { position: 'center-left' })
-    else this.$dialog.error({ text: 'Bearbeitung konnte nicht gespeichert werden', title: 'Fehler' })
+    if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung erfolgreich', color: 'info' } as ShowToast)
+    else this.$root.$emit('notify-user', { text: 'Bearbeitung konnte nicht gespeichert werden', color: 'error' } as ShowToast)
 
     /* Allocation.update({
       where: task.Id,
