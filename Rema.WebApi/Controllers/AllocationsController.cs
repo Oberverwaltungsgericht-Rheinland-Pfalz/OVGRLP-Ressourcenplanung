@@ -990,6 +990,7 @@ namespace Rema.WebApi.Controllers
         .Select(e => e.GroupEmail)
         .ToListAsync();
 
+      // Alle Unterstützergruppen müssen benachrichtigt werden wenn sich etwas relevantes ändert, daher:
       if (ressourceChanged || (allocationVM.IsAllDay != oldAllocation.IsAllDay) || (oldAllocation.From != changedAllocation.From) || (oldAllocation.To != changedAllocation.To)) {
         var allHintsGroups = oldAllocation.HintsForSuppliers.Select(x => x.Group.GroupEmail).ToList();
         var allGadgetGroups = oldAllocation.AllocationGadgets.Select(x => x.Gadget.SuppliedBy.GroupEmail).ToList();
