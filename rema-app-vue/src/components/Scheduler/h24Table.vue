@@ -45,11 +45,13 @@ export default class h24Table extends Vue {
   }
 
   private get ressources ():Array<object> {
+    let myId = this.$store.state.user.id
     let rArray = []
     let start = moment(this.Day).valueOf()
     let end = moment(this.Day).add(1, 'day').valueOf()
     // [{id, name, done24:[]}]
     const allocations = Allocation.query().withAll()
+      .where((al: any) => (al.Status === 1 || al.Status === 3) || al.CreatedById === myId || al.ReferencePersonId === myId)
       .where((al: any) => {
         let to = moment(al.To).valueOf()
         let from = moment(al.From).valueOf()

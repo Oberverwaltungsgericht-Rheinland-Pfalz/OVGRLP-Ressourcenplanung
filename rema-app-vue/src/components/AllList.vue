@@ -125,6 +125,18 @@ export default class AllList extends Vue {
       .orderBy('From')
       .get()
 
+    // Search only if a supplier-group is selected for filtering
+    if (this.selectedGroup) {
+      let existingIds = allocations.map((e: any) => e.Id)
+      let allocations2 = Allocation.query().withAll()
+        .where((al: any) => al.HintsForSuppliers.length > 0 && !existingIds.includes(al.Id) && ((!this.hideNotMine && (al.Status === 1 || al.Status === 3)) || al.CreatedById === myId || al.ReferencePersonId === myId))
+        .where('To', (value: any) => (!this.hideOld || Date.parse(value) > Date.now()))
+        .where('HintsForSuppliers', (values: WebApi.SimpleSupplierHint[]) => values.some((e: WebApi.SimpleSupplierHint) => e.GroupId === this.selectedGroup?.Id))
+        .get()
+      allocations.push(...allocations2)
+      allocations.sort((a: any, b: any) => Number(a.From > b.From) - 1)
+    }
+
     if (!allocations.length) return []
 
     return allocations.map((v: any) => ({
