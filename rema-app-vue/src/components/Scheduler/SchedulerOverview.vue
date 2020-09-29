@@ -21,7 +21,7 @@
           </v-date-picker>
         </v-menu>
 
-        <v-btn @click="tomorrow" fab text small><v-icon>arrow_forward_ios</v-icon></v-btn></v-col>
+      <v-btn @click="tomorrow" fab text small><v-icon>arrow_forward_ios</v-icon></v-btn></v-col>
       <v-col cols="3" class="items-right">
         <v-btn @click="dayOrWeek = Boolean(dayOrWeek^=1)" :title="dayOrWeek ? 'Wochenansicht' : 'Tagesansicht'">
           <v-icon v-if="!dayOrWeek" >date_range</v-icon>

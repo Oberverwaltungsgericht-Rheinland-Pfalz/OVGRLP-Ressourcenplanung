@@ -27,7 +27,7 @@ export default new Router({
     } as any,
     {
       path: '/overview',
-      name: 'Terminübersicht',
+      name: 'Terminliste',
       icon: 'list',
       authLevel: 1,
       component: () => import('@/components/AllList.vue')
