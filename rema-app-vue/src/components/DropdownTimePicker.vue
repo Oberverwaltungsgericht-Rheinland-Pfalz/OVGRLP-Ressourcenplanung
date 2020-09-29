@@ -15,7 +15,8 @@
       </select>
     </span>
 
-    <v-switch v-model="precise" class="ma-2 inline-checkbox" label="Genau"></v-switch>
+    &ensp;
+    <v-btn @click="precise^=1" elevation="2" icon><v-icon v-if="precise" color="primary">av_timer</v-icon><v-icon v-else >av_timer</v-icon></v-btn>
   </span>
 </template>
 

@@ -5,6 +5,7 @@ export interface AllocationRequestView {
   IsAllDay: boolean
   Status: number
   CreatedAt: string
+  CreatedById: number
   LastModified: string
   ApprovedAt: string
   ReferencePerson: string

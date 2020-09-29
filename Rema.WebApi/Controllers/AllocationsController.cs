@@ -781,7 +781,7 @@ namespace Rema.WebApi.Controllers
       {
         return NotFound();
       }
-
+      var ed = editedRequest;
       try
       {
         allocation.Status = (MeetingStatus)editedRequest.status;
@@ -795,6 +795,20 @@ namespace Rema.WebApi.Controllers
         {
           allocation.From = editedRequest.From.GetValueOrDefault();
           allocation.To = editedRequest.To.GetValueOrDefault();
+          allocation.IsAllDay = editedRequest.IsAllDay;
+
+          if (editedRequest.IsAllDay) {
+            try
+            {
+              allocation.From = editedRequest.From.GetValueOrDefault().Date + new TimeSpan(0, 0, 0);
+              allocation.To = editedRequest.To.GetValueOrDefault().Date + new TimeSpan(23, 59, 00);
+            }
+            catch (Exception ex)
+            {
+              Log.Error(ex, "error while set correct times for all day");
+            }
+
+          }
         }
 
         _context.Entry(allocation).State = EntityState.Modified;
@@ -934,7 +948,6 @@ namespace Rema.WebApi.Controllers
       var newGadgets = allocationVM.GadgetsIds.Where(x => !currentGadgetIds.Contains(x));
       var droppedGadgets = currentGadgetIds.Where(x => !allocationVM.GadgetsIds.Contains(x)).ToArray();
       IQueryable<Gadget> newGadgetsObjects = new List<Gadget>().AsQueryable();
-      IEnumerable<AllocationGagdet> droppedGadgetObjects = new List<AllocationGagdet>();
       var deletedGadgets = new List<AllocationGagdet>();
       var createdGadgets = new List<AllocationGagdet>();
 
@@ -968,7 +981,7 @@ namespace Rema.WebApi.Controllers
       {
         try 
         {
-          droppedGadgetObjects = oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
+          oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
 
           foreach(var i in droppedGadgets)
           {
@@ -991,11 +1004,12 @@ namespace Rema.WebApi.Controllers
         .ToListAsync();
 
       // Alle Unterstützergruppen müssen benachrichtigt werden wenn sich etwas relevantes ändert, daher:
-      if (ressourceChanged || (allocationVM.IsAllDay != oldAllocation.IsAllDay) || (oldAllocation.From != changedAllocation.From) || (oldAllocation.To != changedAllocation.To)) {
-        var allHintsGroups = oldAllocation.HintsForSuppliers.Select(x => x.Group.GroupEmail).ToList();
-        var allGadgetGroups = oldAllocation.AllocationGadgets.Select(x => x.Gadget.SuppliedBy.GroupEmail).ToList();
-        hintGroupMails.Concat(allHintsGroups).Concat(allGadgetGroups);
-      }
+      // if (ressourceChanged || (allocationVM.IsAllDay != oldAllocation.IsAllDay) || (oldAllocation.From != changedAllocation.From) || (oldAllocation.To != changedAllocation.To)) {
+      // Änderung: einfach alle benachrichtigen (ggf. das granularere konfigurierbar machen
+      var allHintsGroups = oldAllocation.HintsForSuppliers.Select(x => x.Group.GroupEmail).ToList();
+      var allGadgetGroups = oldAllocation.AllocationGadgets.Select(x => x.Gadget.SuppliedBy.GroupEmail).ToList();
+      hintGroupMails.Concat(allHintsGroups).Concat(allGadgetGroups);
+      // }
 
       try
       {
