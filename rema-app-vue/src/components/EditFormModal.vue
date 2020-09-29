@@ -143,7 +143,7 @@
         <v-divider />
         <v-row>
           <v-col>
-            <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined :disabled="readonly"></v-textarea>
+            <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined :disabled="readonly" hide-details=true rows="2"></v-textarea>
           </v-col>
         </v-row>
         <collision-detection :viewAllocation="RessourceChecker"/>

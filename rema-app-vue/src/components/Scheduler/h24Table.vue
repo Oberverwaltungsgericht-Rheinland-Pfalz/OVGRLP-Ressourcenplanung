@@ -87,6 +87,7 @@ export default class h24Table extends Vue {
     }
     if (!this.HideEmptyRessources) this.addEmptyRessources(rArray)
     if (this.NameFilter && this.NameFilter.length) this.applyNameFilter(rArray)
+    rArray.sort((a: ScheduledRessource, b: ScheduledRessource) => Number(a.Name > b.Name) - 1)
 
     return rArray
   }
@@ -101,20 +102,19 @@ export default class h24Table extends Vue {
       let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24) }
       ar.push(newObj)
     }
-    ar.sort((a: ScheduledRessource, b: ScheduledRessource) => Number(a.Name > b.Name) - 1)
   }
 
   private createAllocation (blocked: boolean, id: number, hourNumber: number) {
-    if (blocked) return
+    if (blocked || !this.allocationPossible) return
 
     // @ts-ignore
     let slotString = this.Day + ' ' + this.$options.filters['2digits'](hourNumber) + ':00:00'
     let isPast = !moment().isBefore(slotString)
     if (isPast) {
       this.$root.$emit('notify-user', { text: 'Zeitpunkt liegt in der Vergangenheit', color: 'warning', center: false } as ShowToast)
-
       return
     }
+
     let request: InitAllocation = {
       // @ts-ignore
       From: this.$options.filters['2digits'](hourNumber) + ':00',

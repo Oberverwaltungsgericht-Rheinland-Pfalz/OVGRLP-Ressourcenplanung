@@ -11,5 +11,6 @@ namespace Rema.WebApi.ViewModels
     public int status { get; set; }
     public DateTime? From { get; set; }
     public DateTime? To { get; set; }
+    public Boolean IsAllDay { get; set; }
   }
 }

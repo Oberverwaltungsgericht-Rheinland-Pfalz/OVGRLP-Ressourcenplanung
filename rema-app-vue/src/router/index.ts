@@ -13,7 +13,7 @@ export default new Router({
     {
       path: '/',
       name: 'Kalender',
-      icon: 'business',
+      icon: 'event_note',
       authLevel: 0,
       component: () => import('@/views/Calendar.vue')
     } as any,
@@ -21,21 +21,21 @@ export default new Router({
       path: '/schedule',
       name: 'Terminfinder',
       icon: 'blur_linear',
-      authLevel: 100,
+      authLevel: 0,
       beforeEnter: (to: any, from: any, next: any) => requireAuth(0, to, from, next),
       component: () => import('@/views/Schedules.vue')
     } as any,
     {
       path: '/overview',
       name: 'Terminübersicht',
-      icon: 'storage',
+      icon: 'list',
       authLevel: 1,
       component: () => import('@/components/AllList.vue')
     } as any,
     {
       path: '/acknowledge',
       name: 'Anfragenverwaltung',
-      icon: 'storage',
+      icon: 'playlist_add_check',
       authLevel: 10,
       beforeEnter: (to: any, from: any, next: any) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')

@@ -12,6 +12,7 @@ declare module WebApi {
         status: number;
         From?: string;
         To?: string;
+        IsAllDay: Boolean;
     }
 
     // ..\Rema.WebApi\ViewModels\AllocationViewModel.cs

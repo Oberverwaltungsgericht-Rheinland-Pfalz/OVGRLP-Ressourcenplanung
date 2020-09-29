@@ -147,6 +147,8 @@
             <v-textarea
               v-model="notes"
               :label="'Notizen'"
+              rows="2"
+              hide-details=true
               auto-grow
               clearable
               outlined
