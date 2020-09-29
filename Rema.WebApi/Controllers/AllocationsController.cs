@@ -877,7 +877,7 @@ namespace Rema.WebApi.Controllers
         return NotFound();
       }
 
-      bool ressourceChanged = false;
+      // bool ressourceChanged = false;
       Allocation changedAllocation;
       try
       {
@@ -916,7 +916,7 @@ namespace Rema.WebApi.Controllers
       Ressource newRessource = null;
       if(oldAllocation.Ressource.Id != allocationVM.RessourceId)
       {
-        ressourceChanged = true;
+        // ressourceChanged = true;
         newRessource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
       }
 
