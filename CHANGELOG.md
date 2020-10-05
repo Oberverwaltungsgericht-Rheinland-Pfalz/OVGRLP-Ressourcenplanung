@@ -1,3 +1,7 @@
+### Änderungen
+
+* Refresh Button für die Daten in der Client- Anwendung
+
 ## Ressourcenmanagement v1.8.0
 
 * Ressourcen können in Scheduler gefiltert, beobachtet und gebucht/beantragt werden

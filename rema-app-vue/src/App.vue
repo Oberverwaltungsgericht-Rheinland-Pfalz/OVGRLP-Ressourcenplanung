@@ -35,6 +35,7 @@
       <v-layout justify-space-between wrap align-center>
         <div class="text-center">
           <new-form-modal />&ensp;
+          <v-btn color="primary" title="Daten aktualisieren" @click="loadData"><v-icon>sync</v-icon></v-btn>
           <v-menu v-if="!drawer && showNav" offset-y open-on-hover>
             <template v-slot:activator="{ on }">
               <v-btn color="primary" dark v-on="on">
@@ -168,11 +169,16 @@ export default class App extends Vue {
     if (this.loading) return false
     return this.userData.roleNames.length > 0
   }
-  public async created () {
+  public loadData () : Array<Promise<any>> {
+    Allocation.deleteAll()
     let promise1 = Gadget.api().get('gadgets')
     let promise2 = Supplier.api().get('suppliergroups')
     let promise3 = Ressource.api().get('ressources')
     let promise4 = refreshAllocations()
+    return [promise1, promise2, promise3, promise4]
+  }
+  public async created () {
+    let loadDataPromises = this.loadData()
 
     await this.loadUser()
     ;(this.$router as any).options.routes.forEach((route: any) => {
@@ -186,7 +192,7 @@ export default class App extends Vue {
       }
     })
 
-    await Promise.all([promise1, promise2, promise3, promise4])
+    await Promise.all(loadDataPromises)
     this.loading = false
   }
 

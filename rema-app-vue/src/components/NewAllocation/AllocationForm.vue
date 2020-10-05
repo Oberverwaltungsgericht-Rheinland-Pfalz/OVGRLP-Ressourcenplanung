@@ -161,6 +161,7 @@
     </v-card-text>
     <v-card-actions>
       <div class="flex-grow-1"></div>
+      <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
       <v-btn
         v-if="permissionToEdit"
         color="green darken-1"
@@ -210,6 +211,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
   public isRepeating: boolean = false
+  private loading: boolean = false
 
   beforeMount () {
     if (this.initValues && this.initValues.RessourceId) {
@@ -259,6 +261,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     }
 
     var success : boolean = false
+    this.loading = true
     if (!this.isRepeating) {
       success = await submitAllocation(newAllocation)
       if (success) this.$root.$emit('notify-user', { text: 'Speichern erfolgreich', color: 'success' } as ShowToast)
@@ -276,6 +279,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     } else {
       this.$root.$emit('notify-user', { text: 'Speichern fehlgeschlagen' })
     }
+    this.loading = false
   }
 
   private close () {
