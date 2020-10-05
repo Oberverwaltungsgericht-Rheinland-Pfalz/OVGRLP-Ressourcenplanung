@@ -39,6 +39,7 @@ export default class TitleProposal extends Vue {
     this.internalModel = newVal
   }
 
+  @Watch('search')
   @Watch('internalModel')
   private watchInternalModel (newVal: string, oldValue: string) {
     if (newVal !== oldValue) { this.$emit('input', newVal) }

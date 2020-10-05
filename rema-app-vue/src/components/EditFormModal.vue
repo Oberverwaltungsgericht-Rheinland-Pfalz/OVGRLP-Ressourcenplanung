@@ -152,6 +152,7 @@
     </v-card-text>
     <v-card-actions>
       <div class="flex-grow-1"></div>
+      <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
       <v-btn
         v-if="permissionToEdit && !readonly "
         color="green darken-1" text
@@ -208,6 +209,7 @@ export default class EditFormModal extends mixins(AllocationFormService) {
 
   public isRepeating: boolean = false
   public dialog: boolean = false
+  public loading: boolean = false
 
   private mounted () {
     this.dialog = this.show
@@ -324,7 +326,9 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       data.to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
     }
 
+    this.loading = true
     let success = await editAllocation(data)
+    this.loading = false
     if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung gespeichert', color: 'success' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Bearbeitung speichern fehlgeschlagen', color: 'error' } as ShowToast)
 
