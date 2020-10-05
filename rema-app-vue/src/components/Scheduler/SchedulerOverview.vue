@@ -9,7 +9,8 @@
         <v-btn v-else @click="hideEmptyRessources = true" title="Freie Ressourcen ausblenden"><v-icon>blur_linear</v-icon></v-btn>
       </v-col>
       <v-col cols="6">
-        <v-btn @click="yesterday" fab text small><v-icon>arrow_back_ios</v-icon></v-btn>
+        <v-btn @click="jumpDays(-7)" fab text small><v-icon>first_page</v-icon></v-btn>
+        <v-btn @click="jumpDays(-1)" fab text small><v-icon>arrow_back_ios</v-icon></v-btn>
         <v-menu ref="todayMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
           v-model="daypickerOpen">
           <template v-slot:activator="{ on }">
@@ -21,7 +22,8 @@
           </v-date-picker>
         </v-menu>
 
-      <v-btn @click="tomorrow" fab text small><v-icon>arrow_forward_ios</v-icon></v-btn></v-col>
+      <v-btn @click="jumpDays(1)" fab text small><v-icon>arrow_forward_ios</v-icon></v-btn>
+      <v-btn @click="jumpDays(7)" fab text small><v-icon>last_page</v-icon></v-btn></v-col>
       <v-col cols="3" class="items-right">
         <v-btn @click="dayOrWeek = Boolean(dayOrWeek^=1)" :title="dayOrWeek ? 'Wochenansicht' : 'Tagesansicht'">
           <v-icon v-if="!dayOrWeek" >date_range</v-icon>
@@ -85,11 +87,8 @@ export default class SchedulerOverview extends Vue {
   private set pickedDate (v: string) {
     this.today = moment(v).format('YYYY-MM-DD')
   }
-  private tomorrow () {
-    this.today = moment(this.today).add(1, 'd').format('YYYY-MM-DD')
-  }
-  private yesterday () {
-    this.today = moment(this.today).add(-1, 'd').format('YYYY-MM-DD')
+  private jumpDays (days: number) {
+    this.today = moment(this.today).add(days, 'd').format('YYYY-MM-DD')
   }
 }
 </script>
