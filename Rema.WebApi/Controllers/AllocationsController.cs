@@ -1008,7 +1008,8 @@ namespace Rema.WebApi.Controllers
       // Änderung: einfach alle benachrichtigen (ggf. das granularere konfigurierbar machen
       var allHintsGroups = oldAllocation.HintsForSuppliers.Select(x => x.Group.GroupEmail).ToList();
       var allGadgetGroups = oldAllocation.AllocationGadgets.Select(x => x.Gadget.SuppliedBy.GroupEmail).ToList();
-      hintGroupMails.Concat(allHintsGroups).Concat(allGadgetGroups);
+      hintGroupMails.AddRange(allHintsGroups);
+      hintGroupMails.AddRange(allGadgetGroups);
       // }
 
       try
