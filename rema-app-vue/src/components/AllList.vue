@@ -1,25 +1,11 @@
 <template>
   <v-layout id="all-list" column>
-    <v-data-table
-      v-if="hasItems"
-      :headers="headers"
-      :items="Requests"
-      :search="search"
-      sort-by="From"
-    >
-      <template v-slot:top>
-        <v-toolbar flat color="white">
-          <label class="blue-icon">
-            <input hidden type="checkbox" v-model="hideOld" />
-            Vergangene Termine &ensp;<v-icon v-if="!hideOld">visibility</v-icon>
-            <v-icon v-else>visibility_off</v-icon>
-          </label>
+    <v-sheet height="64">
+      <v-toolbar flat color="white">
+          <v-checkbox v-model="hideOld" label="Vergangene Termine" on-icon="visibility_off" off-icon="visibility_on" class="pad-top"></v-checkbox>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <label class="blue-icon">
-            <input hidden type="checkbox" v-model="hideNotMine" />
-            Zeige nur meine Termine &ensp;<v-icon v-if="!hideNotMine">check_box_outline_blank</v-icon>
-            <v-icon v-else>check_box</v-icon>
-          </label>
+          <v-checkbox v-model="hideNotMine" label="Zeige nur meine Termine" on-icon="check_box" off-icon="check_box_outline_blank" class="pad-top"></v-checkbox>
+
           <v-spacer/>
           <v-text-field
             v-model="search"
@@ -40,14 +26,21 @@
               :menu-props="{ offsetY: true }"
               class="select-group"
             />
-        </v-toolbar>
-      </template>
+      </v-toolbar>
+    </v-sheet>
+    <v-data-table
+      v-if="hasItems"
+      :headers="headers"
+      :items="Requests"
+      :search="search"
+      sort-by="From"
+    >
       <template v-slot:item="props">
         <tr @click.stop="rowClicked(props.item.Id)" :class="{'mark-today': props.item.From.startsWith(today)}">
-          <td class="text-start">
-            <v-icon v-if="permissionToEdit" @click.stop="confirmDelete(props.item)">delete</v-icon>&emsp;
-            <v-icon @click.stop="printItem(props.item)">print</v-icon>&emsp;
-            <v-icon v-if="permissionToEdit" @click.stop="editItem(props.item.Id)">edit</v-icon>
+          <td class="text-start fit-cell">
+            <v-icon v-if="permissionToEdit" @click.stop="confirmDelete(props.item)" title="Termin löschen" class="pad-right">delete</v-icon>&emsp;
+            <v-icon @click.stop="printItem(props.item)" title="Termin drucken" class="pad-right">print</v-icon>&emsp;
+            <v-icon v-if="permissionToEdit" @click.stop="editItem(props.item.Id)" title="Termin bearbeiten">edit</v-icon>
           </td>
           <td class="text-start">{{props.item.Title}}
             <v-chip v-show="selectedGroup" v-for="gadget in showGadgets(props.item)" :key="'gadget'+props.item.Id+gadget" class="ma-2" color="yellow">
@@ -216,6 +209,8 @@ interface VisibleAllocation {
 
 .blue-icon i
   color #82b1ff !important
+.icon-button
+  cursor pointer
 </style>
 
 <style lang="stylus">
@@ -226,4 +221,11 @@ interface VisibleAllocation {
     margin-bottom 0
   .select-group .v-text-field__details
     display none
+  .pad-right
+    padding-right .5em
+  .pad-top
+    padding-top 2em
+.fit-cell
+  white-space nowrap
+  width 1%
 </style>

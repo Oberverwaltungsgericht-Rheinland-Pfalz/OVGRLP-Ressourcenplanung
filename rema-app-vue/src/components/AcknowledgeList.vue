@@ -14,16 +14,15 @@
         <v-toolbar flat color="white">
           <v-toolbar-title>Wartende Anfragen</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
-          <label class="blue-icon">
-            <input hidden type="checkbox" v-model="hideOld" />vergangene Termine bleiben ausgeblendet&ensp;<v-icon v-if="!hideOld">visibility</v-icon>
-            <v-icon v-else>visibility_off</v-icon>
-          </label>
+
+          <v-checkbox v-model="hideOld" label="Vergangene Termine" on-icon="visibility_off" off-icon="visibility_on" class="pad-top pad-right"></v-checkbox>
+          <v-checkbox v-model="hideDone" label="Bestätigte Termine" on-icon="visibility_off" off-icon="visibility_on" class="pad-top"></v-checkbox>
 
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
             append-icon="search"
-            label="Filter"
+            label="Namensfilter"
             single-line
             hide-details
           />
@@ -34,7 +33,7 @@
       <template v-slot:item.DateTime="{ item }">{{item.DateTime | toLocal}}</template>
       <template v-slot:item.CreateDate="{ item }">{{item.CreateDate | toLocal}}</template>
       <template v-slot:item.action="{ item }">
-        <v-btn @click="openDialog(item.Id)">Bearbeiten</v-btn>
+        <v-btn @click="openDialog(item.Id)"><span>Status</span><v-icon class="pad-left">edit</v-icon></v-btn>
       </template>
       <template v-slot:no-data>
         <span>Keine Einträge zu bearbeiten</span>
@@ -74,6 +73,7 @@ export default class AcknowledgeList extends Vue {
   private dialog: boolean = false
   private viewAllocation: AllocationRequestView = {} as AllocationRequestView
   private hideOld: boolean = true
+  private hideDone: boolean = true
 
   private search: string = ''
   private headers: object[] = [
@@ -118,6 +118,7 @@ export default class AcknowledgeList extends Vue {
     this.fillContactUsers()
     return this.UnAcknowledgedAllocations
       .filter((a: any) => {
+        if (this.hideDone && (a.Status === 1 || a.Status === 3)) return false
         return Date.parse(a.To) > Date.now()
       })
       .map((v: any) => ({
@@ -156,11 +157,19 @@ export default class AcknowledgeList extends Vue {
 </script>
 
 <style scoped lang="stylus">
-.appointment-open-list:nth-of-type(2n) {
-  background-color: lightgrey;
-}
+.appointment-open-list:nth-of-type(2n)
+  background-color lightgrey
 
-.invalid-date {
-  border: 1px solid red;
-}
+.invalid-date
+  border 1px solid red
+
+.pad-left
+  margin-left .5em
+td.text-start:first-of-type
+  white-space nowrap
+  width 1%
+.pad-top
+  padding-top 2em
+.pad-right
+  padding-right 1em
 </style>

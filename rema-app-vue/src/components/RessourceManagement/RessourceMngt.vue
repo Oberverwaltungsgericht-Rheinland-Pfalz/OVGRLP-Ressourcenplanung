@@ -19,11 +19,8 @@
       </template>
 
       <template v-slot:item.action="{ item }">
-        <v-icon class="mr-2" @click="editItem(item)">edit</v-icon>
-        <v-icon @click="confirmItem(item)">delete</v-icon>
-      </template>
-      <template v-slot:no-data>
-        <v-btn color="primary">Neu laden</v-btn>
+        <v-icon class="mr-2" @click="editItem(item)" title="Ressource bearbeiten">edit</v-icon>
+        <v-icon @click="confirmItem(item)" title="Ressource löschen">delete</v-icon>
       </template>
     </v-data-table>
 

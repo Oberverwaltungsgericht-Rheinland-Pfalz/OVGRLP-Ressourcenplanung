@@ -74,6 +74,7 @@
               color="red"
               v-on="on"
               class="action-avatar"
+              title="Mein Profil"
             >
               <span class="white--text headline">{{ userData.name[0] }}</span>
             </v-avatar>

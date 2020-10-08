@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-tabs v-model="tab" fixed-tabs background-color="white" light>
-      <v-tab>Ressourcen</v-tab>
-      <v-tab>Hilfsmittel</v-tab>
-      <v-tab>Unterstützergruppen</v-tab>
+      <v-tab title="Ressourcen verwalten">Ressourcen</v-tab>
+      <v-tab title="Hilfsmittel verwalten">Hilfsmittel</v-tab>
+      <v-tab title="Unterstützergruppen verwalten">Unterstützergruppen</v-tab>
     </v-tabs>
 
     <ressource-management v-show="tab===0" />
