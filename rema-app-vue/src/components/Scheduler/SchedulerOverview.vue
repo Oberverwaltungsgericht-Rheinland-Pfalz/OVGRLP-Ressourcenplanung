@@ -9,21 +9,21 @@
         <v-btn v-else @click="hideEmptyRessources = true" title="Freie Ressourcen ausblenden"><v-icon>blur_linear</v-icon></v-btn>
       </v-col>
       <v-col cols="6">
-        <v-btn @click="jumpDays(-7)" fab text small><v-icon>first_page</v-icon></v-btn>
-        <v-btn @click="jumpDays(-1)" fab text small><v-icon>arrow_back_ios</v-icon></v-btn>
+        <v-btn @click="jumpDays(-7)" fab text small title="7 Tage zurück"><v-icon>first_page</v-icon></v-btn>
+        <v-btn @click="jumpDays(-1)" fab text small title="1 Tag zurück"><v-icon>arrow_back_ios</v-icon></v-btn>
         <v-menu ref="todayMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
           v-model="daypickerOpen">
           <template v-slot:activator="{ on }">
-            <v-btn v-if="dayOrWeek" outlined v-on="on">{{today | toLocalDate}}</v-btn>
-            <v-btn v-else outlined v-on="on">{{todayPlus(0) | toLocalDate}} - {{todayPlus(4) | toLocalDate}}</v-btn>
+            <v-btn v-if="dayOrWeek" outlined v-on="on" title="Tag auswählen">{{today | toLocalDate}}</v-btn>
+            <v-btn v-else outlined v-on="on" title="Anfang auswählen">{{todayPlus(0) | toLocalDate}} - {{todayPlus(4) | toLocalDate}}</v-btn>
           </template>
           <v-date-picker v-model="pickedDate" locale="de" :first-day-of-week="1" no-title @input="daypickerOpen = false">
             <v-btn text color="primary" @click="daypickerOpen = false" block>Abbrechen</v-btn>
           </v-date-picker>
         </v-menu>
 
-      <v-btn @click="jumpDays(1)" fab text small><v-icon>arrow_forward_ios</v-icon></v-btn>
-      <v-btn @click="jumpDays(7)" fab text small><v-icon>last_page</v-icon></v-btn></v-col>
+      <v-btn @click="jumpDays(1)" fab text small title="1 Tag weiter"><v-icon>arrow_forward_ios</v-icon></v-btn>
+      <v-btn @click="jumpDays(7)" fab text small title="7 Tage weiter"><v-icon>last_page</v-icon></v-btn></v-col>
       <v-col cols="3" class="items-right">
         <v-btn @click="dayOrWeek = Boolean(dayOrWeek^=1)" :title="dayOrWeek ? 'Wochenansicht' : 'Tagesansicht'">
           <v-icon v-if="!dayOrWeek" >date_range</v-icon>

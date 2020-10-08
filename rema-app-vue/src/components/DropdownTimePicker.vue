@@ -16,7 +16,10 @@
     </span>
 
     &ensp;
-    <v-btn @click="precise^=1" elevation="2" icon><v-icon v-if="precise" color="primary">av_timer</v-icon><v-icon v-else >av_timer</v-icon></v-btn>
+    <v-btn @click="precise^=1" elevation="2" icon>
+      <v-icon v-if="precise" color="primary" title="Minuten genau auswählen">av_timer</v-icon>
+      <v-icon v-else title="15 Minuten Intervalle auswählen">av_timer</v-icon>
+    </v-btn>
   </span>
 </template>
 
