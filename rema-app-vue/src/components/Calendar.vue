@@ -3,7 +3,7 @@
     <v-flex>
       <v-sheet height="64">
         <v-toolbar flat color="white">
-          <v-btn outlined class="mr-4" @click="setToday">Heute</v-btn>
+          <v-btn outlined class="mr-4" @click="setToday" title="Ansicht auf aktuellen Tag">Heute</v-btn>
           <v-btn fab text small @click="prev">
             <v-icon small>arrow_back_ios</v-icon>
           </v-btn>
@@ -15,13 +15,13 @@
 
           <v-dialog v-model="showFilterModal" width="800" scrollable >
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" color="primary">Suchkriterien ({{titleFilter.length}})</v-btn>
+              <v-btn v-on="on" color="primary" title="Anzeigte Termine filtern">Suchkriterien ({{titleFilter.length}})</v-btn>
             </template>
             <v-card>
               <v-card-title>Anzeige einschränken auf:
                 <v-spacer/>
                 <v-btn @click="resetFilter" :style="{visibility: titleFilter.length ? 'visible':'hidden'}" color="warning" right class="ma-2">Zurücksetzen</v-btn>
-                <v-btn @click="showFilterModal=false" class="ma-2" right color="success">Ok</v-btn>
+                <v-btn @click="showFilterModal=false" class="ma-2" right color="success" title="Filterkriterien anwenden">Ok</v-btn>
               </v-card-title>
               <v-card-text id="pad-bot-twenty">
                 <v-select v-model="titleFilter" :items="possibleTitles" attach chips label="Räume" multiple single-line></v-select>
@@ -30,7 +30,7 @@
           </v-dialog>
           <v-spacer/>
 
-          <v-checkbox class="showWe" v-model="showWE" :label="'WE'" on-icon="visibility" off-icon="visibility_off"></v-checkbox>
+          <v-checkbox title="Wochenenden aus/einblenden" class="showWe" v-model="showWE" :label="'WE'" on-icon="visibility" off-icon="visibility_off"></v-checkbox>
           <v-radio-group v-model="currentview" row @change="scrollToTime">
             <v-radio v-for="n in types" :key="'ansicht'+n" :label="typeName(n)" :value="n"/>
           </v-radio-group>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="ressources-admin">
     <v-tabs v-model="tab" fixed-tabs background-color="white" light>
       <v-tab title="Ressourcen verwalten">Ressourcen</v-tab>
       <v-tab title="Hilfsmittel verwalten">Hilfsmittel</v-tab>
@@ -22,6 +22,13 @@ import SupplierManagement from '@/components/RessourceManagement/SupplierManagem
   components: { RessourceManagement, GadgetManagement, SupplierManagement }
 })
 export default class Ressources extends Vue {
-  public tab: any = null;
+  public tab: any = null
 }
 </script>
+
+<style lang="stylus">
+#ressources-admin
+  tr td:last-of-type
+    white-space nowrap
+    width 1%
+</style>

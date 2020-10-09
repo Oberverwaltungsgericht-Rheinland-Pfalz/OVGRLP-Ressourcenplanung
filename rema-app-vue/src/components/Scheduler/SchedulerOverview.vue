@@ -2,7 +2,7 @@
   <v-layout column>
     <v-row class="text-center">
       <v-col cols="2">
-        <v-text-field type="text" placeholder="Namensfilter" v-model="nameFilter"/>
+        <v-text-field type="text" placeholder="Namensfilter" v-model="nameFilter" title="Anzeigte Ressourcen anhand ihrer Namen filtern"/>
       </v-col>
       <v-col cols="1">
         <v-btn v-if="hideEmptyRessources" @click="hideEmptyRessources = false" title="Freie Ressourcen anzeigen"><v-icon>blur_circular</v-icon></v-btn>

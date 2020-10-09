@@ -17,7 +17,7 @@
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-icon @click="editItem(item)" title="Hilfsmittel bearbeiten">edit</v-icon>
+        <v-icon @click="editItem(item)" title="Hilfsmittel bearbeiten" class="mr-2">edit</v-icon>
         <v-icon @click="openDialog(item)" title="Hilfsmittel löschen">delete</v-icon>
       </template>
     </v-data-table>
