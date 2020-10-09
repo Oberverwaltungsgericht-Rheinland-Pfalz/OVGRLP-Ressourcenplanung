@@ -1,5 +1,5 @@
 <template>
-  <v-layout column>
+  <v-layout column id="ressource-mngt">
     <v-data-table
       :headers="headers"
       :items="items"

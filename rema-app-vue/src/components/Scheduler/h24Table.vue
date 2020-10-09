@@ -8,7 +8,9 @@
       <th v-for="(v, idx0) in hours" :key="'thhours'+idx0" v-show="!(HideLateEarly && (idx0 < startHour || idx0 > endHour))">{{(v-1) | 2digits}}</th>
     </tr>
     <tr v-for="(r, idx1) in ressources" :key="'res'+idx1">
-      <td class="right-space first-cell">{{r.Name}}</td>
+      <td :title="r.Details" class="right-space first-cell">{{r.Name}}
+        <v-icon v-if="r.Details" color="blue" class="info-cell">info_icon</v-icon>
+      </td>
       <td
         v-for="(h2, idx2) in r.Hours"
         :key="idx1+'row'+idx2"
@@ -66,7 +68,7 @@ export default class h24Table extends Vue {
     ressources.sort()
 
     for (let res of ressources) {
-      let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24) }
+      let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24), Details: res.SpecialsDescription }
 
       let allocs = allocations.filter((e: any) => e.Ressource.Id === res.Id)
       for (let allo of allocs) {
@@ -101,7 +103,7 @@ export default class h24Table extends Vue {
     let withoutExisting = allRessources.filter((a: any) => !ar.find((b: any) => a.Id === b.Id))
     for (let res of withoutExisting) {
       // @ts-ignore
-      let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24) }
+      let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24), Details: res.SpecialsDescription }
       ar.push(newObj)
     }
   }
@@ -131,6 +133,8 @@ export default class h24Table extends Vue {
 <style lang="stylus" scoped>
 .blocked
   background-color lightgrey
+.info-cell
+  cursor help
 td.s
   background-color lightgrey
 td.f

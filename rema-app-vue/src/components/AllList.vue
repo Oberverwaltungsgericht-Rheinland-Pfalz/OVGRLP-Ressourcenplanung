@@ -2,30 +2,46 @@
   <v-layout id="all-list" column>
     <v-sheet height="64">
       <v-toolbar flat color="white">
-          <v-checkbox v-model="hideOld" label="Vergangene Termine" on-icon="visibility_off" off-icon="visibility_on" class="pad-top"></v-checkbox>
-          <v-divider class="mx-4" inset vertical></v-divider>
-          <v-checkbox v-model="hideNotMine" label="Zeige nur meine Termine" on-icon="check_box" off-icon="check_box_outline_blank" class="pad-top"></v-checkbox>
+        <v-checkbox v-model="hideOld" label="Vergangene Termine" on-icon="visibility_off" off-icon="visibility_on" class="pad-top"></v-checkbox>
+        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-checkbox v-model="hideNotMine" label="Zeige nur meine Termine" on-icon="check_box" off-icon="check_box_outline_blank" class="pad-top"></v-checkbox>
 
-          <v-spacer/>
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Filter"
-            single-line
-            hide-details
-          />
-          <v-spacer/>
-          <v-select
-              v-model="selectedGroup"
-              :items="GroupItems"
-              item-text="Title"
-              return-object
-              clearable
-              placeholder=""
-              label="Hilfsmittel-Abteilung"
-              :menu-props="{ offsetY: true }"
-              class="select-group"
+        <v-spacer/>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-bind="attrs" v-on="on"
+              v-model="search"
+              append-icon="search"
+              label="Bezeichnungsfilter"
+              single-line
+              hide-details
             />
+          </template>
+          <span>Schränkt die Ansicht auf Termine ein, deren Namen die hier eingetippten Buchstaben enthalten</span>
+        </v-tooltip>
+
+        <v-spacer/>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <div class="select-wrap-width" v-bind="attrs" v-on="on">
+              <v-select
+                v-model="selectedGroup"
+                :items="GroupItems"
+                item-text="Title"
+                return-object
+                clearable
+                placeholder=""
+                label="Unterstützergruppe auswählen"
+                :menu-props="{ offsetY: true }"
+                class="select-group"
+              />
+            </div>
+          </template>
+          <span>Zeige nur Termine welche für eine Unterstützergruppe zu beachten sind</span>
+        </v-tooltip>
       </v-toolbar>
     </v-sheet>
     <v-data-table
@@ -225,6 +241,9 @@ interface VisibleAllocation {
     padding-right .5em
   .pad-top
     padding-top 2em
+  .select-wrap-width
+    min-width 25%
+    max-width 100%
 .fit-cell
   white-space nowrap
   width 1%

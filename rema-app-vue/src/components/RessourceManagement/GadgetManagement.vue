@@ -17,7 +17,7 @@
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-icon @click="editItem(item)" title="Unterstützergruppe bearbeiten">edit</v-icon>
+        <v-icon @click="editItem(item)" title="Unterstützergruppe bearbeiten" class="mr-2">edit</v-icon>
         <v-icon @click="confirmDelete(item)" title="Unterstützergruppe löschen">delete</v-icon>
       </template>
       <template v-slot:item.SuppliedBy="{ item }">{{
