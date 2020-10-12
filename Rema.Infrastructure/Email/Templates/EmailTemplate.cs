@@ -73,8 +73,8 @@ namespace Rema.Infrastructure.Email.Templates
       }
     }
     private string TimeOneDateSingle (Allocation al) {
-      if (al.IsAllDay) return $"{al.From.ToString("dddd, dd MMMM y")}  - {al.To.ToString("dddd, dd MMMM y")} Ganztägig";
-      return $"{al.From.ToString("dddd, dd MMMM y HH:mm")}  - {al.To.ToString("dddd, dd MMMM y HH:mm")}";
+      if (al.IsAllDay) return $"{al.From.ToString("dddd, dd MMMM yyyy")}  - {al.To.ToString("dddd, dd MMMM yyyy")} Ganztägig";
+      return $"{al.From.ToString("dddd, dd MMMM yyyy HH:mm")}  - {al.To.ToString("dddd, dd MMMM yyyy HH:mm")}";
     }
     private string TimeOneDateMultiple ()
     {

@@ -678,14 +678,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var title = allocationsVM.Title;
         var recipient = allocations[0]?.ReferencePerson?.Email;
-        var ressourceName = allocations[0].Ressource.Name;
-        string list = "";
-        foreach(var all in allocations) {
-          list += $@"*{all.From.ToString("dddd, dd MMMM y HH:mm")} - {all.To.ToString("dddd, dd MMMM y HH:mm")}{System.Environment.NewLine}
-";
-        }
 
         var isBooking = allocations[0].Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
         var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";

@@ -20,7 +20,7 @@ namespace Rema.Infrastructure.Email.Templates
 
 Erstellt durch: {this._allocation.CreatedBy?.Name}
 Zuletzt geändert durch: {LastModifier}
-Zuletzt geändert am: {this._allocation.LastModified.ToString("dddd, dd MMMM y")}
+Zuletzt geändert am: {this._allocation.LastModified.ToString("dddd, dd MMMM yyyy")}
 
 Ansprechpartner:
 {ReferencePerson}
