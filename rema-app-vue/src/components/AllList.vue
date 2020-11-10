@@ -230,6 +230,9 @@ interface VisibleAllocation {
 </style>
 
 <style lang="stylus">
+.v-input--selection-controls__input
+    display -webkit-inline-box !important
+
 #all-list
   .mark-today
     background-color lightblue
