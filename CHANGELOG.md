@@ -1,3 +1,25 @@
+### Änderungen
+
+* Refresh Button für die Daten in der Client- Anwendung
+
+## Ressourcenmanagement v1.8.0
+
+* Ressourcen können in Scheduler gefiltert, beobachtet und gebucht/beantragt werden
+* Email Versand über eigenes Konto an mehrere Empfänger konfigurierbar
+* Benutzerhandbuch ist für Endanwender erreichbar
+* Termin ID wird in Emails angezeigt
+* Lange Gerichtstermine werden im Kalender korrekt angezeigt
+* Ansprechpartner können korrekt bearbeitet werden
+* 
+
+### Änderungen
+
+* Performance optimierung in Terminliste
+* Tagesansicht beginnt standardmäßig bei 6 Uhr
+* Anfragen für Termine sind möglich
+* E-Mail Versand konfigurierbar
+
+
 ## VueWebApp v1.4.0+20301
 
 ### Änderungen

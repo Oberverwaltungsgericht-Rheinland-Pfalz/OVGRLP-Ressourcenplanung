@@ -147,6 +147,8 @@
             <v-textarea
               v-model="notes"
               :label="'Notizen'"
+              rows="2"
+              hide-details=true
               auto-grow
               clearable
               outlined
@@ -159,6 +161,7 @@
     </v-card-text>
     <v-card-actions>
       <div class="flex-grow-1"></div>
+      <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
       <v-btn
         v-if="permissionToEdit"
         color="green darken-1"
@@ -184,7 +187,7 @@
 import { Component, Prop, Vue, Watch, Mixins } from 'vue-property-decorator'
 import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { ShortAllocationView } from '../../models/interfaces'
+import { InitAllocation, ShortAllocationView, ShowToast } from '../../models/interfaces'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import AllocationFormService from '../../services/AllocationFormServices'
 import moment from 'moment'
@@ -199,6 +202,7 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
   }
 })
 export default class AllocationForm extends Mixins(AllocationFormService) {
+  @Prop(Object) private readonly initValues!: InitAllocation
   public title: String = ''
   public ressourceId: number | any = null
   public fullday: boolean = false
@@ -207,8 +211,15 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   private multipleDates: string[] = []
   private showMultipleDatesMenu: boolean = false
   public isRepeating: boolean = false
-  @State('isRequestable', { namespace: 'user' })
-  private requestsAllowed!: boolean
+  private loading: boolean = false
+
+  beforeMount () {
+    if (this.initValues && this.initValues.RessourceId) {
+      this.ressourceId = this.initValues.RessourceId
+      this.timeFrom = this.initValues.From
+      this.dateFrom = this.initValues.Day
+    }
+  }
 
   private async sendAllocation (status: number) {
     if (this.isFormInvalid()) return
@@ -250,10 +261,11 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     }
 
     var success : boolean = false
+    this.loading = true
     if (!this.isRepeating) {
       success = await submitAllocation(newAllocation)
-      if (success) this.$dialog.message.success('Speichern erfolgreich', { position: 'center-left' })
-      else this.$dialog.error({ text: 'Speichern fehlgeschlagen', title: 'Fehler' })
+      if (success) this.$root.$emit('notify-user', { text: 'Speichern erfolgreich', color: 'success' } as ShowToast)
+      else this.$root.$emit('notify-user', { text: 'Speichern fehlgeschlagen', color: 'error' } as ShowToast)
     } else {
       newAllocation.from = this.timeFrom
       newAllocation.to = this.timeTo
@@ -262,11 +274,12 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
       success = await submitAllocations(newAllocation)
     }
     if (success) {
-      this.$dialog.message.success('Speichern erfolgreich', { position: 'center-left' })
+      this.$root.$emit('notify-user', { text: 'Speichern erfolgreich', color: 'success' } as ShowToast)
       await refreshAllocations()
     } else {
-      this.$dialog.error({ text: 'Speichern fehlgeschlagen', title: 'Fehler' })
+      this.$root.$emit('notify-user', { text: 'Speichern fehlgeschlagen' })
     }
+    this.loading = false
   }
 
   private close () {

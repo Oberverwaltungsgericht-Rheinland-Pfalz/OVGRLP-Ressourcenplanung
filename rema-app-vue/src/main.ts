@@ -15,11 +15,13 @@ Vue.config.productionTip = false
 Vue.filter('toLocal', (dateVal: Date) =>
   moment(dateVal).format('DD.MM.YYYY') + ' ' + moment(dateVal).format('LT')
 )
+Vue.filter('onlyDay', (dateVal: Date) => moment(dateVal).format('DD.MM.'))
 // new Date(dateVal).toLocaleTimeString())
 Vue.filter('toLocalDate', (dateVal: Date) =>
   moment(dateVal).format(' DD.MM.YYYY')
 )
 Vue.filter('status2string', (status: number) => statusEnums[status])
+Vue.filter('2digits', (num: number) => `${num}`.length > 1 ? num : '0' + num)
 Vue.filter('boolean2word', (bit: boolean) => (bit ? 'Ja' : 'Nein'))
 Vue.filter('simpleDateTime', (date: string) => {
   if (!date) return ''

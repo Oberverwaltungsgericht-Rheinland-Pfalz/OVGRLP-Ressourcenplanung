@@ -1,5 +1,49 @@
 <template>
   <v-layout id="all-list" column>
+    <v-sheet height="64">
+      <v-toolbar flat color="white">
+        <v-checkbox v-model="hideOld" label="Vergangene Termine" on-icon="visibility_off" off-icon="visibility_on" class="pad-top"></v-checkbox>
+        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-checkbox v-model="hideNotMine" label="Zeige nur meine Termine" on-icon="check_box" off-icon="check_box_outline_blank" class="pad-top"></v-checkbox>
+
+        <v-spacer/>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-bind="attrs" v-on="on"
+              v-model="search"
+              append-icon="search"
+              label="Bezeichnungsfilter"
+              single-line
+              hide-details
+            />
+          </template>
+          <span>Schränkt die Ansicht auf Termine ein, deren Namen die hier eingetippten Buchstaben enthalten</span>
+        </v-tooltip>
+
+        <v-spacer/>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <div class="select-wrap-width" v-bind="attrs" v-on="on">
+              <v-select
+                v-model="selectedGroup"
+                :items="GroupItems"
+                item-text="Title"
+                return-object
+                clearable
+                placeholder=""
+                label="Unterstützergruppe auswählen"
+                :menu-props="{ offsetY: true }"
+                class="select-group"
+              />
+            </div>
+          </template>
+          <span>Zeige nur Termine welche für eine Unterstützergruppe zu beachten sind</span>
+        </v-tooltip>
+      </v-toolbar>
+    </v-sheet>
     <v-data-table
       v-if="hasItems"
       :headers="headers"
@@ -7,49 +51,17 @@
       :search="search"
       sort-by="From"
     >
-      <template v-slot:top>
-        <v-toolbar flat color="white">
-          <label class="blue-icon">
-            <input hidden type="checkbox" v-model="hideOld" />
-            Vergangene Termine &ensp;<v-icon v-if="!hideOld">visibility</v-icon>
-            <v-icon v-else>visibility_off</v-icon>
-          </label>
-          <v-divider class="mx-4" inset vertical></v-divider>
-          <label class="blue-icon">
-            <input hidden type="checkbox" v-model="hideNotMine" />
-            Zeige nur meine Termine &ensp;<v-icon v-if="!hideNotMine">check_box_outline_blank</v-icon>
-            <v-icon v-else>check_box</v-icon>
-          </label>
-          <v-spacer/>
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Filter"
-            single-line
-            hide-details
-          />
-          <v-spacer/>
-          <v-select
-              v-model="selectedGroup"
-              :items="GroupItems"
-              item-text="Title"
-              return-object
-              clearable
-              placeholder=""
-              label="Hilfsmittel-Abteilung"
-              :menu-props="{ offsetY: true }"
-              class="select-group"
-            />
-        </v-toolbar>
-      </template>
       <template v-slot:item="props">
         <tr @click.stop="rowClicked(props.item.Id)" :class="{'mark-today': props.item.From.startsWith(today)}">
-          <td class="text-start">
-            <v-icon v-if="permissionToEdit" @click.stop="deleteItem(props.item)">delete</v-icon>&emsp;
-            <v-icon @click.stop="printItem(props.item)">print</v-icon>&emsp;
-            <v-icon v-if="permissionToEdit" @click.stop="editItem(props.item.Id)">edit</v-icon>
+          <td class="text-start fit-cell">
+            <v-icon v-if="permissionToEdit" @click.stop="confirmDelete(props.item)" title="Termin löschen" class="pad-right">delete</v-icon>&emsp;
+            <v-icon @click.stop="printItem(props.item)" title="Termin drucken" class="pad-right">print</v-icon>&emsp;
+            <v-icon v-if="permissionToEdit" @click.stop="editItem(props.item.Id)" title="Termin bearbeiten">edit</v-icon>
           </td>
-          <td class="text-start">{{props.item.Title}}<span v-if="selectedGroup">: [ {{showGadgets(props.item.Gadgets)}} ]</span></td>
+          <td class="text-start">{{props.item.Title}}
+            <v-chip v-show="selectedGroup" v-for="gadget in showGadgets(props.item)" :key="'gadget'+props.item.Id+gadget" class="ma-2" color="yellow">
+              {{gadget}}</v-chip>
+          </td>
           <td class="text-start">{{props.item.Status}}</td>
           <td class="text-start">{{props.item.Ressource}}</td>
           <td class="text-start">{{props.item.From | toLocal}}</td>
@@ -71,7 +83,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation, Gadget, Supplier } from '../models'
-import { SelectableGroup } from '../models/interfaces'
+import { SelectableGroup, ShowToast, ConfirmData } from '../models/interfaces'
 import { deleteAllocation } from '../services/AllocationApiService'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
@@ -97,12 +109,14 @@ export default class AllList extends Vue {
     { text: 'Bis', value: 'To' },
     { text: 'Zuletzt geändert', value: 'LastModified' }
   ];
+
   private today: string = moment().format('YYYY-MM-DD')
-  public showGadgets (ar: []) {
-    let rVal = ar.map((e: any) => e.Title)
-    if (rVal.length === 1) return rVal[0]
-    let rString = rVal.join(', ')
-    return rString
+  public showGadgets (item: any): string[] {
+    let selectedGroupId = this.selectedGroup?.Id || 0
+    let rVal: string[] = []
+    item.Gadgets.filter((e: any) => e.SuppliedBy === selectedGroupId).forEach((e: any) => rVal.push(e.Title))
+    item.HintsForSuppliers.filter((e:any) => e.GroupId === selectedGroupId).forEach((e: any) => rVal.push(e.Message))
+    return rVal
   }
   public get hasItems () {
     const allocations = Allocation.query()
@@ -119,6 +133,18 @@ export default class AllList extends Vue {
       .where('GadgetsIds', (values: number[]) => !this.selectedGroup || (this.selectedGroup && this.selectedGroup.gadgetIds.some((e: number) => values.includes(e))))
       .orderBy('From')
       .get()
+
+    // Search only if a supplier-group is selected for filtering
+    if (this.selectedGroup) {
+      let existingIds = allocations.map((e: any) => e.Id)
+      let allocations2 = Allocation.query().withAll()
+        .where((al: any) => al.HintsForSuppliers.length > 0 && !existingIds.includes(al.Id) && ((!this.hideNotMine && (al.Status === 1 || al.Status === 3)) || al.CreatedById === myId || al.ReferencePersonId === myId))
+        .where('To', (value: any) => (!this.hideOld || Date.parse(value) > Date.now()))
+        .where('HintsForSuppliers', (values: WebApi.SimpleSupplierHint[]) => values.some((e: WebApi.SimpleSupplierHint) => e.GroupId === this.selectedGroup?.Id))
+        .get()
+      allocations.push(...allocations2)
+      allocations.sort((a: any, b: any) => Number(a.From > b.From) - 1)
+    }
 
     if (!allocations.length) return []
 
@@ -148,22 +174,19 @@ export default class AllList extends Vue {
     return returnValues
   }
 
-  private async deleteItem (item: VisibleAllocation) {
-    const confirmation = await this.$dialog.confirm({
-      text: `Möchten sie diese Buchung ${item.Title} wirklich löschen?`,
-      title: 'Löschen bestätigen',
-      persistent: true,
-      actions: [
-        { text: 'Nein', color: 'blue', key: false },
-        { text: 'Löschen', color: 'red', key: true }
-      ]
-    })
+  private confirmDelete (item: VisibleAllocation) {
+    let data: ConfirmData = { title: 'Löschen bestätigen',
+      content: `Möchten sie diese Buchung ${item.Title} wirklich löschen?`,
+      callback: this.deleteItem,
+      id: item.Id
+    }
+    this.$root.$emit('user-confirm', data)
+  }
+  private async deleteItem (id: number) {
+    let success = await deleteAllocation(id)
 
-    if (confirmation !== true) return
-
-    let success = await deleteAllocation(item.Id)
-    if (success) this.$dialog.message.success('Löschung erfolgreich', { position: 'center-left' })
-    else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
+    if (success) this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)
+    else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)
   }
   private async printItem (item: VisibleAllocation) {
     print('api/Allocations/print/' + item.Id)
@@ -202,9 +225,14 @@ interface VisibleAllocation {
 
 .blue-icon i
   color #82b1ff !important
+.icon-button
+  cursor pointer
 </style>
 
 <style lang="stylus">
+.v-input--selection-controls__input
+    display -webkit-inline-box !important
+
 #all-list
   .mark-today
     background-color lightblue
@@ -212,4 +240,14 @@ interface VisibleAllocation {
     margin-bottom 0
   .select-group .v-text-field__details
     display none
+  .pad-right
+    padding-right .5em
+  .pad-top
+    padding-top 2em
+  .select-wrap-width
+    min-width 25%
+    max-width 100%
+.fit-cell
+  white-space nowrap
+  width 1%
 </style>

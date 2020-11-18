@@ -1,9 +1,9 @@
 <template>
   <v-combobox
     v-model="internalModel"
-    :search-input.sync="search"
     placeholder="Bitte tippen Sie einen Titel für den Termin ein."
     :items="titleEntries"
+    :search-input.sync="search"
     label="Titel*"
     color="black"
     :error="error"
@@ -23,12 +23,20 @@ export default class TitleProposal extends Vue {
   @Prop(Boolean) private readonly readonly!: boolean
 
   public internalModel: string = ''
-  public search: string = ''
+  public searchInternal: string = ''
   public get titleEntries () : string[] {
     var rList = Allocation.query()
     //      .where('title', (s: string) => s && s.startsWith(this.search))
       .get().map((v:any) => v.Title)
     return rList
+  }
+
+  public get search () {
+    return this.searchInternal
+  }
+  public set search (s: string) {
+    this.searchInternal = s
+    this.watchInternalModel(s, this.internalModel)
   }
 
   public mounted () {

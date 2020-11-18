@@ -1,8 +1,8 @@
 <template>
-  <v-dialog :value="value" max-width="900px" persistent scrollable>
+  <v-dialog :value="value" max-width="1000px" persistent scrollable>
     <v-card>
       <v-card-title>
-        <span class="headline">Anfrage bearbeiten</span>
+        <span class="headline">Anfrage bearbeiten <span>(#{{ viewAllocation.Id }})</span></span>
       </v-card-title>
       <v-card-text>
         <v-container>
@@ -11,16 +11,43 @@
               <strong>Bezeichnung:</strong>
             </v-col>
             <v-col cols="3"
-              >{{ viewAllocation.Title }} {{ viewAllocation.Id }}</v-col
-            >
-            <v-col cols="3">
-              <strong>Status:</strong>
-            </v-col>
-            <v-col cols="3">{{ viewAllocation.Status | status2string }}</v-col>
+              >{{ viewAllocation.Title }}</v-col>
             <v-col cols="3">
               <strong>Raum:</strong>
             </v-col>
             <v-col cols="3">{{ viewAllocation.RessourceTitle }}</v-col>
+
+            <v-col cols="3">
+              <strong>Von:</strong>
+            </v-col>
+            <v-col cols="3">{{ viewAllocation.From | toLocal }}</v-col>
+            <v-col cols="3">
+              <strong>Bis:</strong>
+            </v-col>
+            <v-col cols="3">{{ viewAllocation.To | toLocal }}</v-col>
+
+            <v-col cols="3">
+              <strong>Ganztägiges Ereignis:</strong>
+            </v-col>
+            <v-col cols="3">{{ viewAllocation.IsAllDay | boolean2word }}</v-col>
+            <v-col cols="3">
+              <strong>Status:</strong>
+            </v-col>
+            <v-col cols="3">{{ viewAllocation.Status | status2string }}</v-col>
+
+            <v-col cols="3">
+              <strong>Anfragesteller:</strong>
+            </v-col>
+            <v-col cols="3">{{
+              contactUserName(viewAllocation.CreatedById)
+            }}</v-col>
+            <v-col cols="3">
+              <strong>Ansprechpartner:</strong>
+            </v-col>
+            <v-col cols="3">{{
+              contactUserName(viewAllocation.ReferencePerson)
+            }}</v-col>
+
             <v-col cols="3">
               <strong>Anfragedatum:</strong>
             </v-col>
@@ -35,25 +62,6 @@
             }}</v-col>
 
             <v-col cols="3">
-              <strong>Ganztägiges Ereignis:</strong>
-            </v-col>
-            <v-col cols="3">{{ viewAllocation.IsAllDay | boolean2word }}</v-col>
-            <v-col cols="3">
-              <strong>Von:</strong>
-            </v-col>
-            <v-col cols="3">{{ viewAllocation.From | toLocal }}</v-col>
-            <v-col cols="3">
-              <strong>Bis:</strong>
-            </v-col>
-            <v-col cols="3">{{ viewAllocation.To | toLocal }}</v-col>
-
-            <v-col cols="3">
-              <strong>Ansprechpartner:</strong>
-            </v-col>
-            <v-col cols="3">{{
-              contactUserName(viewAllocation.ReferencePerson)
-            }}</v-col>
-            <v-col cols="3">
               <strong>Telefonnummer:</strong>
             </v-col>
             <v-col cols="3">{{ viewAllocation.ContactTel }}</v-col>
@@ -62,6 +70,7 @@
             </v-col>
             <v-col cols="3">{{ viewAllocation.Notices }}</v-col>
           </v-row>
+
           <v-row v-if="moveEdit">
             <v-col cols="12">
               <h2 :class="{ 'valid-range': timesInvalid }">Neuer Zeitraum</h2>
@@ -80,8 +89,8 @@
                 </v-date-picker>
               </v-menu>
             </v-col>
-            <v-col cols="3">
-              <drop-down-time-picker v-model="editFromTime"/>
+            <v-col cols="2">
+              <drop-down-time-picker v-show="!fullday" v-model="editFromTime"/>
             </v-col>
             <v-col cols="3">
               <v-menu ref="toMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"
@@ -97,8 +106,11 @@
                 </v-date-picker>
               </v-menu>
             </v-col>
-            <v-col cols="3">
-              <drop-down-time-picker v-model="editToTime"/>
+            <v-col cols="2">
+              <drop-down-time-picker v-show="!fullday" v-model="editToTime"/>
+            </v-col>
+            <v-col cols="2">
+              <v-checkbox v-model="fullday" label="ganztägig" hide-details=true class="no-margin"></v-checkbox>
             </v-col>
           </v-row>
         </v-container>
@@ -135,7 +147,7 @@ import { mixins } from 'vue-class-component'
 import { Names as Fnn } from '../store/User/types'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import AllocationFormService from '@/services/AllocationFormServices'
-import { AllocationRequest, AllocationRequestView } from '../models/interfaces'
+import { AllocationRequest, AllocationRequestView, ShowToast } from '../models/interfaces'
 import { Allocation } from '../models'
 import { editAllocationStatus, refreshAllocations } from '../services/AllocationApiService'
 import CollisionDetection from './CollisionDetection.vue'
@@ -156,6 +168,7 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
   private editFromTime: string = ''
   private editTo: string = ''
   private editToTime: string = ''
+  private fullday: boolean = false
 
   public get timesInvalid (): boolean {
     if (!this.editFrom || !this.editTo) return true
@@ -196,21 +209,23 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
       this.editFromTime = this.viewAllocation.From.substr(11, 5)
       this.editTo = this.viewAllocation.To.substr(0, 10)
       this.editToTime = this.viewAllocation.To.substr(11, 5)
+      this.fullday = this.viewAllocation.IsAllDay
       return
     }
     const changedAllocation: WebApi.AllocationRequestEdition = {
       Id: this.viewAllocation.Id,
       status: 3,
-      From: this.editFrom,
-      To: this.editTo
+      From: this.editFrom + 'T' + this.editFromTime,
+      To: this.editTo + 'T' + this.editToTime,
+      IsAllDay: this.fullday
     }
     this.saveStatus(changedAllocation)
   }
 
   public async saveStatus (task: WebApi.AllocationRequestEdition) {
-    let success = editAllocationStatus(task.Id, task.status, task.From || '', task.To || '')
-    if (success) this.$dialog.message.success('Bearbeitung erfolgreich', { position: 'center-left' })
-    else this.$dialog.error({ text: 'Bearbeitung konnte nicht gespeichert werden', title: 'Fehler' })
+    let success = await editAllocationStatus(task)
+    if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung erfolgreich', color: 'info' } as ShowToast)
+    else this.$root.$emit('notify-user', { text: 'Bearbeitung konnte nicht gespeichert werden', color: 'error' } as ShowToast)
 
     /* Allocation.update({
       where: task.Id,
@@ -227,11 +242,9 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
   border: 3px solid red;
 }
 
-input[type='datetime-local'] {
-  border-bottom: 1px solid black;
-}
+input[type='datetime-local']
+  border-bottom 1px solid black
 
-.valid-range {
-  color: red;
-}
+.valid-range
+  color red
 </style>

@@ -143,7 +143,7 @@
         <v-divider />
         <v-row>
           <v-col>
-            <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined :disabled="readonly"></v-textarea>
+            <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined :disabled="readonly" hide-details=true rows="2"></v-textarea>
           </v-col>
         </v-row>
         <collision-detection :viewAllocation="RessourceChecker"/>
@@ -152,6 +152,7 @@
     </v-card-text>
     <v-card-actions>
       <div class="flex-grow-1"></div>
+      <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
       <v-btn
         v-if="permissionToEdit && !readonly "
         color="green darken-1" text
@@ -168,7 +169,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { ShortAllocationView } from '../models/interfaces'
+import { ShortAllocationView, ShowToast } from '../models/interfaces'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Gadget, Ressource, Supplier, Allocation } from '../models'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
@@ -208,6 +209,7 @@ export default class EditFormModal extends mixins(AllocationFormService) {
 
   public isRepeating: boolean = false
   public dialog: boolean = false
+  public loading: boolean = false
 
   private mounted () {
     this.dialog = this.show
@@ -324,9 +326,11 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       data.to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
     }
 
+    this.loading = true
     let success = await editAllocation(data)
-    if (success) this.$dialog.message.success('Bearbeitung gespeichert', { position: 'center-left' })
-    else this.$dialog.error({ text: 'Bearbeitung speichern fehlgeschlagen', title: 'Fehler' })
+    this.loading = false
+    if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung gespeichert', color: 'success' } as ShowToast)
+    else this.$root.$emit('notify-user', { text: 'Bearbeitung speichern fehlgeschlagen', color: 'error' } as ShowToast)
 
     await Allocation.update(data)
     await refreshAllocations()

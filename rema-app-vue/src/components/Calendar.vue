@@ -3,7 +3,7 @@
     <v-flex>
       <v-sheet height="64">
         <v-toolbar flat color="white">
-          <v-btn outlined class="mr-4" @click="setToday">Heute</v-btn>
+          <v-btn outlined class="mr-4" @click="setToday" title="Ansicht auf aktuellen Tag">Heute</v-btn>
           <v-btn fab text small @click="prev">
             <v-icon small>arrow_back_ios</v-icon>
           </v-btn>
@@ -15,13 +15,13 @@
 
           <v-dialog v-model="showFilterModal" width="800" scrollable >
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" color="primary">Suchkriterien ({{titleFilter.length}})</v-btn>
+              <v-btn v-on="on" color="primary" title="Anzeigte Termine filtern">Suchkriterien ({{titleFilter.length}})</v-btn>
             </template>
             <v-card>
               <v-card-title>Anzeige einschränken auf:
                 <v-spacer/>
                 <v-btn @click="resetFilter" :style="{visibility: titleFilter.length ? 'visible':'hidden'}" color="warning" right class="ma-2">Zurücksetzen</v-btn>
-                <v-btn @click="showFilterModal=false" class="ma-2" right color="success">Ok</v-btn>
+                <v-btn @click="showFilterModal=false" class="ma-2" right color="success" title="Filterkriterien anwenden">Ok</v-btn>
               </v-card-title>
               <v-card-text id="pad-bot-twenty">
                 <v-select v-model="titleFilter" :items="possibleTitles" attach chips label="Räume" multiple single-line></v-select>
@@ -30,7 +30,7 @@
           </v-dialog>
           <v-spacer/>
 
-          <v-checkbox class="showWe" v-model="showWE" :label="'WE'" on-icon="visibility" off-icon="visibility_off"></v-checkbox>
+          <v-checkbox title="Wochenenden aus/einblenden" class="showWe" v-model="showWE" :label="'WE'" on-icon="visibility" off-icon="visibility_off"></v-checkbox>
           <v-radio-group v-model="currentview" row @change="scrollToTime">
             <v-radio v-for="n in types" :key="'ansicht'+n" :label="typeName(n)" :value="n"/>
           </v-radio-group>
@@ -68,7 +68,7 @@
               <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
               <v-spacer></v-spacer>
                 <v-btn @click="printAllocation(selectedEvent.id)" fab small outlined><v-icon>print</v-icon></v-btn>
-                <v-btn v-show="permissionToEdit" @click="deleteAllocation" fab small outlined><v-icon small>delete</v-icon>
+                <v-btn v-show="permissionToEdit" @click="confirmDelete" fab small outlined><v-icon small>delete</v-icon>
                 </v-btn><span>&emsp;</span>
                 <edit-form-modal v-if="selectedOpen && permissionToEdit" :eventId="selectedEvent.id" @updateview="selectedOpen = false">
                   <v-icon small>edit</v-icon>
@@ -98,6 +98,7 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/User/types'
 import { deleteAllocation } from '../services/AllocationApiService'
 import { Allocation, Gadget, Supplier } from '../models'
+import { ShowToast, ConfirmData } from '../models/interfaces'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
 import print from 'print-js'
@@ -243,30 +244,21 @@ export default class Calendar extends Vue {
   public printAllocation (id: number) {
     print('api/Allocations/print/' + id)
   }
+  private confirmDelete () {
+    const { id, name } = this.selectedEvent as any
+    let data: ConfirmData = { title: 'Löschen bestätigen',
+      content: `Möchten sie dem Termin ${name} wirklich löschen?`,
+      callback: this.deleteAllocation,
+      id
+    }
+    this.$root.$emit('user-confirm', data)
+  }
   public async deleteAllocation () {
     const { id, name } = this.selectedEvent as any
-    const confirmation = await this.$dialog.confirm({
-      text: `Möchten sie dem Termin ${name} wirklich löschen?`,
-      title: 'Löschen bestätigen',
-      persistent: true,
-      actions: [
-        {
-          text: 'Nein',
-          color: 'blue',
-          key: false
-        },
-        {
-          text: 'Löschen',
-          color: 'red',
-          key: true
-        }
-      ]
-    })
-
-    if (confirmation !== true) return
     let success = await deleteAllocation(id)
-    if (success) this.$dialog.message.success('Eintrag gelöscht', { position: 'center-left' })
-    else this.$dialog.error({ text: 'Löschen fehlgeschlagen', title: 'Fehler' })
+
+    if (success) this.$root.$emit('notify-user', { text: 'Eintrag gelöscht', color: 'success' } as ShowToast)
+    else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)
   }
   public scrollToTime () {
     this.$nextTick(() => {
@@ -328,8 +320,8 @@ function transfer2Calendar (v: any) {
     rVal.name = (v.Ressource || {}).Name + ' - ' + v.Title
 
     if (rVal.longDate) {
-      rVal.start = v.From.substring(0, 16).replace('T', ' ') // ,10) -> kleine Darstellung; ,16) maximal große Darstellung
-      rVal.end = v.To.substring(0, 16).replace('T', ' ') // ,10) -> kleine Darstellung; ,16) maximal große Darstellung
+      rVal.start = v.From.substring(0, 10).replace('T', ' ') // ,10) -> kleine Darstellung; ,16) maximal große Darstellung
+      rVal.end = v.To.substring(0, 10).replace('T', ' ') // ,10) -> kleine Darstellung; ,16) maximal große Darstellung
       rVal.schedule = `Von ${moment(v.From).format('DD.MM.YYYY')} bis ${moment(v.To).format('DD.MM.YYYY')} ganztägig`
     }
   } else {
