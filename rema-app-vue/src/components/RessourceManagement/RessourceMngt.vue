@@ -1,5 +1,5 @@
 <template>
-  <v-layout column>
+  <v-layout column id="ressource-mngt">
     <v-data-table
       :headers="headers"
       :items="items"
@@ -19,11 +19,8 @@
       </template>
 
       <template v-slot:item.action="{ item }">
-        <v-icon class="mr-2" @click="editItem(item)">edit</v-icon>
-        <v-icon @click="deleteItem(item)">delete</v-icon>
-      </template>
-      <template v-slot:no-data>
-        <v-btn color="primary">Neu laden</v-btn>
+        <v-icon class="mr-2" @click="editItem(item)" title="Ressource bearbeiten">edit</v-icon>
+        <v-icon @click="confirmItem(item)" title="Ressource löschen">delete</v-icon>
       </template>
     </v-data-table>
 
@@ -73,6 +70,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Ressource } from '../../models'
+import { ShowToast, ConfirmData } from '../../models/interfaces'
 
 @Component({})
 export default class RessourceManagement extends Vue {
@@ -152,35 +150,25 @@ export default class RessourceManagement extends Vue {
     this.editDetails = item.SpecialsDescription
     this.dialog = 2
   }
-
-  private async deleteItem (item: WebApi.RessourceViewModel) {
-    const confirmation = await this.$dialog.confirm({
-      text: `Möchten sie die Ressource ${item.Name} wirklich löschen?`,
-      title: 'Löschen bestätigen',
-      persistent: true,
-      actions: [
-        {
-          text: 'Nein',
-          color: 'blue',
-          key: false
-        },
-        {
-          text: 'Löschen',
-          color: 'red',
-          key: true
-        }
-      ]
-    })
-
-    if (confirmation === true) {
-      try {
-        let response = await Ressource.api().delete(`ressources/${item.Id}`, { delete: item.Id })
-      } catch (e) {
-        await this.$dialog.error({
-          text: 'Es können nur Ressourcen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.',
-          title: 'Löschen fehlgeschlagen'
-        })
-      }
+  private confirmItem (item: WebApi.RessourceViewModel) {
+    let data: ConfirmData = { title: 'Löschen bestätigen',
+      content: `Möchten sie die Ressource ${item.Name} wirklich löschen?`,
+      callback: this.deleteItem,
+      id: item.Id
+    }
+    this.$root.$emit('user-confirm', data)
+  }
+  private async deleteItem (id: number) {
+    try {
+      let response = await Ressource.api().delete(`ressources/${id}`, { delete: id })
+      this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)
+    } catch (e) {
+      await this.$root.$emit('notify-user', {
+        text: `Löschen fehlgeschlagen
+        Es können nur Ressourcen gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.`,
+        color: 'error',
+        timeout: 1e4
+      } as ShowToast)
     }
   }
 

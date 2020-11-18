@@ -1,7 +1,6 @@
 import { Allocation } from '../models/Allocation'
 
-export async function editAllocationStatus (Id: number, status: number, From: string, To: string) : Promise<boolean> {
-  const editedRequest = { Id, status, From, To }
+export async function editAllocationStatus (editedRequest: WebApi.AllocationRequestEdition) : Promise<boolean> {
   try {
     const response = await fetch(`/api/allocations/editRequest`, {
       method: 'PUT',

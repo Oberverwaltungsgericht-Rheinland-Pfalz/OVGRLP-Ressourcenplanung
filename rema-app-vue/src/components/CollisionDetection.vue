@@ -2,7 +2,7 @@
   <div>
     <v-row v-if="hasCollisions">
       <v-col cols="12">
-      <h2>Mögliche Kollisionen</h2>
+      <h2>Mögliche Kollisionen <v-icon color="orange">warning</v-icon></h2>
       </v-col>
     </v-row>
     <v-row v-for="(i, idx) in possibleCollisions" v-bind:key="idx + 'cols'">

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Rema.Infrastructure.Models;
 
@@ -7,7 +8,7 @@ namespace Rema.Infrastructure.Email.Templates
 {
   public class NewAllocationTemplate : EmailTemplate
   {
-    public NewAllocationTemplate(Allocation allocation, string bookingType) :base(allocation)
+    public NewAllocationTemplate(Allocation allocation, string bookingType) : base(allocation)
     {
       base.Type = "erstellt";
       _bookingType = bookingType;
@@ -18,8 +19,11 @@ namespace Rema.Infrastructure.Email.Templates
       _bookingType = bookingType;
     }
 
+    private string singleId => this.ForSerial ? "" : $"#{this._allocation.Id}";
+    private string _multipleIds => !ForSerial? "" : "Termin IDs: #" + string.Join(" #", this._allocations.Select(e => e.Id));
     private string _bookingType;
-    public override string Subject => $"Termin {_bookingType} wurde erstellt";
+
+  public override string Subject => $"Termin {_bookingType}{this.singleId} wurde erstellt";
 
     public override string ToString()
     {
@@ -45,7 +49,7 @@ Telefonnummer:
 Notizen:
 {Notes}
 {HintsForSuppliersText}
-";
+{_multipleIds}";
     }
   }
 }

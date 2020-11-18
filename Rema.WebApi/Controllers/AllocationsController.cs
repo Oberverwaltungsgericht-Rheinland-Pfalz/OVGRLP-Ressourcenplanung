@@ -472,7 +472,6 @@ namespace Rema.WebApi.Controllers
 
       var isBooking = allocation.Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
       allocation.Status = isBooking ? allocationVM.Status : MeetingStatus.Pending;
-      var emailTitle = isBooking ? "Buchung wurde erstellt" : "Anfrage wurde erstellt";
       var yourRequest = isBooking ? "Buchung" : "Anfrage";
 
       try
@@ -679,20 +678,12 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var title = allocationsVM.Title;
         var recipient = allocations[0]?.ReferencePerson?.Email;
-        var ressourceName = allocations[0].Ressource.Name;
-        string list = "";
-        foreach(var all in allocations) {
-          list += $@"*{all.From.ToString("dddd, dd MMMM y HH:mm")} - {all.To.ToString("dddd, dd MMMM y HH:mm")}{System.Environment.NewLine}
-";
-        }
 
         var isBooking = allocations[0].Status >= MeetingStatus.Approved && base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
-        var requestType = isBooking ? "erstellt" : "angefragt";
         var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";
 
-        var template = new NewAllocationTemplate(allocations, requestType);
+        var template = new NewAllocationTemplate(allocations, yourRequest);
         this._emailTrigger.SendEmail(template, recipient, template.GetGroupEmails());
       }
       catch (Exception ex)
@@ -783,7 +774,7 @@ namespace Rema.WebApi.Controllers
       {
         return NotFound();
       }
-
+      var ed = editedRequest;
       try
       {
         allocation.Status = (MeetingStatus)editedRequest.status;
@@ -797,6 +788,20 @@ namespace Rema.WebApi.Controllers
         {
           allocation.From = editedRequest.From.GetValueOrDefault();
           allocation.To = editedRequest.To.GetValueOrDefault();
+          allocation.IsAllDay = editedRequest.IsAllDay;
+
+          if (editedRequest.IsAllDay) {
+            try
+            {
+              allocation.From = editedRequest.From.GetValueOrDefault().Date + new TimeSpan(0, 0, 0);
+              allocation.To = editedRequest.To.GetValueOrDefault().Date + new TimeSpan(23, 59, 00);
+            }
+            catch (Exception ex)
+            {
+              Log.Error(ex, "error while set correct times for all day");
+            }
+
+          }
         }
 
         _context.Entry(allocation).State = EntityState.Modified;
@@ -865,6 +870,7 @@ namespace Rema.WebApi.Controllers
         return NotFound();
       }
 
+      // bool ressourceChanged = false;
       Allocation changedAllocation;
       try
       {
@@ -903,6 +909,7 @@ namespace Rema.WebApi.Controllers
       Ressource newRessource = null;
       if(oldAllocation.Ressource.Id != allocationVM.RessourceId)
       {
+        // ressourceChanged = true;
         newRessource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
       }
 
@@ -934,7 +941,6 @@ namespace Rema.WebApi.Controllers
       var newGadgets = allocationVM.GadgetsIds.Where(x => !currentGadgetIds.Contains(x));
       var droppedGadgets = currentGadgetIds.Where(x => !allocationVM.GadgetsIds.Contains(x)).ToArray();
       IQueryable<Gadget> newGadgetsObjects = new List<Gadget>().AsQueryable();
-      IEnumerable<AllocationGagdet> droppedGadgetObjects = new List<AllocationGagdet>();
       var deletedGadgets = new List<AllocationGagdet>();
       var createdGadgets = new List<AllocationGagdet>();
 
@@ -968,7 +974,7 @@ namespace Rema.WebApi.Controllers
       {
         try 
         {
-          droppedGadgetObjects = oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
+          oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
 
           foreach(var i in droppedGadgets)
           {
@@ -989,6 +995,15 @@ namespace Rema.WebApi.Controllers
         .Where(e => oldHintsGroupIds.Contains(e.Id) || newHintsGroupIds.Contains(e.Id))
         .Select(e => e.GroupEmail)
         .ToListAsync();
+
+      // Alle Unterstützergruppen müssen benachrichtigt werden wenn sich etwas relevantes ändert, daher:
+      // if (ressourceChanged || (allocationVM.IsAllDay != oldAllocation.IsAllDay) || (oldAllocation.From != changedAllocation.From) || (oldAllocation.To != changedAllocation.To)) {
+      // Änderung: einfach alle benachrichtigen (ggf. das granularere konfigurierbar machen
+      var allHintsGroups = oldAllocation.HintsForSuppliers.Select(x => x.Group.GroupEmail).ToList();
+      var allGadgetGroups = oldAllocation.AllocationGadgets.Select(x => x.Gadget.SuppliedBy.GroupEmail).ToList();
+      hintGroupMails.AddRange(allHintsGroups);
+      hintGroupMails.AddRange(allGadgetGroups);
+      // }
 
       try
       {
@@ -1043,8 +1058,8 @@ namespace Rema.WebApi.Controllers
         return Conflict();
       }
 
-      var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets);
-      this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails(hintGroupMails));
+      var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets, hintGroupMails);
+      this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails());
       return Ok();
     }
   }

@@ -14,7 +14,7 @@ namespace Rema.Infrastructure.Email.Templates
     }
     public EmailTemplate(IList<Allocation> allocations)
     {
-      _forSerial = true;
+      ForSerial = true;
       _allocations = allocations;
       _allocation = allocations.First();
     }
@@ -37,7 +37,7 @@ namespace Rema.Infrastructure.Email.Templates
     public static string CREATED = "erstellt";
     public static string UPDATED = "geändert";
     public static string DELETED = "gelöscht";
-    private bool _forSerial = false;
+    protected bool ForSerial = false;
 
     public string Type { get; set; }
     protected Allocation _allocation { get; set; }
@@ -68,13 +68,13 @@ namespace Rema.Infrastructure.Email.Templates
     protected string Notes => this._allocation.Notes;
     protected string ContactPhone => this._allocation.ContactPhone;
     protected string ReserveTime { get {
-        if (!this._forSerial) return TimeOneDateSingle(_allocation);
+        if (!this.ForSerial) return TimeOneDateSingle(_allocation);
         return TimeOneDateMultiple();
       }
     }
     private string TimeOneDateSingle (Allocation al) {
-      if (al.IsAllDay) return $"{al.From.ToString("dddd, dd MMMM y")}  - {al.To.ToString("dddd, dd MMMM y")} Ganztägig";
-      return $"{al.From.ToString("dddd, dd MMMM y HH:mm")}  - {al.To.ToString("dddd, dd MMMM y HH:mm")}";
+      if (al.IsAllDay) return $"{al.From.ToString("dddd, dd MMMM yyyy")}  - {al.To.ToString("dddd, dd MMMM yyyy")} Ganztägig";
+      return $"{al.From.ToString("dddd, dd MMMM yyyy HH:mm")}  - {al.To.ToString("dddd, dd MMMM yyyy HH:mm")}";
     }
     private string TimeOneDateMultiple ()
     {

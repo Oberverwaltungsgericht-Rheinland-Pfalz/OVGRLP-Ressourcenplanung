@@ -17,8 +17,8 @@
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-icon @click="editItem(item)">edit</v-icon>
-        <v-icon @click="deleteItem(item)">delete</v-icon>
+        <v-icon @click="editItem(item)" title="Unterstützergruppe bearbeiten" class="mr-2">edit</v-icon>
+        <v-icon @click="confirmDelete(item)" title="Unterstützergruppe löschen">delete</v-icon>
       </template>
       <template v-slot:item.SuppliedBy="{ item }">{{
         item.SuppliedBy | supplierName
@@ -73,6 +73,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
+import { ShowToast, ConfirmData } from '../../models/interfaces'
 import {
   Supplier,
   Ressource,
@@ -144,33 +145,37 @@ export default class SupplierManagement extends Vue {
     }
     if (this.dialog === 2) {
       let success = await editGadget(data)
-      if (success) this.$dialog.message.success('Hilfsmittel gespeichert', { position: 'center-left' })
-      else this.$dialog.error({ text: 'Hilfsmittel speichern fehlgeschlagen', title: 'Fehler' })
+      if (success) this.$root.$emit('notify-user', { text: 'Hilfsmittel gespeichert', color: 'success' } as ShowToast)
+      else this.$root.$emit('notify-user', { text: 'Hilfsmittel speichern fehlgeschlagen', color: 'error' } as ShowToast)
+
       await Gadget.update(data)
     } else {
       const group = Supplier.find(this.editSupplier)
 
       let success = await submitGadget(data)
-      if (success) this.$dialog.message.success('Hilfsmittel gespeichert', { position: 'center-left' })
-      else this.$dialog.error({ text: 'Hilfsmittel speichern fehlgeschlagen', title: 'Fehler' })
+      if (success) this.$root.$emit('notify-user', { text: 'Hilfsmittel gespeichert', color: 'success' } as ShowToast)
+      else this.$root.$emit('notify-user', { text: 'Hilfsmittel speichern fehlgeschlagen', color: 'error' } as ShowToast)
     }
     this.closeModal()
   }
-  private async deleteItem (item: WebApi.GadgetViewModel) {
-    const confirmation = await this.$dialog.confirm({
-      text: `Möchten sie dieses Hilfsmittel ${item.Title} wirklich löschen?`,
-      title: 'Löschen bestätigen',
-      persistent: true,
-      actions: [
-        { text: 'Nein', color: 'blue', key: false },
-        { text: 'Löschen', color: 'red', key: true }
-      ]
-    })
-
-    if (confirmation === true) {
-      let success = await deleteGadget(item.Id)
-      if (success) this.$dialog.message.success('Hilfsmittel gelöscht', { position: 'center-left' })
-      else this.$dialog.error({ text: 'Es können nur Hilfsmittel gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.', title: 'Löschen fehlgeschlagen' })
+  private confirmDelete (item: WebApi.GadgetViewModel) {
+    let data: ConfirmData = { title: 'Löschen bestätigen',
+      content: `Möchten sie dieses Hilfsmittel ${item.Title} wirklich löschen?`,
+      callback: this.deleteItem,
+      id: item.Id
+    }
+    this.$root.$emit('user-confirm', data)
+  }
+  private async deleteItem (id: number) {
+    let success = await deleteGadget(id)
+    if (success) {
+      this.$root.$emit('notify-user', { text: 'Hilfsmittel gelöscht', color: 'success' } as ShowToast)
+    } else {
+      this.$root.$emit('notify-user', {
+        text: 'Es können nur Hilfsmittel gelöscht werden welche nicht mit einem Termin verbunden sind. Vergange Termine sind ebenfalls zu berücksichtigen. Bitte wenden sie sich an ihren IT-Support falls sie Hilfe benötigen.',
+        color: 'error',
+        timeout: 1e4
+      } as ShowToast)
     }
   }
 }

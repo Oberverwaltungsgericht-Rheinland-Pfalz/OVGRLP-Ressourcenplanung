@@ -39,15 +39,16 @@ namespace Rema.Infrastructure.Email
 
       var senderEmail = "support@ovg.jm.rlp.de";
       var uniqueList = groups.Distinct(StringComparer.CurrentCultureIgnoreCase).ToList();
+
       foreach (var emailAdress in uniqueList)
+      using (SmtpClient smtp = new SmtpClient(this._emailSettings.Domain))
       {
-        SmtpClient smtp = new SmtpClient(this._emailSettings.Domain);
         smtp.EnableSsl = this._emailSettings.EnableSSL;
         smtp.Port = this._emailSettings.Port;
 
         if (this._emailSettings.useIISAccount)
         {
-          senderEmail = this._emailSettings.EmailUsername;
+          senderEmail = this._emailSettings.EmailSenderAddress;
           smtp.UseDefaultCredentials = false;
           smtp.Credentials = new NetworkCredential(this._emailSettings.EmailUsername, this._emailSettings.EmailPassword);
         }

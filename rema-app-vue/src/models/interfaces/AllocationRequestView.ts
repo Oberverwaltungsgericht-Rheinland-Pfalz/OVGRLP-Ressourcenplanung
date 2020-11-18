@@ -5,6 +5,7 @@ export interface AllocationRequestView {
   IsAllDay: boolean
   Status: number
   CreatedAt: string
+  CreatedById: number
   LastModified: string
   ApprovedAt: string
   ReferencePerson: string
@@ -23,4 +24,9 @@ export interface ShortAllocationView {
   To: string
   RessourceId: string
   dates: string[] | null
+}
+export interface InitAllocation {
+  From: string
+  RessourceId: number
+  Day: string
 }

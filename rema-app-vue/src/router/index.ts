@@ -12,22 +12,30 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Planungsübersicht',
-      icon: 'business',
+      name: 'Kalender',
+      icon: 'event_note',
       authLevel: 0,
       component: () => import('@/views/Calendar.vue')
     } as any,
     {
+      path: '/schedule',
+      name: 'Terminfinder',
+      icon: 'blur_linear',
+      authLevel: 0,
+      beforeEnter: (to: any, from: any, next: any) => requireAuth(0, to, from, next),
+      component: () => import('@/views/Schedules.vue')
+    } as any,
+    {
       path: '/overview',
-      name: 'Terminübersicht',
-      icon: 'storage',
+      name: 'Terminliste',
+      icon: 'list',
       authLevel: 1,
       component: () => import('@/components/AllList.vue')
     } as any,
     {
       path: '/acknowledge',
       name: 'Anfragenverwaltung',
-      icon: 'storage',
+      icon: 'playlist_add_check',
       authLevel: 10,
       beforeEnter: (to: any, from: any, next: any) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')
@@ -57,13 +65,6 @@ export default new Router({
       component: () => import('@/components/GadgetView.vue')
     } as any
     /*
-    {
-      path: '/occupancy',
-      name: 'Scheduler',
-      icon: 'schedule',
-      authLevel: 1,
-      component: () => import('@/views/Occupancy.vue')
-    } as RemaRouteConfig,
     {
       path: '/supports',
       name: 'Aufgaben',
