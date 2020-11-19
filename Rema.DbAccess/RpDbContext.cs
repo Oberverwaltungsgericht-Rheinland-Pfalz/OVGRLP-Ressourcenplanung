@@ -39,6 +39,17 @@ namespace Rema.DbAccess
         .HasOne(ag => ag.Gadget)
         .WithMany(g => g.AllocationGadgets)
         .HasForeignKey(ag => ag.GadgetId);
+
+      modelBuilder.Entity<AllocationRessource>()
+        .HasKey(ag => new { ag.RessourceId, ag.AllocationId });
+      modelBuilder.Entity<AllocationRessource>()
+        .HasOne(ag => ag.Allocation)
+        .WithMany(a => a.AllocationRessources)
+        .HasForeignKey(ag => ag.AllocationId);
+      modelBuilder.Entity<AllocationRessource>()
+        .HasOne(ag => ag.Ressource)
+        .WithMany(g => g.AllocationRessources)
+        .HasForeignKey(ag => ag.RessourceId);
     }
   }
 }
