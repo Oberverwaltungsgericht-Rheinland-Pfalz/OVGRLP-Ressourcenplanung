@@ -18,13 +18,17 @@ namespace Rema.Infrastructure.Models
     public string Name { get; set; } // todo: should be unique
 
     public string FunctionDescription { get; set; }
-    
+
     // todo: delete
     public string Usability { get; set; }
+
     // todo: delete
     public virtual ICollection<Gadget> Gadgets { get; set; }
 
     public string SpecialsDescription { get; set; }
+
     public string Type { get; set; }
+
+    public virtual ICollection<Allocation> Allocations { get; set; }
   }
 }
