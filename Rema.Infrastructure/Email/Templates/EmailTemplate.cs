@@ -12,13 +12,16 @@ namespace Rema.Infrastructure.Email.Templates
     {
       this._allocation = allocation;
     }
+
     public EmailTemplate(IList<Allocation> allocations)
     {
       ForSerial = true;
       _allocations = allocations;
       _allocation = allocations.First();
     }
+
     public abstract string Subject { get; }
+
     public virtual IList<string> GetGroupEmails()
     {
       var rList = new HashSet<string>();
@@ -42,18 +45,23 @@ namespace Rema.Infrastructure.Email.Templates
     public string Type { get; set; }
     protected Allocation _allocation { get; set; }
     protected IList<Allocation> _allocations { get; set; }
-    public Ressource Ressource => this._allocation.Ressource;
-    protected string RessourceName => this.Ressource.Name;
+    protected string RessourceName => string.Join(", ", this._allocation.Ressources.Select(x => x.Name));
     protected string Title => this._allocation.Title;
-    protected string ReferencePerson { get {
-      if (this._allocation.ReferencePerson == null) return "";
-      var referencePerson =  $@"{this._allocation.ReferencePerson.Organisation} \ {this._allocation.ReferencePerson.Name}";
 
-      return referencePerson;
+    protected string ReferencePerson
+    {
+      get
+      {
+        if (this._allocation.ReferencePerson == null) return "";
+        var referencePerson = $@"{this._allocation.ReferencePerson.Organisation} \ {this._allocation.ReferencePerson.Name}";
+
+        return referencePerson;
       }
     }
-    
-    protected string Status { get
+
+    protected string Status
+    {
+      get
       {
         switch (this._allocation.Status)
         {
@@ -63,33 +71,46 @@ namespace Rema.Infrastructure.Email.Templates
           case MeetingStatus.Clarification: return "Abgelehnt";
           default: return "";
         }
-      } 
+      }
     }
+
     protected string Notes => this._allocation.Notes;
     protected string ContactPhone => this._allocation.ContactPhone;
-    protected string ReserveTime { get {
+
+    protected string ReserveTime
+    {
+      get
+      {
         if (!this.ForSerial) return TimeOneDateSingle(_allocation);
         return TimeOneDateMultiple();
       }
     }
-    private string TimeOneDateSingle (Allocation al) {
+
+    private string TimeOneDateSingle(Allocation al)
+    {
       if (al.IsAllDay) return $"{al.From.ToString("dddd, dd MMMM yyyy")}  - {al.To.ToString("dddd, dd MMMM yyyy")} Ganztägig";
       return $"{al.From.ToString("dddd, dd MMMM yyyy HH:mm")}  - {al.To.ToString("dddd, dd MMMM yyyy HH:mm")}";
     }
-    private string TimeOneDateMultiple ()
+
+    private string TimeOneDateMultiple()
     {
       return string.Join(System.Environment.NewLine, _allocations.Select(TimeOneDateSingle));
     }
 
     protected string LastModifier => this._allocation.LastModifiedBy.Name;
 
-    protected string AllGadgets { get {
+    protected string AllGadgets
+    {
+      get
+      {
         var list = _allocation.AllocationGadgets.Select(e => e.Gadget.Title);
         return string.Join(", ", list);
       }
     }
 
-    protected string GroupsGadgets { get
+    protected string GroupsGadgets
+    {
+      get
       {
         var dictGroups = new Dictionary<SupplierGroup, IList<string>>();
 
@@ -102,17 +123,17 @@ namespace Rema.Infrastructure.Email.Templates
             dictGroups.Add(group, new List<string>() { gadget.Title });
         }
         string rValue = "";
-        foreach(var group in dictGroups.ToList())
+        foreach (var group in dictGroups.ToList())
         {
           rValue += $"{System.Environment.NewLine}{System.Environment.NewLine}Organisation {group.Key.Title}:\n";
-          foreach(var gadget in group.Value)
+          foreach (var gadget in group.Value)
           {
             rValue += $"{gadget}, ";
           }
           rValue = rValue.Remove(rValue.Length - 2, 1);
         }
         return rValue;
-      } 
+      }
     }
 
     protected string HintsForSuppliersText
@@ -136,7 +157,7 @@ namespace Rema.Infrastructure.Email.Templates
 Von: {LastModifier}
 
 Raum:
-{RessourceName} 
+{RessourceName}
 
 Titel:
 {Title}
@@ -159,7 +180,8 @@ Notizen:
     }
   }
 }
-    /*
+
+/*
 Folgender Eintrag wurde in der Ressourcenplanung erstellt oder geändert.
 
 Raum:
@@ -182,5 +204,4 @@ Organisation Hausverwaltung:
 
 Notizen:
 VK Rechtshilfeersuchen Spanien; Tische und Stühle für Beteiligte frontal zu VK-Sytem stellen;
-    */
-
+*/

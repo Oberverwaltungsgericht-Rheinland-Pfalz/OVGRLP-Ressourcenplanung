@@ -13,10 +13,10 @@ namespace Rema.WebApi.MappingProfiles
     public AllocationMappingProfile()
     {
       CreateMap<Allocation, AllocationViewModel>()
-        .ForMember(dest => dest.RessourceId, opt => opt.MapFrom(src => src.Ressource.Id))
+        .ForMember(dest => dest.RessourceIds, opt => opt.MapFrom(src => src.Ressources.Select(r => r.Id)))
         .ForMember(dest => dest.ScheduleSeries, opt => opt.MapFrom(src => src.ScheduleSeriesGuid))
-        .ForMember(dest => dest.HintsForSuppliers, opt => opt.MapFrom(src => 
-          src.HintsForSuppliers.Select(e => 
+        .ForMember(dest => dest.HintsForSuppliers, opt => opt.MapFrom(src =>
+          src.HintsForSuppliers.Select(e =>
             new SimpleSupplierHint() { GroupId = e.Group.Id, Message = e.Message }
           )))
         .ForMember(dest => dest.GadgetsIds, opt => opt.MapFrom(src => src.AllocationGadgets.Select(a => a.GadgetId)));

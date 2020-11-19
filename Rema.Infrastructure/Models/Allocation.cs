@@ -34,7 +34,8 @@ namespace Rema.Infrastructure.Models
 
     public MeetingStatus Status { get; set; }
 
-    public virtual Ressource Ressource { get; set; }
+    [Obsolete]
+    public virtual long RessourceId { get; set; }
 
     public Guid? ScheduleSeriesGuid { get; set; }
 
@@ -53,22 +54,29 @@ namespace Rema.Infrastructure.Models
 
     public virtual User ReferencePerson { get; set; }
 
-    public virtual ICollection<AllocationGagdet> AllocationGadgets { get; set; }   
-    
+    public virtual ICollection<AllocationGagdet> AllocationGadgets { get; set; }
+
+    public virtual ICollection<Ressource> Ressources { get; set; }
+
     [Column]
     protected string SerializedHints { get; set; }
+
     public static readonly Expression<Func<Allocation, string>> SerializedHintsExpression = p => p.SerializedHints;
 
     [NotMapped]
-    public IList<SupplierHint> HintsForSuppliers { get 
+    public IList<SupplierHint> HintsForSuppliers
+    {
+      get
       {
-        if (string.IsNullOrEmpty(this.SerializedHints)) 
+        if (string.IsNullOrEmpty(this.SerializedHints))
           return new List<SupplierHint>();
 
         return JsonConvert.DeserializeObject<IList<SupplierHint>>(this.SerializedHints);
-      } set { // input = value
+      }
+      set
+      { // input = value
         this.SerializedHints = JsonConvert.SerializeObject((IList<SupplierHint>)value);
-      } 
+      }
     }
   }
 }
