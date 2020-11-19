@@ -27,6 +27,7 @@ namespace Rema.WebApi.Controllers
   public class AllocationsController : BaseController
   {
     private readonly IEmailTrigger _emailTrigger;
+
     public AllocationsController(RpDbContext context, IMapper mapper, IEmailTrigger emailTrigger) : base(context, mapper)
     {
       this._emailTrigger = emailTrigger;
@@ -36,13 +37,13 @@ namespace Rema.WebApi.Controllers
     [HttpGet("print/{id}")]
     public async Task<FileStreamResult> GetPrint(long id)
     {
-      Log.Information("GET print allocation id:"+id);
+      Log.Information("GET print allocation id:" + id);
       Allocation allocation;
 
       try
       {
         allocation = await _context.Allocations
-          .Include(o => o.Ressource)
+          .Include(o => o.Ressources)
           .Include(r => r.ReferencePerson)
           .Include(r => r.LastModifiedBy)
           .Include(r => r.CreatedBy)
@@ -64,7 +65,7 @@ namespace Rema.WebApi.Controllers
       try
       {
         var template = new PrintTemplate(allocation);
-        
+
         PdfDocument document = new PdfDocument();
 
         PdfPage page = document.AddPage();
@@ -75,7 +76,6 @@ namespace Rema.WebApi.Controllers
         XRect rect = new XRect(40, 50, page.Width * 0.8, page.Height * 7.5);
         gfx.DrawRectangle(XBrushes.White, rect);
         tf.DrawString(template.ToString(), font, XBrushes.Black, rect, XStringFormats.TopLeft);
-
 
         //var document = new PdfDocument();
         //var page = document.AddPage();
@@ -91,7 +91,7 @@ namespace Rema.WebApi.Controllers
       }
       catch (Exception ex)
       {
-        Log.Error(ex, "printing pdf for id: "+id);
+        Log.Error(ex, "printing pdf for id: " + id);
         return null;
       }
       finally
@@ -116,7 +116,7 @@ namespace Rema.WebApi.Controllers
         query = _context.Allocations
           .Where(g => g.To > firstDayOfLastMonth);
 
-        query.Include(g => g.Ressource)
+        query.Include(g => g.Ressources)
           .Include(g => g.ApprovedBy)
           .Load();
 
@@ -175,7 +175,7 @@ namespace Rema.WebApi.Controllers
         query = _context.Allocations
           .Where(g => (g.To >= first && g.To <= last) || (g.From <= last && g.From >= first) || (g.From <= first && g.To >= last));
 
-        query.Include(g => g.Ressource)
+        query.Include(g => g.Ressources)
           .Include(g => g.ApprovedBy)
           .Load();
 
@@ -217,7 +217,7 @@ namespace Rema.WebApi.Controllers
         query = _context.Allocations
           .Where(g => (g.To >= first && g.To <= last) || (g.From <= last && g.From >= first) || (g.From <= first && g.To >= last));
 
-        query.Include(g => g.Ressource)
+        query.Include(g => g.Ressources)
           .Include(g => g.ApprovedBy)
           .Load();
 
@@ -257,6 +257,7 @@ namespace Rema.WebApi.Controllers
         return null;
       }
     }
+
     // GET: allocations/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Allocation>> GetAllocation(long id)
@@ -267,62 +268,62 @@ namespace Rema.WebApi.Controllers
       if (allocation != null) return Ok(allocation);
       return NotFound();
     }
-/*
-    // PUT: allocations/5
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutAllocation(long id, AllocationViewModel allocationVM)
-    {
-      Log.Information("PUT allocations/{id}: {allocation}", id, allocationVM);
-     
-      if (id != allocationVM.Id)
-      {
-        Log.Error("allocation not mached the id");
-        return BadRequest();
-      }
-      Allocation allocation;
-      try
-      {
-        allocation = _mapper.Map<AllocationViewModel, Allocation>(allocationVM);
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while mapping allocation");
-        return BadRequest();
-      }
 
-      bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || allocation.CreatedBy.Id == base.RequestSenderVM.Id;
-      if (!hasRight)
-      {
-        Log.Warning("User {user} was restricted to change allocation {allocation}", base.RequestSenderVM, allocation);
-        return new UnauthorizedResult();
-      }
+    /*
+        // PUT: allocations/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAllocation(long id, AllocationViewModel allocationVM)
+        {
+          Log.Information("PUT allocations/{id}: {allocation}", id, allocationVM);
 
-      try
-      {
-        allocation.LastModified = DateTime.Now;
-        if (allocation.LastModifiedBy.Id != base.RequestSender.Id)
-          allocation.LastModifiedBy = base.RequestSender;
-        _context.Entry(allocation).State = EntityState.Modified;
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while set modified values for allocation");
-        return Conflict();
-      }
+          if (id != allocationVM.Id)
+          {
+            Log.Error("allocation not mached the id");
+            return BadRequest();
+          }
+          Allocation allocation;
+          try
+          {
+            allocation = _mapper.Map<AllocationViewModel, Allocation>(allocationVM);
+          }
+          catch (Exception ex)
+          {
+            Log.Error(ex, "error while mapping allocation");
+            return BadRequest();
+          }
 
-      try
-      {
-        await _context.SaveChangesAsync();
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while save allocation");
-        return Conflict();
-      }
+          bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || allocation.CreatedBy.Id == base.RequestSenderVM.Id;
+          if (!hasRight)
+          {
+            Log.Warning("User {user} was restricted to change allocation {allocation}", base.RequestSenderVM, allocation);
+            return new UnauthorizedResult();
+          }
 
-      return Ok();
-    } */
+          try
+          {
+            allocation.LastModified = DateTime.Now;
+            if (allocation.LastModifiedBy.Id != base.RequestSender.Id)
+              allocation.LastModifiedBy = base.RequestSender;
+            _context.Entry(allocation).State = EntityState.Modified;
+          }
+          catch (Exception ex)
+          {
+            Log.Error(ex, "error while set modified values for allocation");
+            return Conflict();
+          }
 
+          try
+          {
+            await _context.SaveChangesAsync();
+          }
+          catch (Exception ex)
+          {
+            Log.Error(ex, "error while save allocation");
+            return Conflict();
+          }
+
+          return Ok();
+        } */
 
     // POST: allocation
     [HttpPost]
@@ -357,7 +358,7 @@ namespace Rema.WebApi.Controllers
         {
           var searchedGroupIds = allocationVM.HintsForSuppliers.Select(g => g.GroupId);
           var groups = await _context.SupplierGroups.Where(g => searchedGroupIds.Contains(g.Id)).ToListAsync();
-          foreach(SimpleSupplierHint hint in allocationVM.HintsForSuppliers)
+          foreach (SimpleSupplierHint hint in allocationVM.HintsForSuppliers)
           {
             var group = groups.Find(e => e.Id == hint.GroupId);
             var newHintsList = allocation.HintsForSuppliers;  // list existiert nur virtuell als deserialisierung!
@@ -373,7 +374,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation.Ressource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
+        MapChangedOrNewRessources(allocation, allocationVM);
       }
       catch (Exception ex)
       {
@@ -385,7 +386,7 @@ namespace Rema.WebApi.Controllers
         var gadgets = await _context.Gadgets.Include(e => e.SuppliedBy).Where(g => allocationVM.GadgetsIds.Contains(g.Id)).ToListAsync();
 
         allocation.AllocationGadgets = new List<AllocationGagdet>();
-        foreach(var g in gadgets)
+        foreach (var g in gadgets)
         {
           allocation.AllocationGadgets.Add(new AllocationGagdet
           {
@@ -396,7 +397,7 @@ namespace Rema.WebApi.Controllers
           });
         }
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
         Log.Error(ex, "error while mapping gadgets to allocation");
       }
@@ -448,8 +449,8 @@ namespace Rema.WebApi.Controllers
         if (!string.IsNullOrEmpty(allocationVM.ReferencePersonId))
         {
           allocation.ReferencePerson = _userManagementService.GetAndUpdateOrInsertUserFromDB(allocationVM.ReferencePersonId);
-        } 
-        else if(allocationVM.Status == MeetingStatus.Pending)
+        }
+        else if (allocationVM.Status == MeetingStatus.Pending)
         {
           allocation.ReferencePerson = requestedUser;
         }
@@ -525,7 +526,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        foreach(var date in allocationsVM.Dates)
+        foreach (var date in allocationsVM.Dates)
         {
           var singleDate = _mapper.Map<AllocationViewModel, Allocation>(allocationsVM);
           var newFrom = DateTime.Parse(date);
@@ -546,8 +547,8 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var ressource = await _context.Ressources.FindAsync(allocationsVM.RessourceId);
-        allocations.ForEach(e => e.Ressource = ressource);
+        allocations.ForEach(
+          e => MapChangedOrNewRessources(e, allocationsVM));
       }
       catch (Exception ex)
       {
@@ -611,7 +612,8 @@ namespace Rema.WebApi.Controllers
       {
         if (allocationsVM.IsAllDay)
         {
-          allocations.ForEach((e) => {
+          allocations.ForEach((e) =>
+          {
             e.From = e.From.Date + new TimeSpan(0, 0, 0);
             e.To = e.To.Date + new TimeSpan(23, 59, 00);
           });
@@ -663,7 +665,6 @@ namespace Rema.WebApi.Controllers
       Boolean hasApproveRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor));
       if (status >= MeetingStatus.Approved && !hasApproveRight)
         return new UnauthorizedResult();
-      
 
       try
       {
@@ -707,7 +708,7 @@ namespace Rema.WebApi.Controllers
       try
       {
         allocation = await _context.Allocations
-          .Include(o => o.Ressource)
+          .Include(o => o.Ressources)
           .Include(r => r.ReferencePerson)
           .Include(r => r.LastModifiedBy)
           .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
@@ -746,7 +747,7 @@ namespace Rema.WebApi.Controllers
       this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
       return Ok();
     }
-   
+
     // PUT: allocations/editRequest
     [HttpPut("editRequest/")]
     [AuthorizeAd("Editor")]
@@ -760,9 +761,8 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation = await _context.Allocations.Include(o => o.Ressource).Include(o => o.AllocationGadgets)
+        allocation = await _context.Allocations.Include(o => o.Ressources).Include(o => o.AllocationGadgets)
           .Include(o => o.LastModifiedBy).Include(o => o.ReferencePerson).AsNoTracking().FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
-        ressourceName = allocation.Ressource.Name;
       }
       catch (Exception ex)
       {
@@ -790,7 +790,8 @@ namespace Rema.WebApi.Controllers
           allocation.To = editedRequest.To.GetValueOrDefault();
           allocation.IsAllDay = editedRequest.IsAllDay;
 
-          if (editedRequest.IsAllDay) {
+          if (editedRequest.IsAllDay)
+          {
             try
             {
               allocation.From = editedRequest.From.GetValueOrDefault().Date + new TimeSpan(0, 0, 0);
@@ -800,7 +801,6 @@ namespace Rema.WebApi.Controllers
             {
               Log.Error(ex, "error while set correct times for all day");
             }
-
           }
         }
 
@@ -831,7 +831,6 @@ namespace Rema.WebApi.Controllers
         if (template != null)
           this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, new List<string>());
       }
-
       catch (Exception ex)
       {
         Log.Error(ex, "error while processing mails");
@@ -839,7 +838,7 @@ namespace Rema.WebApi.Controllers
 
       return Ok();
     }
-    
+
     // PUT: allocations/{editAllocation}
     [HttpPut("edit/{editAllocation}")]
     [AuthorizeAd("Editor")]
@@ -857,7 +856,7 @@ namespace Rema.WebApi.Controllers
       try
       {
         oldAllocation = await _context.Allocations
-          .Include(o => o.Ressource)
+          .Include(o => o.Ressources)
           .Include(o => o.ReferencePerson)
           .Include(o => o.LastModifiedBy)
           .Include(o => o.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
@@ -897,7 +896,9 @@ namespace Rema.WebApi.Controllers
         if (!string.IsNullOrEmpty(allocationVM.ReferencePersonId) && allocationVM.ReferencePersonId.Length > 12)
         {
           oldAllocation.ReferencePerson = _userManagementService.GetAndUpdateOrInsertUserFromDB(allocationVM.ReferencePersonId); ;
-        } else if (string.IsNullOrEmpty(allocationVM.ReferencePersonId))   {
+        }
+        else if (string.IsNullOrEmpty(allocationVM.ReferencePersonId))
+        {
           oldAllocation.ReferencePerson = null;
         }
       }
@@ -906,12 +907,7 @@ namespace Rema.WebApi.Controllers
         Log.Error(ex, "error while changing referencePerson");
       }
 
-      Ressource newRessource = null;
-      if(oldAllocation.Ressource.Id != allocationVM.RessourceId)
-      {
-        // ressourceChanged = true;
-        newRessource = await _context.Ressources.FindAsync(allocationVM.RessourceId);
-      }
+      MapChangedOrNewRessources(oldAllocation, allocationVM);
 
       var oldHintsGroupIds = oldAllocation.HintsForSuppliers.Select(e => e.Group.Id);
       oldAllocation.HintsForSuppliers = new List<SupplierHint>();
@@ -944,7 +940,8 @@ namespace Rema.WebApi.Controllers
       var deletedGadgets = new List<AllocationGagdet>();
       var createdGadgets = new List<AllocationGagdet>();
 
-      if (newGadgets.Any()) { 
+      if (newGadgets.Any())
+      {
         try
         {
           newGadgetsObjects = _context.Gadgets
@@ -970,13 +967,13 @@ namespace Rema.WebApi.Controllers
         }
       }
 
-      if(droppedGadgets.Any())
+      if (droppedGadgets.Any())
       {
-        try 
+        try
         {
           oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
 
-          foreach(var i in droppedGadgets)
+          foreach (var i in droppedGadgets)
           {
             var fuu = oldAllocation.AllocationGadgets.SingleOrDefault(x => x.GadgetId == i);
             deletedGadgets.Add(fuu);
@@ -1019,7 +1016,7 @@ namespace Rema.WebApi.Controllers
       }
 
       // Änderungen sind nur für Bearbeiter und darüber hinaus erlaubt, außer wenn Anfrage noch nicht genehmigt
-      bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || 
+      bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) ||
                       (oldAllocation.CreatedBy.Id == base.RequestSenderVM.Id && oldAllocation.Status == MeetingStatus.Pending);
       if (!hasRight)
       {
@@ -1035,12 +1032,12 @@ namespace Rema.WebApi.Controllers
         oldAllocation.From = changedAllocation.From;
         oldAllocation.To = changedAllocation.To;
         oldAllocation.ContactPhone = changedAllocation.ContactPhone;
-        oldAllocation.Ressource = newRessource ?? oldAllocation.Ressource;
+        // ressources are already changed
         // gadgets are added above
 
         oldAllocation.LastModified = DateTime.Now;
-        if(oldAllocation.LastModifiedBy.Id != base.RequestSender.Id)
-          oldAllocation.LastModifiedBy = base.RequestSender;       
+        if (oldAllocation.LastModifiedBy.Id != base.RequestSender.Id)
+          oldAllocation.LastModifiedBy = base.RequestSender;
       }
       catch (Exception ex)
       {
@@ -1061,6 +1058,14 @@ namespace Rema.WebApi.Controllers
       var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets, hintGroupMails);
       this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails());
       return Ok();
+    }
+
+    private void MapChangedOrNewRessources(Allocation oldAllocation, AllocationViewModel allocationVM)
+    {
+      var newRessources = _context.Ressources.Where(r => allocationVM.RessourceIds.Contains(r.Id));
+      oldAllocation.Ressources.Clear();
+      foreach (var ressource in newRessources)
+        oldAllocation.Ressources.Add(ressource);
     }
   }
 }
