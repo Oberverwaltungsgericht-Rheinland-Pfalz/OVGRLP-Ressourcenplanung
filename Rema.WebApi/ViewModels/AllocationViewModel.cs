@@ -24,7 +24,7 @@ namespace Rema.WebApi.ViewModels
 
     public MeetingStatus Status { get; set; }
 
-    public long RessourceId { get; set; }
+    public IEnumerable<long> RessourceIds { get; set; }
 
     public IEnumerable<long> GadgetsIds { get; set; }
 
@@ -44,7 +44,8 @@ namespace Rema.WebApi.ViewModels
 
     public string ScheduleSeries { get; set; }
     public IList<SimpleSupplierHint> HintsForSuppliers { get; set; }
-    public override string ToString ()
+
+    public override string ToString()
     {
       return JsonConvert.SerializeObject(this);
     }
