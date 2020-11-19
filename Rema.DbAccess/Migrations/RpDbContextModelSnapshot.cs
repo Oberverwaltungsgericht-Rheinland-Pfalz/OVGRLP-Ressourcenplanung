@@ -15,16 +15,31 @@ namespace Rema.DbAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.0")
+                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "5.0.0");
+
+            modelBuilder.Entity("AllocationRessource", b =>
+                {
+                    b.Property<long>("AllocationsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RessourcesId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AllocationsId", "RessourcesId");
+
+                    b.HasIndex("RessourcesId");
+
+                    b.ToTable("AllocationRessource");
+                });
 
             modelBuilder.Entity("Rema.Infrastructure.Models.Allocation", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<DateTime>("ApprovedAt")
                         .HasColumnType("datetime2");
@@ -38,7 +53,7 @@ namespace Rema.DbAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("CreatedById")
+                    b.Property<long?>("CreatedById")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("From")
@@ -54,13 +69,13 @@ namespace Rema.DbAccess.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(3000)")
-                        .HasMaxLength(3000);
+                        .HasMaxLength(3000)
+                        .HasColumnType("nvarchar(3000)");
 
                     b.Property<long?>("ReferencePersonId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("RessourceId")
+                    b.Property<long>("RessourceId")
                         .HasColumnType("bigint");
 
                     b.Property<Guid?>("ScheduleSeriesGuid")
@@ -89,8 +104,6 @@ namespace Rema.DbAccess.Migrations
 
                     b.HasIndex("ReferencePersonId");
 
-                    b.HasIndex("RessourceId");
-
                     b.ToTable("Allocations");
                 });
 
@@ -114,7 +127,7 @@ namespace Rema.DbAccess.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<long?>("RessourceId")
                         .HasColumnType("bigint");
@@ -139,7 +152,7 @@ namespace Rema.DbAccess.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("FunctionDescription")
                         .HasColumnType("nvarchar(max)");
@@ -169,7 +182,7 @@ namespace Rema.DbAccess.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("GroupEmail")
                         .HasColumnType("nvarchar(max)");
@@ -190,7 +203,7 @@ namespace Rema.DbAccess.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("ActiveDirectoryID")
                         .HasColumnType("nvarchar(max)");
@@ -213,6 +226,21 @@ namespace Rema.DbAccess.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("AllocationRessource", b =>
+                {
+                    b.HasOne("Rema.Infrastructure.Models.Allocation", null)
+                        .WithMany()
+                        .HasForeignKey("AllocationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rema.Infrastructure.Models.Ressource", null)
+                        .WithMany()
+                        .HasForeignKey("RessourcesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Rema.Infrastructure.Models.Allocation", b =>
                 {
                     b.HasOne("Rema.Infrastructure.Models.User", "ApprovedBy")
@@ -221,9 +249,7 @@ namespace Rema.DbAccess.Migrations
 
                     b.HasOne("Rema.Infrastructure.Models.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreatedById");
 
                     b.HasOne("Rema.Infrastructure.Models.User", "LastModifiedBy")
                         .WithMany()
@@ -233,9 +259,13 @@ namespace Rema.DbAccess.Migrations
                         .WithMany()
                         .HasForeignKey("ReferencePersonId");
 
-                    b.HasOne("Rema.Infrastructure.Models.Ressource", "Ressource")
-                        .WithMany()
-                        .HasForeignKey("RessourceId");
+                    b.Navigation("ApprovedBy");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("LastModifiedBy");
+
+                    b.Navigation("ReferencePerson");
                 });
 
             modelBuilder.Entity("Rema.Infrastructure.Models.AllocationGagdet", b =>
@@ -251,6 +281,10 @@ namespace Rema.DbAccess.Migrations
                         .HasForeignKey("GadgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Allocation");
+
+                    b.Navigation("Gadget");
                 });
 
             modelBuilder.Entity("Rema.Infrastructure.Models.Gadget", b =>
@@ -262,6 +296,23 @@ namespace Rema.DbAccess.Migrations
                     b.HasOne("Rema.Infrastructure.Models.SupplierGroup", "SuppliedBy")
                         .WithMany()
                         .HasForeignKey("SuppliedById");
+
+                    b.Navigation("SuppliedBy");
+                });
+
+            modelBuilder.Entity("Rema.Infrastructure.Models.Allocation", b =>
+                {
+                    b.Navigation("AllocationGadgets");
+                });
+
+            modelBuilder.Entity("Rema.Infrastructure.Models.Gadget", b =>
+                {
+                    b.Navigation("AllocationGadgets");
+                });
+
+            modelBuilder.Entity("Rema.Infrastructure.Models.Ressource", b =>
+                {
+                    b.Navigation("Gadgets");
                 });
 #pragma warning restore 612, 618
         }
