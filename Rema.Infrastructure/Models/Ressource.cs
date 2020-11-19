@@ -26,5 +26,7 @@ namespace Rema.Infrastructure.Models
 
     public string SpecialsDescription { get; set; }
     public string Type { get; set; }
+    public virtual ICollection<AllocationRessource> AllocationRessources { get; set; }
+
   }
 }
