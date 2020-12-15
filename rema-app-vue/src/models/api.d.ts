@@ -25,7 +25,7 @@ declare module WebApi {
         IsAllDay: Boolean;
         ContactPhone: string;
         Status: MeetingStatus;
-        RessourceId: number;
+        RessourceIds: number[];
         GadgetsIds: number[];
         CreatedById: number;
         CreatedAt: string;
