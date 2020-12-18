@@ -8,6 +8,8 @@ import { SelectableGroup } from './SelectableGroup'
 import { ScheduledRessource } from './ScheduledRessource'
 import { ShowToast } from './ShowToast'
 import { ConfirmData } from './ConfirmData'
+export * from './CalendarElement'
+export * from './GadgetItem'
 
 export {
   AcknowledgeState,

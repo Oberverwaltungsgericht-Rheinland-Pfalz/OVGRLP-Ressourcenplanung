@@ -269,62 +269,6 @@ namespace Rema.WebApi.Controllers
       return NotFound();
     }
 
-    /*
-        // PUT: allocations/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAllocation(long id, AllocationViewModel allocationVM)
-        {
-          Log.Information("PUT allocations/{id}: {allocation}", id, allocationVM);
-
-          if (id != allocationVM.Id)
-          {
-            Log.Error("allocation not mached the id");
-            return BadRequest();
-          }
-          Allocation allocation;
-          try
-          {
-            allocation = _mapper.Map<AllocationViewModel, Allocation>(allocationVM);
-          }
-          catch (Exception ex)
-          {
-            Log.Error(ex, "error while mapping allocation");
-            return BadRequest();
-          }
-
-          bool hasRight = base.RequestSenderVM.Roles.Exists(e => e.HasRole(Startup.Editor)) || allocation.CreatedBy.Id == base.RequestSenderVM.Id;
-          if (!hasRight)
-          {
-            Log.Warning("User {user} was restricted to change allocation {allocation}", base.RequestSenderVM, allocation);
-            return new UnauthorizedResult();
-          }
-
-          try
-          {
-            allocation.LastModified = DateTime.Now;
-            if (allocation.LastModifiedBy.Id != base.RequestSender.Id)
-              allocation.LastModifiedBy = base.RequestSender;
-            _context.Entry(allocation).State = EntityState.Modified;
-          }
-          catch (Exception ex)
-          {
-            Log.Error(ex, "error while set modified values for allocation");
-            return Conflict();
-          }
-
-          try
-          {
-            await _context.SaveChangesAsync();
-          }
-          catch (Exception ex)
-          {
-            Log.Error(ex, "error while save allocation");
-            return Conflict();
-          }
-
-          return Ok();
-        } */
-
     // POST: allocation
     [HttpPost]
     public async Task<ActionResult<AllocationViewModel>> PostAllocation(AllocationViewModel allocationVM)
@@ -757,8 +701,7 @@ namespace Rema.WebApi.Controllers
       Log.Information("PUT allocations/editrequest: {editRequest}", editedRequest);
 
       Allocation allocation;
-      string ressourceName;
-
+      
       try
       {
         allocation = await _context.Allocations.Include(o => o.Ressources).Include(o => o.AllocationGadgets)

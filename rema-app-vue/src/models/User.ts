@@ -14,4 +14,10 @@ export class User extends Model {
       Email: this.attr('')
     }
   }
+
+  Id!: number
+  Name!: string
+  ActiveDirectoryID!: number
+  Organisation!: string
+  Email!: string
 }

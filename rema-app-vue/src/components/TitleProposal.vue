@@ -25,9 +25,9 @@ export default class TitleProposal extends Vue {
   public internalModel: string = ''
   public searchInternal: string = ''
   public get titleEntries () : string[] {
-    var rList = Allocation.query()
+    var rList: Array<string> = Allocation.query()
     //      .where('title', (s: string) => s && s.startsWith(this.search))
-      .get().map((v:any) => v.Title)
+      .get().map((v:Allocation) => v.Title)
     return rList
   }
 

@@ -97,11 +97,12 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Names } from '../store/User/types'
 import { deleteAllocation } from '../services/AllocationApiService'
-import { Allocation, Gadget, Supplier } from '../models'
-import { ShowToast, ConfirmData } from '../models/interfaces'
+import { Allocation, Gadget, Ressource, Supplier } from '../models'
+import { ShowToast, ConfirmData, CalendarElement } from '../models/interfaces'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
 import print from 'print-js'
+import { CalendarEventParsed, CalendarTimestamp } from 'vuetify'
 
 @Component({
   components: { EditFormModal }
@@ -114,23 +115,23 @@ export default class Calendar extends Vue {
   @State('hideCalendarFrom', { namespace: 'user' })
   private HideCalendarFrom!: boolean
   @Action(Names.a.loadUsers, { namespace: 'user' })
-  private loadUsers: any
+  private loadUsers!: Function
 
   private today: string = moment().format('YYYY-MM-DD')
   private focus: string = moment().format('YYYY-MM-DD')
 
   private types: string[] =['month', 'week', 'day', '4day']
   private currentview: string = 'month'
-  private start: any = null
-  private end: any = null
-  private selectedEvent: object = {}
-  private selectedElement: object = {}
+  private start: CalendarTimestamp = {} as CalendarTimestamp
+  private end: CalendarTimestamp = {} as CalendarTimestamp
+  private selectedEvent: CalendarElement = {} as CalendarElement
+  private selectedElement: CalendarElement = {} as CalendarElement
   private selectedOpen: Boolean = false
   private titleFilter: string[] = []
   private showFilterModal: boolean = false
   private showWE: boolean = true
 
-  public formatEventText (e:any): string {
+  public formatEventText (e: CalendarEventParsed): string {
     // if (this.currentview === 'month') return e.input.name
     let start = e.input.start.endsWith('00') ? e.input.start.substring(10, 13) : e.input.start.substring(10, 16)
     let end = ''
@@ -146,7 +147,7 @@ export default class Calendar extends Vue {
   public get weekdays (): number[] {
     return this.showWE ? [1, 2, 3, 4, 5, 6, 0] : [1, 2, 3, 4, 5]
   }
-  public typeName (s: string) {
+  public typeName (s: string): undefined | string {
     switch (s) {
       case 'month': return 'Monat'
       case 'week': return 'Woche'
@@ -154,20 +155,21 @@ export default class Calendar extends Vue {
       case '4day': return '4 Tage'
     }
   }
-  public get filteredItems () {
+  public get filteredItems (): Array<CalendarElement> {
     let isEmpty = !Allocation.all().length
     if (isEmpty) return []
+
     return this.itemsFormated
-      .filter((v: any) => {
-        if (this.titleFilter.length) return this.titleFilter.includes(v.RessourceName)
+      .filter((v: CalendarElement) => {
+        if (this.titleFilter.length) return this.titleFilter.includes(v.RessourceNames)
         return true
       })
   }
-  public get itemsFormated () {
+  public get itemsFormated (): Array<CalendarElement> {
     var roleLvl = this.$store.state.user.role
     let myId = this.$store.state.user.id
 
-    var formatedItems = []
+    var formatedItems: Array<Allocation> = []
     if (roleLvl >= 10) {
       formatedItems = Allocation.query()
         .with('Ressource')
@@ -175,29 +177,33 @@ export default class Calendar extends Vue {
         .get()
     } else {
       formatedItems = Allocation.query()
-        .where((al: any) => (al.Status === 1 || al.Status === 3) || al.CreatedById === myId || al.ReferencePersonId === myId)
+        .where((al: Allocation) => (al.Status === 1 || al.Status === 3) || al.CreatedById === myId || al.ReferencePersonId === myId)
         .with('Ressource')
         .with('Gadget')
         .get()
     }
-    let userIds2Load = formatedItems.map((e:any) => e.ReferencePersonId)
-    userIds2Load.push(...formatedItems.map((e: any) => e.CreatedById))
+    let userIds2Load = formatedItems.map((e: Allocation) => e.ReferencePersonId)
+    userIds2Load.push(...formatedItems.map((e: Allocation) => e.CreatedById))
     this.loadUsers(userIds2Load)
     return formatedItems.map(transfer2Calendar)
   }
-  public ReferenceUserName (id:number) {
+
+  public ReferenceUserName (id:number): string | number {
     if (!id) return ''
 
     let user = this.ContactUsers.find(e => e.Id === id)
     return user ? user.Title : id
   }
 
-  public get possibleTitles () {
-    return Allocation.query()
-      .with('Ressource')
-      .get().map((v:any) => v.Ressource).map((v:any) => (v || { Name: '' }).Name)
+  public get possibleTitles (): Array<string> {
+    const ressources: Array<Ressource> = []
+    Allocation.query()
+      .with('Ressources')
+      .get().forEach((v:Allocation) => ressources.push(...v.Ressources))
+
+    return ressources.map((v:Ressource) => (v || { Name: '' }).Name)
   }
-  public get title () {
+  public get title (): string {
     const { start, end } = this
     if (!start || !end) return moment().format('MMMM YYYY')
 
@@ -237,14 +243,14 @@ export default class Calendar extends Vue {
     })
   }
 
-  public resetFilter () {
+  public resetFilter (): void {
     this.titleFilter.splice(0, Infinity)
   }
 
-  public printAllocation (id: number) {
+  public printAllocation (id: number): void {
     print('api/Allocations/print/' + id)
   }
-  private confirmDelete () {
+  private confirmDelete (): void {
     const { id, name } = this.selectedEvent as any
     let data: ConfirmData = { title: 'Löschen bestätigen',
       content: `Möchten sie dem Termin ${name} wirklich löschen?`,
@@ -253,40 +259,42 @@ export default class Calendar extends Vue {
     }
     this.$root.$emit('user-confirm', data)
   }
-  public async deleteAllocation () {
+  public async deleteAllocation (): Promise<void> {
     const { id, name } = this.selectedEvent as any
     let success = await deleteAllocation(id)
 
     if (success) this.$root.$emit('notify-user', { text: 'Eintrag gelöscht', color: 'success' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)
   }
-  public scrollToTime () {
+
+  public scrollToTime (): void {
     this.$nextTick(() => {
       // @ts-ignore
       this.$refs.calendar.scrollToTime(this.CalendarFrom.length > 1 ? this.CalendarFrom + ':00' : '0' + this.CalendarFrom + ':00')
     })
   }
-  public viewDay ({ date }: any) {
+
+  public viewDay ({ date }: CalendarTimestamp): void {
     this.focus = date
     this.currentview = 'day'
 
     this.scrollToTime()
   }
-  public getEventColor (event: any) {
-    return event.color
+  public getEventColor ({ color }: any): string {
+    return color
   }
-  public setToday () {
+  public setToday (): void {
     this.focus = this.today
   }
-  public prev () {
+  public prev (): void {
     // @ts-ignore
     this.$refs.calendar.prev()
   }
-  public next () {
+  public next (): void {
     // @ts-ignore
     this.$refs.calendar.next()
   }
-  public showEvent ({ nativeEvent, event }: any) {
+  public showEvent ({ nativeEvent, event }: any): void {
     const open = () => {
       this.selectedEvent = event
       this.selectedElement = nativeEvent.target
@@ -302,7 +310,7 @@ export default class Calendar extends Vue {
 
     nativeEvent.stopPropagation()
   }
-  public updateRange ({ start, end }: any) {
+  public updateRange ({ start, end }: {start: CalendarTimestamp, end: CalendarTimestamp}): void {
     // You could load events from an outside source (like database)
     // now that we have the start and end dates on the calendar
     this.start = start
@@ -311,13 +319,16 @@ export default class Calendar extends Vue {
     this.scrollToTime()
   }
 }
-function transfer2Calendar (v: any) {
-  let rVal:any = {}
+function transfer2Calendar (v: Allocation): CalendarElement {
+  let rVal: CalendarElement = {} as CalendarElement
   rVal.longDate = v.From.substr(0, 10) !== v.To.substr(0, 10)
+  let ressourceNames = v.Ressources.map((v: Ressource) => v.Name).join(', ')
+
   if (v.IsAllDay) {
     rVal.start = v.From.substring(0, 10)
     rVal.schedule = `ganztägig`
-    rVal.name = (v.Ressource || {}).Name + ' - ' + v.Title
+    rVal.RessourceNames = ressourceNames
+    rVal.name = ressourceNames + ' - ' + v.Title
 
     if (rVal.longDate) {
       rVal.start = v.From.substring(0, 10).replace('T', ' ') // ,10) -> kleine Darstellung; ,16) maximal große Darstellung
@@ -331,7 +342,7 @@ function transfer2Calendar (v: any) {
       Von ${moment(v.From).format('LT')} 
       bis ${moment(v.To).format('LT')}`
     if (rVal.longDate) rVal.schedule += ` zwischen dem ${moment(v.From).format('DD.MM.YYYY')} und ${moment(v.To).format('DD.MM.YYYY')}`
-    rVal.name = `${(v.Ressource || {}).Name} ab ${moment(v.From).format('LT')}: ${v.Title}`
+    rVal.name = `${ressourceNames} ab ${moment(v.From).format('LT')}: ${v.Title}`
   }
 
   if (v.Status === 1 || v.Status === 3) {
@@ -346,8 +357,6 @@ function transfer2Calendar (v: any) {
   rVal.Contact = v.ReferencePersonId
   if (!rVal.Contact) rVal.Creator = v.CreatedById
 
-  rVal.RessourceName = (v.Ressource || {}).Name
-
   rVal.Hints = ''
   v.HintsForSuppliers.forEach((e: WebApi.SimpleSupplierHint) => {
     rVal.Hints += `<strong>${GetGroupName(e.GroupId)}</strong>: ${e.Message} <br/>`
@@ -355,8 +364,7 @@ function transfer2Calendar (v: any) {
 
   rVal.Gadgets = '<br>'
   if (Gadget.all().length) {
-    v.GadgetsIds.map((e:any) => (Gadget.find(e) as any).Title)
-      .forEach((e: any) => { rVal.Gadgets += e + '<br> ' })
+    v.GadgetsIds.map((e: number) => (Gadget.find(e) as Gadget).Title).forEach((e: string) => { rVal.Gadgets += e + '<br> ' })
   }
   rVal.Gadgets.slice(0, -1)
 

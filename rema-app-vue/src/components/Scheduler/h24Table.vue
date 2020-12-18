@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Allocation, Ressource } from '../../models'
+import { Allocation, Ressource, Supplier } from '../../models'
 import { ScheduledRessource, InitAllocation, ShowToast } from '../../models/interfaces'
 import { deleteAllocation } from '../../services/AllocationApiService'
 import moment from 'moment'
@@ -52,9 +52,9 @@ export default class h24Table extends Vue {
     let start = moment(this.Day).valueOf()
     let end = moment(this.Day).add(1, 'day').valueOf()
     // [{id, name, done24:[]}]
-    const allocations = Allocation.query().withAll()
-      .where((al: any) => (al.Status === 1 || al.Status === 3) || al.CreatedById === myId || al.ReferencePersonId === myId)
-      .where((al: any) => {
+    const allocations: Array<Allocation> = Allocation.query().withAll()
+      .where((al: Allocation) => (al.Status === 1 || al.Status === 3) || al.CreatedById === myId || al.ReferencePersonId === myId)
+      .where((al: Allocation) => {
         let to = moment(al.To).valueOf()
         let from = moment(al.From).valueOf()
         return ((to < end) && to > start) || ((from > start) && from < end) || ((from < start) && to > end)
@@ -63,14 +63,15 @@ export default class h24Table extends Vue {
       .get()
 
     // aufteilen in ressourcen gruppen
-    let ressourcesAll = allocations.map((e:any) => e.Ressource)
+    let ressourcesAll: Array<Ressource> = []
+    allocations.forEach((e:Allocation) => ressourcesAll.push(...e.Ressources))
     let ressources = [...new Set(ressourcesAll)]
     ressources.sort()
 
     for (let res of ressources) {
       let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24), Details: res.SpecialsDescription }
 
-      let allocs = allocations.filter((e: any) => e.Ressource.Id === res.Id)
+      let allocs = allocations.filter((e: Allocation) => e.Ressources.some((e: Ressource) => e.Id === res.Id))
       for (let allo of allocs) {
         // @ts-ignore
         if (allo.IsAllDay) {
@@ -99,8 +100,8 @@ export default class h24Table extends Vue {
     ar.splice(0, Infinity, ...ar.filter((x: ScheduledRessource) => x.Name.toLowerCase().includes(this.NameFilter.toLowerCase())))
   }
   public addEmptyRessources (ar: ScheduledRessource[]) {
-    let allRessources = Ressource.query().get()
-    let withoutExisting = allRessources.filter((a: any) => !ar.find((b: any) => a.Id === b.Id))
+    let allRessources: Array<Ressource> = Ressource.query().get()
+    let withoutExisting = allRessources.filter((a: Ressource) => !ar.find((b: ScheduledRessource) => a.Id === b.Id))
     for (let res of withoutExisting) {
       // @ts-ignore
       let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24), Details: res.SpecialsDescription }
@@ -122,7 +123,7 @@ export default class h24Table extends Vue {
     let request: InitAllocation = {
       // @ts-ignore
       From: this.$options.filters['2digits'](hourNumber) + ':00',
-      RessourceId: id,
+      RessourceIds: [id],
       Day: this.Day
     }
     this.$root.$emit('open-allocation-form', request)

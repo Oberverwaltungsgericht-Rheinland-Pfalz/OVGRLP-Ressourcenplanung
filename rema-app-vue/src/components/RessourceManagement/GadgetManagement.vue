@@ -16,13 +16,11 @@
           </v-btn>
         </v-toolbar>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-icon @click="editItem(item)" title="Unterstützergruppe bearbeiten" class="mr-2">edit</v-icon>
         <v-icon @click="confirmDelete(item)" title="Unterstützergruppe löschen">delete</v-icon>
       </template>
-      <template v-slot:item.SuppliedBy="{ item }">{{
-        item.SuppliedBy | supplierName
-      }}</template>
+      <template v-slot:[`item.SuppliedBy`]="{ item }">{{item.SupplierName}}</template>
     </v-data-table>
     <v-dialog :value="dialog" persistent max-width="600px" scrollable>
       <v-card>
@@ -73,21 +71,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { ShowToast, ConfirmData } from '../../models/interfaces'
-import {
-  Supplier,
-  Ressource,
-  Gadget
-} from '../../models'
+import { ShowToast, ConfirmData, GadgetItem } from '../../models/interfaces'
+import { Supplier, Ressource, Gadget } from '../../models'
 import { submitGadget, editGadget, deleteGadget } from '../../services/GadgetApiService'
 
-@Component({
-  filters: {
-    supplierName (id: number) {
-      return ((Supplier.find(id) as any) || { Title: '' }).Title
-    }
-  }
-})
+@Component
 export default class SupplierManagement extends Vue {
   private dialog: number = 0
   private editId: number = 0
@@ -106,20 +94,16 @@ export default class SupplierManagement extends Vue {
     if (this.dialog === 1) return 'Neues Hilfsmittel'
     if (this.dialog === 2) return 'Bearbeite Hilfsmittel'
   }
-  private get RessourceNames () {
-    return Ressource.all()
-      .filter((v: any) => !!v.Title)
-      .map((v: any) => v.Title)
-  }
+
   private get supplierItems () {
     return Supplier.all()
   }
-  private get items () {
-    const suppNames: any = {}
-    Supplier.all().forEach((e: any) => (suppNames[e.Id] = e.Title))
-    return Gadget.all().map((v: any) => ({
-      ...v,
-      supplierTitle: suppNames[v.SuppliedBy]
+  private get items (): Array<GadgetItem> {
+    return Gadget.query().withAll().get().map((g: Gadget) => ({
+      Id: g.Id,
+      Title: g.Title,
+      SuppliedBy: g.SuppliedBy.Id,
+      SupplierName: g.SuppliedBy.Title
     }))
   }
   private get invalidForm (): boolean {
@@ -131,7 +115,7 @@ export default class SupplierManagement extends Vue {
     this.editTitle = ''
     this.editSupplier = 0
   }
-  private editItem (item: WebApi.GadgetViewModel) {
+  private editItem (item: GadgetItem) {
     this.editId = item.Id
     this.editTitle = item.Title
     this.editSupplier = item.SuppliedBy

@@ -28,11 +28,11 @@
           />
         </v-toolbar>
       </template>
-      <template v-slot:item.From="{ item }">{{item.From | toLocal}}</template>
-      <template v-slot:item.To="{ item }">{{item.To | toLocal}}</template>
-      <template v-slot:item.DateTime="{ item }">{{item.DateTime | toLocal}}</template>
-      <template v-slot:item.CreateDate="{ item }">{{item.CreateDate | toLocal}}</template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.From`]="{ item }">{{item.From | toLocal}}</template>
+      <template v-slot:[`item.To`]="{ item }">{{item.To | toLocal}}</template>
+      <template v-slot:[`item.DateTime`]="{ item }">{{item.DateTime | toLocal}}</template>
+      <template v-slot:[`item.CreateDate`]="{ item }">{{item.CreateDate | toLocal}}</template>
+      <template v-slot:[`item.action`]="{ item }">
         <v-btn @click="openDialog(item.Id)"><span>Status</span><v-icon class="pad-left">edit</v-icon></v-btn>
       </template>
       <template v-slot:no-data>
@@ -63,12 +63,8 @@ const namespace = 'user'
 export default class AcknowledgeList extends Vue {
   @State('ContactUsers', { namespace })
   private ContactUsers!: WebApi.ContactUser[];
-  @Mutation('addContactUser', { namespace })
-  private addContactUser: any;
-  @Mutation('reserveContactUser', { namespace })
-  private reserveContactUser: any;
   @Action(Names.a.loadUsers, { namespace: 'user' })
-  private loadUsers: any;
+  private loadUsers!: Function
 
   private dialog: boolean = false
   private viewAllocation: AllocationRequestView = {} as AllocationRequestView
@@ -88,26 +84,24 @@ export default class AcknowledgeList extends Vue {
     { text: 'Letzte Veränderung', value: 'DateTime' }
   ]
 
-  public get hasItems () {
-    const allocations = Allocation.query()
-      .withAll()
-      .get()
-    return allocations.length
+  public get hasItems (): boolean {
+    const allocations: Array<Allocation> = Allocation.query().get()
+    return allocations.length > 0
   }
-  public openDialog (id: number) {
-    const viewA = Allocation.query()
+  public openDialog (id: number): void {
+    const viewA: Allocation = Allocation.query()
       .withAll()
       .where('Id', id)
       .first() as any
     if (viewA == null) return
     this.dialog = true
-    this.viewAllocation = {
-      ...viewA,
-      RessourceTitle: viewA.Ressource.Name,
-      Title: viewA.Title,
-      Notices: viewA.Notes
-    }
+
+    Object.assign(this.viewAllocation, viewA)
+    this.viewAllocation.Title = viewA.Title
+    this.viewAllocation.Notices = viewA.Notes
+    this.viewAllocation.RessourceTitles = viewA.Ressources.map((v: Ressource) => v.Name).join(', ')
   }
+
   public get UnAcknowledgedAllocations (): Allocation[] {
     return Allocation.query()
       .withAll()
@@ -117,11 +111,11 @@ export default class AcknowledgeList extends Vue {
     if (!Allocation.all().length) return []
     this.fillContactUsers()
     return this.UnAcknowledgedAllocations
-      .filter((a: any) => {
+      .filter((a: Allocation) => {
         if (this.hideDone && (a.Status === 1 || a.Status === 3)) return false
         return Date.parse(a.To) > Date.now()
       })
-      .map((v: any) => ({
+      .map((v: Allocation) => ({
         Id: v.Id,
         Title: v.Title,
         CreateDate: v.CreatedAt,
@@ -132,20 +126,20 @@ export default class AcknowledgeList extends Vue {
             (w: WebApi.ContactUser) => w.Id === v.ReferencePersonId
           ) || { Title: '' }
         ).Title,
-        Ressource: (v.Ressource || {}).Name,
+        Ressource: v.Ressources.map((v: Ressource) => v.Name).join(', '),
         From: v.From,
         To: v.To,
         DateTime: v.LastModified
       }))
   }
-  public refreshAllocations () {
+  public refreshAllocations (): void {
     refreshAllocations()
     Supplier.api().get('suppliergroups')
     Ressource.api().get('ressources')
     refreshAllocations()
   }
-  public async fillContactUsers () {
-    let referencePersons = this.UnAcknowledgedAllocations.map((v: any) => v.ReferencePersonId)
+  public async fillContactUsers (): Promise<void> {
+    let referencePersons = this.UnAcknowledgedAllocations.map((v: Allocation) => v.ReferencePersonId)
     referencePersons = [...new Set(referencePersons)] // remove duplicates
     referencePersons = referencePersons.filter((v: number) => v !== 0) // remove 0
     let hasAllUsernames = referencePersons.every((id: number) =>

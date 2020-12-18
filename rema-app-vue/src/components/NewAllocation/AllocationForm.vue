@@ -166,14 +166,14 @@
         v-if="permissionToEdit"
         color="green darken-1"
         text
-        @click="sendAllocation(1)"
+        @click="sendAllocation('Acknowledged')"
         ><v-icon>save</v-icon> Speichern</v-btn
       >
       <v-btn
         v-else
         color="green darken-1"
         text
-        @click="sendAllocation(0)"
+        @click="sendAllocation('Pending')"
         ><v-icon>save</v-icon> Anfragen</v-btn
       >
       <v-btn color="red darken-1" text @click="close"
@@ -203,8 +203,8 @@ import { State, Action, Getter, Mutation } from 'vuex-class'
 })
 export default class AllocationForm extends Mixins(AllocationFormService) {
   @Prop(Object) private readonly initValues!: InitAllocation
-  public title: String = ''
-  public ressourceId: number | any = null
+  public title: string = ''
+  public ressourceIds: Array<number> = []
   public fullday: boolean = false
   public notes: string = ''
   public selectedGadgets: number[] = []
@@ -214,14 +214,14 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   private loading: boolean = false
 
   beforeMount () {
-    if (this.initValues && this.initValues.RessourceId) {
-      this.ressourceId = this.initValues.RessourceId
+    if (this.initValues && this.initValues.RessourceIds.length) {
+      this.ressourceIds.push(...this.initValues.RessourceIds)
       this.timeFrom = this.initValues.From
       this.dateFrom = this.initValues.Day
     }
   }
 
-  private async sendAllocation (status: number) {
+  private async sendAllocation (status: string) {
     if (this.isFormInvalid()) return
     this.saveAllocation(status)
     this.close()
@@ -238,27 +238,29 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
       from = this.dateFrom + 'T' + (this.fullday ? '00:00' : this.timeFrom)
       to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
     }
-    return { Id: 0, From: from, To: to, RessourceId: this.ressourceId, dates }
+    return { Id: 0, From: from, To: to, RessourceIds: this.ressourceIds, dates }
   }
 
-  private async saveAllocation (
-    status: number,
-    date?: string
-  ) {
-    let newAllocation = {
-      status: status,
-      from: `${this.dateFrom}T${this.timeFrom}`,
-      to: `${this.dateTo}T${this.timeTo}`,
-      title: this.title,
-      notes: this.notes,
-      isAllDay: this.fullday,
-      ressourceId: this.ressourceId,
-      gadgetsIds: [...this.selectedGadgets],
-      contactPhone: this.telNumber,
+  private async saveAllocation (status: string, date?: string) {
+    let newAllocation: WebApi.MultipleAllocationsViewModel = {} as WebApi.MultipleAllocationsViewModel
+
+    let newAllocationData: Partial<WebApi.MultipleAllocationsViewModel> = {
+      // nAC.Status = status as unknown as WebApi.MeetingStatus
+      Status: WebApi.MeetingStatus[status as WebApi.MeetingStatus],
+      From: `${this.dateFrom}T${this.timeFrom}`,
+      To: `${this.dateTo}T${this.timeTo}`,
+      Title: this.title,
+      Notes: this.notes,
+      IsAllDay: this.fullday,
+      GadgetsIds: [...this.selectedGadgets],
+      ContactPhone: this.telNumber,
       ReferencePersonId: this.referencePerson.ActiveDirectoryID,
-      dates: [''],
-      HintsForSuppliers: this.GetHintsForSuppliers
+      Dates: [''],
+      HintsForSuppliers: this.GetHintsForSuppliers,
+      RessourceIds: this.ressourceIds
     }
+
+    Object.assign(newAllocation, newAllocationData)
 
     var success : boolean = false
     this.loading = true
@@ -267,9 +269,9 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
       if (success) this.$root.$emit('notify-user', { text: 'Speichern erfolgreich', color: 'success' } as ShowToast)
       else this.$root.$emit('notify-user', { text: 'Speichern fehlgeschlagen', color: 'error' } as ShowToast)
     } else {
-      newAllocation.from = this.timeFrom
-      newAllocation.to = this.timeTo
-      newAllocation.dates = this.multipleDates
+      newAllocation.From = this.timeFrom
+      newAllocation.To = this.timeTo
+      newAllocation.Dates = this.multipleDates
 
       success = await submitAllocations(newAllocation)
     }
@@ -289,7 +291,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
   public get formInvalid () {
     let rValue = true
     if (!this.title) rValue = false
-    if (!this.ressourceId) rValue = false
+    if (!this.ressourceIds.length) rValue = false
     if (!this.dateFrom && !this.isRepeating) rValue = false
     if (!this.dateTo && !this.isRepeating && this.dateTo.length < 7) rValue = false
     if (this.isRepeating && !this.multipleDates.length) rValue = false
@@ -318,7 +320,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     this.timeTo = '17:00'
     this.timeFrom = '08:00'
     this.fullday = false
-    this.ressourceId = null
+    this.ressourceIds.splice(this.ressourceIds.length)
     this.selectedGadgets = []
     this.multipleDates = []
     this.isRepeating = false

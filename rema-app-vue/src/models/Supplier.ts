@@ -16,4 +16,9 @@ export class Supplier extends Model {
       Gadgets: this.hasMany(Gadget, 'SuppliedBy', 'Id')
     }
   }
+
+  Id!: number
+  Title!: string
+  GroupEmail!: string
+  Gadgets!: Array<Gadget>
 }

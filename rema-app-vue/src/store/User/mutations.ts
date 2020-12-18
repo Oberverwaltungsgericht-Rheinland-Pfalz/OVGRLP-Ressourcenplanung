@@ -3,11 +3,11 @@ import { Names } from './types'
 import { UserState } from '@/models/interfaces'
 
 export const mutations: MutationTree<UserState> = {
-  [Names.m.clearUser] (state: any) {
+  [Names.m.clearUser] (state: UserState) {
     state.id = 0
     state.name = ''
     state.email = ''
-    state.role = false
+    state.role = ''
     state.supplierGroups = false
     state.organisation = ''
     state.lastUpdated = new Date()
@@ -16,8 +16,8 @@ export const mutations: MutationTree<UserState> = {
     state.id = userPayload.Id
     state.name = userPayload.Name
     state.email = userPayload.Email
-    state.role = Math.max(...userPayload.Roles.map((e: any) => e.Level))
-    state.roleNames = userPayload.Roles.reduce((last: string, e: any) => last + e.Name + ' ', '')
+    state.role = Math.max(...userPayload.Roles.map((e: WebApi.Role) => e.Level))
+    state.roleNames = userPayload.Roles.reduce((last: string, e: WebApi.Role) => last + e.Name + ' ', '')
     state.supplierGroups = userPayload.SupportGroupIds
     state.organisation = userPayload.Organisation
     state.lastUpdated = new Date()

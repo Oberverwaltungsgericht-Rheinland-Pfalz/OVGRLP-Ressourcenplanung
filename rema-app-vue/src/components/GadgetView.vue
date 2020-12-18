@@ -9,9 +9,7 @@
       fixed-header
       sort-by="SuppliedBy"
     >
-      <template v-slot:item.SuppliedBy="{ item }">{{
-        item.SuppliedBy | supplierName
-      }}</template>
+      <template v-slot:[`item.SuppliedBy`]="{ item }">{{ item.SupplierName }}</template>
     </v-data-table>
   </v-layout>
   </template>
@@ -20,29 +18,20 @@
 import { submitGadget, editGadget, deleteGadget } from '../services/GadgetApiService'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Ressource, Gadget, Supplier } from '../models'
+import { GadgetItem } from '@/models/interfaces'
 
-@Component({
-  filters: {
-    supplierName (id: number) {
-      return ((Supplier.find(id) as any) || { Title: '' }).Title
-    }
-  }
-})
+@Component
 export default class GadgetView extends Vue {
   private headers: object[] = [
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Unterstützergruppe', value: 'SuppliedBy' }
   ]
-
-  private get supplierItems () {
-    return Supplier.all()
-  }
-  private get items () {
-    const suppNames: any = {}
-    Supplier.all().forEach((e: any) => (suppNames[e.Id] = e.Title))
-    return Gadget.all().map((v: any) => ({
-      ...v,
-      supplierTitle: suppNames[v.SuppliedBy]
+  private get items (): Array<GadgetItem> {
+    return Gadget.query().withAll().get().map((g: Gadget) => ({
+      Id: g.Id,
+      Title: g.Title,
+      SuppliedBy: g.SuppliedBy.Id,
+      SupplierName: g.SuppliedBy.Title
     }))
   }
 }
