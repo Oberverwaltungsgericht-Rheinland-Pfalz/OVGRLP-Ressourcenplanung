@@ -6,15 +6,16 @@
       </v-col>
     </v-row>
     <v-row v-for="(i, idx) in possibleCollisions" v-bind:key="idx + 'cols'">
-      <v-col cols="4">{{ i.From | toLocal }} - {{ i.To | toLocal }}</v-col>
-      <v-col cols="4">{{ i.Title }}</v-col>
-      <v-col cols="4">{{ i.Status | status2string }}</v-col>
+      <v-col cols="5">{{ i.From | toLocal }} - {{ i.To | toLocal }}</v-col>
+      <v-col cols="3">{{ i.Title }}</v-col>
+      <v-col cols="2">{{ getRessourceNames(i.Ressources) }}</v-col>
+      <v-col cols="2">{{ i.Status | status2string }}</v-col>
     </v-row>
   </div>
 </template>
 
 <script lang="ts">
-import { Allocation } from '../models'
+import { Allocation, Ressource } from '../models'
 import { Component, Prop, Vue, Mixins } from 'vue-property-decorator'
 import { ShortAllocationView } from '../models/interfaces'
 
@@ -30,7 +31,9 @@ export default class CollisionDetection extends Vue {
     const rValues: Array<Allocation> = Allocation.query()
       .withAll()
       .where('Status', (s: number) => s !== 2)
-      .where('RessourceId', this.viewAllocation.RessourceIds)
+      .where('RessourceIds', (a : Array<number>) =>
+        this.viewAllocation.RessourceIds.some((rId: number) => a.includes(rId))
+      )
       .where((a: Allocation) => {
         if (a.Id === id) return false
         let rVal = false
@@ -56,6 +59,9 @@ export default class CollisionDetection extends Vue {
         return rVal
       }).get()
     return rValues
+  }
+  public getRessourceNames (r: Ressource[]) : string {
+    return r.map((r: Ressource) => r.Name).join(', ')
   }
   public get hasCollisions (): boolean {
     return this.possibleCollisions.length > 0

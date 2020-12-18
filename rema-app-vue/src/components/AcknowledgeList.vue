@@ -76,7 +76,7 @@ export default class AcknowledgeList extends Vue {
     { text: 'Bearbeiten', value: 'action', sortable: false },
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Status', value: 'Status' },
-    { text: 'Raum', value: 'Ressource' },
+    { text: 'Raum', value: 'Ressources' },
     { text: 'Von', value: 'From' },
     { text: 'Bis', value: 'To' },
     { text: 'Ansprechpartner', value: 'Contact' },
@@ -126,7 +126,7 @@ export default class AcknowledgeList extends Vue {
             (w: WebApi.ContactUser) => w.Id === v.ReferencePersonId
           ) || { Title: '' }
         ).Title,
-        Ressource: v.Ressources.map((v: Ressource) => v.Name).join(', '),
+        Ressources: v.Ressources.map((v: Ressource) => v.Name).join(', '),
         From: v.From,
         To: v.To,
         DateTime: v.LastModified

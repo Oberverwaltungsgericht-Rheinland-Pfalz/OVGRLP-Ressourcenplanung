@@ -1006,7 +1006,7 @@ namespace Rema.WebApi.Controllers
     private void MapChangedOrNewRessources(Allocation oldAllocation, AllocationViewModel allocationVM)
     {
       var newRessources = _context.Ressources.Where(r => allocationVM.RessourceIds.Contains(r.Id));
-      oldAllocation.Ressources.Clear();
+      oldAllocation.Ressources = new List<Ressource>();
       foreach (var ressource in newRessources)
         oldAllocation.Ressources.Add(ressource);
     }

@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Rema.Infrastructure\Rema.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ControllerLogic\" />
+  </ItemGroup>
+
 </Project>

@@ -24,7 +24,8 @@
                 <v-btn @click="showFilterModal=false" class="ma-2" right color="success" title="Filterkriterien anwenden">Ok</v-btn>
               </v-card-title>
               <v-card-text id="pad-bot-twenty">
-                <v-select v-model="titleFilter" :items="possibleTitles" attach chips label="Räume" multiple single-line></v-select>
+                <v-select v-model="titleFilter" :items="possibleTitles" item-text="Name" item-value="Id"
+                  attach chips label="Räume" multiple single-line></v-select>
               </v-card-text>
             </v-card>
           </v-dialog>
@@ -93,16 +94,17 @@
 </template>
 
 <script lang="ts">
+import moment from 'moment'
+import print from 'print-js'
+import { Names } from '../store/User/types'
+import Ressources from '@/views/Ressources.vue'
+import EditFormModal from './EditFormModal.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { State, Action, Getter, Mutation } from 'vuex-class'
-import { Names } from '../store/User/types'
+import { CalendarEventParsed, CalendarTimestamp } from 'vuetify'
 import { deleteAllocation } from '../services/AllocationApiService'
 import { Allocation, Gadget, Ressource, Supplier } from '../models'
 import { ShowToast, ConfirmData, CalendarElement } from '../models/interfaces'
-import EditFormModal from './EditFormModal.vue'
-import moment from 'moment'
-import print from 'print-js'
-import { CalendarEventParsed, CalendarTimestamp } from 'vuetify'
 
 @Component({
   components: { EditFormModal }
@@ -127,7 +129,7 @@ export default class Calendar extends Vue {
   private selectedEvent: CalendarElement = {} as CalendarElement
   private selectedElement: CalendarElement = {} as CalendarElement
   private selectedOpen: Boolean = false
-  private titleFilter: string[] = []
+  private titleFilter: Array<number> = []
   private showFilterModal: boolean = false
   private showWE: boolean = true
 
@@ -161,7 +163,9 @@ export default class Calendar extends Vue {
 
     return this.itemsFormated
       .filter((v: CalendarElement) => {
-        if (this.titleFilter.length) return this.titleFilter.includes(v.RessourceNames)
+        if (this.titleFilter.length) {
+          return this.titleFilter.some((rId: number) => v.RessourceIds.includes(rId))
+        }
         return true
       })
   }
@@ -172,14 +176,14 @@ export default class Calendar extends Vue {
     var formatedItems: Array<Allocation> = []
     if (roleLvl >= 10) {
       formatedItems = Allocation.query()
-        .with('Ressource')
-        .with('Gadget')
+        .with('Ressources')
+        .with('Gadgets')
         .get()
     } else {
       formatedItems = Allocation.query()
         .where((al: Allocation) => (al.Status === 1 || al.Status === 3) || al.CreatedById === myId || al.ReferencePersonId === myId)
-        .with('Ressource')
-        .with('Gadget')
+        .with('Ressources')
+        .with('Gadgets')
         .get()
     }
     let userIds2Load = formatedItems.map((e: Allocation) => e.ReferencePersonId)
@@ -195,21 +199,29 @@ export default class Calendar extends Vue {
     return user ? user.Title : id
   }
 
-  public get possibleTitles (): Array<string> {
-    const ressources: Array<Ressource> = []
+  public get possibleTitles (): Array<SelectedRessource> {
+    const resIds = new Set<number>()
+    const ressources: Array<SelectedRessource> = []
     Allocation.query()
       .with('Ressources')
-      .get().forEach((v:Allocation) => ressources.push(...v.Ressources))
-
-    return ressources.map((v:Ressource) => (v || { Name: '' }).Name)
+      .get().forEach((v:Allocation) => {
+        v.Ressources.forEach((r: Ressource) => {
+          if (!resIds.has(r.Id)) {
+            resIds.add(r.Id)
+            ressources.push({ Name: r.Name, Id: r.Id })
+          }
+        })
+      })
+    return ressources
   }
+
   public get title (): string {
     const { start, end } = this
     if (!start || !end) return moment().format('MMMM YYYY')
 
     const isoWeek = moment(start.date).format('W')
-    const startMonth = this.monthFormatter(start)
-    const endMonth = this.monthFormatter(end)
+    const startMonth = moment(start.date).format('MMMM') // start.month
+    const endMonth = moment(end.date).format('MMMM')
     const suffixMonth = startMonth === endMonth ? '' : endMonth
 
     const startYear = start.year
@@ -233,14 +245,6 @@ export default class Calendar extends Vue {
         return `${startDay}. ${startMonth} ${startYear}`
     }
     return ''
-  }
-
-  public get monthFormatter () {
-    // @ts-ignore
-    return this.$refs.calendar.getFormatter({
-      timeZone: 'UTC',
-      month: 'long'
-    })
   }
 
   public resetFilter (): void {
@@ -322,6 +326,8 @@ export default class Calendar extends Vue {
 function transfer2Calendar (v: Allocation): CalendarElement {
   let rVal: CalendarElement = {} as CalendarElement
   rVal.longDate = v.From.substr(0, 10) !== v.To.substr(0, 10)
+  rVal.RessourceIds = v.Ressources.map((r: Ressource) => r.Id)
+
   let ressourceNames = v.Ressources.map((v: Ressource) => v.Name).join(', ')
 
   if (v.IsAllDay) {
@@ -372,6 +378,10 @@ function transfer2Calendar (v: Allocation): CalendarElement {
 }
 function GetGroupName (id : number) : string {
   return (Supplier.find(id) as any || { Title: '' }).Title
+}
+interface SelectedRessource {
+  Name: string
+  Id: number
 }
 </script>
 

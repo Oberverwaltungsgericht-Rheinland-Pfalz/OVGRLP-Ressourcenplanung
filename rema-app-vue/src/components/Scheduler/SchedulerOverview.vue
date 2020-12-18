@@ -58,7 +58,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { Allocation, Ressource } from '../../models'
 import { ScheduledRessource } from '../../models/interfaces'
-import { State } from 'vuex-class'
 import h24Table from './h24Table.vue'
 import moment from 'moment'
 
