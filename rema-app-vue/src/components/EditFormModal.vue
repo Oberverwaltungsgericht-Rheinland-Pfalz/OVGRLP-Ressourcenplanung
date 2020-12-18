@@ -168,17 +168,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { ShortAllocationView, ShowToast } from '../models/interfaces'
-import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { Gadget, Ressource, Supplier, Allocation } from '../models'
-import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
-import { mixins } from 'vue-class-component'
-import AllocationFormService from '../services/AllocationFormServices'
-import { refreshAllocations, editAllocation } from '../services/AllocationApiService'
 import moment from 'moment'
+import { mixins } from 'vue-class-component'
 import TitleProposal from './TitleProposal.vue'
 import CollisionDetection from './CollisionDetection.vue'
+import { Gadget, Ressource, Supplier, Allocation } from '../models'
+import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { ShortAllocationView, ShowToast } from '../models/interfaces'
+import AllocationFormService from '../services/AllocationFormServices'
+import { refreshAllocations, editAllocation } from '../services/AllocationApiService'
+import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 
 @Component({
   components: { DropDownTimePicker, InputReferencePerson, TitleProposal, CollisionDetection }
@@ -189,9 +189,9 @@ export default class EditFormModal extends mixins(AllocationFormService) {
   @Prop(Boolean) private readonly! : boolean
 
   private menu1: boolean = false
-  private title: String = ''
+  private title: string = ''
   private Notes: string = ''
-  private ressourceId: number | any = null
+  private ressourceIds: Array<number> = []
   private fullday: boolean = false
   private selectedGadgets: number[] = []
   private multipleDates: string[] = []
@@ -205,7 +205,7 @@ export default class EditFormModal extends mixins(AllocationFormService) {
   private dateFromFocus: boolean = false
   private dateToFocus: boolean = false
   private dateOfSeries: string = ''
-  private eventAllocation: any = {}
+  private eventAllocation: Allocation = {} as Allocation
 
   public isRepeating: boolean = false
   public dialog: boolean = false
@@ -221,17 +221,17 @@ export default class EditFormModal extends mixins(AllocationFormService) {
   @Watch('dialog')
   public async watchDialog (newVal:boolean) {
     if (newVal) {
-      let all : any = Allocation.find(this.eventId)
+      let all : Allocation = Allocation.find(this.eventId) || {} as Allocation
       this.eventAllocation = all
 
       this.Id = all.Id
       this.title = all.Title
-      this.ressourceId = all.RessourceId
+      this.ressourceIds.push(...all.RessourceIds)
       this.isRepeating = !!all.ScheduleSeries
       this.ScheduleSeries = all.ScheduleSeries
       this.fullday = all.IsAllDay
       this.ReferencePersonId = all.ReferencePersonId
-      this.referencePerson.ActiveDirectoryID = all.ReferencePersonId
+      this.referencePerson.ActiveDirectoryID = `${all.ReferencePersonId}`
       this.dateOfSeries = all.From.substring(0, 10)
       this.dateFrom = all.From.substring(0, 10)
       this.timeFrom = all.From.substring(11, 16)
@@ -261,14 +261,9 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       from = this.dateFrom + 'T' + (this.fullday ? '00:00' : this.timeFrom)
       to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
     }
-    return { Id: this.Id, From: from, To: to, RessourceId: this.ressourceId, dates: null }
+    return { Id: this.Id, From: from, To: to, RessourceIds: this.ressourceIds, dates: null }
   }
-  private changeDateFrom (e:any) {
-    if (e.target.value) { this.dateFrom = e.target.value.substring(0, 10) }
-  }
-  private changeDateTo (e:any) {
-    if (e.target.value) { this.dateTo = e.target.value.substring(0, 10) }
-  }
+
   private getGadgets (groupId: number) {
     return Gadget.query()
       .where('SuppliedBy', groupId)
@@ -282,7 +277,7 @@ export default class EditFormModal extends mixins(AllocationFormService) {
   public get formInvalid () {
     let rValue = true
     if (!this.title) rValue = false
-    if (!this.ressourceId) rValue = false
+    if (!this.ressourceIds.length) rValue = false
     if (!this.dateFrom && !this.isRepeating) rValue = false
     if (!this.dateTo && !this.isRepeating) rValue = false
     if (!this.dateOfSeries && this.isRepeating) rValue = false
@@ -295,23 +290,23 @@ export default class EditFormModal extends mixins(AllocationFormService) {
   public async saveAllocation () {
     if (this.isFormInvalid()) return
 
-    let data = {} as any
+    let data = {} as WebApi.AllocationViewModel
     data.Id = this.eventId
 
     data.Title = this.title
-    data.RessourceId = this.ressourceId
+    data.RessourceIds.push(...this.ressourceIds)
     data.IsAllDay = this.fullday
 
-    if (this.referencePerson.ActiveDirectoryID) {
+    if (this.referencePerson.ActiveDirectoryID) { // reference person was set in the ui
       data.ReferencePersonId = this.referencePerson.ActiveDirectoryID
-    } else if (!this.referencePerson.ActiveDirectoryID && this.ReferencePersonId) {
+    } else if (!this.referencePerson.ActiveDirectoryID && this.ReferencePersonId) { // no reference person was set
       data.ReferencePersonId = ''
-    } else {
+    } /* else {
       data.ReferencePersonId = this.ReferencePersonId
-    }
+    } */ // should never happen
 
-    data.gadgetsIds = this.selectedGadgets
-    data.contactPhone = this.telNumber
+    data.GadgetsIds = this.selectedGadgets
+    data.ContactPhone = this.telNumber
     data.Notes = this.Notes
     data.HintsForSuppliers = this.GetHintsForSuppliers
 
@@ -319,11 +314,11 @@ export default class EditFormModal extends mixins(AllocationFormService) {
     else data.ScheduleSeries = ''
 
     if (this.isRepeating) {
-      data.from = this.dateOfSeries + 'T' + (this.fullday ? '00:00' : this.timeFrom)
-      data.to = this.dateOfSeries + 'T' + (this.fullday ? '23:59' : this.timeTo)
+      data.From = this.dateOfSeries + 'T' + (this.fullday ? '00:00' : this.timeFrom)
+      data.To = this.dateOfSeries + 'T' + (this.fullday ? '23:59' : this.timeTo)
     } else {
-      data.from = this.dateFrom + 'T' + (this.fullday ? '00:00' : this.timeFrom)
-      data.to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
+      data.From = this.dateFrom + 'T' + (this.fullday ? '00:00' : this.timeFrom)
+      data.To = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
     }
 
     this.loading = true

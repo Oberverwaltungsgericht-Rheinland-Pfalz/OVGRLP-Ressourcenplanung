@@ -22,7 +22,7 @@ export default new Router({
       name: 'Terminfinder',
       icon: 'blur_linear',
       authLevel: 0,
-      beforeEnter: (to: any, from: any, next: any) => requireAuth(0, to, from, next),
+      beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(0, to, from, next),
       component: () => import('@/views/Schedules.vue')
     } as any,
     {
@@ -37,7 +37,7 @@ export default new Router({
       name: 'Anfragenverwaltung',
       icon: 'playlist_add_check',
       authLevel: 10,
-      beforeEnter: (to: any, from: any, next: any) => requireAuth(10, to, from, next),
+      beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(10, to, from, next),
       component: () => import('@/views/Acknowledge.vue')
     } as any,
      {
@@ -45,7 +45,7 @@ export default new Router({
        name: 'Administration',
        icon: 'dvr',
        authLevel: 100,
-       beforeEnter: (to: any, from: any, next: any) => requireAuth(100, to, from, next),
+       beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(100, to, from, next),
        component: () => import('@/views/Ressources.vue')
      } as any,
     {
@@ -53,7 +53,7 @@ export default new Router({
       name: 'Raumübersicht',
       icon: 'art_track',
       authLevel: 1,
-      beforeEnter: (to: any, from: any, next: any) => requireAuth(1, to, from, next),
+      beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(1, to, from, next),
       component: () => import('@/components/RoomView.vue')
     } as any,
     {
@@ -61,7 +61,7 @@ export default new Router({
       name: 'Hilfsmittelübersicht',
       icon: 'library_add',
       authLevel: 1,
-      beforeEnter: (to :any, from: any, next: any) => requireAuth(1, to, from, next),
+      beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(1, to, from, next),
       component: () => import('@/components/GadgetView.vue')
     } as any
     /*
@@ -89,7 +89,7 @@ export default new Router({
   */ ]
 })
 
-function requireAuth (level: number, to: any, from: any, next: any) {
+function requireAuth (level: number, to: Function, from: Function, next: Function) {
   // @ts-ignore
   const role: number = store.state.user.role
   if (role >= level) {

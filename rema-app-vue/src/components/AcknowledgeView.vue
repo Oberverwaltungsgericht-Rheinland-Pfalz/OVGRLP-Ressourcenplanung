@@ -15,7 +15,7 @@
             <v-col cols="3">
               <strong>Raum:</strong>
             </v-col>
-            <v-col cols="3">{{ viewAllocation.RessourceTitle }}</v-col>
+            <v-col cols="3">{{ viewAllocation.RessourceTitles }}</v-col>
 
             <v-col cols="3">
               <strong>Von:</strong>
@@ -157,10 +157,6 @@ const namespace = 'user'
 export default class AcknowledgeView extends mixins(AllocationFormService) {
   @State('ContactUsers', { namespace })
   private ContactUsers!: WebApi.ContactUser[]
-  @Mutation(Fnn.m.addContactUser, { namespace })
-  private addContactUser: any
-  @Mutation(Fnn.m.reserveContactUser, { namespace })
-  private reserveContactUser: any
   @Prop(Boolean) private readonly value!: boolean
   @Prop(Object) private viewAllocation!: AllocationRequestView
   private moveEdit: boolean = false
@@ -189,19 +185,18 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
   }
 
   public contactUserName (id: number): string {
-    // acts as filter, because it causes errors as filter
     return (
       this.ContactUsers.find((w: WebApi.ContactUser) => w.Id === id) || { Title: '' }
     ).Title
   }
-  public async acknowledge () {
+  public async acknowledge (): Promise<void> {
     this.saveStatus({ ...this.viewAllocation, status: 1 })
   }
-  public reject () {
+  public reject (): void {
     // change appointment status to rejected
     this.saveStatus({ ...this.viewAllocation, status: 2 })
   }
-  public async move () {
+  public async move (): Promise<void> {
     this.moveEdit = !this.moveEdit
 
     if (this.moveEdit) {
@@ -222,7 +217,7 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
     this.saveStatus(changedAllocation)
   }
 
-  public async saveStatus (task: WebApi.AllocationRequestEdition) {
+  public async saveStatus (task: WebApi.AllocationRequestEdition): Promise<void> {
     let success = await editAllocationStatus(task)
     if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung erfolgreich', color: 'info' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Bearbeitung konnte nicht gespeichert werden', color: 'error' } as ShowToast)

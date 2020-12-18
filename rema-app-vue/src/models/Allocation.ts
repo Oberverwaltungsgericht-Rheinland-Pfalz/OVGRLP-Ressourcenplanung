@@ -1,5 +1,6 @@
 import { Model } from '@vuex-orm/core'
 import { Ressource, Gadget } from '.'
+import { User } from './User'
 
 export class Allocation extends Model {
   // This is the name used as module name of the Vuex Store.
@@ -7,7 +8,7 @@ export class Allocation extends Model {
   public static primaryKey = 'Id'
   // List of all fields (schema) of the post model. `this.attr` is used
   // for the generic field type. The argument is the default value.
-  public static fields (): any {
+  public static fields () {
     return {
       Id: this.attr(null),
       ScheduleSeries: this.attr(null),
@@ -23,13 +24,34 @@ export class Allocation extends Model {
       LastModified: this.attr(null),
       ApprovedById: this.attr(null),
       ApprovedAt: this.attr(null),
-      ReferencePerson: this.attr(''),
+      // ReferencePerson: this.hasOne(User, 'Id', 'ReferencePersonId'),  // die user werden nicht am Anfang geladen!
       ReferencePersonId: this.number(0),
-      RessourceId: this.attr(null),
-      Ressource: this.belongsTo(Ressource, 'RessourceId', 'Id'),
+      RessourceIds: this.attr(null),
+      Ressources: this.hasManyBy(Ressource, 'RessourceIds', 'Id'),
       GadgetsIds: this.attr(null),
       Gadgets: this.hasManyBy(Gadget, 'GadgetsIds', 'Id'),
       HintsForSuppliers: this.attr(null)
     }
   }
+
+  Id!: number
+  ScheduleSeries!: string
+  From!: string
+  To!: string
+  Title!: string
+  Notes!: string
+  ContactPhone!: string
+  IsAllDay!: boolean
+  Status!: number
+  CreatedById!: number
+  CreatedAt!: string
+  LastModified!: string
+  ApprovedById!: number
+  ApprovedAt!: string
+  ReferencePersonId!: number
+  RessourceIds!: Array<number>
+  Ressources!: Array<Ressource>
+  GadgetsIds!: Array<number>
+  Gadgets!: Array<Gadget>
+  HintsForSuppliers!: Array<WebApi.SimpleSupplierHint>
 }

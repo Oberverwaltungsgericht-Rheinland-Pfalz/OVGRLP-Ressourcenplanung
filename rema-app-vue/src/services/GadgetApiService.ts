@@ -10,7 +10,7 @@ const config = {
     'Content-Type': 'application/json'
   } }
 
-export async function submitGadget (newGadget: object): Promise<boolean> {
+export async function submitGadget (newGadget: WebApi.GadgetViewModel): Promise<boolean> {
   try {
     const response = await Gadget.api().post('gadgets', newGadget)
     if (response.response.status > 300 && response.response.status < 200) return false
@@ -20,7 +20,7 @@ export async function submitGadget (newGadget: object): Promise<boolean> {
   }
 }
 
-export async function editGadget (gadget: any) : Promise<boolean> {
+export async function editGadget (gadget: WebApi.GadgetViewModel) : Promise<boolean> {
   try {
     const response = await Gadget.api().put(`gadgets/${gadget.Id}`, gadget)
 

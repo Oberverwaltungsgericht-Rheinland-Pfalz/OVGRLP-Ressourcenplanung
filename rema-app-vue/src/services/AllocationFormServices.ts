@@ -46,16 +46,9 @@ export default class AllocationFormService extends Vue {
     if (this.dateFrom === this.dateTo) return this.timeFrom
     return '00:00'
   }
-  public setReferencePerson (e:WebApi.AdUserViewModel) {
+  public setReferencePerson (e: WebApi.AdUserViewModel) {
     this.referencePerson = e
     this.telNumber = this.referencePerson.Phone
-  }
-
-  public get Rooms () {
-    function compareNumbers (a: any, b: any) {
-      return (a.Name > b.Name) ? 1 : -1
-    }
-    return Ressource.all().sort(compareNumbers)
   }
 
   public isFormInvalid () {
@@ -72,12 +65,12 @@ export default class AllocationFormService extends Vue {
     else return moment().format('DD.MM.YYYY')
   }
 
-  public get GadgetGroups () {
+  public get GadgetGroups (): Array<Supplier> {
     return Supplier.all()
   }
   public get groupTexts () : string[] {
     if (!this.groupTextsInternal.length) {
-      this.GadgetGroups.forEach((g:any) => {
+      this.GadgetGroups.forEach((g: Supplier) => {
         this.groupTextsInternal[g.Id] = ''
       })
     }
@@ -86,6 +79,7 @@ export default class AllocationFormService extends Vue {
   public set groupTexts (input: string[]) {
     this.groupTextsInternal.splice(0, Infinity, ...input)
   }
+
   public get GetHintsForSuppliers (): WebApi.SimpleSupplierHint[] {
     let rVal: WebApi.SimpleSupplierHint[] = []
     for (let key in this.groupTexts) {

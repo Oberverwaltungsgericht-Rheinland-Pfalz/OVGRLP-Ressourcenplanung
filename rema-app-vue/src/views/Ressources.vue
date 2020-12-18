@@ -22,7 +22,7 @@ import SupplierManagement from '@/components/RessourceManagement/SupplierManagem
   components: { RessourceManagement, GadgetManagement, SupplierManagement }
 })
 export default class Ressources extends Vue {
-  public tab: any = null
+  public tab: number = 0
 }
 </script>
 

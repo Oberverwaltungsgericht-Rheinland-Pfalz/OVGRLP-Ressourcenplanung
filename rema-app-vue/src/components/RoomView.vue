@@ -45,7 +45,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Ressource } from '../models'
 
-@Component({})
+@Component
 export default class Roomview extends Vue {
   private dialog: number = 0;
   private editId: number = 0;
@@ -61,7 +61,7 @@ export default class Roomview extends Vue {
     { text: 'Details', value: 'SpecialsDescription' }
   ];
 
-  private clicked (element: any) {
+  private clicked (element: Ressource): void {
     this.dialog = 1
     this.editId = element.Id
     this.editTitle = element.Name
@@ -69,7 +69,7 @@ export default class Roomview extends Vue {
     this.editDescription = element.FunctionDescription
     this.editDetails = element.SpecialsDescription
   }
-  private get items () {
+  private get items (): Array<Ressource> {
     return Ressource.all()
   }
 }

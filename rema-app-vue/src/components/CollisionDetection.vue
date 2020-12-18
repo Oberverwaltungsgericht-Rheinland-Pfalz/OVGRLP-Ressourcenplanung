@@ -27,11 +27,11 @@ export default class CollisionDetection extends Vue {
     let end = Date.parse(this.viewAllocation.To)
     const id = this.viewAllocation.Id
 
-    const rValues = Allocation.query()
+    const rValues: Array<Allocation> = Allocation.query()
       .withAll()
       .where('Status', (s: number) => s !== 2)
-      .where('RessourceId', this.viewAllocation.RessourceId)
-      .where((a: any) => {
+      .where('RessourceId', this.viewAllocation.RessourceIds)
+      .where((a: Allocation) => {
         if (a.Id === id) return false
         let rVal = false
         const aTo = Date.parse(a.To)
@@ -57,7 +57,7 @@ export default class CollisionDetection extends Vue {
       }).get()
     return rValues
   }
-  public get hasCollisions () {
+  public get hasCollisions (): boolean {
     return this.possibleCollisions.length > 0
   }
 }

@@ -17,8 +17,8 @@ import AllocationForm from './AllocationForm.vue'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { InitAllocation } from '../../models/interfaces/index'
 
-const emptyInit = (): InitAllocation => ({ RessourceId: 0, From: '', Day: '' })
-const copyInit = (a: InitAllocation, b: InitAllocation) => { a.RessourceId = b.RessourceId; a.From = b.From; a.Day = b.Day }
+const emptyInit = (): InitAllocation => ({ RessourceIds: [], From: '', Day: '' })
+const copyInit = (a: InitAllocation, b: InitAllocation) => { a.RessourceIds.push(...b.RessourceIds); a.From = b.From; a.Day = b.Day }
 
 @Component({
   components: { AllocationForm }

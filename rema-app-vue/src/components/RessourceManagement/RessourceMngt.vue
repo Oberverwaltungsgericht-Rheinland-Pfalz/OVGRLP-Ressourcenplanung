@@ -94,10 +94,10 @@ export default class RessourceManagement extends Vue {
   ];
   private editedIndex: number = -1;
 
-  private get typeItems () {
+  private get typeItems (): Array<string> {
     return Ressource.query()
       .all()
-      .map((e: any) => e.Type)
+      .map((e: Ressource) => e.Type)
   }
   private get ModalTitle () {
     if (this.dialog === 1) return 'Neue Ressource'
@@ -138,7 +138,7 @@ export default class RessourceManagement extends Vue {
     return this.editedIndex !== -1
   }
 
-  private get items () {
+  private get items (): Array<Ressource> {
     return Ressource.all()
   }
 
@@ -170,22 +170,6 @@ export default class RessourceManagement extends Vue {
         timeout: 1e4
       } as ShowToast)
     }
-  }
-
-  private saveNew (event: WebApi.RessourceViewModel) {
-    // Save to server here
-    //  this.items.push({ ...this.newItem })
-    this.showNewForm = false
-  }
-
-  private save (event: any) {
-    if (this.editDialog) {
-      // Update to server here
-    } else {
-      // Save to server here
-      //    this.items.push(this.editedItem)
-    }
-    this.dialog = 0
   }
 }
 

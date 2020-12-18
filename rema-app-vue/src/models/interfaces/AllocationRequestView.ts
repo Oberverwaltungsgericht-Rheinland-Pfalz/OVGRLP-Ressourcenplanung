@@ -10,9 +10,9 @@ export interface AllocationRequestView {
   ApprovedAt: string
   ReferencePerson: string
   ReferencePersonId: number
-  RessourceId: string
+  RessourceIds: Array<number>
   Title: string
-  RessourceTitle: string
+  RessourceTitles: string
   ContactTel: string
   Description: string
   Notices: string
@@ -22,11 +22,11 @@ export interface ShortAllocationView {
   Id: number
   From: string
   To: string
-  RessourceId: string
+  RessourceIds: Array<number>
   dates: string[] | null
 }
 export interface InitAllocation {
   From: string
-  RessourceId: number
+  RessourceIds: Array<number>
   Day: string
 }

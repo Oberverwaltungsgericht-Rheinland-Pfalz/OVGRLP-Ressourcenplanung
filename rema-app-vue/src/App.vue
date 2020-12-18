@@ -149,9 +149,8 @@ export default class App extends Vue {
     return this.$route.name
   }
 
-  protected routes: any = []
   @Action(Fnn.a.loadUser, { namespace: 'user' })
-  private loadUser: any
+  private loadUser!: Function
   @Getter('getUserData', { namespace: 'user' })
   private userData!: UserData
 

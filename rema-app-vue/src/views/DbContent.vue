@@ -68,14 +68,14 @@ export default class DbContentView extends Vue {
     // @ts-ignore
     Gadgets.$create({ data })
   }
-  private updateGadget (item: any) {
+  private updateGadget (item: Gadget) {
     // @ts-ignore
     Gadgets.$update({
       params: { Id: item.Id },
       data: { ...item, Title: item.Title }
     })
   }
-  private deleteGadget (item: any) {
+  private deleteGadget (item: Gadget) {
     // @ts-ignore
     Gadgets.$delete({
       params: { Id: item.Id }

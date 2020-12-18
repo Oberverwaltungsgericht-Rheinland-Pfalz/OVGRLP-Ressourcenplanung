@@ -93,24 +93,19 @@ export default class SupplierManagement extends Vue {
     if (this.dialog === 1) return 'Neue Gruppe'
     if (this.dialog === 2) return 'Bearbeite Gruppe'
   }
-  private get RessourceNames () {
-    return Ressource.all()
-      .filter((v: any) => !!v.Title)
-      .map((v: any) => v.Title)
-  }
-  private get items () {
+  private get items (): Array<Supplier> {
     return Supplier.all()
   }
   private get invalidForm (): boolean {
     return !this.editTitle || !this.editEmail
   }
-  private closeModal () {
+  private closeModal (): void {
     this.dialog = 0
     this.editId = 0
     this.editTitle = ''
     this.editEmail = ''
   }
-  private editItem (item: WebApi.SupplierGroup) {
+  private editItem (item: WebApi.SupplierGroup): void {
     this.editId = item.Id
     this.editTitle = item.Title
     this.editEmail = item.GroupEmail

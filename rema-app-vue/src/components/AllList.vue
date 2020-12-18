@@ -82,7 +82,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Allocation, Gadget, Supplier } from '../models'
+import { Allocation, Gadget, Ressource, Supplier } from '../models'
 import { SelectableGroup, ShowToast, ConfirmData } from '../models/interfaces'
 import { deleteAllocation } from '../services/AllocationApiService'
 import EditFormModal from './EditFormModal.vue'
@@ -111,24 +111,32 @@ export default class AllList extends Vue {
   ];
 
   private today: string = moment().format('YYYY-MM-DD')
-  public showGadgets (item: any): string[] {
-    let selectedGroupId = this.selectedGroup?.Id || 0
-    let rVal: string[] = []
-    item.Gadgets.filter((e: any) => e.SuppliedBy === selectedGroupId).forEach((e: any) => rVal.push(e.Title))
-    item.HintsForSuppliers.filter((e:any) => e.GroupId === selectedGroupId).forEach((e: any) => rVal.push(e.Message))
+
+  public showGadgets (item: VisibleAllocation): string[] {
+    if (this.selectedGroup?.Id === null) return []
+
+    const selectedGroupId = this.selectedGroup?.Id || 0
+    const rVal: string[] = []
+    item.Gadgets.filter((e: Gadget) => e.SuppliedBy.Id === selectedGroupId)
+      .forEach((e: Gadget) => rVal.push(e.Title))
+
+    item.HintsForSuppliers.filter((e: WebApi.SimpleSupplierHint) => e.GroupId === selectedGroupId)
+      .forEach((e: WebApi.SimpleSupplierHint) => rVal.push(e.Message))
+
     return rVal
   }
-  public get hasItems () {
-    const allocations = Allocation.query()
-      .get()
-    return allocations.length
-  }
-  public get Requests (): VisibleAllocation[] {
-    let myId = this.$store.state.user.id
 
-    const allocations = Allocation.query().withAll()
-      .where((al: any) => (!this.hideNotMine && (al.Status === 1 || al.Status === 3)) || al.CreatedById === myId || al.ReferencePersonId === myId)
-      .where('To', (value: any) => (!this.hideOld || Date.parse(value) > Date.now()))
+  public get hasItems (): boolean {
+    const allocations = Allocation.query().get()
+    return allocations.length > 0
+  }
+
+  public get Requests (): VisibleAllocation[] {
+    const myId = this.$store.state.user.id
+
+    const allocations: Array<Allocation> = Allocation.query().withAll()
+      .where((al: Allocation) => (!this.hideNotMine && (al.Status === 1 || al.Status === 3)) || al.CreatedById === myId || al.ReferencePersonId === myId)
+      .where('To', (value: string) => (!this.hideOld || Date.parse(value) > Date.now()))
       .where('GadgetsIds', (values: number[]) => (!this.selectedGroup || values.length > 0))
       .where('GadgetsIds', (values: number[]) => !this.selectedGroup || (this.selectedGroup && this.selectedGroup.gadgetIds.some((e: number) => values.includes(e))))
       .orderBy('From')
@@ -136,45 +144,54 @@ export default class AllList extends Vue {
 
     // Search only if a supplier-group is selected for filtering
     if (this.selectedGroup) {
-      let existingIds = allocations.map((e: any) => e.Id)
-      let allocations2 = Allocation.query().withAll()
-        .where((al: any) => al.HintsForSuppliers.length > 0 && !existingIds.includes(al.Id) && ((!this.hideNotMine && (al.Status === 1 || al.Status === 3)) || al.CreatedById === myId || al.ReferencePersonId === myId))
-        .where('To', (value: any) => (!this.hideOld || Date.parse(value) > Date.now()))
+      let existingIds: Array<number> = allocations.map((e: Allocation) => e.Id)
+      let allocations2: Array<Allocation> = Allocation.query().withAll()
+        .where((al: Allocation) => al.HintsForSuppliers.length > 0 && !existingIds.includes(al.Id) && ((!this.hideNotMine && (al.Status === 1 || al.Status === 3)) || al.CreatedById === myId || al.ReferencePersonId === myId))
+        .where('To', (value: string) => (!this.hideOld || Date.parse(value) > Date.now()))
         .where('HintsForSuppliers', (values: WebApi.SimpleSupplierHint[]) => values.some((e: WebApi.SimpleSupplierHint) => e.GroupId === this.selectedGroup?.Id))
         .get()
       allocations.push(...allocations2)
-      allocations.sort((a: any, b: any) => Number(a.From > b.From) - 1)
+      allocations.sort((a: Allocation, b: Allocation) => Number(a.From > b.From) - 1)
     }
 
     if (!allocations.length) return []
 
-    return allocations.map((v: any) => ({
-      ...v,
+    let returnVisibleAllocations: VisibleAllocation[] = allocations.map((v: Allocation) => ({
+      Id: v.Id,
+      Title: v.Title,
+      From: v.From,
+      LastModified: v.LastModified,
       // @ts-ignore
       Status: this.$options.filters.status2string(v.Status),
-      Ressource: (v.Ressource || { Name: '' }).Name
+      RessourceNames: v.Ressources.map((r: Ressource) => r.Name).join(', '),
+      Gadgets: v.Gadgets,
+      HintsForSuppliers: v.HintsForSuppliers
     }))
+    return returnVisibleAllocations
   }
-  public get GroupItems (): object[] {
-    var groups = new Map()
 
-    Allocation.query().withAll().get().forEach((e:any) => e.GadgetsIds.forEach((f: number) => {
-      let groupId = (Gadget.find(f) as any).SuppliedBy
+  public get GroupItems (): SelectableGroup[] {
+    var groups = new Map<number, SelectableGroup>()
+
+    Allocation.query().withAll().get().forEach((e: Allocation) => e.GadgetsIds.forEach((f: number) => {
+      let groupId = (Gadget.find(f) as any).SuppliedBy as number
       let group = Supplier.find(groupId) as any
+
       if (!groups.has(groupId)) {
         let filterObj: SelectableGroup = { Id: group.Id, Title: (group.Title || ''), gadgetIds: [f] }
         groups.set(groupId, filterObj)
       } else {
         let filterObj = groups.get(groupId)
-        filterObj.gadgetIds.push(f)
+        filterObj?.gadgetIds.push(f)
       }
     }))
-    let rawValues = [...groups.values()]
-    let returnValues = rawValues.map((e: SelectableGroup) => ({ Id: e.Id, Title: e.Title, gadgetIds: [...new Set(e.gadgetIds)] }))
+    let rawValues: Array<SelectableGroup> = [...groups.values()]
+    let returnValues: Array<SelectableGroup> = rawValues.map((e: SelectableGroup) => (
+      { Id: e.Id, Title: e.Title, gadgetIds: [...new Set(e.gadgetIds)] }))
     return returnValues
   }
 
-  private confirmDelete (item: VisibleAllocation) {
+  private confirmDelete (item: VisibleAllocation): void {
     let data: ConfirmData = { title: 'Löschen bestätigen',
       content: `Möchten sie diese Buchung ${item.Title} wirklich löschen?`,
       callback: this.deleteItem,
@@ -182,23 +199,23 @@ export default class AllList extends Vue {
     }
     this.$root.$emit('user-confirm', data)
   }
-  private async deleteItem (id: number) {
+  private async deleteItem (id: number): Promise<void> {
     let success = await deleteAllocation(id)
 
     if (success) this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)
   }
-  private async printItem (item: VisibleAllocation) {
+  private async printItem (item: VisibleAllocation): Promise<void> {
     print('api/Allocations/print/' + item.Id)
   }
 
-  public editItem (id: number) {
+  public editItem (id: number): void {
     this.selectedOpen = -1
     this.$nextTick(() => {
       this.selectedOpen = id
     })
   }
-  private rowClicked (id: number) {
+  private rowClicked (id: number): void {
     this.displayView = false
     this.displayId = id
     this.$nextTick(() => {
@@ -208,13 +225,14 @@ export default class AllList extends Vue {
 }
 
 interface VisibleAllocation {
-  Id: number;
-  Title: string;
-  Status: string;
-  Ressource: string;
-  From: string;
-  PurposeId: number;
-  LastModified: string;
+  Id: number
+  Title: string
+  Status: string
+  RessourceNames: string
+  From: string
+  LastModified: string
+  Gadgets: Array<Gadget>
+  HintsForSuppliers: Array<WebApi.SimpleSupplierHint>
 }
 </script>
 

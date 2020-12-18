@@ -18,7 +18,7 @@ export async function editAllocationStatus (editedRequest: WebApi.AllocationRequ
   }
 }
 
-export async function submitAllocations (newAllocations: object): Promise<boolean> {
+export async function submitAllocations (newAllocations: WebApi.MultipleAllocationsViewModel): Promise<boolean> {
   try {
     const response = await fetch(`/api/Allocations/PostAllocations`, {
       method: 'POST',
@@ -36,7 +36,7 @@ export async function submitAllocations (newAllocations: object): Promise<boolea
   }
 }
 
-export async function submitAllocation (newAllocation: object): Promise<boolean> {
+export async function submitAllocation (newAllocation: WebApi.AllocationViewModel): Promise<boolean> {
   try {
     let response = await Allocation.api().post('allocations', newAllocation)
     if (response.response.status > 300 && response.response.status < 200) return false
@@ -71,7 +71,7 @@ export async function deleteAllocation (id: number) : Promise<boolean> {
   }
 }
 
-export async function editAllocation (allocation: any) : Promise<boolean> {
+export async function editAllocation (allocation: WebApi.AllocationViewModel) : Promise<boolean> {
   try {
     const response = await Allocation.api().put(`allocations/edit/${allocation.Id}`, allocation)
 

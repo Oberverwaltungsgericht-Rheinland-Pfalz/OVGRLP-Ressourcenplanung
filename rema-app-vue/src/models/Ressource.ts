@@ -1,4 +1,4 @@
-import { Model } from '@vuex-orm/core'
+import { Attr, Attribute, Fields, HasMany, Model } from '@vuex-orm/core'
 import { Allocation } from '.'
 
 export class Ressource extends Model {
@@ -14,8 +14,15 @@ export class Ressource extends Model {
       Name: this.attr(''),
       Type: this.attr('Raum'),
       FunctionDescription: this.attr(''),
-      SpecialsDescription: this.attr(''),
-      allocations: this.hasMany(Allocation, 'Ressource_id')
+      SpecialsDescription: this.attr('')
+      // allocations: this.hasMany(Allocation, 'Ressource_id') // überflüssig to delete
     }
   }
+
+  Id!: number
+  Name!: string
+  Type!: string
+  FunctionDescription!: string
+  SpecialsDescription!: string
+  allocations!: []
 }
