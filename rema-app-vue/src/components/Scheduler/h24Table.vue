@@ -46,12 +46,12 @@ export default class h24Table extends Vue {
       (this.$store.state.user.isRequestable || this.permissionToEdit)
   }
 
-  private get ressources ():Array<object> {
-    let myId = this.$store.state.user.id
-    let rArray = []
-    let start = moment(this.Day).valueOf()
-    let end = moment(this.Day).add(1, 'day').valueOf()
-    // [{id, name, done24:[]}]
+  private get ressources (): Array<ScheduledRessource> {
+    const myId = this.$store.state.user.id
+    const rArray: Array<ScheduledRessource> = []
+    const start = moment(this.Day).valueOf()
+    const end = moment(this.Day).add(1, 'day').valueOf()
+
     const allocations: Array<Allocation> = Allocation.query().withAll()
       .where((al: Allocation) => (al.Status === 1 || al.Status === 3) || al.CreatedById === myId || al.ReferencePersonId === myId)
       .where((al: Allocation) => {
@@ -90,6 +90,7 @@ export default class h24Table extends Vue {
       }
       rArray.push(newObj)
     }
+
     if (!this.HideEmptyRessources) this.addEmptyRessources(rArray)
     if (this.NameFilter && this.NameFilter.length) this.applyNameFilter(rArray)
     rArray.sort((a: ScheduledRessource, b: ScheduledRessource) => Number(a.Name > b.Name) - 1)

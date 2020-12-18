@@ -17,12 +17,12 @@
           </v-col>
           <v-col>
             <v-select
-              v-model="ressourceId"
+              v-model="ressourceIds"
               :items="Rooms"
-              :error="!ressourceId && checkForm"
+              :error="!ressourceIds && checkForm"
               item-text="Name"
               item-value="Id"
-              clearable
+              clearable multiple
               placeholder="Bitte wählen Sie einen Raum aus."
               label="Raum"
               :menu-props="{ offsetY: true }"
@@ -294,7 +294,7 @@ export default class EditFormModal extends mixins(AllocationFormService) {
     data.Id = this.eventId
 
     data.Title = this.title
-    data.RessourceIds.push(...this.ressourceIds)
+    data.RessourceIds = [...this.ressourceIds]
     data.IsAllDay = this.fullday
 
     if (this.referencePerson.ActiveDirectoryID) { // reference person was set in the ui

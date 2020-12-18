@@ -15,12 +15,12 @@
           </v-col>
           <v-col>
             <v-select
-              v-model="ressourceId"
+              v-model="ressourceIds"
               :items="Rooms"
               item-text="Name"
               item-value="Id"
-              clearable
-              :error="!ressourceId && checkForm"
+              clearable multiple
+              :error="!ressourceIds && checkForm"
               placeholder="Bitte wählen Sie einen Raum aus."
               label="Raum *"
               :menu-props="{ offsetY: true }"
@@ -184,17 +184,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch, Mixins } from 'vue-property-decorator'
-import { Gadget, Ressource, Supplier, Allocation } from '../../models'
-import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { InitAllocation, ShortAllocationView, ShowToast } from '../../models/interfaces'
-import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
-import AllocationFormService from '../../services/AllocationFormServices'
 import moment from 'moment'
-import { submitAllocation, submitAllocations, refreshAllocations } from '../../services/AllocationApiService'
 import TitleProposal from '../TitleProposal.vue'
 import CollisionDetection from '../CollisionDetection.vue'
 import { State, Action, Getter, Mutation } from 'vuex-class'
+import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
+import { Gadget, Ressource, Supplier, Allocation } from '../../models'
+import AllocationFormService from '../../services/AllocationFormServices'
+import { Component, Prop, Vue, Watch, Mixins } from 'vue-property-decorator'
+import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
+import { InitAllocation, ShortAllocationView, ShowToast } from '../../models/interfaces'
+import { submitAllocation, submitAllocations, refreshAllocations } from '../../services/AllocationApiService'
 
 @Component({
   components: {
@@ -221,7 +221,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     }
   }
 
-  private async sendAllocation (status: string) {
+  private async sendAllocation (status: string): Promise<void> {
     if (this.isFormInvalid()) return
     this.saveAllocation(status)
     this.close()
@@ -241,12 +241,12 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     return { Id: 0, From: from, To: to, RessourceIds: this.ressourceIds, dates }
   }
 
-  private async saveAllocation (status: string, date?: string) {
+  private async saveAllocation (status: string, date?: string): Promise<void> {
     let newAllocation: WebApi.MultipleAllocationsViewModel = {} as WebApi.MultipleAllocationsViewModel
 
     let newAllocationData: Partial<WebApi.MultipleAllocationsViewModel> = {
       // nAC.Status = status as unknown as WebApi.MeetingStatus
-      Status: WebApi.MeetingStatus[status as WebApi.MeetingStatus],
+      Status: status as WebApi.MeetingStatus, // WebApi.MeetingStatus[status as WebApi.MeetingStatus],
       From: `${this.dateFrom}T${this.timeFrom}`,
       To: `${this.dateTo}T${this.timeTo}`,
       Title: this.title,
@@ -288,7 +288,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     this.clearAll()
     this.$emit('close')
   }
-  public get formInvalid () {
+  public get formInvalid (): boolean {
     let rValue = true
     if (!this.title) rValue = false
     if (!this.ressourceIds.length) rValue = false
@@ -299,18 +299,18 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     return !rValue
   }
 
-  private getGadgets (groupId: number) {
+  private getGadgets (groupId: number): Array<Gadget> {
     return Gadget.query()
       .where('SuppliedBy', groupId)
       .get()
   }
 
-  private removeDate (item: string) {
+  private removeDate (item: string): void {
     const idx = this.multipleDates.findIndex(v => v === item)
     this.multipleDates.splice(idx, 1)
   }
 
-  private clearAll () {
+  private clearAll (): void {
     this.checkForm = false
     this.title = ''
     this.notes = ''

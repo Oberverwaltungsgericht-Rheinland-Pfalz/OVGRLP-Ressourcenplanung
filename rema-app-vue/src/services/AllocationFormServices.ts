@@ -51,12 +51,20 @@ export default class AllocationFormService extends Vue {
     this.telNumber = this.referencePerson.Phone
   }
 
-  public isFormInvalid () {
+  public get Rooms (): Array<Ressource> {
+    function compareNumbers (a: Ressource, b: Ressource) {
+      return (a.Name > b.Name) ? 1 : -1
+    }
+    return Ressource.all().sort(compareNumbers)
+  }
+
+  public isFormInvalid (): boolean {
     this.checkForm = true
     if (this.formInvalid) {
       this.$root.$emit('notify-user', { text: 'Bitte füllen sie alle Pflichtfelder richtig aus', color: 'warning', center: true } as ShowToast)
       return true
     }
+    return false
   }
 
   public dateFormatted (dateValue: string): string {

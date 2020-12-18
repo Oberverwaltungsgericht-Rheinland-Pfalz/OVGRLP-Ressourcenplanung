@@ -63,7 +63,7 @@
               {{gadget}}</v-chip>
           </td>
           <td class="text-start">{{props.item.Status}}</td>
-          <td class="text-start">{{props.item.Ressource}}</td>
+          <td class="text-start">{{props.item.RessourceNames}}</td>
           <td class="text-start">{{props.item.From | toLocal}}</td>
           <td class="text-start">{{props.item.To | toLocal}}</td>
           <td class="text-start">{{props.item.LastModified | toLocal}}</td>
@@ -104,7 +104,7 @@ export default class AllList extends Vue {
     { text: 'Bearbeiten', value: 'action', sortable: false },
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Status', value: 'Status' },
-    { text: 'Raum', value: 'Ressource' },
+    { text: 'Raum', value: 'RessourceNames' },
     { text: 'Von', value: 'From' },
     { text: 'Bis', value: 'To' },
     { text: 'Zuletzt geändert', value: 'LastModified' }
@@ -117,7 +117,8 @@ export default class AllList extends Vue {
 
     const selectedGroupId = this.selectedGroup?.Id || 0
     const rVal: string[] = []
-    item.Gadgets.filter((e: Gadget) => e.SuppliedBy.Id === selectedGroupId)
+
+    item.Gadgets.filter((e: Partial<Gadget>) => (e.SuppliedBy as unknown as number) === selectedGroupId)
       .forEach((e: Gadget) => rVal.push(e.Title))
 
     item.HintsForSuppliers.filter((e: WebApi.SimpleSupplierHint) => e.GroupId === selectedGroupId)
@@ -237,9 +238,8 @@ interface VisibleAllocation {
 </script>
 
 <style scoped lang="stylus">
-.appointment-open-list:nth-of-type(2n) {
-  background-color: lightgrey;
-}
+.appointment-open-list:nth-of-type(2n)
+  background-color lightgrey
 
 .blue-icon i
   color #82b1ff !important
