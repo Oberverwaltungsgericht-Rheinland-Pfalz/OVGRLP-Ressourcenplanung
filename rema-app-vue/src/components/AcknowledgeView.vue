@@ -114,7 +114,7 @@
             </v-col>
           </v-row>
         </v-container>
-        <collision-detection :viewAllocation="viewAllocation"/>
+        <collision-detection :viewAllocation="RessourceChecker"/>
       </v-card-text>
       <v-card-actions>
         <div class="flex-grow-1"></div>
@@ -147,15 +147,14 @@ import { mixins } from 'vue-class-component'
 import { Names as Fnn } from '../store/User/types'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import AllocationFormService from '@/services/AllocationFormServices'
-import { AllocationRequest, AllocationRequestView, ShowToast } from '../models/interfaces'
+import { AllocationRequest, AllocationRequestView, ShortAllocationView, ShowToast } from '../models/interfaces'
 import { Allocation } from '../models'
 import { editAllocationStatus, refreshAllocations } from '../services/AllocationApiService'
 import CollisionDetection from './CollisionDetection.vue'
-const namespace = 'user'
 
 @Component({ components: { DropDownTimePicker, CollisionDetection } })
 export default class AcknowledgeView extends mixins(AllocationFormService) {
-  @State('ContactUsers', { namespace })
+  @State('ContactUsers', { namespace: 'user' })
   private ContactUsers!: WebApi.ContactUser[]
   @Prop(Boolean) private readonly value!: boolean
   @Prop(Object) private viewAllocation!: AllocationRequestView
@@ -228,6 +227,19 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
     }) */
     await refreshAllocations()
     this.$emit('input', false)
+  }
+
+  public get RessourceChecker () : ShortAllocationView {
+    let from, to
+    if (this.moveEdit) {
+      from = this.editFrom + 'T' + (this.fullday ? '00:00' : this.editFromTime)
+      to = this.editTo + 'T' + (this.fullday ? '23:59' : this.editToTime)
+    } else {
+      from = this.viewAllocation.From
+      to = this.viewAllocation.To
+    }
+
+    return { Id: this.viewAllocation.Id, From: from, To: to, RessourceIds: this.viewAllocation.RessourceIds, dates: null }
   }
 }
 </script>
