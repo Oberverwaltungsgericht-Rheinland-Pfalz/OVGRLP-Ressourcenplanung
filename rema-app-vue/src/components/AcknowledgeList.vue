@@ -6,7 +6,6 @@
       :headers="headers"
       :items="Requests"
       :search="search"
-      hide-default-footer
       sort-by="calories"
       class="elevation-1"
     >
@@ -67,7 +66,7 @@ export default class AcknowledgeList extends Vue {
   private loadUsers!: Function
 
   private dialog: boolean = false
-  private viewAllocation: AllocationRequestView = {} as AllocationRequestView
+  private viewAllocation: Allocation = {} as Allocation
   private hideOld: boolean = true
   private hideDone: boolean = true
 
