@@ -16,55 +16,61 @@
 
 <script lang="ts">
 import { Allocation, Ressource } from '../models'
-import { Component, Prop, Vue, Mixins } from 'vue-property-decorator'
+import { Component, Prop, Vue, Mixins, Watch } from 'vue-property-decorator'
 import { ShortAllocationView } from '../models/interfaces'
 
 @Component
 export default class CollisionDetection extends Vue {
   @Prop(Object) private viewAllocation!: ShortAllocationView
+  private possibleCollisions: Allocation[] = [] as Array<Allocation>
 
-  public get possibleCollisions (): Allocation[] {
-    let start = Date.parse(this.viewAllocation.From)
-    let end = Date.parse(this.viewAllocation.To)
-    const id = this.viewAllocation.Id
-
+  @Watch('viewAllocation', { deep: true })
+  onviewAllocationChanged (viewAllocation: ShortAllocationView) {
+    let start = Date.parse(viewAllocation.From)
+    let end = Date.parse(viewAllocation.To)
+    const id = viewAllocation.Id
     const rValues: Array<Allocation> = Allocation.query()
       .withAll()
       .where('Status', (s: number) => s !== 2)
       .where('RessourceIds', (a : Array<number>) =>
-        this.viewAllocation.RessourceIds.some((rId: number) => a.includes(rId))
+        viewAllocation.RessourceIds.some((rId: number) => a.includes(rId))
       )
       .where((a: Allocation) => {
         if (a.Id === id) return false
+
+        // console.log((this.viewAllocation.dates == null))
         let rVal = false
         const aTo = Date.parse(a.To)
         const aFrom = Date.parse(a.From)
-        if (this.viewAllocation.dates == null) {
+        if (viewAllocation.dates == null) {
           let hitBegin = (aTo >= start && aTo <= end)
           let hitEnd = (aFrom >= start && aFrom <= end)
           let hitBetween = (aFrom <= start && aTo >= end)
           rVal = hitBegin || hitEnd || hitBetween
         } else {
           // uhrzeiten von to u from, datums von dates
-          rVal = this.viewAllocation.dates.filter(b => {
-            start = Date.parse(b + this.viewAllocation.From)
-            end = Date.parse(b + this.viewAllocation.To)
+          rVal = viewAllocation.dates.filter(b => {
+            start = Date.parse(b + viewAllocation.From)
+            end = Date.parse(b + viewAllocation.To)
             let hitBegin = (aTo >= start && aTo <= end)
             let hitEnd = (aFrom >= start && aFrom <= end)
             let hitBetween = (aFrom <= start && aTo >= end)
             return hitBegin || hitEnd || hitBetween
           }).length > 0
         }
-
         return rVal
       }).get()
-    return rValues
+
+    this.possibleCollisions.splice(0, 9e9, ...rValues)
   }
   public getRessourceNames (r: Ressource[]) : string {
     return r.map((r: Ressource) => r.Name).join(', ')
   }
   public get hasCollisions (): boolean {
     return this.possibleCollisions.length > 0
+  }
+  private mounted () {
+    this.onviewAllocationChanged(this.viewAllocation)
   }
 }
 </script>
