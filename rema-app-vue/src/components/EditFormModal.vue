@@ -191,7 +191,6 @@ export default class EditFormModal extends mixins(AllocationFormService) {
   private menu1: boolean = false
   private title: string = ''
   private Notes: string = ''
-  private ressourceIds: Array<number> = []
   private fullday: boolean = false
   private selectedGadgets: number[] = []
   private multipleDates: string[] = []

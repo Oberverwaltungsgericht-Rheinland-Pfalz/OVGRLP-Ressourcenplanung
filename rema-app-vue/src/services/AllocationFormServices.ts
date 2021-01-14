@@ -8,6 +8,7 @@ import moment from 'moment'
 export default class AllocationFormService extends Vue {
   public referencePerson: WebApi.AdUserViewModel = { ActiveDirectoryID: '', Name: '', Email: '', Phone: '' }
   public telNumber: string = ''
+  public ressourceIds: Array<number> = []
   public groupTextsInternal: string[] = []
   public refreshInputReferencePerson: number = 0
   public dateFrom: string = ''

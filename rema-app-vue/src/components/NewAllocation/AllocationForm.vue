@@ -204,7 +204,6 @@ import { submitAllocation, submitAllocations, refreshAllocations } from '../../s
 export default class AllocationForm extends Mixins(AllocationFormService) {
   @Prop(Object) private readonly initValues!: InitAllocation
   public title: string = ''
-  public ressourceIds: Array<number> = []
   public fullday: boolean = false
   public notes: string = ''
   public selectedGadgets: number[] = []
@@ -215,7 +214,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
 
   beforeMount () {
     if (this.initValues && this.initValues.RessourceIds.length) {
-      this.ressourceIds.push(...this.initValues.RessourceIds)
+      this.ressourceIds.splice(0, 9e9, ...this.initValues.RessourceIds)
       this.timeFrom = this.initValues.From
       this.dateFrom = this.initValues.Day
     }

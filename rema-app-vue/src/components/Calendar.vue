@@ -370,7 +370,11 @@ function transfer2Calendar (v: Allocation): CalendarElement {
 
   rVal.Gadgets = '<br>'
   if (Gadget.all().length) {
-    v.GadgetsIds.map((e: number) => (Gadget.find(e) as Gadget).Title).forEach((e: string) => { rVal.Gadgets += e + '<br> ' })
+    v.GadgetsIds.map((e: number) => {
+      let gadget = (Gadget.find(e) as Gadget)
+      let title = (gadget || { Title: '' }).Title
+      return title
+    }).forEach((e: string) => { rVal.Gadgets += e + '<br> ' })
   }
   rVal.Gadgets.slice(0, -1)
 
