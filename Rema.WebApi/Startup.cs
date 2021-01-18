@@ -13,6 +13,7 @@ using Newtonsoft.Json.Serialization;
 using Rema.DbAccess;
 using Rema.Infrastructure.Email;
 using Rema.ServiceLayer;
+using Rema.ServiceLayer.ControllerLogic;
 using Rema.ServiceLayer.Interfaces;
 using Rema.ServiceLayer.Services;
 using Rema.WebApi.ViewModels;
@@ -48,6 +49,7 @@ namespace Rema.WebApi
       services.AddSingleton<EmailSettings>(emailSettings);
 
       services.AddScoped<IEmailTrigger, EmailTrigger>();
+      services.AddScoped<IAllocationService, AllocationService>();
       services.AddSingleton<IAdService>(new AdService(DomainsToSearch));
       services.AddAutoMapper(typeof(Startup));
       services.AddHttpContextAccessor();
