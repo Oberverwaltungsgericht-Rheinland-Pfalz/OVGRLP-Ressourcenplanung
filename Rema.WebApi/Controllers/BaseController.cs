@@ -18,9 +18,9 @@ namespace Rema.WebApi.Controllers
 {
   public abstract class BaseController : ControllerBase
   {
-    protected RpDbContext _context;
-    protected IMapper _mapper;
-    protected UserManagementService _userManagementService;
+    protected readonly RpDbContext _context;
+    protected readonly IMapper _mapper;
+    protected readonly UserManagementService _userManagementService;
 
     protected BaseController(RpDbContext context, IMapper mapper)
     {

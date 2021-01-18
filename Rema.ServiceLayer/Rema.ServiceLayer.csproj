@@ -7,18 +7,16 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.0" />
+    <PackageReference Include="PdfSharpCore" Version="1.1.29" />
     <PackageReference Include="Serilog" Version="2.9.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Rema.DbAccess\Rema.DbAccess.csproj" />
     <ProjectReference Include="..\Rema.Infrastructure\Rema.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ControllerLogic\" />
   </ItemGroup>
 
 </Project>

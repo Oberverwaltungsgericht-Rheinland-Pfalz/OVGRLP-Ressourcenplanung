@@ -14,6 +14,7 @@ using Rema.DbAccess;
 using Rema.Infrastructure.Email;
 using Rema.Infrastructure.Email.Templates;
 using Rema.Infrastructure.Models;
+using Rema.ServiceLayer.ControllerLogic;
 using Rema.WebApi.Filter;
 using Rema.WebApi.ViewModels;
 using Serilog;
@@ -27,10 +28,12 @@ namespace Rema.WebApi.Controllers
   public class AllocationsController : BaseController
   {
     private readonly IEmailTrigger _emailTrigger;
+    private readonly IAllocationService _allocationService;
 
-    public AllocationsController(RpDbContext context, IMapper mapper, IEmailTrigger emailTrigger) : base(context, mapper)
+    public AllocationsController(RpDbContext context, IMapper mapper, IEmailTrigger emailTrigger, IAllocationService allocationService) : base(context, mapper)
     {
       this._emailTrigger = emailTrigger;
+      this._allocationService = allocationService;
     }
 
     [Route("print")]
@@ -42,13 +45,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation = await _context.Allocations
-          .Include(o => o.Ressources)
-          .Include(r => r.ReferencePerson)
-          .Include(r => r.LastModifiedBy)
-          .Include(r => r.CreatedBy)
-          .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
-          .FirstOrDefaultAsync(i => i.Id == id);
+        allocation = await _allocationService.FindAllocationAll(id);
 
         if (allocation == null)
         {
@@ -64,39 +61,23 @@ namespace Rema.WebApi.Controllers
       string filename = DateTime.UtcNow.Ticks + "print.pdf";
       try
       {
-        var template = new PrintTemplate(allocation);
-
-        PdfDocument document = new PdfDocument();
-
-        PdfPage page = document.AddPage();
-        XGraphics gfx = XGraphics.FromPdfPage(page);
-        XFont font = new XFont("Calibri", 12, XFontStyle.Bold);
-        XTextFormatter tf = new XTextFormatter(gfx);
-
-        XRect rect = new XRect(40, 50, page.Width * 0.8, page.Height * 7.5);
-        gfx.DrawRectangle(XBrushes.White, rect);
-        tf.DrawString(template.ToString(), font, XBrushes.Black, rect, XStringFormats.TopLeft);
-
-        //var document = new PdfDocument();
-        //var page = document.AddPage();
-        //var gfx = XGraphics.FromPdfPage(page);
-        //var font = new XFont("OpenSans", 12, XFontStyle.Bold);
-
-        //gfx.DrawString(template.ToString(), font, XBrushes.Black, new XRect(20, 20, page.Width/10, /*page.Height*/ 25), XStringFormats.Center);
-
-        document.Save(filename);
-
-        var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.DeleteOnClose);
-        return File(fs, "application/pdf", "FileDownloadName.pdf");
+        this._allocationService.PrintAllocation(allocation, filename);
       }
       catch (Exception ex)
       {
-        Log.Error(ex, "printing pdf for id: " + id);
+        Log.Error(ex, "creating pdf for id: " + id);
         return null;
       }
-      finally
+
+      try
       {
-        // System.IO.File.Delete(filename);
+        using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.DeleteOnClose))
+          return File(fs, "application/pdf", "FileDownloadName.pdf");
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "sending pdf file for id: " + id);
+        return null;
       }
     }
 
@@ -143,99 +124,6 @@ namespace Rema.WebApi.Controllers
       catch (Exception ex)
       {
         Log.Error(ex, "error while mapping allocations");
-        return NotFound();
-      }
-    }
-
-    [HttpGet]
-    [Route("timespan/m/{year}/{month}")]
-    public async Task<ActionResult<IEnumerable<AllocationViewModel>>> GetAllocationsMonth(long year, long month)
-    {
-      Log.Information("GET allocations timespan month");
-
-      // get the first day of the month
-      DateTime first = new DateTime((int)year, (int)month, 1);
-
-      // subtract 6 days so the last few allocations are displayed
-      first = first.AddDays(-6);
-
-      // Get the last day of the month
-      DateTime last = new DateTime((int)year, (int)month, DateTime.DaysInMonth((int)year, (int)month));
-
-      // add 6 days so the last few allocations are displayed
-      last = last.AddDays(6);
-
-      Console.WriteLine("First Date: {0}", first);
-      Console.WriteLine("Last Date: {0}", last);
-
-      IQueryable<Allocation> query;
-
-      try
-      {
-        query = _context.Allocations
-          .Where(g => (g.To >= first && g.To <= last) || (g.From <= last && g.From >= first) || (g.From <= first && g.To >= last));
-
-        query.Include(g => g.Ressources)
-          .Include(g => g.ApprovedBy)
-          .Load();
-
-        query.Include(g => g.CreatedBy)
-          .Include(g => g.AllocationGadgets)
-          .Load();
-
-        query.Include(g => g.LastModifiedBy)
-          .Include(g => g.ReferencePerson)
-          .Load();
-
-        var allMapped = await query.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e)).ToListAsync();
-        var json = Ok(allMapped);
-        return json;
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting allocations");
-        return NotFound();
-      }
-    }
-
-    [HttpGet]
-    [Route("timespan/w/{year}/{week}")]
-    public async Task<ActionResult<IEnumerable<AllocationViewModel>>> GetAllocationsWeek(long year, long week)
-    {
-      Log.Information("GET allocations timespan week");
-
-      IQueryable<Allocation> query;
-
-      DateTime first = System.Globalization.ISOWeek.ToDateTime((int)year, (int)week, DayOfWeek.Monday);
-      DateTime last = first.AddDays(6);
-
-      Console.WriteLine("First Date: {0}", first);
-      Console.WriteLine("Last Date: {0}", last);
-
-      try
-      {
-        query = _context.Allocations
-          .Where(g => (g.To >= first && g.To <= last) || (g.From <= last && g.From >= first) || (g.From <= first && g.To >= last));
-
-        query.Include(g => g.Ressources)
-          .Include(g => g.ApprovedBy)
-          .Load();
-
-        query.Include(g => g.CreatedBy)
-          .Include(g => g.AllocationGadgets)
-          .Load();
-
-        query.Include(g => g.LastModifiedBy)
-          .Include(g => g.ReferencePerson)
-          .Load();
-
-        var allMapped = await query.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e)).ToListAsync();
-        var json = Ok(allMapped);
-        return json;
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "error while getting allocations");
         return NotFound();
       }
     }
@@ -421,10 +309,6 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation = await _context.Allocations
-          .Include(r => r.ReferencePerson)
-          .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
-          .FirstOrDefaultAsync(i => i.Id == allocation.Id);
         allocation = await _context.Allocations.FindAsync(allocation.Id);
         var template = new NewAllocationTemplate(allocation, yourRequest);
         this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
@@ -651,12 +535,7 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        allocation = await _context.Allocations
-          .Include(o => o.Ressources)
-          .Include(r => r.ReferencePerson)
-          .Include(r => r.LastModifiedBy)
-          .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
-          .FirstOrDefaultAsync(i => i.Id == id);
+        allocation = await _allocationService.FindAllocationAll(id);
       }
       catch (Exception ex)
       {
@@ -704,8 +583,7 @@ namespace Rema.WebApi.Controllers
       
       try
       {
-        allocation = await _context.Allocations.Include(o => o.Ressources).Include(o => o.AllocationGadgets)
-          .Include(o => o.LastModifiedBy).Include(o => o.ReferencePerson).AsNoTracking().FirstOrDefaultAsync(i => i.Id == editedRequest.Id);
+        allocation = await _allocationService.FindAllocationAll(editedRequest.Id);
       }
       catch (Exception ex)
       {
@@ -747,7 +625,6 @@ namespace Rema.WebApi.Controllers
           }
         }
 
-        _context.Entry(allocation).State = EntityState.Modified;
         await _context.SaveChangesAsync();
       }
       catch (Exception ex)
@@ -798,12 +675,7 @@ namespace Rema.WebApi.Controllers
       Allocation oldAllocation;
       try
       {
-        oldAllocation = await _context.Allocations
-          .Include(o => o.Ressources)
-          .Include(o => o.ReferencePerson)
-          .Include(o => o.LastModifiedBy)
-          .Include(o => o.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
-          .FirstOrDefaultAsync(i => i.Id == allocationVM.Id);
+        oldAllocation = await _allocationService.FindAllocationAll(allocationVM.Id);
         if (oldAllocation == null) return BadRequest("ID does not exist");
       }
       catch (Exception ex)
@@ -1010,5 +882,101 @@ namespace Rema.WebApi.Controllers
       foreach (var ressource in newRessources)
         oldAllocation.Ressources.Add(ressource);
     }
+
+    // könnte mal benutzt werden
+    /*
+[HttpGet]
+[Route("timespan/m/{year}/{month}")]
+public async Task<ActionResult<IEnumerable<AllocationViewModel>>> GetAllocationsMonth(long year, long month)
+{
+  Log.Information("GET allocations timespan month");
+
+  // get the first day of the month
+  DateTime first = new DateTime((int)year, (int)month, 1);
+
+  // subtract 6 days so the last few allocations are displayed
+  first = first.AddDays(-6);
+
+  // Get the last day of the month
+  DateTime last = new DateTime((int)year, (int)month, DateTime.DaysInMonth((int)year, (int)month));
+
+  // add 6 days so the last few allocations are displayed
+  last = last.AddDays(6);
+
+  Console.WriteLine("First Date: {0}", first);
+  Console.WriteLine("Last Date: {0}", last);
+
+  IQueryable<Allocation> query;
+
+  try
+  {
+    query = _context.Allocations
+      .Where(g => (g.To >= first && g.To <= last) || (g.From <= last && g.From >= first) || (g.From <= first && g.To >= last));
+
+    query.Include(g => g.Ressources)
+      .Include(g => g.ApprovedBy)
+      .Load();
+
+    query.Include(g => g.CreatedBy)
+      .Include(g => g.AllocationGadgets)
+      .Load();
+
+    query.Include(g => g.LastModifiedBy)
+      .Include(g => g.ReferencePerson)
+      .Load();
+
+    var allMapped = await query.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e)).ToListAsync();
+    var json = Ok(allMapped);
+    return json;
+  }
+  catch (Exception ex)
+  {
+    Log.Error(ex, "error while getting allocations");
+    return NotFound();
+  }
+}
+
+[HttpGet]
+[Route("timespan/w/{year}/{week}")]
+public async Task<ActionResult<IEnumerable<AllocationViewModel>>> GetAllocationsWeek(long year, long week)
+{
+  Log.Information("GET allocations timespan week");
+
+  IQueryable<Allocation> query;
+
+  DateTime first = System.Globalization.ISOWeek.ToDateTime((int)year, (int)week, DayOfWeek.Monday);
+  DateTime last = first.AddDays(6);
+
+  Console.WriteLine("First Date: {0}", first);
+  Console.WriteLine("Last Date: {0}", last);
+
+  try
+  {
+    query = _context.Allocations
+      .Where(g => (g.To >= first && g.To <= last) || (g.From <= last && g.From >= first) || (g.From <= first && g.To >= last));
+
+    query.Include(g => g.Ressources)
+      .Include(g => g.ApprovedBy)
+      .Load();
+
+    query.Include(g => g.CreatedBy)
+      .Include(g => g.AllocationGadgets)
+      .Load();
+
+    query.Include(g => g.LastModifiedBy)
+      .Include(g => g.ReferencePerson)
+      .Load();
+
+    var allMapped = await query.Select(e => _mapper.Map<Allocation, AllocationViewModel>(e)).ToListAsync();
+    var json = Ok(allMapped);
+    return json;
+  }
+  catch (Exception ex)
+  {
+    Log.Error(ex, "error while getting allocations");
+    return NotFound();
+  }
+}
+*/
   }
 }

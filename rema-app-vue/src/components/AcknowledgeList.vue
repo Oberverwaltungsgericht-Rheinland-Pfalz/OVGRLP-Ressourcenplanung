@@ -66,7 +66,7 @@ export default class AcknowledgeList extends Vue {
   private loadUsers!: Function
 
   private dialog: boolean = false
-  private viewAllocation: Allocation = {} as Allocation
+  private viewAllocation: AllocationRequestView = {} as AllocationRequestView
   private hideOld: boolean = true
   private hideDone: boolean = true
 
