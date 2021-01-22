@@ -18,7 +18,7 @@ namespace Rema.ServiceLayer.ControllerLogic
   public interface IAllocationService
   {
     public Task<Allocation> FindAllocationAll(long id);
-    public void PrintAllocation(Allocation allocation, string filename);
+    public MemoryStream GenerateAllocationPrintPdf(Allocation allocation);
   }
   public class AllocationService : IAllocationService
   {
@@ -38,23 +38,25 @@ namespace Rema.ServiceLayer.ControllerLogic
          .FirstOrDefaultAsync(i => i.Id == id);
     }
 
-    public void PrintAllocation(Allocation allocation, string filename)
+    public MemoryStream GenerateAllocationPrintPdf(Allocation allocation)
     {
-        var template = new PrintTemplate(allocation);
+      var template = new PrintTemplate(allocation);
 
-        PdfDocument document = new PdfDocument();
+      PdfDocument document = new PdfDocument();
 
-        PdfPage page = document.AddPage();
-        XGraphics gfx = XGraphics.FromPdfPage(page);
-        XFont font = new XFont("Calibri", 12, XFontStyle.Bold);
-        XTextFormatter tf = new XTextFormatter(gfx);
+      PdfPage page = document.AddPage();
+      XGraphics gfx = XGraphics.FromPdfPage(page);
+      XFont font = new XFont("Calibri", 12, XFontStyle.Bold);
+      XTextFormatter tf = new XTextFormatter(gfx);
 
-        XRect rect = new XRect(40, 50, page.Width * 0.8, page.Height * 7.5);
-        gfx.DrawRectangle(XBrushes.White, rect);
-        tf.DrawString(template.ToString(), font, XBrushes.Black, rect, XStringFormats.TopLeft);
+      XRect rect = new XRect(40, 50, page.Width * 0.8, page.Height * 7.5);
+      gfx.DrawRectangle(XBrushes.White, rect);
+      tf.DrawString(template.ToString(), font, XBrushes.Black, rect, XStringFormats.TopLeft);
+      MemoryStream stream = new MemoryStream();
+      document.Save(stream, false);
 
-        document.Save(filename);
-      }
+      return stream;
     }
   }
+}
 
