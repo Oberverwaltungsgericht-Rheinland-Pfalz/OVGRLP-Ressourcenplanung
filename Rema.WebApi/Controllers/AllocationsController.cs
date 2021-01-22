@@ -58,25 +58,20 @@ namespace Rema.WebApi.Controllers
         return null;
       }
 
-      string filename = DateTime.UtcNow.Ticks + "print.pdf";
       try
       {
-        this._allocationService.PrintAllocation(allocation, filename);
-      }
-      catch (Exception ex)
-      {
-        Log.Error(ex, "creating pdf for id: " + id);
+        MemoryStream stream = this._allocationService.GenerateAllocationPrintPdf(allocation);
+
+        Response.ContentType = "application/pdf";
+        Response.StatusCode = 200;
+          await stream.CopyToAsync(Response.Body);
+        await Response.CompleteAsync();
+        await stream.DisposeAsync();
         return null;
       }
-
-      try
-      {
-        using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.DeleteOnClose))
-          return File(fs, "application/pdf", "FileDownloadName.pdf");
-      }
       catch (Exception ex)
       {
-        Log.Error(ex, "sending pdf file for id: " + id);
+        Log.Error(ex, "creating pdf and sending for id: " + id);
         return null;
       }
     }
