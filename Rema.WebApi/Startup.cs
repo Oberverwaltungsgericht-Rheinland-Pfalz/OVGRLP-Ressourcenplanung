@@ -10,11 +10,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using Quartz;
 using Rema.DbAccess;
 using Rema.Infrastructure.Email;
 using Rema.ServiceLayer;
 using Rema.ServiceLayer.ControllerLogic;
 using Rema.ServiceLayer.Interfaces;
+using Rema.ServiceLayer.Jobs;
 using Rema.ServiceLayer.Services;
 using Rema.WebApi.ViewModels;
 
@@ -103,6 +105,42 @@ namespace Rema.WebApi
       Reader = new Role() { Level = 1, Name = "Reader", AdDescription = Configuration["Auth:Reader"] };
       Editor = new Role() { Level = 10, Name = "Editor", AdDescription = Configuration["Auth:Editor"] };
       Admin = new Role() { Level = 100, Name = "Admin", AdDescription = Configuration["Auth:Admin"] };
+
+      // nur wenn die 
+      var hasReminder = Configuration["Reminder"];
+      var hasReminderInt = Convert.ToInt32(hasReminder);
+      if (Convert.ToBoolean(hasReminderInt)) // is true when Reminder is unequal to 0
+      {
+        services.AddQuartz(q =>
+        {
+          q.SchedulerName = "Quartz Scheduler for reminder email";
+          // base quartz scheduler, job and trigger configuration
+
+         /* q.ScheduleJob<TestJob>(trigger => trigger
+         // .StartNow()
+          .WithSimpleSchedule(x=> x.WithIntervalInSeconds(180).RepeatForever())
+          //.UsingJobData(
+          ); */
+          
+          // quickest way to create a job with single trigger is to use ScheduleJob
+          // (requires version 3.2)
+          q.ScheduleJob<RemindJob>(trigger => trigger
+              .WithIdentity("Combined Configuration Trigger")
+              .StartNow()
+              .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever())
+              .WithDescription("the email reminder is triggert to send mails on daily basis")
+          );
+        
+          q.UseMicrosoftDependencyInjectionScopedJobFactory();
+        });
+
+        // ASP.NET Core hosting
+        services.AddQuartzServer(options =>
+        {
+          // when shutting down we want jobs to complete gracefully
+          options.WaitForJobsToComplete = true;
+        });
+      }
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

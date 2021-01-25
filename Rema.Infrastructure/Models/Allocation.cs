@@ -31,6 +31,7 @@ namespace Rema.Infrastructure.Models
     public DateTime To { get; set; }
 
     public Boolean IsAllDay { get; set; }
+    public Boolean Reminded { get; set; }
 
     public MeetingStatus Status { get; set; }
 
