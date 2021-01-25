@@ -75,6 +75,9 @@ namespace Rema.DbAccess.Migrations
                     b.Property<long?>("ReferencePersonId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("Reminded")
+                        .HasColumnType("bit");
+
                     b.Property<long>("RessourceId")
                         .HasColumnType("bigint");
 
