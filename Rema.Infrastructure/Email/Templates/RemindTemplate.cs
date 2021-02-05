@@ -13,9 +13,11 @@ namespace Rema.Infrastructure.Email.Templates
 
     public override string ToString()
     {
-      return $@"Möchten Sie Ihren Termin #{this._allocation.Id} am {this._allocation.From} in der Ressourcenplanung
+      return $@"Möchten Sie Ihren Termin #{this._allocation.Id} am  {this._allocation.From}  in der Ressourcenplanung
 wie geplant wahrnehmen?
-Wenn Ja müssen sie nichts tun, ansonsten löschen Sie diesen falls möglich oder 
+
+Wenn dies der Fall ist müssen sie nichts tun. 
+Falls Sie ihren Termin nicht wahrnehmen möchten 
 setzen sie sich bitte mit Ihrer zuständigen Verwaltunsstelle in Verbindung.
 
 Ansprechpartner:

@@ -1,3 +1,19 @@
+## Ressourcenmanagement v2.1.0
+
+### Änderungen
+
+* Ansprechpartner von Terminen können x Tage (mindestens 3) vor dem Termin eine Erinnerungs-Email erhalten.
+* Es muss ein Datenbankupdate Skript eingespielt werden
+
+## Ressourcenmanagement v2.0.0
+
+### Änderungen
+
+* Es können mehre Ressourcen einem Termin zugeordnet werden
+* Es muss ein Datenbank Update sowie ein Migrationsskript eingespielt werden
+
+
+
 ### Änderungen
 
 * Refresh Button für die Daten in der Client- Anwendung
@@ -10,7 +26,8 @@
 * Termin ID wird in Emails angezeigt
 * Lange Gerichtstermine werden im Kalender korrekt angezeigt
 * Ansprechpartner können korrekt bearbeitet werden
-* 
+
+  
 
 ### Änderungen
 

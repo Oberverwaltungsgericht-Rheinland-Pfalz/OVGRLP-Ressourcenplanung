@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Quartz;
 using Rema.DbAccess;
 using Rema.Infrastructure.Email;
@@ -21,16 +22,22 @@ namespace Rema.ServiceLayer.Jobs
     protected readonly RpDbContext _context;
 //    protected readonly IMapper _mapper;
     protected readonly IEmailTrigger _emailTrigger;
+    private readonly IConfiguration _configuration;
 
-    public RemindJob(RpDbContext context, IEmailTrigger emailTrigger)
+    public RemindJob(RpDbContext context, IEmailTrigger emailTrigger, IConfiguration configuration)
     {
       this._context = context;
       this._emailTrigger = emailTrigger;
+      this._configuration = configuration;
     }
 
     public async Task Execute(IJobExecutionContext context)
     {
-      var timeRange = DateTime.Now.AddDays(10);
+      int remindRange = this._configuration.GetValue<int>("Reminder");
+      var timeRange = DateTime.Now.AddDays(remindRange);
+      var timeRangeDistance = DateTime.Now.AddDays(3);
+      var timeRangeCreation = DateTime.Now.AddDays(-20);
+
       IList<Allocation> unreminded = new List<Allocation>();
       try
       {
@@ -42,9 +49,18 @@ namespace Rema.ServiceLayer.Jobs
       .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
       .Where(a => a
         .ReferencePerson != null && 
-        a.From > DateTime.Now && 
-        a.From < timeRange
-        && !a.Reminded // was reminded boolean
+
+        // Termin muss weniger als 10 Tage entfernt sein
+        a.From < timeRange &&
+
+        // Termin muss noch mindestens 3 Tage entfernt sein
+        a.From > timeRangeDistance &&
+        
+        // Terminerstellung muss mindestens 20 Tage her sein 
+        a.CreatedAt < timeRangeCreation
+        
+        // wurde noch nicht erinnert
+        && !a.Reminded 
         )
       .ToListAsync();
       }
@@ -57,9 +73,9 @@ namespace Rema.ServiceLayer.Jobs
       foreach(var remindAllocation in unreminded)
       {
         var template = new RemindTemplate(remindAllocation);
-        this._emailTrigger.SendEmail(template, null, new List<string>(){ remindAllocation.ReferencePerson.Email });
+        bool reminded =_emailTrigger.SendEmail(template, null, new List<string>(){ remindAllocation.ReferencePerson.Email });
 
-        remindAllocation.Reminded = true;
+        remindAllocation.Reminded = reminded;
       }
 
       try

@@ -47,6 +47,7 @@ namespace Rema.Infrastructure.Email.Templates
     protected IList<Allocation> _allocations { get; set; }
     protected string RessourceName => string.Join(", ", this._allocation.Ressources.Select(x => x.Name));
     protected string Title => this._allocation.Title;
+    public long ID => this._allocation.Id;
 
     protected string ReferencePerson
     {

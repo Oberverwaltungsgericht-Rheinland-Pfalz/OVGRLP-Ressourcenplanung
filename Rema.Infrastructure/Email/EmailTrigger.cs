@@ -11,7 +11,7 @@ namespace Rema.Infrastructure.Email
 {
   public interface IEmailTrigger
   {
-    public void SendEmail(EmailTemplate template, string recipient, IList<string> groups);
+    public bool SendEmail(EmailTemplate template, string recipient, IList<string> groups);
   }
 
   public class EmailTrigger: IEmailTrigger
@@ -25,12 +25,12 @@ namespace Rema.Infrastructure.Email
       this._configuration = configuration;
     } 
 
-    public void SendEmail(EmailTemplate template, string recipient, IList<string> groups)
+    public bool SendEmail(EmailTemplate template, string recipient, IList<string> groups)
     {
       if (!this._emailSettings.SendEmails)
       {
-        Log.Information("email sending to deaktivated");
-        return;
+        Log.Information("email sending is deactivated");
+        return true;
       }
       if (recipient != null)
       {
@@ -67,15 +67,16 @@ namespace Rema.Infrastructure.Email
 
         try
         {
-          Log.Information("Sending email to "+ emailAdress);
+          Log.Information("Sending email to "+ emailAdress + " @#" + template.ID);
           smtp.Send(senderEmail, emailAdress, $"[Raumplanung] {template.Subject}", template.ToString());
         }
         catch (Exception ex)
         {
-          Log.Error(ex, $"error while sending email to {emailAdress}");
-          return;
+          Log.Error(ex, $"error while sending email to {emailAdress} @#{template.ID}");
+          return false;
         }
       }
+      return true;
     }
   }
 }
