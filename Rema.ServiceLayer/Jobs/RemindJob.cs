@@ -73,7 +73,7 @@ namespace Rema.ServiceLayer.Jobs
       foreach(var remindAllocation in unreminded)
       {
         var template = new RemindTemplate(remindAllocation);
-        bool reminded =_emailTrigger.SendEmail(template, null, new List<string>(){ remindAllocation.ReferencePerson.Email });
+        bool reminded = _emailTrigger.SendEmail(template, null, new List<string>(){ remindAllocation.ReferencePerson.Email });
 
         remindAllocation.Reminded = reminded;
       }

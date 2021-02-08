@@ -18,7 +18,7 @@ wie geplant wahrnehmen?
 
 Wenn dies der Fall ist müssen sie nichts tun. 
 Falls Sie ihren Termin nicht wahrnehmen möchten 
-setzen sie sich bitte mit Ihrer zuständigen Verwaltunsstelle in Verbindung.
+setzen sie sich bitte mit Ihrer zuständigen Verwaltungsstelle in Verbindung.
 
 Ansprechpartner:
 {ReferencePerson}
