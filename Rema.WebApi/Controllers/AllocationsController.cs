@@ -38,7 +38,7 @@ namespace Rema.WebApi.Controllers
 
     [Route("print")]
     [HttpGet("print/{id}")]
-    public async Task<FileStreamResult> GetPrint(long id)
+    public async Task<ActionResult> GetPrint(long id)
     {
       Log.Information("GET print allocation id:" + id);
       Allocation allocation;
@@ -49,13 +49,13 @@ namespace Rema.WebApi.Controllers
 
         if (allocation == null)
         {
-          return null;
+          return NotFound();
         }
       }
       catch (Exception ex)
       {
         Log.Error(ex, "error while getting allocation");
-        return null;
+        return Conflict("error while geting allocation");
       }
 
       try
@@ -63,16 +63,16 @@ namespace Rema.WebApi.Controllers
         MemoryStream stream = this._allocationService.GenerateAllocationPrintPdf(allocation);
 
         Response.ContentType = "application/pdf";
-        Response.StatusCode = 200;
+        //Response.StatusCode = 200;
           await stream.CopyToAsync(Response.Body);
         await Response.CompleteAsync();
         await stream.DisposeAsync();
-        return null;
+        return Ok();
       }
       catch (Exception ex)
       {
         Log.Error(ex, "creating pdf and sending for id: " + id);
-        return null;
+        return Conflict("error at creating pdf");
       }
     }
 
