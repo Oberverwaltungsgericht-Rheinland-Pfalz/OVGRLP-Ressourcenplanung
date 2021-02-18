@@ -27,7 +27,27 @@
               label="Raum"
               :menu-props="{ offsetY: true }"
               :disabled="readonly"
-            />
+            >
+                <template v-slot:item="{ active, item, attrs, on }">
+                  <v-list-item v-on="on" v-bind="attrs" #default="{ active }">
+                    <v-list-item-action>
+                      <v-checkbox :input-value="active"></v-checkbox>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        <v-row no-gutters align="center">
+                        <span>{{ item.Name }}</span>
+                        <v-spacer></v-spacer>
+                        <v-chip text-color="white" color="blue" small v-if="item.FunctionDescription" :title="'Funktion: '+item.FunctionDescription"
+                        >F</v-chip>
+                        <v-chip text-color="white" color="blue" class="ressourcedetails" small v-if="item.SpecialsDescription" :title="'Details: '+item.SpecialsDescription"
+                        >D</v-chip>
+                        </v-row>
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+            </v-select>
           </v-col>
         </v-row>
         <v-divider />
