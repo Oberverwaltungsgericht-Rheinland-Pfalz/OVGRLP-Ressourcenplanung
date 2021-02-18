@@ -93,9 +93,6 @@ namespace Rema.DbAccess.Migrations
                     b.Property<bool>("Reminded")
                         .HasColumnType("bit");
 
-                    b.Property<long>("RessourceId")
-                        .HasColumnType("bigint");
-
                     b.Property<Guid?>("ScheduleSeriesGuid")
                         .HasColumnType("uniqueidentifier");
 
@@ -125,30 +122,12 @@ namespace Rema.DbAccess.Migrations
                     b.ToTable("Allocations");
                 });
 
-            modelBuilder.Entity("Rema.Infrastructure.Models.AllocationGagdet", b =>
-                {
-                    b.Property<long>("AllocationId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("GadgetId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("AllocationId", "GadgetId");
-
-                    b.HasIndex("GadgetId");
-
-                    b.ToTable("AllocationGagdetOld");
-                });
-
             modelBuilder.Entity("Rema.Infrastructure.Models.Gadget", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .UseIdentityColumn();
-
-                    b.Property<long?>("RessourceId")
-                        .HasColumnType("bigint");
 
                     b.Property<long?>("SuppliedById")
                         .HasColumnType("bigint");
@@ -158,8 +137,6 @@ namespace Rema.DbAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RessourceId");
 
                     b.HasIndex("SuppliedById");
 
@@ -184,9 +161,6 @@ namespace Rema.DbAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Usability")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -302,41 +276,13 @@ namespace Rema.DbAccess.Migrations
                     b.Navigation("ReferencePerson");
                 });
 
-            modelBuilder.Entity("Rema.Infrastructure.Models.AllocationGagdet", b =>
-                {
-                    b.HasOne("Rema.Infrastructure.Models.Allocation", "Allocation")
-                        .WithMany()
-                        .HasForeignKey("AllocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Rema.Infrastructure.Models.Gadget", "Gadget")
-                        .WithMany()
-                        .HasForeignKey("GadgetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Allocation");
-
-                    b.Navigation("Gadget");
-                });
-
             modelBuilder.Entity("Rema.Infrastructure.Models.Gadget", b =>
                 {
-                    b.HasOne("Rema.Infrastructure.Models.Ressource", null)
-                        .WithMany("Gadgets")
-                        .HasForeignKey("RessourceId");
-
                     b.HasOne("Rema.Infrastructure.Models.SupplierGroup", "SuppliedBy")
                         .WithMany()
                         .HasForeignKey("SuppliedById");
 
                     b.Navigation("SuppliedBy");
-                });
-
-            modelBuilder.Entity("Rema.Infrastructure.Models.Ressource", b =>
-                {
-                    b.Navigation("Gadgets");
                 });
 #pragma warning restore 612, 618
         }

@@ -35,9 +35,6 @@ namespace Rema.Infrastructure.Models
 
     public MeetingStatus Status { get; set; }
 
-    [Obsolete]
-    public virtual long RessourceId { get; set; }
-
     public Guid? ScheduleSeriesGuid { get; set; }
 
     [Required]
