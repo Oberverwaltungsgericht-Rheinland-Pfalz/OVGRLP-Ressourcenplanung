@@ -19,6 +19,21 @@ namespace Rema.DbAccess.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.0");
 
+            modelBuilder.Entity("AllocationGadget", b =>
+                {
+                    b.Property<long>("AllocationsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("GadgetsId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AllocationsId", "GadgetsId");
+
+                    b.HasIndex("GadgetsId");
+
+                    b.ToTable("AllocationGadget");
+                });
+
             modelBuilder.Entity("AllocationRessource", b =>
                 {
                     b.Property<long>("AllocationsId")
@@ -122,7 +137,7 @@ namespace Rema.DbAccess.Migrations
 
                     b.HasIndex("GadgetId");
 
-                    b.ToTable("AllocationGagdet");
+                    b.ToTable("AllocationGagdetOld");
                 });
 
             modelBuilder.Entity("Rema.Infrastructure.Models.Gadget", b =>
@@ -139,6 +154,7 @@ namespace Rema.DbAccess.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -229,6 +245,21 @@ namespace Rema.DbAccess.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("AllocationGadget", b =>
+                {
+                    b.HasOne("Rema.Infrastructure.Models.Allocation", null)
+                        .WithMany()
+                        .HasForeignKey("AllocationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Rema.Infrastructure.Models.Gadget", null)
+                        .WithMany()
+                        .HasForeignKey("GadgetsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("AllocationRessource", b =>
                 {
                     b.HasOne("Rema.Infrastructure.Models.Allocation", null)
@@ -274,13 +305,13 @@ namespace Rema.DbAccess.Migrations
             modelBuilder.Entity("Rema.Infrastructure.Models.AllocationGagdet", b =>
                 {
                     b.HasOne("Rema.Infrastructure.Models.Allocation", "Allocation")
-                        .WithMany("AllocationGadgets")
+                        .WithMany()
                         .HasForeignKey("AllocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Rema.Infrastructure.Models.Gadget", "Gadget")
-                        .WithMany("AllocationGadgets")
+                        .WithMany()
                         .HasForeignKey("GadgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -301,16 +332,6 @@ namespace Rema.DbAccess.Migrations
                         .HasForeignKey("SuppliedById");
 
                     b.Navigation("SuppliedBy");
-                });
-
-            modelBuilder.Entity("Rema.Infrastructure.Models.Allocation", b =>
-                {
-                    b.Navigation("AllocationGadgets");
-                });
-
-            modelBuilder.Entity("Rema.Infrastructure.Models.Gadget", b =>
-                {
-                    b.Navigation("AllocationGadgets");
                 });
 
             modelBuilder.Entity("Rema.Infrastructure.Models.Ressource", b =>

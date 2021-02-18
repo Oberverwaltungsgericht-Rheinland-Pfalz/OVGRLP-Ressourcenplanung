@@ -206,17 +206,13 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var gadgets = await _context.Gadgets
-          .Include(e => e.SuppliedBy)
-          .Where(g => allocationVM.GadgetsIds.Contains(g.Id))
-          .ToListAsync();
-
-        gadgets.ForEach(g => allocation.Gadgets.Add(g));
+        MapChangedOrNewGadget(allocation, allocationVM);
       }
       catch (Exception ex)
       {
         Log.Error(ex, "error while mapping gadgets to allocation");
       }
+
 
       try
       {
@@ -847,6 +843,17 @@ namespace Rema.WebApi.Controllers
       oldAllocation.Ressources = new List<Ressource>();
       foreach (var ressource in newRessources)
         oldAllocation.Ressources.Add(ressource);
+    }
+
+    private void MapChangedOrNewGadget(Allocation oldAllocation, AllocationViewModel allocationVM)
+    {
+      var newGadgets = _context.Gadgets.Where(r => allocationVM.GadgetsIds.Contains(r.Id))
+        .Include(r => r.SuppliedBy)
+        .ToList();
+
+      oldAllocation.Gadgets = new List<Gadget>();
+      foreach (var gadget in newGadgets)
+        oldAllocation.Gadgets.Add(gadget);
     }
 
     // könnte mal benutzt werden
