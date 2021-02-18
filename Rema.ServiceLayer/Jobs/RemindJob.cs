@@ -46,7 +46,7 @@ namespace Rema.ServiceLayer.Jobs
       .Include(r => r.ReferencePerson)
       .Include(r => r.LastModifiedBy)
       .Include(r => r.CreatedBy)
-      .Include(g => g.AllocationGadgets).ThenInclude(ag => ag.Gadget).ThenInclude(g => g.SuppliedBy)
+      .Include(g => g.Gadgets).ThenInclude(g => g.SuppliedBy)
       .Where(a => a
         .ReferencePerson != null && 
 

@@ -55,7 +55,7 @@ namespace Rema.Infrastructure.Models
 
     public virtual User ReferencePerson { get; set; }
 
-    public virtual ICollection<AllocationGagdet> AllocationGadgets { get; set; }
+    public virtual ICollection<Gadget> Gadgets { get; set; }
 
     public virtual ICollection<Ressource> Ressources { get; set; }
 

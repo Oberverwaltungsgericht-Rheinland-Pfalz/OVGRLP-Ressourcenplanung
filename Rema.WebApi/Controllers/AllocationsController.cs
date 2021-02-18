@@ -4,12 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PdfSharpCore.Drawing;
-using PdfSharpCore.Drawing.Layout;
-using PdfSharpCore.Pdf;
 using Rema.DbAccess;
 using Rema.Infrastructure.Email;
 using Rema.Infrastructure.Email.Templates;
@@ -97,7 +93,7 @@ namespace Rema.WebApi.Controllers
           .Load();
 
         query.Include(g => g.CreatedBy)
-          .Include(g => g.AllocationGadgets)
+          .Include(g => g.Gadgets)
           .Load();
 
         query.Include(g => g.LastModifiedBy)
@@ -210,19 +206,12 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var gadgets = await _context.Gadgets.Include(e => e.SuppliedBy).Where(g => allocationVM.GadgetsIds.Contains(g.Id)).ToListAsync();
+        var gadgets = await _context.Gadgets
+          .Include(e => e.SuppliedBy)
+          .Where(g => allocationVM.GadgetsIds.Contains(g.Id))
+          .ToListAsync();
 
-        allocation.AllocationGadgets = new List<AllocationGagdet>();
-        foreach (var g in gadgets)
-        {
-          allocation.AllocationGadgets.Add(new AllocationGagdet
-          {
-            AllocationId = allocation.Id,
-            Allocation = allocation,
-            GadgetId = g.Id,
-            Gadget = g
-          });
-        }
+        gadgets.ForEach(g => allocation.Gadgets.Add(g));
       }
       catch (Exception ex)
       {
@@ -380,22 +369,16 @@ namespace Rema.WebApi.Controllers
 
       try
       {
-        var gadgets = _context.Gadgets.Include(e => e.SuppliedBy).Where(g => allocationsVM.GadgetsIds.Contains(g.Id));
+        var gadgets = await _context.Gadgets
+          .Include(e => e.SuppliedBy)
+          .Where(g => allocationsVM.GadgetsIds.Contains(g.Id))
+          .ToListAsync();
 
-        foreach (var a in allocations)
+        allocations.ForEach(a =>
         {
-          a.AllocationGadgets = new List<AllocationGagdet>();
-          foreach (var g in gadgets)
-          {
-            a.AllocationGadgets.Add(new AllocationGagdet
-            {
-              AllocationId = a.Id,
-              Allocation = a,
-              GadgetId = g.Id,
-              Gadget = g
-            });
-          }
-        }
+          a.Gadgets = new List<Gadget>();
+          gadgets.ForEach(g => a.Gadgets.Add(g));
+        });
       }
       catch (Exception ex)
       {
@@ -740,36 +723,26 @@ namespace Rema.WebApi.Controllers
           return BadRequest();
         }
 
-      oldAllocation.AllocationGadgets = oldAllocation.AllocationGadgets ?? new List<AllocationGagdet>();
+      oldAllocation.Gadgets = oldAllocation.Gadgets ?? new List<Gadget>();
       // Entfallene Hilfsmittel müssen aus allocationGadgets vom Allocation-Objekt entfernt werden
       // Neue Hilfsmittel müssen hinzugefügt werden
-      var currentGadgetIds = oldAllocation.AllocationGadgets.Select(x => x.GadgetId);
+      var currentGadgetIds = oldAllocation.Gadgets.Select(x => x.Id);
       var newGadgets = allocationVM.GadgetsIds.Where(x => !currentGadgetIds.Contains(x));
-      var droppedGadgets = currentGadgetIds.Where(x => !allocationVM.GadgetsIds.Contains(x)).ToArray();
-      IQueryable<Gadget> newGadgetsObjects = new List<Gadget>().AsQueryable();
-      var deletedGadgets = new List<AllocationGagdet>();
-      var createdGadgets = new List<AllocationGagdet>();
+      var droppedGadgetIds = currentGadgetIds.Where(x => !allocationVM.GadgetsIds.Contains(x)).ToArray();
+      
+      var createdGadgets = new List<Gadget>();
+      var deletedGadgets = new List<Gadget>();
 
       if (newGadgets.Any())
       {
         try
         {
-          newGadgetsObjects = _context.Gadgets
+          createdGadgets = await _context.Gadgets
             .Include(g => g.SuppliedBy)
-            .Where(g => newGadgets.Contains(g.Id));
+            .Where(g => newGadgets.Contains(g.Id))
+            .ToListAsync();
 
-          foreach (var g in newGadgetsObjects)
-          {
-            var ag = new AllocationGagdet
-            {
-              AllocationId = oldAllocation.Id,
-              Allocation = oldAllocation,
-              GadgetId = g.Id,
-              Gadget = g
-            };
-            createdGadgets.Add(ag);
-            oldAllocation.AllocationGadgets.Add(ag);
-          }
+          createdGadgets.ForEach(ng => oldAllocation.Gadgets.Add(ng));
         }
         catch (Exception ex)
         {
@@ -777,18 +750,16 @@ namespace Rema.WebApi.Controllers
         }
       }
 
-      if (droppedGadgets.Any())
+      if (droppedGadgetIds.Any())
       {
         try
         {
-          oldAllocation.AllocationGadgets.Where(x => droppedGadgets.Contains(x.GadgetId));
+          deletedGadgets = await _context.Gadgets
+            .Include(g => g.SuppliedBy)
+            .Where(g => droppedGadgetIds.Contains(g.Id))
+            .ToListAsync();
 
-          foreach (var i in droppedGadgets)
-          {
-            var fuu = oldAllocation.AllocationGadgets.SingleOrDefault(x => x.GadgetId == i);
-            deletedGadgets.Add(fuu);
-            oldAllocation.AllocationGadgets.Remove(fuu);
-          }
+          deletedGadgets.ForEach(rg => oldAllocation.Gadgets.Remove(rg));
         }
         catch (Exception ex)
         {
@@ -807,7 +778,7 @@ namespace Rema.WebApi.Controllers
       // if (ressourceChanged || (allocationVM.IsAllDay != oldAllocation.IsAllDay) || (oldAllocation.From != changedAllocation.From) || (oldAllocation.To != changedAllocation.To)) {
       // Änderung: einfach alle benachrichtigen (ggf. das granularere konfigurierbar machen
       var allHintsGroups = oldAllocation.HintsForSuppliers.Select(x => x.Group.GroupEmail).ToList();
-      var allGadgetGroups = oldAllocation.AllocationGadgets.Select(x => x.Gadget.SuppliedBy.GroupEmail).ToList();
+      var allGadgetGroups = oldAllocation.Gadgets.Select(x => x.SuppliedBy.GroupEmail).ToList();
       hintGroupMails.AddRange(allHintsGroups);
       hintGroupMails.AddRange(allGadgetGroups);
       // }

@@ -19,7 +19,7 @@ namespace Rema.WebApi.MappingProfiles
           src.HintsForSuppliers.Select(e =>
             new SimpleSupplierHint() { GroupId = e.Group.Id, Message = e.Message }
           )))
-        .ForMember(dest => dest.GadgetsIds, opt => opt.MapFrom(src => src.AllocationGadgets.Select(a => a.GadgetId)));
+        .ForMember(dest => dest.GadgetsIds, opt => opt.MapFrom(src => src.Gadgets.Select(a => a.Id)));
 
       CreateMap<AllocationViewModel, Allocation>()
         .ForMember(dest => dest.HintsForSuppliers, act => act.Ignore());

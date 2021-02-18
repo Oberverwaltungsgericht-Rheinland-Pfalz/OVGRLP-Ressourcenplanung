@@ -25,9 +25,9 @@ namespace Rema.Infrastructure.Email.Templates
     public virtual IList<string> GetGroupEmails()
     {
       var rList = new HashSet<string>();
-      foreach (var allocationGadget in _allocation.AllocationGadgets)
+      foreach (var gadget in _allocation.Gadgets)
       {
-        rList.Add(allocationGadget.Gadget.SuppliedBy.GroupEmail);
+        rList.Add(gadget.SuppliedBy.GroupEmail);
       }
       foreach (var hint in _allocation.HintsForSuppliers)
       {
@@ -104,7 +104,7 @@ namespace Rema.Infrastructure.Email.Templates
     {
       get
       {
-        var list = _allocation.AllocationGadgets.Select(e => e.Gadget.Title);
+        var list = _allocation.Gadgets.Select(e => e.Title);
         return string.Join(", ", list);
       }
     }
@@ -115,7 +115,7 @@ namespace Rema.Infrastructure.Email.Templates
       {
         var dictGroups = new Dictionary<SupplierGroup, IList<string>>();
 
-        foreach (var gadget in _allocation.AllocationGadgets.Select(e => e.Gadget))
+        foreach (var gadget in _allocation.Gadgets)
         {
           var group = gadget.SuppliedBy;
           if (dictGroups.TryGetValue(group, out IList<string> oldTitles))

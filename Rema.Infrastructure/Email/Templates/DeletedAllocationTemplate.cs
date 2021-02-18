@@ -17,10 +17,10 @@ namespace Rema.Infrastructure.Email.Templates
     private Dictionary<SupplierGroup, string> GetGadgetGroups()
     {
       var dict = new Dictionary<SupplierGroup, string>();
-      foreach (var allocationGadget in _allocation.AllocationGadgets)
+      foreach (var allocationGadget in _allocation.Gadgets)
       {
-        var group = allocationGadget.Gadget.SuppliedBy;
-        var title = allocationGadget.Gadget.Title;
+        var group = allocationGadget.SuppliedBy;
+        var title = allocationGadget.Title;
         if (dict.TryGetValue(group, out string oldTitles))
           dict[group] = oldTitles + $", {title}";
         else
@@ -35,10 +35,10 @@ namespace Rema.Infrastructure.Email.Templates
       {
         {
           var dict = new Dictionary<SupplierGroup, string>();
-          foreach (var allocationGadget in _allocation.AllocationGadgets)
+          foreach (var allocationGadget in _allocation.Gadgets)
           {
-            var group = allocationGadget.Gadget.SuppliedBy;
-            var title = allocationGadget.Gadget.Title;
+            var group = allocationGadget.SuppliedBy;
+            var title = allocationGadget.Title;
             if (dict.TryGetValue(group, out string oldTitles))
               dict[group] = oldTitles + $", {title}";
             else

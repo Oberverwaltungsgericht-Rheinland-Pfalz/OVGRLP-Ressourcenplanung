@@ -14,10 +14,10 @@ namespace Rema.Infrastructure.Models
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
 
+    [Required]
     public string Title { get; set; }
 
     public virtual SupplierGroup SuppliedBy { get; set; }
-
-    public virtual ICollection<AllocationGagdet> AllocationGadgets { get; set; }
+    public virtual ICollection<Allocation> Allocations { get; set; }
   }
 }

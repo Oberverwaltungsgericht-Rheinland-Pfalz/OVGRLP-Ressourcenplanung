@@ -8,15 +8,15 @@ namespace Rema.Infrastructure.Email.Templates
 {
   public class GadgetUpdateTemplate : EmailTemplate
   {
-    public GadgetUpdateTemplate(Allocation allocation, IList<AllocationGagdet> createdGadgets, IList<AllocationGagdet> droppedGadgets, IList<string> additionalGroups = null) : base(allocation)
+    public GadgetUpdateTemplate(Allocation allocation, IList<Gadget> createdGadgets, IList<Gadget> droppedGadgets, IList<string> additionalGroups = null) : base(allocation)
     {
       base.Type = "geändert";
       _droppedGadgets = droppedGadgets;
       _createdGadgets = createdGadgets;
       _additionalGroups = additionalGroups;
     }
-    private readonly IList<AllocationGagdet> _droppedGadgets;
-    private readonly IList<AllocationGagdet> _createdGadgets;
+    private readonly IList<Gadget> _droppedGadgets;
+    private readonly IList<Gadget> _createdGadgets;
     private readonly IList<string> _additionalGroups;
 
     public override string Subject => "Termin wurde geändert #" + this._allocation.Id;
@@ -43,21 +43,21 @@ namespace Rema.Infrastructure.Email.Templates
 
       foreach (var gadget in _droppedGadgets)
       {
-        var group = gadget.Gadget.SuppliedBy;
+        var group = gadget.SuppliedBy;
         if (dictDeleted.TryGetValue(group, out string oldTitles))
-          dictDeleted[group] = $"{oldTitles}, {gadget.Gadget.Title}";
+          dictDeleted[group] = $"{oldTitles}, {gadget.Title}";
         else
-          dictDeleted.Add(group, $"{System.Environment.NewLine}-Folgende Hilfsmittel werden nicht mehr benötigt: {gadget.Gadget.Title}");
+          dictDeleted.Add(group, $"{System.Environment.NewLine}-Folgende Hilfsmittel werden nicht mehr benötigt: {gadget.Title}");
       }
 
       // wegen neuer Hilfsmittel benachrichtigen
       foreach (var alGadget in _createdGadgets)
       {
-        var group = alGadget.Gadget.SuppliedBy;
+        var group = alGadget.SuppliedBy;
         if (dictCreated.TryGetValue(group, out string oldTitles))
-          dictCreated[group] = $"{oldTitles}, {alGadget.Gadget.Title}";
+          dictCreated[group] = $"{oldTitles}, {alGadget.Title}";
         else
-          dictCreated.Add(group, $"{System.Environment.NewLine}-Folgende Hilfsmittel werden zusätzlich benötigt: {alGadget.Gadget.Title}");
+          dictCreated.Add(group, $"{System.Environment.NewLine}-Folgende Hilfsmittel werden zusätzlich benötigt: {alGadget.Title}");
       }
       return (dictDeleted, dictCreated);
     }

@@ -31,14 +31,14 @@ namespace Rema.DbAccess
 
       modelBuilder.Entity<AllocationGagdet>()
         .HasKey(ag => new { ag.AllocationId, ag.GadgetId });
-      modelBuilder.Entity<AllocationGagdet>()
+/*      modelBuilder.Entity<AllocationGagdet>()
         .HasOne(ag => ag.Allocation)
         .WithMany(a => a.AllocationGadgets)
         .HasForeignKey(ag => ag.AllocationId);
       modelBuilder.Entity<AllocationGagdet>()
         .HasOne(ag => ag.Gadget)
         .WithMany(g => g.AllocationGadgets)
-        .HasForeignKey(ag => ag.GadgetId);
+        .HasForeignKey(ag => ag.GadgetId);*/
     }
   }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Rema.Infrastructure.Models
 {
-  [Table("AllocationGagdet")]
+  [Table("AllocationGagdetOld")]
   public class AllocationGagdet
   {
     public long AllocationId { get; set; }
