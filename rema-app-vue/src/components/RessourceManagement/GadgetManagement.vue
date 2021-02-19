@@ -99,12 +99,20 @@ export default class SupplierManagement extends Vue {
     return Supplier.all()
   }
   private get items (): Array<GadgetItem> {
-    return Gadget.query().withAll().get().map((g: Gadget) => ({
+    let supplierGroups = new Map()
+    Supplier.query().get().forEach((s: Supplier) => {
+      supplierGroups.set(s.Id, s.Title)
+    })
+
+    let allGadgets: Array<Gadget> = Gadget.query().withAll().get()
+    let rValue: Array<GadgetItem> = allGadgets.map((g: Gadget) => ({
       Id: g.Id,
       Title: g.Title,
-      SuppliedBy: g.SuppliedBy.Id,
-      SupplierName: g.SuppliedBy.Title
+      SuppliedBy: g.SuppliedBy,
+      SupplierName: supplierGroups.get(g.SuppliedBy)
     }))
+
+    return rValue
   }
   private get invalidForm (): boolean {
     return !this.editTitle || !this.editSupplier

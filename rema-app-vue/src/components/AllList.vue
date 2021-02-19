@@ -118,7 +118,7 @@ export default class AllList extends Vue {
     const selectedGroupId = this.selectedGroup?.Id || 0
     const rVal: string[] = []
 
-    item.Gadgets.filter((e: Partial<Gadget>) => (e.SuppliedBy as unknown as number) === selectedGroupId)
+    item.Gadgets.filter((e: Partial<Gadget>) => (e.SuppliedBy /* as unknown as number */) === selectedGroupId)
       .forEach((e: Gadget) => rVal.push(e.Title))
 
     item.HintsForSuppliers.filter((e: WebApi.SimpleSupplierHint) => e.GroupId === selectedGroupId)

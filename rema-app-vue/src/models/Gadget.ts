@@ -12,11 +12,13 @@ export class Gadget extends Model {
     return {
       Id: this.attr(null),
       Title: this.attr(''),
-      SuppliedBy: this.attr(null)
+      SuppliedBy: this.attr(null),
+      Supplier: this.hasOne(Supplier, 'Id')
     }
   }
 
   Id!: number
   Title!: string
-  SuppliedBy!: Supplier
+  SuppliedBy!: number
+  Supplier!: Supplier
 }
