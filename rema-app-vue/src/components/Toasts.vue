@@ -1,14 +1,16 @@
 <template>
-  <v-snackbar
-      v-model="snackbar"
-      :multi-line="multiline"
-      :timeout="timeout"
-      :color="color"
-      :centered="center"
+<div>
+  <v-snackbar v-for="(toast, idx) in toasts" :key="'toast'+idx"
+      v-model="toast.snackbar"
+      :multi-line="toast.multiline"
+      :timeout="toast.timeout"
+      :color="toast.color"
+      :centered="toast.center"
       bottom
     >
-      {{ text }}
+      {{ toast.text }}
     </v-snackbar>
+</div>
 </template>
 
 <script lang="ts">
@@ -17,33 +19,18 @@ import { ShowToast } from '../models/interfaces'
 
 @Component
 export default class Toasts extends Vue {
-  private timeout: number = 3000
-  private text: string = ''
-  private multiline: boolean = true
-  private snackbar: boolean = false
-  private color: string = 'primary'
-  private center: boolean = false
+  private toasts: Array<ToastSettings> = []
 
   private openToast (payload: ShowToast) {
-    this.text = payload.text
-    this.color = payload.color || 'primary'
-    this.center = !!payload.center
-    if (payload.timeout) {
-      this.timeout = payload.timeout
-      setTimeout(() => { this.timeout = 3000 }, payload.timeout * 1.1)
-    }
+    let toast = new ToastSettings()
+    toast.text = payload.text
+    toast.color = payload.color || 'primary'
+    toast.center = !!payload.center
+    toast.multiline = true
+    toast.timeout = payload.timeout || 3000
 
-    this.snackbar = true
-  }
-  @Watch('snackbar')
-  public watchSnackbar (newV: boolean) {
-    if (newV) return
-
-    this.timeout = 3000
-    this.text = ''
-    this.multiline = true
-    this.color = 'primary'
-    this.center = false
+    toast.snackbar = true
+    this.toasts.push(toast)
   }
 
   private created () {
@@ -52,5 +39,14 @@ export default class Toasts extends Vue {
   private destroyed () {
     this.$root.$off('notify-user', this.openToast)
   }
+}
+
+class ToastSettings {
+  public timeout: number = 3000
+  public text: string = ''
+  public multiline: boolean = true
+  public snackbar: boolean = false
+  public color: string = 'primary'
+  public center: boolean = false
 }
 </script>

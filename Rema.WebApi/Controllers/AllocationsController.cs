@@ -291,7 +291,8 @@ namespace Rema.WebApi.Controllers
       {
         allocation = await _context.Allocations.FindAsync(allocation.Id);
         var template = new NewAllocationTemplate(allocation, yourRequest);
-        this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
+        var emailSuccess = this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
+        AddMailErrorHeaderCondidtional(emailSuccess);
       }
       catch (Exception ex)
       {
@@ -487,7 +488,8 @@ namespace Rema.WebApi.Controllers
         var yourRequest = isBooking ? "Buchung" : "Buchungsanfrage";
 
         var template = new NewAllocationTemplate(allocations, yourRequest);
-        this._emailTrigger.SendEmail(template, recipient, template.GetGroupEmails());
+        var emailSuccess = this._emailTrigger.SendEmail(template, recipient, template.GetGroupEmails());
+        AddMailErrorHeaderCondidtional(emailSuccess);
       }
       catch (Exception ex)
       {
@@ -541,7 +543,9 @@ namespace Rema.WebApi.Controllers
       }
 
       var template = new DeletedAllocationTemplate(allocation);
-      this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
+      var emailSuccess = this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, template.GetGroupEmails());
+      AddMailErrorHeaderCondidtional(emailSuccess);
+
       return Ok();
     }
 
@@ -623,7 +627,10 @@ namespace Rema.WebApi.Controllers
           template = new StatusChangedTemplate(allocation, "abgelehnt");
         }
         if (template != null)
-          this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, new List<string>());
+        {
+          var emailSuccess = this._emailTrigger.SendEmail(template, allocation?.ReferencePerson?.Email, new List<string>());
+          AddMailErrorHeaderCondidtional(emailSuccess);
+        }
       }
       catch (Exception ex)
       {
@@ -833,7 +840,8 @@ namespace Rema.WebApi.Controllers
       }
 
       var template = new GadgetUpdateTemplate(oldAllocation, createdGadgets, deletedGadgets, hintGroupMails);
-      this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails());
+      var emailSuccess = this._emailTrigger.SendEmail(template, oldAllocation?.ReferencePerson?.Email, template.GetGroupEmails());
+      AddMailErrorHeaderCondidtional(emailSuccess);
       return Ok();
     }
 
@@ -854,6 +862,12 @@ namespace Rema.WebApi.Controllers
       oldAllocation.Gadgets = new List<Gadget>();
       foreach (var gadget in newGadgets)
         oldAllocation.Gadgets.Add(gadget);
+    }
+
+    private void AddMailErrorHeaderCondidtional(bool hasNoError)
+    {
+      if (!hasNoError)
+        Response.Headers.Add("mailerror", "Fehler bei Versand der Benachrichtigungs-E-Mails");
     }
 
     // könnte mal benutzt werden

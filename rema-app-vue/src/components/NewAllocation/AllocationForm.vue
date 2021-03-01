@@ -194,7 +194,7 @@ import AllocationFormService from '../../services/AllocationFormServices'
 import { Component, Prop, Vue, Watch, Mixins } from 'vue-property-decorator'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import { InitAllocation, ShortAllocationView, ShowToast } from '../../models/interfaces'
-import { submitAllocation, submitAllocations, refreshAllocations } from '../../services/AllocationApiService'
+import { submitAllocation, submitAllocations, refreshAllocations, errorCallbackFactory } from '../../services/AllocationApiService'
 
 @Component({
   components: {
@@ -263,8 +263,9 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
 
     var success : boolean = false
     this.loading = true
+    let errorCallback = errorCallbackFactory(this)
     if (!this.isRepeating) {
-      success = await submitAllocation(newAllocation)
+      success = await submitAllocation(newAllocation, errorCallback)
       if (success) this.$root.$emit('notify-user', { text: 'Speichern erfolgreich', color: 'success' } as ShowToast)
       else this.$root.$emit('notify-user', { text: 'Speichern fehlgeschlagen', color: 'error' } as ShowToast)
     } else {
@@ -272,7 +273,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
       newAllocation.To = this.timeTo
       newAllocation.Dates = this.multipleDates
 
-      success = await submitAllocations(newAllocation)
+      success = await submitAllocations(newAllocation, errorCallback)
     }
     if (success) {
       this.$root.$emit('notify-user', { text: 'Speichern erfolgreich', color: 'success' } as ShowToast)

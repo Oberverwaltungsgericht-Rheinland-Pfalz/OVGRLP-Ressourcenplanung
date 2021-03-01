@@ -177,7 +177,7 @@ import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { ShortAllocationView, ShowToast } from '../models/interfaces'
 import AllocationFormService from '../services/AllocationFormServices'
-import { refreshAllocations, editAllocation } from '../services/AllocationApiService'
+import { refreshAllocations, editAllocation, errorCallbackFactory } from '../services/AllocationApiService'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 
 @Component({
@@ -321,7 +321,7 @@ export default class EditFormModal extends mixins(AllocationFormService) {
     }
 
     this.loading = true
-    let success = await editAllocation(data)
+    let success = await editAllocation(data, errorCallbackFactory(this))
     this.loading = false
     if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung gespeichert', color: 'success' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Bearbeitung speichern fehlgeschlagen', color: 'error' } as ShowToast)

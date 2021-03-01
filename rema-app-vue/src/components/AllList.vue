@@ -84,7 +84,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation, Gadget, Ressource, Supplier } from '../models'
 import { SelectableGroup, ShowToast, ConfirmData } from '../models/interfaces'
-import { deleteAllocation } from '../services/AllocationApiService'
+import { deleteAllocation, errorCallbackFactory } from '../services/AllocationApiService'
 import EditFormModal from './EditFormModal.vue'
 import moment from 'moment'
 import print from 'print-js'
@@ -201,7 +201,8 @@ export default class AllList extends Vue {
     this.$root.$emit('user-confirm', data)
   }
   private async deleteItem (id: number): Promise<void> {
-    let success = await deleteAllocation(id)
+    let errorCallback = errorCallbackFactory(this)
+    let success = await deleteAllocation(id, errorCallback)
 
     if (success) this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)

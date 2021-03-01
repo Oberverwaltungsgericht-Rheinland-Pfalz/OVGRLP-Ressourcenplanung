@@ -102,7 +102,7 @@ import EditFormModal from './EditFormModal.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { CalendarEventParsed, CalendarTimestamp } from 'vuetify'
-import { deleteAllocation } from '../services/AllocationApiService'
+import { deleteAllocation, errorCallbackFactory } from '../services/AllocationApiService'
 import { Allocation, Gadget, Ressource, Supplier } from '../models'
 import { ShowToast, ConfirmData, CalendarElement } from '../models/interfaces'
 
@@ -264,8 +264,9 @@ export default class Calendar extends Vue {
     this.$root.$emit('user-confirm', data)
   }
   public async deleteAllocation (): Promise<void> {
+    let errorCallback = errorCallbackFactory(this)
     const { id, name } = this.selectedEvent as any
-    let success = await deleteAllocation(id)
+    let success = await deleteAllocation(id, errorCallback)
 
     if (success) this.$root.$emit('notify-user', { text: 'Eintrag gelöscht', color: 'success' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)

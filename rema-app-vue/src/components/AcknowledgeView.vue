@@ -149,7 +149,7 @@ import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import AllocationFormService from '@/services/AllocationFormServices'
 import { AllocationRequest, AllocationRequestView, ShortAllocationView, ShowToast } from '../models/interfaces'
 import { Allocation } from '../models'
-import { editAllocationStatus, refreshAllocations } from '../services/AllocationApiService'
+import { editAllocationStatus, errorCallbackFactory, refreshAllocations } from '../services/AllocationApiService'
 import CollisionDetection from './CollisionDetection.vue'
 
 @Component({ components: { DropDownTimePicker, CollisionDetection } })
@@ -217,14 +217,11 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
   }
 
   public async saveStatus (task: WebApi.AllocationRequestEdition): Promise<void> {
-    let success = await editAllocationStatus(task)
+    let errorCallback = errorCallbackFactory(this)
+    let success = await editAllocationStatus(task, errorCallback)
     if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung erfolgreich', color: 'info' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Bearbeitung konnte nicht gespeichert werden', color: 'error' } as ShowToast)
 
-    /* Allocation.update({
-      where: task.Id,
-      data: { From: task.From, To: task.To, Status: status }
-    }) */
     await refreshAllocations()
     this.$emit('input', false)
   }
