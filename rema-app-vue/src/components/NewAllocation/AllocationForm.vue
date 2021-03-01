@@ -170,7 +170,6 @@
         ><v-icon>save</v-icon> Speichern</v-btn
       >
       <v-btn
-        v-else
         color="green darken-1"
         text
         @click="sendAllocation('Pending')"

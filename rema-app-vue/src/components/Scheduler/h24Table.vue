@@ -26,13 +26,13 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Allocation, Ressource, Supplier } from '../../models'
 import { ScheduledRessource, InitAllocation, ShowToast } from '../../models/interfaces'
-import { deleteAllocation } from '../../services/AllocationApiService'
 import moment from 'moment'
 
 @Component
 export default class h24Table extends Vue {
   @Prop(String) private Day!: string
   @Prop(String) private NameFilter!: string
+  @Prop(String) private DetailFilter!: string
   @Prop(Boolean) private HideLateEarly!: boolean
   @Prop(Boolean) private HideEmptyRessources!: boolean
 
@@ -93,12 +93,16 @@ export default class h24Table extends Vue {
 
     if (!this.HideEmptyRessources) this.addEmptyRessources(rArray)
     if (this.NameFilter && this.NameFilter.length) this.applyNameFilter(rArray)
+    if (this.DetailFilter && this.DetailFilter.length) this.applyDetailFilter(rArray)
     rArray.sort((a: ScheduledRessource, b: ScheduledRessource) => Number(a.Name > b.Name) - 1)
 
     return rArray
   }
   public applyNameFilter (ar: ScheduledRessource[]) {
     ar.splice(0, Infinity, ...ar.filter((x: ScheduledRessource) => x.Name.toLowerCase().includes(this.NameFilter.toLowerCase())))
+  }
+  public applyDetailFilter (ar: ScheduledRessource[]) {
+    ar.splice(0, Infinity, ...ar.filter((x: ScheduledRessource) => x.Details && x.Details.toLowerCase().includes(this.DetailFilter.toLowerCase())))
   }
   public addEmptyRessources (ar: ScheduledRessource[]) {
     let allRessources: Array<Ressource> = Ressource.query().get()

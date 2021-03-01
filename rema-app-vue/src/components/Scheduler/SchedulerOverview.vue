@@ -4,6 +4,9 @@
       <v-col cols="2">
         <v-text-field type="text" placeholder="Namensfilter" v-model="nameFilter" title="Anzeigte Ressourcen anhand ihrer Namen filtern"/>
       </v-col>
+      <v-col cols="2">
+        <v-text-field type="text" placeholder="Detailsfilter" v-model="detailFilter" title="Anzeigte Ressourcen anhand ihrer Details filtern"/>
+      </v-col>
       <v-col cols="1">
         <v-btn v-if="hideEmptyRessources" @click="hideEmptyRessources = false" title="Freie Ressourcen anzeigen"><v-icon>blur_circular</v-icon></v-btn>
         <v-btn v-else @click="hideEmptyRessources = true" title="Freie Ressourcen ausblenden"><v-icon>blur_linear</v-icon></v-btn>
@@ -40,13 +43,13 @@
       v-if="dayOrWeek" :Day="today"
         :HideLateEarly="hideLateEarly"
         :NameFilter="nameFilter"
+        :DetailFilter="detailFilter"
         :HideEmptyRessources="hideEmptyRessources"
     />
     <div v-else :class="{'day': dayOrWeek, 'week': !dayOrWeek}">
       <h24-table
         v-for="idx in 5" :key="'dayScheduler'+idx"
         :HideLateEarly="hideLateEarly"
-        :NameFilter="nameFilter"
         :HideEmptyRessources="hideEmptyRessources"
         :Day="todayPlus(idx-1)"
       />
@@ -68,6 +71,7 @@ export default class SchedulerOverview extends Vue {
   private dayOrWeek: boolean = true
   private hideLateEarly: boolean = true
   private nameFilter: string = ''
+  private detailFilter: string = ''
   private hideEmptyRessources: boolean = false
 
   private daypickerOpen: boolean = false
