@@ -33,9 +33,18 @@ namespace Rema.Infrastructure.Email
         Log.Information("email sending is deactivated");
         return true;
       }
+      if (groups == null)
+      {
+        groups = new List<string>();
+      }
       if (recipient != null)
       {
         groups.Add(recipient);
+      }
+      if(template.IsRequest)
+      {
+        string acknowledgeMail = this._configuration["RequestAcknowledgeEmail"];
+        groups.Add(acknowledgeMail);
       }
 
       var senderEmail = "support@ovg.jm.rlp.de";
