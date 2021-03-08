@@ -146,12 +146,13 @@
             <v-textarea v-model="Notes" :label="'Notizen'" auto-grow clearable outlined :disabled="readonly" hide-details=true rows="2"></v-textarea>
           </v-col>
         </v-row>
-        <collision-detection :viewAllocation="RessourceChecker"/>
+        <collision-detection :viewAllocation="RessourceChecker" @has-collisions="hasCollisions = $event" />
         <v-row><v-col class="no-top-padding"><span class="right-head">Terminstatus: {{Status | status2string}}</span></v-col></v-row>
       </v-container>
     </v-card-text>
     <v-card-actions>
       <div class="flex-grow-1"></div>
+      <v-icon v-if="hasCollisions" color="orange" title="Mögliche Kollisionen">warning</v-icon>
       <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
       <v-btn
         v-if="permissionToEdit && !readonly "
@@ -168,13 +169,12 @@
 </template>
 
 <script lang="ts">
-import moment from 'moment'
 import { mixins } from 'vue-class-component'
 import TitleProposal from './TitleProposal.vue'
 import CollisionDetection from './CollisionDetection.vue'
-import { Gadget, Ressource, Supplier, Allocation } from '../models'
+import { Gadget, Allocation } from '../models'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Watch } from 'vue-property-decorator'
 import { ShortAllocationView, ShowToast } from '../models/interfaces'
 import AllocationFormService from '../services/AllocationFormServices'
 import { refreshAllocations, editAllocation, errorCallbackFactory } from '../services/AllocationApiService'

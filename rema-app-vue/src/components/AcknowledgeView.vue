@@ -114,7 +114,7 @@
             </v-col>
           </v-row>
         </v-container>
-        <collision-detection :viewAllocation="RessourceChecker"/>
+        <collision-detection :viewAllocation="RessourceChecker" @has-collisions="hasCollisions = $event" />
       </v-card-text>
       <v-card-actions>
         <div class="flex-grow-1"></div>
@@ -124,6 +124,7 @@
         <v-btn color="red darken-1" :disabled="moveEdit" text @click="reject">
           <v-icon v-html="'close'"></v-icon>Ablehnen
         </v-btn>
+        <v-icon v-if="hasCollisions" color="orange" title="Mögliche Kollisionen">warning</v-icon>
         <v-btn
           color="gray darken-1"
           :disabled="timesInvalid && moveEdit"
@@ -144,7 +145,6 @@
 import { State, Action, Getter, Mutation } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
-import { Names as Fnn } from '../store/User/types'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
 import AllocationFormService from '@/services/AllocationFormServices'
 import { AllocationRequest, AllocationRequestView, ShortAllocationView, ShowToast } from '../models/interfaces'

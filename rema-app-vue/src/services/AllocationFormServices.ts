@@ -18,6 +18,7 @@ export default class AllocationFormService extends Vue {
   public timeFrom: string = '08:00'
   public timeTo: string = '17:00'
   public checkForm: boolean = false
+  public hasCollisions: boolean = false
 
   @Watch('dateFrom')
   @Watch('dateTo')

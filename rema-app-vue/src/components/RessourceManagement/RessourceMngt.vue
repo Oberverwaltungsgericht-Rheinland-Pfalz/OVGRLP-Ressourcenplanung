@@ -18,7 +18,7 @@
         </v-toolbar>
       </template>
 
-      <template v-slot:item.action="{ item }">
+      <template v-slot:[`item.action`]="{ item }">
         <v-icon class="mr-2" @click="editItem(item)" title="Ressource bearbeiten">edit</v-icon>
         <v-icon @click="confirmItem(item)" title="Ressource löschen">delete</v-icon>
       </template>

@@ -72,5 +72,9 @@ export default class CollisionDetection extends Vue {
   private mounted () {
     this.onviewAllocationChanged(this.viewAllocation)
   }
+  @Watch('hasCollisions')
+  private watchHasCollisions (newValue: boolean) {
+    this.$emit('has-collisions', newValue)
+  }
 }
 </script>

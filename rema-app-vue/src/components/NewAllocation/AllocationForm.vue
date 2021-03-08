@@ -149,19 +149,17 @@
               :label="'Notizen'"
               rows="2"
               hide-details=true
-              auto-grow
-              clearable
-              outlined
-              rounded
+              auto-grow clearable outlined rounded
             ></v-textarea>
           </v-col>
         </v-row>
       </v-container>
-      <collision-detection :viewAllocation="RessourceChecker"/>
+      <collision-detection :viewAllocation="RessourceChecker" @has-collisions="hasCollisions = $event" />
     </v-card-text>
     <v-card-actions>
       <div class="flex-grow-1"></div>
       <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
+      <v-icon v-if="hasCollisions" color="orange" title="Mögliche Kollisionen">warning</v-icon>
       <v-btn
         v-if="permissionToEdit"
         color="green darken-1"
@@ -183,14 +181,12 @@
 </template>
 
 <script lang="ts">
-import moment from 'moment'
 import TitleProposal from '../TitleProposal.vue'
 import CollisionDetection from '../CollisionDetection.vue'
-import { State, Action, Getter, Mutation } from 'vuex-class'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { Gadget, Ressource, Supplier, Allocation } from '../../models'
+import { Gadget } from '../../models'
 import AllocationFormService from '../../services/AllocationFormServices'
-import { Component, Prop, Vue, Watch, Mixins } from 'vue-property-decorator'
+import { Component, Prop, Mixins } from 'vue-property-decorator'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
 import { InitAllocation, ShortAllocationView, ShowToast } from '../../models/interfaces'
 import { submitAllocation, submitAllocations, refreshAllocations, errorCallbackFactory } from '../../services/AllocationApiService'
