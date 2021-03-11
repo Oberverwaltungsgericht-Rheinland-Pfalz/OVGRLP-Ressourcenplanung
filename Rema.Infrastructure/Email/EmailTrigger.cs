@@ -33,6 +33,7 @@ namespace Rema.Infrastructure.Email
         Log.Information("email sending is deactivated");
         return true;
       }
+      
       if (groups == null)
       {
         groups = new List<string>();
@@ -41,6 +42,11 @@ namespace Rema.Infrastructure.Email
       {
         groups.Add(recipient);
       }
+      if (groups.Count == 0 )
+      {
+        return true;
+      }
+
       if(template.IsRequest)
       {
         string acknowledgeMail = this._configuration["RequestAcknowledgeEmail"];

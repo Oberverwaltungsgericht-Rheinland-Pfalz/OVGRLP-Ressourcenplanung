@@ -289,47 +289,48 @@ export default class EditFormModal extends mixins(AllocationFormService) {
   public async saveAllocation () {
     if (this.isFormInvalid()) return
 
-    let data = {} as WebApi.AllocationViewModel
-    data.Id = this.eventId
+    let callbackFn = async () => { // eigentlich Funktion, wird aufgerufen wenn Bestätigung erteilt wurde
+      let data = {} as WebApi.AllocationViewModel
+      data.Id = this.eventId
 
-    data.Title = this.title
-    data.RessourceIds = [...this.ressourceIds]
-    data.IsAllDay = this.fullday
+      data.Title = this.title
+      data.RessourceIds = [...this.ressourceIds]
+      data.IsAllDay = this.fullday
 
-    if (this.referencePerson.ActiveDirectoryID) { // reference person was set in the ui
-      data.ReferencePersonId = this.referencePerson.ActiveDirectoryID
-    } else if (!this.referencePerson.ActiveDirectoryID && this.ReferencePersonId) { // no reference person was set
-      data.ReferencePersonId = ''
-    } /* else {
-      data.ReferencePersonId = this.ReferencePersonId
-    } */ // should never happen
+      if (this.referencePerson.ActiveDirectoryID) { // reference person was set in the ui
+        data.ReferencePersonId = this.referencePerson.ActiveDirectoryID
+      } else if (!this.referencePerson.ActiveDirectoryID && this.ReferencePersonId) { // no reference person was set
+        data.ReferencePersonId = ''
+      }
 
-    data.GadgetsIds = this.selectedGadgets
-    data.ContactPhone = this.telNumber
-    data.Notes = this.Notes
-    data.HintsForSuppliers = this.GetHintsForSuppliers
+      data.GadgetsIds = this.selectedGadgets
+      data.ContactPhone = this.telNumber
+      data.Notes = this.Notes
+      data.HintsForSuppliers = this.GetHintsForSuppliers
 
-    if (this.isRepeating) data.ScheduleSeries = this.ScheduleSeries
-    else data.ScheduleSeries = ''
+      if (this.isRepeating) data.ScheduleSeries = this.ScheduleSeries
+      else data.ScheduleSeries = ''
 
-    if (this.isRepeating) {
-      data.From = this.dateOfSeries + 'T' + (this.fullday ? '00:00' : this.timeFrom)
-      data.To = this.dateOfSeries + 'T' + (this.fullday ? '23:59' : this.timeTo)
-    } else {
-      data.From = this.dateFrom + 'T' + (this.fullday ? '00:00' : this.timeFrom)
-      data.To = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
+      if (this.isRepeating) {
+        data.From = this.dateOfSeries + 'T' + (this.fullday ? '00:00' : this.timeFrom)
+        data.To = this.dateOfSeries + 'T' + (this.fullday ? '23:59' : this.timeTo)
+      } else {
+        data.From = this.dateFrom + 'T' + (this.fullday ? '00:00' : this.timeFrom)
+        data.To = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
+      }
+
+      this.loading = true
+      let success = await editAllocation(data, errorCallbackFactory(this))
+      this.loading = false
+      if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung gespeichert', color: 'success' } as ShowToast)
+      else this.$root.$emit('notify-user', { text: 'Bearbeitung speichern fehlgeschlagen', color: 'error' } as ShowToast)
+
+      await Allocation.update(data)
+      await refreshAllocations()
+      this.$emit('updateview')
+      this.dialog = false
     }
-
-    this.loading = true
-    let success = await editAllocation(data, errorCallbackFactory(this))
-    this.loading = false
-    if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung gespeichert', color: 'success' } as ShowToast)
-    else this.$root.$emit('notify-user', { text: 'Bearbeitung speichern fehlgeschlagen', color: 'error' } as ShowToast)
-
-    await Allocation.update(data)
-    await refreshAllocations()
-    this.$emit('updateview')
-    this.dialog = false
+    this.saveDateWithWarning(callbackFn)
   }
 }
 </script>

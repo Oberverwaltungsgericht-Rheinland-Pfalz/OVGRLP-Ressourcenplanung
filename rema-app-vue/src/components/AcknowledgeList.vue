@@ -40,19 +40,18 @@
     </v-data-table>
 
     <h3 v-else>Es liegen keine zu bearbeitenden Terminanfragen vor</h3>
-    <AcknowledgeView v-model="dialog" :viewAllocation="viewAllocation" />
+    <AcknowledgeView v-if="dialog" v-model="dialog" :viewAllocation="viewAllocation" />
   </v-layout>
 </template>
 
 <script lang="ts">
-import { State, Action, Getter, Mutation } from 'vuex-class'
+import { State, Action } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AllocationRequest, AllocationRequestView, UserData } from '../models/interfaces'
 import AcknowledgeView from './AcknowledgeView.vue'
 import { Allocation, Gadget, Ressource, Supplier } from '../models'
 import { Names } from '../store/User/types'
 import { refreshAllocations } from '../services/AllocationApiService'
-import { refreshGadgets } from '../services/GadgetApiService'
 
 const namespace = 'user'
 

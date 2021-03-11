@@ -188,7 +188,7 @@ import { Gadget } from '../../models'
 import AllocationFormService from '../../services/AllocationFormServices'
 import { Component, Prop, Mixins } from 'vue-property-decorator'
 import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
-import { InitAllocation, ShortAllocationView, ShowToast } from '../../models/interfaces'
+import { ConfirmData, InitAllocation, ShortAllocationView, ShowToast } from '../../models/interfaces'
 import { submitAllocation, submitAllocations, refreshAllocations, errorCallbackFactory } from '../../services/AllocationApiService'
 
 @Component({
@@ -217,8 +217,11 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
 
   private async sendAllocation (status: string): Promise<void> {
     if (this.isFormInvalid()) return
-    this.saveAllocation(status)
-    this.close()
+    let callbackFn = () => { // eigentlich Funktion, wird aufgerufen wenn Bestätigung erteilt wurde
+      this.saveAllocation(status)
+      this.close()
+    }
+    this.saveDateWithWarning(callbackFn)
   }
 
   public get RessourceChecker () : ShortAllocationView {

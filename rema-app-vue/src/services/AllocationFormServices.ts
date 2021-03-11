@@ -1,7 +1,7 @@
 
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { Ressource, Supplier } from '../models'
-import { ShowToast } from '../models/interfaces'
+import { ConfirmData, ShowToast } from '../models/interfaces'
 import moment from 'moment'
 
 @Component
@@ -58,6 +58,15 @@ export default class AllocationFormService extends Vue {
       return (a.Name > b.Name) ? 1 : -1
     }
     return Ressource.all().sort(compareNumbers)
+  }
+
+  public saveDateWithWarning (callbackFn: Function) {
+    let data: ConfirmData = { title: 'Mögliche Doppelbuchung',
+      content: `Möchten sie den Termin trotz möglicher Doppelbelegung wirklich speichern?`,
+      callback: callbackFn,
+      id: 0
+    }
+    this.$root.$emit('user-confirm', data)
   }
 
   public isFormInvalid (): boolean {

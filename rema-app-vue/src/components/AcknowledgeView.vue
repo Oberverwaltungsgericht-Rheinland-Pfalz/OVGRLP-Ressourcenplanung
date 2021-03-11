@@ -45,7 +45,7 @@
               <strong>Ansprechpartner:</strong>
             </v-col>
             <v-col cols="3">{{
-              contactUserName(viewAllocation.ReferencePerson)
+              contactUserName(viewAllocation.ReferencePersonId)
             }}</v-col>
 
             <v-col cols="3">
@@ -119,12 +119,13 @@
       <v-card-actions>
         <div class="flex-grow-1"></div>
         <v-btn color="green darken-1" :disabled="moveEdit" text @click="acknowledge">
+          <v-icon v-if="hasCollisions" color="orange" title="Mögliche Kollisionen">warning</v-icon>
           <v-icon v-html="'done'"></v-icon>Bestätigen
         </v-btn>
         <v-btn color="red darken-1" :disabled="moveEdit" text @click="reject">
           <v-icon v-html="'close'"></v-icon>Ablehnen
         </v-btn>
-        <v-icon v-if="hasCollisions" color="orange" title="Mögliche Kollisionen">warning</v-icon>
+        <v-icon v-if="hasCollisions" v-show="moveEdit" color="orange" title="Mögliche Kollisionen">warning</v-icon>
         <v-btn
           color="gray darken-1"
           :disabled="timesInvalid && moveEdit"
@@ -142,12 +143,12 @@
 </template>
 
 <script lang="ts">
-import { State, Action, Getter, Mutation } from 'vuex-class'
+import { State } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
 import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import AllocationFormService from '@/services/AllocationFormServices'
-import { AllocationRequest, AllocationRequestView, ShortAllocationView, ShowToast } from '../models/interfaces'
+import AllocationFormService from '../services/AllocationFormServices'
+import { AllocationRequestView, ShortAllocationView, ShowToast } from '../models/interfaces'
 import { Allocation } from '../models'
 import { editAllocationStatus, errorCallbackFactory, refreshAllocations } from '../services/AllocationApiService'
 import CollisionDetection from './CollisionDetection.vue'
@@ -189,7 +190,9 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
     ).Title
   }
   public async acknowledge (): Promise<void> {
-    this.saveStatus({ ...this.viewAllocation, status: 1 })
+    this.saveDateWithWarning(() => {
+      this.saveStatus({ ...this.viewAllocation, status: 1 })
+    })
   }
   public reject (): void {
     // change appointment status to rejected
@@ -213,12 +216,15 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
       To: this.editTo + 'T' + this.editToTime,
       IsAllDay: this.fullday
     }
-    this.saveStatus(changedAllocation)
+    this.saveDateWithWarning(() => {
+      this.saveStatus(changedAllocation)
+    })
   }
 
   public async saveStatus (task: WebApi.AllocationRequestEdition): Promise<void> {
     let errorCallback = errorCallbackFactory(this)
     let success = await editAllocationStatus(task, errorCallback)
+
     if (success) this.$root.$emit('notify-user', { text: 'Bearbeitung erfolgreich', color: 'info' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Bearbeitung konnte nicht gespeichert werden', color: 'error' } as ShowToast)
 
