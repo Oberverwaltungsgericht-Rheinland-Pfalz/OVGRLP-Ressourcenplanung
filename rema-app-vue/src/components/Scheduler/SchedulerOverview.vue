@@ -11,7 +11,7 @@
         <v-btn v-if="hideEmptyRessources" @click="hideEmptyRessources = false" title="Freie Ressourcen anzeigen"><v-icon>blur_circular</v-icon></v-btn>
         <v-btn v-else @click="hideEmptyRessources = true" title="Freie Ressourcen ausblenden"><v-icon>blur_linear</v-icon></v-btn>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="4">
         <v-btn @click="jumpDays(-7)" fab text small title="7 Tage zurück"><v-icon>first_page</v-icon></v-btn>
         <v-btn @click="jumpDays(-1)" fab text small title="1 Tag zurück"><v-icon>arrow_back_ios</v-icon></v-btn>
         <v-menu ref="todayMenu" :close-on-content-click="true" transition="scale-transition" offset-y max-width="290px" min-width="290px"

@@ -103,7 +103,7 @@ function checkMailErrorCallback (response: any, errorCallback?: Function) {
   if (!errorCallback) return
   let mailerror: string | boolean = false
 
-  if (response.hasOwnProperty('headers')) {
+  if (response.headers) {
     mailerror = response.headers.get('mailerror') || false
   } else if (response.response.hasOwnProperty('headers')) {
     mailerror = response.response.headers.mailerror || false

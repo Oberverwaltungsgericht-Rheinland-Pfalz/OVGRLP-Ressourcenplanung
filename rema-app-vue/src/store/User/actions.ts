@@ -30,10 +30,13 @@ export const actions: ActionTree<UserState, RootState> = {
     await dispatch(Names.a.loadUser)
     // commit(Names.m.setUser, user)
   },
-  async [Names.a.loadUsers] ({ commit }, ids: number[]): Promise<any> {
+  async [Names.a.loadUsers] ({ commit, state }, ids: number[]): Promise<any> {
     ids = ids.filter(v => !isNaN(v))
     const referencePersonsUnique = [...new Set(ids)]
-    const response = await fetch(`/api/Users/Names/${referencePersonsUnique.join('_')}`)
+    let onlyNew = referencePersonsUnique.filter(e => state.ContactUsers.findIndex((s) => s.Id === e) === -1)
+    if (onlyNew.length === 0) return
+
+    const response = await fetch(`/api/Users/Names/${onlyNew.join('_')}`)
     const newContacts = await response.json()
     let userResponse = newContacts as WebApi.ContactUser[]
     if (userResponse && userResponse != null) {
