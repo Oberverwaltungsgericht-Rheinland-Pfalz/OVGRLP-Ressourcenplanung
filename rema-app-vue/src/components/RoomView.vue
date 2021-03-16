@@ -70,7 +70,7 @@ export default class Roomview extends Vue {
     this.editDetails = element.SpecialsDescription
   }
   private get items (): Array<Ressource> {
-    return Ressource.all()
+    return Ressource.query().where('IsDeactivated', false).get()
   }
 }
 </script>

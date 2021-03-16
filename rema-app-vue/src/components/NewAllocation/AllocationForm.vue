@@ -16,7 +16,8 @@
           <v-col>
             <v-select
               v-model="ressourceIds"
-              :items="Rooms"
+              :items="RoomsActivated"
+              item-disabled="IsDeactivated"
               item-text="Name"
               item-value="Id"
               clearable multiple
@@ -108,6 +109,7 @@
             <v-select
               v-model="selectedGadgets"
               :items="getGadgets(group.Id)"
+              item-disabled="IsDeactivated"
               :label="'Hilfsmittel (' + group.Title + ')'"
               item-text="Title"
               item-value="Id"
@@ -295,12 +297,6 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     if (this.isRepeating && !this.multipleDates.length) rValue = false
     if (this.dateTo === this.dateFrom && (this.timeFrom >= this.timeTo)) rValue = false
     return !rValue
-  }
-
-  private getGadgets (groupId: number): Array<Gadget> {
-    return Gadget.query()
-      .where('SuppliedBy', groupId)
-      .get()
   }
 
   private removeDate (item: string): void {

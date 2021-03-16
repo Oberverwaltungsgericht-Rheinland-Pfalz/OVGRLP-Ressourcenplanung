@@ -18,7 +18,8 @@
           <v-col>
             <v-select
               v-model="ressourceIds"
-              :items="Rooms"
+              :items="RoomsActivated"
+              item-disabled="IsDeactivated"
               :error="!ressourceIds && checkForm"
               item-text="Name"
               item-value="Id"
@@ -106,6 +107,7 @@
             <v-select
               v-model="selectedGadgets"
               :items="getGadgets(group.Id)"
+              item-disabled="IsDeactivated"
               :label="'Hilfsmittel (' + group.Title + ')'"
               item-text="Title"
               item-value="Id"
@@ -225,7 +227,7 @@ export default class EditFormModal extends mixins(AllocationFormService) {
 
       this.Id = all.Id
       this.title = all.Title
-      this.ressourceIds.push(...all.RessourceIds)
+      this.ressourceIds.splice(0, Infinity, ...all.RessourceIds)
       this.isRepeating = !!all.ScheduleSeries
       this.ScheduleSeries = all.ScheduleSeries
       this.fullday = all.IsAllDay
@@ -261,12 +263,6 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       to = this.dateTo + 'T' + (this.fullday ? '23:59' : this.timeTo)
     }
     return { Id: this.Id, From: from, To: to, RessourceIds: this.ressourceIds, dates: null }
-  }
-
-  private getGadgets (groupId: number) {
-    return Gadget.query()
-      .where('SuppliedBy', groupId)
-      .get()
   }
 
   private get wasRepeating () : boolean {

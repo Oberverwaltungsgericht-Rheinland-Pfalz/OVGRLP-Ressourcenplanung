@@ -129,6 +129,9 @@ namespace Rema.DbAccess.Migrations
                         .HasColumnType("bigint")
                         .UseIdentityColumn();
 
+                    b.Property<bool>("IsDeactivated")
+                        .HasColumnType("bit");
+
                     b.Property<long?>("SuppliedById")
                         .HasColumnType("bigint");
 
@@ -152,6 +155,9 @@ namespace Rema.DbAccess.Migrations
 
                     b.Property<string>("FunctionDescription")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeactivated")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()

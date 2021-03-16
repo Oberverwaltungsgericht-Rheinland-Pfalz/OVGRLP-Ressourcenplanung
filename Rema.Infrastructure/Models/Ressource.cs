@@ -24,5 +24,6 @@ namespace Rema.Infrastructure.Models
     public string Type { get; set; }
 
     public virtual ICollection<Allocation> Allocations { get; set; }
+    public bool IsDeactivated { get; set; }
   }
 }

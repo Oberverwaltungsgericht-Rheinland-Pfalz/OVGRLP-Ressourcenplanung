@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Rema.WebApi.ViewModels
+﻿namespace Rema.WebApi.ViewModels
 {
   public class RessourceViewModel
   {
@@ -12,5 +7,6 @@ namespace Rema.WebApi.ViewModels
     public string FunctionDescription { get; set; }
     public string SpecialsDescription { get; set; }
     public string Type { get; set; }
+    public bool IsDeactivated { get; set; }
   }
 }

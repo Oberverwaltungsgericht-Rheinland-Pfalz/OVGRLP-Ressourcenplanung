@@ -21,6 +21,9 @@
         <v-icon @click="confirmDelete(item)" title="Unterstützergruppe löschen">delete</v-icon>
       </template>
       <template v-slot:[`item.SuppliedBy`]="{ item }">{{item.SupplierName}}</template>
+      <template v-slot:[`item.Title`]="{ item }"><span :class="{'deactivated-title': item.IsDeactivated}">{{item.Title}}</span>
+        <v-icon v-if="item.IsDeactivated" color="warning">power_off</v-icon>
+      </template>
     </v-data-table>
     <v-dialog :value="dialog" persistent max-width="600px" scrollable>
       <v-card>
@@ -41,11 +44,23 @@
                 <v-select
                   v-model="editSupplier"
                   :items="supplierItems"
+                  item-disabled="IsDeactivated"
                   :label="'Unterstützergruppe*'"
                   item-text="Title"
                   item-value="Id"
                   persistent-hint
                 />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="no-vertical-padding" cols="12">
+                <v-switch
+                  v-model="IsDeactivated"
+                  :label="IsDeactivated ? 'Ressource ist deaktiviert' : 'Ressource ist aktiviert'"
+                  color="warning"
+                  true-value="true"
+                  hide-details
+                ></v-switch>
               </v-col>
             </v-row>
           </v-container>
@@ -76,11 +91,12 @@ import { Supplier, Ressource, Gadget } from '../../models'
 import { submitGadget, editGadget, deleteGadget } from '../../services/GadgetApiService'
 
 @Component
-export default class SupplierManagement extends Vue {
+export default class GadgetManagement extends Vue {
   private dialog: number = 0
   private editId: number = 0
   private editTitle: string = ''
   private editSupplier: number = 0
+  private IsDeactivated: boolean = false
 
   private nameRules = [(v: string) => !!v || 'Name is required']
   private valid: boolean = false
@@ -108,6 +124,7 @@ export default class SupplierManagement extends Vue {
     let rValue: Array<GadgetItem> = allGadgets.map((g: Gadget) => ({
       Id: g.Id,
       Title: g.Title,
+      IsDeactivated: g.IsDeactivated,
       SuppliedBy: g.SuppliedBy,
       SupplierName: supplierGroups.get(g.SuppliedBy)
     }))
@@ -121,18 +138,21 @@ export default class SupplierManagement extends Vue {
     this.dialog = 0
     this.editId = 0
     this.editTitle = ''
+    this.IsDeactivated = false
     this.editSupplier = 0
   }
   private editItem (item: GadgetItem) {
     this.editId = item.Id
     this.editTitle = item.Title
+    this.IsDeactivated = item.IsDeactivated
     this.editSupplier = item.SuppliedBy
     this.dialog = 2
   }
   private async updateItem () {
-    const data = {
+    const data: WebApi.GadgetViewModel = {
       Id: this.editId,
       Title: this.editTitle,
+      IsDeactivated: this.IsDeactivated,
       SuppliedBy: this.editSupplier
     }
     if (this.dialog === 2) {
@@ -172,3 +192,13 @@ export default class SupplierManagement extends Vue {
   }
 }
 </script>
+
+<style lang="stylus">
+.no-vertical-padding
+  padding-top 0
+  padding-bottom 0
+
+.deactivated-title
+  color darkorange
+  font-weight bold
+</style>

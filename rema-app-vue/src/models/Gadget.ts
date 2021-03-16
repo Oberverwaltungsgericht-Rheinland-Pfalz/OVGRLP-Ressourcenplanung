@@ -13,6 +13,7 @@ export class Gadget extends Model {
       Id: this.attr(null),
       Title: this.attr(''),
       SuppliedBy: this.attr(null),
+      IsDeactivated: this.attr(false),
       Supplier: this.hasOne(Supplier, 'Id')
     }
   }
@@ -20,5 +21,6 @@ export class Gadget extends Model {
   Id!: number
   Title!: string
   SuppliedBy!: number
+  IsDeactivated!: boolean
   Supplier!: Supplier
 }

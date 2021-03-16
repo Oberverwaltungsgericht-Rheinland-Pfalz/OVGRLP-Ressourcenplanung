@@ -1,6 +1,6 @@
 
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import { Ressource, Supplier } from '../models'
+import { Gadget, Ressource, Supplier } from '../models'
 import { ConfirmData, ShowToast } from '../models/interfaces'
 import moment from 'moment'
 
@@ -54,10 +54,10 @@ export default class AllocationFormService extends Vue {
   }
 
   public get Rooms (): Array<Ressource> {
-    function compareNumbers (a: Ressource, b: Ressource) {
-      return (a.Name > b.Name) ? 1 : -1
-    }
     return Ressource.all().sort(compareNumbers)
+  }
+  public get RoomsActivated (): Array<Ressource> {
+    return Ressource.query().where('IsDeactivated', false).get().sort(compareNumbers)
   }
 
   public saveDateWithWarning (callbackFn: Function) {
@@ -87,6 +87,12 @@ export default class AllocationFormService extends Vue {
   public get GadgetGroups (): Array<Supplier> {
     return Supplier.all()
   }
+  private getGadgets (groupId: number) {
+    return Gadget.query()
+      .where('SuppliedBy', groupId)
+      .get()
+  }
+
   public get groupTexts () : string[] {
     if (!this.groupTextsInternal.length) {
       this.GadgetGroups.forEach((g: Supplier) => {
@@ -113,3 +119,5 @@ export default class AllocationFormService extends Vue {
     return rVal
   }
 }
+
+let compareNumbers = (a: Ressource, b: Ressource) => (a.Name > b.Name) ? 1 : -1

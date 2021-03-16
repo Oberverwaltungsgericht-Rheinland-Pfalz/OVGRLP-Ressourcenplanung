@@ -13,6 +13,7 @@ export class Ressource extends Model {
       Id: this.attr(null),
       Name: this.attr(''),
       Type: this.attr('Raum'),
+      IsDeactivated: this.attr(false),
       FunctionDescription: this.attr(''),
       SpecialsDescription: this.attr('')
       // allocations: this.hasMany(Allocation, 'Ressource_id') // überflüssig to delete
@@ -22,6 +23,7 @@ export class Ressource extends Model {
   Id!: number
   Name!: string
   Type!: string
+  IsDeactivated!: boolean
   FunctionDescription!: string
   SpecialsDescription!: string
   allocations!: []

@@ -43,6 +43,7 @@ declare module WebApi {
         Id: number;
         Title: string;
         SuppliedBy: number;
+        IsDeactivated: boolean;
     }
 
     // ..\Rema.WebApi\ViewModels\MultipleAllocationsViewModel.cs
@@ -57,6 +58,7 @@ declare module WebApi {
         FunctionDescription: string;
         SpecialsDescription: string;
         Type: string;
+        IsDeactivated: boolean;
     }
 
     // ..\Rema.WebApi\ViewModels\Role.cs

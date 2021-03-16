@@ -10,14 +10,16 @@
       sort-by="SuppliedBy"
     >
       <template v-slot:[`item.SuppliedBy`]="{ item }">{{ item.SupplierName }}</template>
+      <template v-slot:[`item.Title`]="{ item }">
+        <span :style="{color: item.IsDeactivated ? 'darkorange' : 'black', 'font-weight': item.IsDeactivated ? 'bold' : 'normal'}">{{ item.Title }}</span>
+      </template>
     </v-data-table>
   </v-layout>
   </template>
 
 <script lang="ts">
-import { submitGadget, editGadget, deleteGadget } from '../services/GadgetApiService'
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Ressource, Gadget, Supplier } from '../models'
+import { Component, Vue } from 'vue-property-decorator'
+import { Gadget, Supplier } from '../models'
 import { GadgetItem } from '@/models/interfaces'
 
 @Component
@@ -36,6 +38,7 @@ export default class GadgetView extends Vue {
     let rValue: Array<GadgetItem> = allGadgets.map((g: Gadget) => ({
       Id: g.Id,
       Title: g.Title,
+      IsDeactivated: g.IsDeactivated,
       SuppliedBy: g.SuppliedBy,
       SupplierName: supplierGroups.get(g.SuppliedBy)
     }))

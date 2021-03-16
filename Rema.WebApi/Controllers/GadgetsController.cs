@@ -132,6 +132,7 @@ namespace Rema.WebApi.Controllers
         {
           Id = gadgetVM.Id,
           Title = gadgetVM.Title,
+          IsDeactivated = gadgetVM.IsDeactivated,
           SuppliedBy = await _context.SupplierGroups.FindAsync(gadgetVM.SuppliedBy)
         };
       }

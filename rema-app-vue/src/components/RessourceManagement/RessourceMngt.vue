@@ -22,6 +22,10 @@
         <v-icon class="mr-2" @click="editItem(item)" title="Ressource bearbeiten">edit</v-icon>
         <v-icon @click="confirmItem(item)" title="Ressource löschen">delete</v-icon>
       </template>
+      <template v-slot:[`item.Name`]="{ item }">
+        <span :class="{'deactivated-title': item.IsDeactivated}">{{item.Name}}</span>
+        <v-icon v-if="item.IsDeactivated" color="warning">power_off</v-icon>
+      </template>
     </v-data-table>
 
     <v-dialog :value="dialog" persistent max-width="800px" scrollable>
@@ -49,6 +53,15 @@
               </v-col>
               <v-col cols="12">
                 <v-text-field :label="headers[3].text" v-model="editDetails" required></v-text-field>
+              </v-col>
+              <v-col class="no-vertical-padding" cols="12">
+                <v-switch
+                  v-model="editIsDeactivated"
+                  :label="editIsDeactivated ? 'Ressource ist deaktiviert' : 'Ressource ist aktiviert'"
+                  color="warning"
+                  true-value="true"
+                  hide-details
+                ></v-switch>
               </v-col>
             </v-row>
           </v-container>
@@ -80,6 +93,7 @@ export default class RessourceManagement extends Vue {
   private editTitle: string = '';
   private editType: string = '';
   private editDescription: string = '';
+  private editIsDeactivated: boolean = false;
   private editDetails: string = '';
 
   private nameRules = [(v: string) => !!v || 'Name is required'];
@@ -104,10 +118,11 @@ export default class RessourceManagement extends Vue {
     if (this.dialog === 2) return 'Bearbeite Ressource'
   }
   private async updateItem () {
-    const data = {
+    const data: WebApi.RessourceViewModel = {
       Id: this.editId,
       Name: this.editTitle,
       Type: this.editType,
+      IsDeactivated: this.editIsDeactivated,
       FunctionDescription: this.editDescription,
       SpecialsDescription: this.editDetails
     }
@@ -129,6 +144,7 @@ export default class RessourceManagement extends Vue {
     this.editTitle = ''
     this.editType = ''
     this.editDescription = ''
+    this.editIsDeactivated = false
     this.editDetails = ''
   }
   private get invalidForm (): boolean {
@@ -146,6 +162,7 @@ export default class RessourceManagement extends Vue {
     this.editId = item.Id
     this.editTitle = item.Name
     this.editType = item.Type
+    this.editIsDeactivated = item.IsDeactivated
     this.editDescription = item.FunctionDescription
     this.editDetails = item.SpecialsDescription
     this.dialog = 2
