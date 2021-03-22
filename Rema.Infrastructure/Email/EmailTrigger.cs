@@ -12,7 +12,7 @@ namespace Rema.Infrastructure.Email
 {
   public interface IEmailTrigger
   {
-    public bool SendEmail(EmailTemplate template, string recipient, IList<string> groups);
+    public bool SendEmail(EmailTemplate template, string recipient, IList<string> groups, bool informAcknowledgers = false);
   }
 
   public class EmailTrigger: IEmailTrigger
@@ -26,7 +26,7 @@ namespace Rema.Infrastructure.Email
       this._configuration = configuration;
     }
 
-    public bool SendEmail(EmailTemplate template, string recipient, IList<string> groups)
+    public bool SendEmail(EmailTemplate template, string recipient, IList<string> groups, bool informAcknowledgers = false)
     {
       if (!this._emailSettings.SendEmails)
       {
@@ -42,16 +42,19 @@ namespace Rema.Infrastructure.Email
       {
         groups.Add(recipient);
       }
+      if(informAcknowledgers)
+      {
+        string acknowledgeMail = this._configuration["RequestAcknowledgeEmail"];
+        if(!string.IsNullOrEmpty(acknowledgeMail))
+        {
+          groups.Add(acknowledgeMail);
+        }
+      }
       if (groups.Count == 0 )
       {
         return true;
       }
 
-      if(template.IsRequest)
-      {
-        string acknowledgeMail = this._configuration["RequestAcknowledgeEmail"];
-        groups.Add(acknowledgeMail);
-      }
 
       var senderEmail = "support@ovg.jm.rlp.de";
       var uniqueList = groups.Distinct(StringComparer.CurrentCultureIgnoreCase).ToList();

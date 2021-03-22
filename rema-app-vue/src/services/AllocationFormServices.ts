@@ -62,7 +62,7 @@ export default class AllocationFormService extends Vue {
 
   public saveDateWithWarning (callbackFn: Function) {
     let data: ConfirmData = { title: 'Mögliche Doppelbuchung',
-      content: `Möchten sie den Termin trotz möglicher Doppelbelegung wirklich speichern?`,
+      content: `Möchten sie den Termin trotz möglicher Doppelbelegung wirklich planen?`,
       callback: callbackFn,
       id: 0
     }

@@ -190,9 +190,11 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
     ).Title
   }
   public async acknowledge (): Promise<void> {
-    this.saveDateWithWarning(() => {
+    if (!this.hasCollisions) {
       this.saveStatus({ ...this.viewAllocation, status: 1 })
-    })
+    } else {
+      this.saveDateWithWarning(() => this.saveStatus({ ...this.viewAllocation, status: 1 }))
+    }
   }
   public reject (): void {
     // change appointment status to rejected
@@ -216,9 +218,13 @@ export default class AcknowledgeView extends mixins(AllocationFormService) {
       To: this.editTo + 'T' + this.editToTime,
       IsAllDay: this.fullday
     }
-    this.saveDateWithWarning(() => {
+    if (!this.hasCollisions) {
       this.saveStatus(changedAllocation)
-    })
+    } else {
+      this.saveDateWithWarning(() => {
+        this.saveStatus(changedAllocation)
+      })
+    }
   }
 
   public async saveStatus (task: WebApi.AllocationRequestEdition): Promise<void> {

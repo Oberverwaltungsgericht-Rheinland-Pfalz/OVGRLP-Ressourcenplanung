@@ -223,7 +223,8 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
       this.saveAllocation(status)
       this.close()
     }
-    this.saveDateWithWarning(callbackFn)
+    if (this.hasCollisions) this.saveDateWithWarning(callbackFn)
+    else callbackFn()
   }
 
   public get RessourceChecker () : ShortAllocationView {

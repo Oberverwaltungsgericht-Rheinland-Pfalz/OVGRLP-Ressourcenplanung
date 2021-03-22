@@ -21,7 +21,6 @@ namespace Rema.Infrastructure.Email.Templates
     }
 
     public abstract string Subject { get; }
-    public bool IsRequest => this._allocation.Status == MeetingStatus.Pending;
     public virtual IList<string> GetGroupEmails()
     {
       var rList = new HashSet<string>();

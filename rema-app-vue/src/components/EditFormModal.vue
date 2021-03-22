@@ -326,7 +326,8 @@ export default class EditFormModal extends mixins(AllocationFormService) {
       this.$emit('updateview')
       this.dialog = false
     }
-    this.saveDateWithWarning(callbackFn)
+    if (this.hasCollisions) this.saveDateWithWarning(callbackFn)
+    else callbackFn()
   }
 }
 </script>

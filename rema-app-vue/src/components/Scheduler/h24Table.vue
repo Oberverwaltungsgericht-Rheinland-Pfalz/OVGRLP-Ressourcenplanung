@@ -69,6 +69,7 @@ export default class h24Table extends Vue {
     ressources.sort()
 
     for (let res of ressources) {
+      if (res.IsDeactivated) continue
       let newObj: ScheduledRessource = { Id: res.Id, Name: res.Name, Hours: new Array(24), Details: res.SpecialsDescription }
 
       let allocs = allocations.filter((e: Allocation) => e.Ressources.some((e: Ressource) => e.Id === res.Id))
