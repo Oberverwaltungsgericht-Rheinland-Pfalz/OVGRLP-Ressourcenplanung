@@ -106,7 +106,7 @@ export default class h24Table extends Vue {
     ar.splice(0, Infinity, ...ar.filter((x: ScheduledRessource) => x.Details && x.Details.toLowerCase().includes(this.DetailFilter.toLowerCase())))
   }
   public addEmptyRessources (ar: ScheduledRessource[]) {
-    let allRessources: Array<Ressource> = Ressource.query().get()
+    let allRessources: Array<Ressource> = Ressource.query().where('IsDeactivated', false).get()
     let withoutExisting = allRessources.filter((a: Ressource) => !ar.find((b: ScheduledRessource) => a.Id === b.Id))
     for (let res of withoutExisting) {
       // @ts-ignore
