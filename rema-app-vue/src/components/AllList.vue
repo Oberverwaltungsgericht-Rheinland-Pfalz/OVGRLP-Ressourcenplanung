@@ -161,6 +161,7 @@ export default class AllList extends Vue {
       Id: v.Id,
       Title: v.Title,
       From: v.From,
+      To: v.To,
       LastModified: v.LastModified,
       // @ts-ignore
       Status: this.$options.filters.status2string(v.Status),
