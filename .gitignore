@@ -11,6 +11,7 @@ Webserver_SPA_Raumplanung/ClientApp/dist/
 *.userosscache
 *.sln.docstates
 *.app.zip
+log-*.txt
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

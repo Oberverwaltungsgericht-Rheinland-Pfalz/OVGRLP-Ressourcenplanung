@@ -17,5 +17,6 @@ namespace Rema.Infrastructure.Models
     public string Title { get; set; }
 
     public string GroupEmail { get; set; }
+    public string RemindTime { get; set; }
   }
 }

@@ -45,6 +45,15 @@
                 ></v-text-field>
               </v-col>
             </v-row>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  label="Erinnern um"
+                  required
+                  v-model="editRemindTime"
+                ></v-text-field>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card-text>
         <v-card-actions>
@@ -78,6 +87,7 @@ export default class SupplierManagement extends Vue {
   private editId: number = 0
   private editTitle: string = ''
   private editEmail: string = ''
+  private editRemindTime: string = ''
   private nameRules = [(v: string) => !!v || 'Name is required']
   private emailRules = [
     (v: string) => !!v || 'E-mail ist notwendig',
@@ -87,6 +97,7 @@ export default class SupplierManagement extends Vue {
   private headers: object[] = [
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Email', value: 'GroupEmail' },
+    { text: 'Erinnern um', value: 'RemindTime' },
     { text: 'Bearbeiten', value: 'action', sortable: false }
   ]
   private get ModalTitle () {
@@ -104,18 +115,21 @@ export default class SupplierManagement extends Vue {
     this.editId = 0
     this.editTitle = ''
     this.editEmail = ''
+    this.editRemindTime = ''
   }
   private editItem (item: WebApi.SupplierGroup): void {
     this.editId = item.Id
     this.editTitle = item.Title
     this.editEmail = item.GroupEmail
+    this.editRemindTime = item.RemindTime
     this.dialog = 2
   }
   private async updateItem () {
     const gadget = {
       Id: this.editId,
       Title: this.editTitle,
-      GroupEmail: this.editEmail
+      GroupEmail: this.editEmail,
+      RemindTime: this.editRemindTime
     }
     if (this.dialog === 2) {
       const response = await Supplier.api().put(
