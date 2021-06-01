@@ -16,6 +16,7 @@
           </v-btn>
         </v-toolbar>
       </template>
+      <template v-slot:[`item.Remind`]="{ item }"><v-icon v-if="item.Remind">check</v-icon></template>
       <template v-slot:[`item.action`]="{ item }">
         <v-icon @click="editItem(item)" title="Hilfsmittel bearbeiten" class="mr-2">edit</v-icon>
         <v-icon @click="openDialog(item)" title="Hilfsmittel löschen">delete</v-icon>
@@ -47,11 +48,7 @@
             </v-row>
             <v-row>
               <v-col cols="12">
-                <v-text-field
-                  label="Erinnern um"
-                  required
-                  v-model="editRemindTime"
-                ></v-text-field>
+                <v-checkbox v-model="editRemind" label="Gruppe erinnern"></v-checkbox>
               </v-col>
             </v-row>
           </v-container>
@@ -87,7 +84,7 @@ export default class SupplierManagement extends Vue {
   private editId: number = 0
   private editTitle: string = ''
   private editEmail: string = ''
-  private editRemindTime: string = ''
+  private editRemind: boolean = false
   private nameRules = [(v: string) => !!v || 'Name is required']
   private emailRules = [
     (v: string) => !!v || 'E-mail ist notwendig',
@@ -97,7 +94,7 @@ export default class SupplierManagement extends Vue {
   private headers: object[] = [
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Email', value: 'GroupEmail' },
-    { text: 'Erinnern um', value: 'RemindTime' },
+    { text: 'Erinnern um', value: 'Remind' },
     { text: 'Bearbeiten', value: 'action', sortable: false }
   ]
   private get ModalTitle () {
@@ -115,21 +112,21 @@ export default class SupplierManagement extends Vue {
     this.editId = 0
     this.editTitle = ''
     this.editEmail = ''
-    this.editRemindTime = ''
+    this.editRemind = false
   }
   private editItem (item: WebApi.SupplierGroup): void {
     this.editId = item.Id
     this.editTitle = item.Title
     this.editEmail = item.GroupEmail
-    this.editRemindTime = item.RemindTime
+    this.editRemind = item.Remind
     this.dialog = 2
   }
   private async updateItem () {
-    const gadget = {
+    const gadget: WebApi.SupplierGroup = {
       Id: this.editId,
       Title: this.editTitle,
       GroupEmail: this.editEmail,
-      RemindTime: this.editRemindTime
+      Remind: this.editRemind
     }
     if (this.dialog === 2) {
       const response = await Supplier.api().put(

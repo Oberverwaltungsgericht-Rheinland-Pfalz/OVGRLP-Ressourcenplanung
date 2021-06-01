@@ -99,7 +99,7 @@ declare module WebApi {
         Id: number;
         Title: string;
         GroupEmail: string;
-        RemindTime: string;
+        Remind: boolean;
     }
 
     // ..\Rema.Infrastructure\Models\SimpleSupplierHint.cs

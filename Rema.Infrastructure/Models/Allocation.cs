@@ -32,6 +32,7 @@ namespace Rema.Infrastructure.Models
 
     public Boolean IsAllDay { get; set; }
     public Boolean Reminded { get; set; }
+    public Boolean SupportersReminded { get; set; }
 
     public MeetingStatus Status { get; set; }
 

@@ -130,7 +130,14 @@ namespace Rema.WebApi
               .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever())
               .WithDescription("the email reminder is triggert to send mails on daily basis")
           );
-        
+          q.ScheduleJob<SupporterRemindJob>(trigger => trigger
+            .WithIdentity("Supporter Reminder trigger")
+            .WithCronSchedule("0 3 0 ? * *")    // cron intervall für täglich um 3 Uhr
+         //   .StartNow()
+         //   .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever())
+            .WithDescription("the supporter email reminder is triggert to send mails on daily basis")
+           );
+
           q.UseMicrosoftDependencyInjectionScopedJobFactory();
         });
 

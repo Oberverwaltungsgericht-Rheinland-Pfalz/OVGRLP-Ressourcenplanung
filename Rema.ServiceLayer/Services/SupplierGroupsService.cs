@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -57,11 +58,32 @@ namespace Rema.ServiceLayer.Services
       {
         _context.Entry(supplierGroup).State = EntityState.Modified;
         await _context.SaveChangesAsync();
-        return true;
       }
       catch (Exception ex)
       {
         Log.Error(ex, "error while saving changed suppliergroup");
+        return false;
+      }
+
+      try
+      {
+        var affectedAllocations = await _context.Allocations.Where(s => s.HintsForSuppliers.Any(g => g.Group.Id == supplierGroup.Id)).ToListAsync();
+        foreach (var afAl in affectedAllocations)
+        {
+          var copyHints = afAl.HintsForSuppliers;
+          foreach (var hint in copyHints)
+          {
+            if (hint.Group.Id == supplierGroup.Id) hint.Group = supplierGroup;
+          }
+          afAl.HintsForSuppliers = copyHints;
+          _context.Entry(afAl).State = EntityState.Modified;
+        }
+        await _context.SaveChangesAsync();
+        return true;
+      }
+      catch (Exception ex)
+      {
+        Log.Error(ex, "error while saving changed suppliergroups in allocation hints");
         return false;
       }
     }

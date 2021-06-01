@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Quartz;
@@ -20,7 +18,6 @@ namespace Rema.ServiceLayer.Jobs
   public class RemindJob : IRemindJob
   {
     protected readonly RpDbContext _context;
-//    protected readonly IMapper _mapper;
     protected readonly IEmailTrigger _emailTrigger;
     private readonly IConfiguration _configuration;
 
@@ -33,6 +30,8 @@ namespace Rema.ServiceLayer.Jobs
 
     public async Task Execute(IJobExecutionContext context)
     {
+      Log.Information("Execution of RemindJob");
+
       int remindRange = this._configuration.GetValue<int>("Reminder");
       var timeRange = DateTime.Now.AddDays(remindRange);
       var timeRangeDistance = DateTime.Now.AddDays(3);
@@ -69,14 +68,19 @@ namespace Rema.ServiceLayer.Jobs
         Log.Error(ex, "error while getting allocations");
         return;
       }
+      Log.Information("Execution of RemindJob: Found {countRemindAllocations} allocations to remind", unreminded.Count);
+      int counter = 0;
 
-      foreach(var remindAllocation in unreminded)
+      foreach (var remindAllocation in unreminded)
       {
         var template = new RemindTemplate(remindAllocation);
         bool reminded = _emailTrigger.SendEmail(template, null, new List<string>(){ remindAllocation.ReferencePerson.Email });
 
         remindAllocation.Reminded = reminded;
+        counter += reminded ? 1 : 0;
       }
+      Log.Information("Execution of RemindJob: Send {countRemindEmails} emails for {countRemindAllocations} allocations to remind", 
+        counter, unreminded.Count);
 
       try
       {
@@ -85,6 +89,7 @@ namespace Rema.ServiceLayer.Jobs
       {
         Log.Error(ex, "error while saving reminded allocations");
       }
+      Log.Information("Execution of RemindJob: saved remined allocations");
     }
   }
 }
