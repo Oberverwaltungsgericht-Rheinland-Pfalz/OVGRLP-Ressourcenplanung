@@ -67,7 +67,9 @@ namespace Rema.ServiceLayer.Services
 
       try
       {
-        var affectedAllocations = await _context.Allocations.Where(s => s.HintsForSuppliers.Any(g => g.Group.Id == supplierGroup.Id)).ToListAsync();
+        var affectedAllocations = await _context.Allocations.Where(s => !string.IsNullOrEmpty(s.SerializedHints)).ToListAsync();
+        affectedAllocations = affectedAllocations.Where(s => s.HintsForSuppliers.Any(g => g.Group.Id == supplierGroup.Id)).ToList();
+
         foreach (var afAl in affectedAllocations)
         {
           var copyHints = afAl.HintsForSuppliers;

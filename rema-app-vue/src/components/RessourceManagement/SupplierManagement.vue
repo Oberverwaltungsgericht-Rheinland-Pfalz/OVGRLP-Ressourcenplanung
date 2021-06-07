@@ -101,7 +101,7 @@ export default class SupplierManagement extends Vue {
     if (this.dialog === 1) return 'Neue Gruppe'
     if (this.dialog === 2) return 'Bearbeite Gruppe'
   }
-  private get items (): Array<Supplier> {
+  private get items (): Array<WebApi.SupplierGroup> {
     return Supplier.all()
   }
   private get invalidForm (): boolean {

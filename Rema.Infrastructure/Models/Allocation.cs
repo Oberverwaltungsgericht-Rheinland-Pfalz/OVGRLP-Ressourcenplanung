@@ -58,7 +58,7 @@ namespace Rema.Infrastructure.Models
     public virtual ICollection<Ressource> Ressources { get; set; }
 
     [Column]
-    protected string SerializedHints { get; set; }
+    public string SerializedHints { get; set; }
 
     public static readonly Expression<Func<Allocation, string>> SerializedHintsExpression = p => p.SerializedHints;
 

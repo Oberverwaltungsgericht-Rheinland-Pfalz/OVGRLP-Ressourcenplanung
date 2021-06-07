@@ -13,7 +13,8 @@ export class Supplier extends Model {
       Id: this.attr(null),
       Title: this.attr(''),
       GroupEmail: this.attr(''),
-      Gadgets: this.hasMany(Gadget, 'SuppliedBy', 'Id')
+      Gadgets: this.hasMany(Gadget, 'SuppliedBy', 'Id'),
+      Remind: this.attr(null)
     }
   }
 
@@ -21,4 +22,5 @@ export class Supplier extends Model {
   Title!: string
   GroupEmail!: string
   Gadgets!: Array<Gadget>
+  Remind!: boolean
 }

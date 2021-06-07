@@ -64,8 +64,8 @@ namespace Rema.ServiceLayer.Jobs
         && !a.SupportersReminded 
 
         // enthält Hilfsmittel, welche von Unterstützergruppen bereitgestellt werden, welche erinnert werden müssen
-        && (a.Gadgets != null || a.HintsForSuppliers.Any())
-        && ((a.Gadgets == null ? 0 : a.Gadgets.Count) + a.HintsForSuppliers.Count > 0)
+        && (a.Gadgets != null || !string.IsNullOrEmpty(a.SerializedHints))
+//        && ((a.Gadgets == null ? 0 : a.Gadgets.Count) + a.HintsForSuppliers.Count > 0)
 
         // da auch Termine mit Nachrichten an Unterstützergruppen erinnert werden müssen wäre dies zu genau
         // die Überprüfung erfolgt in der Schleife
