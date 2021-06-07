@@ -102,6 +102,9 @@ namespace Rema.DbAccess.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<bool>("SupportersReminded")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -185,6 +188,9 @@ namespace Rema.DbAccess.Migrations
 
                     b.Property<string>("GroupEmail")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Remind")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Title")
                         .IsRequired()

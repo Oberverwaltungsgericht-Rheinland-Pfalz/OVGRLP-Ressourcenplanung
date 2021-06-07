@@ -94,7 +94,7 @@ export default class SupplierManagement extends Vue {
   private headers: object[] = [
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Email', value: 'GroupEmail' },
-    { text: 'Erinnern um', value: 'Remind' },
+    { text: 'Erinnern', value: 'Remind' },
     { text: 'Bearbeiten', value: 'action', sortable: false }
   ]
   private get ModalTitle () {
