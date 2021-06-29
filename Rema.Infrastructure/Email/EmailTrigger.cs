@@ -63,7 +63,7 @@ namespace Rema.Infrastructure.Email
       MailMessage mail = new MailMessage();
       uniqueList.ForEach(e => mail.To.Add(e));
       mail.From = new MailAddress(senderEmail);
-      mail.Subject = $"[Raumplanung] {template.Subject}";
+      mail.Subject = $"[{this._configuration["SiteTitle"]}] {template.Subject}";
       mail.Body = template.ToString();
 
       mail.IsBodyHtml = false;

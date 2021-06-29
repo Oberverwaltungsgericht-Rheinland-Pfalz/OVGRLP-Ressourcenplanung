@@ -13,7 +13,6 @@ using Newtonsoft.Json.Serialization;
 using Quartz;
 using Rema.DbAccess;
 using Rema.Infrastructure.Email;
-using Rema.ServiceLayer;
 using Rema.ServiceLayer.ControllerLogic;
 using Rema.ServiceLayer.Interfaces;
 using Rema.ServiceLayer.Jobs;
@@ -50,6 +49,8 @@ namespace Rema.WebApi
       Configuration.GetSection("Email").Bind(emailSettings);
       services.AddSingleton<EmailSettings>(emailSettings);
 
+      services.AddScoped<ISupporterRemindJob, SupporterRemindJob>();
+      services.AddScoped<IRemindJob, RemindJob>();
       services.AddScoped<IEmailTrigger, EmailTrigger>();
       services.AddScoped<IAllocationService, AllocationService>();
       services.AddSingleton<IAdService>(new AdService(DomainsToSearch));
@@ -63,7 +64,7 @@ namespace Rema.WebApi
 
       services.AddScoped<IUserService, UsersService>();
       services.AddScoped<ISupplierGroupsService, SupplierGroupsService>();
-
+      
 #if DEBUG
       services.AddDbContext<RpDbContext>(
         options =>
@@ -109,45 +110,60 @@ namespace Rema.WebApi
       // nur wenn die 
       var hasReminder = Configuration["Reminder"];
       var hasReminderInt = Convert.ToInt32(hasReminder);
-      if (Convert.ToBoolean(hasReminderInt)) // is true when Reminder is unequal to 0
+      var remindSTimeString = Configuration["RemindSupporterGroupsIfSetAtTime"];
+      //DateTime remindSupporterGroupsAtTime = DateTime.ParseExact("06:00", "HH:mm", CultureInfo.CurrentCulture);
+      string remindSupporterHour = "0" , remindSupporterMinute = "0";
+
+      if (!string.IsNullOrEmpty(remindSTimeString))
       {
+        if (remindSTimeString.Contains(":"))
+        {
+          remindSupporterHour = remindSTimeString.Split(':')[0];
+          remindSupporterMinute = remindSTimeString.Split(':')[1];
+        } else
+        {
+        remindSupporterHour = remindSTimeString;
+        }
+      }
+      
         services.AddQuartz(q =>
         {
-          q.SchedulerName = "Quartz Scheduler for reminder email";
-          // base quartz scheduler, job and trigger configuration
-
-         /* q.ScheduleJob<TestJob>(trigger => trigger
-         // .StartNow()
-          .WithSimpleSchedule(x=> x.WithIntervalInSeconds(180).RepeatForever())
-          //.UsingJobData(
-          ); */
-          
-          // quickest way to create a job with single trigger is to use ScheduleJob
-          // (requires version 3.2)
-          q.ScheduleJob<RemindJob>(trigger => trigger
-              .WithIdentity("Combined Configuration Trigger")
-              .StartNow()
-              .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever())
-              .WithDescription("the email reminder is triggert to send mails on daily basis")
-          );
-          q.ScheduleJob<SupporterRemindJob>(trigger => trigger
-            .WithIdentity("Supporter Reminder trigger")
-            .WithCronSchedule("0 3 0 ? * *")    // cron intervall für täglich um 3 Uhr
-         //   .StartNow()
-         //   .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever())
-            .WithDescription("the supporter email reminder is triggert to send mails on daily basis")
-           );
-
           q.UseMicrosoftDependencyInjectionScopedJobFactory();
-        });
+          q.SchedulerName = "Quartz Scheduler for reminder email";
 
-        // ASP.NET Core hosting
+          if (Convert.ToBoolean(hasReminderInt)) // is true when Reminder is unequal to 0
+          {
+            // Create a "key" for the job
+            var reminderJobKey = new JobKey("reminderJobKey");
+            // Register the job with the DI container
+            q.AddJob<IRemindJob>(opts => opts.WithIdentity(reminderJobKey));
+            q.AddTrigger(opts => opts
+              .ForJob(reminderJobKey)
+              .WithIdentity("reminderJobKey-trigger")
+              .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever()
+            ));
+          }
+
+          if (!string.IsNullOrEmpty(remindSTimeString))
+          {
+            var groupRemiderJobKey = new JobKey("groupReminderJobKey");
+            q.AddJob<ISupporterRemindJob>(opts => opts.WithIdentity(groupRemiderJobKey));
+            // Create a trigger for the job
+            q.AddTrigger(opts => opts
+                .ForJob(groupRemiderJobKey) // link to the HelloWorldJob
+                .WithIdentity("groupRemiderJobKey-trigger") // give the trigger a unique name
+                .WithCronSchedule($"0 {remindSupporterMinute} {remindSupporterHour} * * ?")); // run every 5 seconds
+                //.WithCronSchedule($"0/30 * * * * ?")); // run every 5 seconds
+                                                       //
+    }
+  });
+
         services.AddQuartzServer(options =>
         {
           // when shutting down we want jobs to complete gracefully
           options.WaitForJobsToComplete = true;
         });
-      }
+      
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
