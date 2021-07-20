@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -81,6 +84,8 @@ namespace Rema.WebApi
         });
 #endif
 
+      services.AddHealthChecks()
+        .AddDbContextCheck<RpDbContext>("ef");
       // Register the Swagger generator, defining 1 or more Swagger documents
       services.AddSwaggerGen(c =>
       {
@@ -113,6 +118,23 @@ namespace Rema.WebApi
       var remindSTimeString = Configuration["RemindSupporterGroupsIfSetAtTime"];
       //DateTime remindSupporterGroupsAtTime = DateTime.ParseExact("06:00", "HH:mm", CultureInfo.CurrentCulture);
       string remindSupporterHour = "0" , remindSupporterMinute = "0";
+
+      Task.Run(() => {
+        Thread.CurrentThread.IsBackground = true;
+        while (true)
+        {
+          WebRequest req = WebRequest.Create(Configuration["siteUrl"] +"/api/health");
+          req.GetResponse();
+          try
+          {
+            Thread.Sleep(19 * 60000);
+          }
+          catch (ThreadAbortException)
+          {
+            break;
+          }
+        }
+      });
 
       if (!string.IsNullOrEmpty(remindSTimeString))
       {
@@ -169,7 +191,15 @@ namespace Rema.WebApi
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+      app.UseHealthChecks("/health");
+//      app.UseRouting();
       app.UseAuthentication();
+/*      app.UseEndpoints(endpoints =>
+      {
+        endpoints.MapControllers().RequireAuthorization();
+        endpoints.MapHealthChecks("/health").AllowAnonymous();
+      });
+*/
       app.UseStaticFiles(new StaticFileOptions()
       {
         OnPrepareResponse = context =>
