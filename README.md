@@ -60,6 +60,13 @@ Es gibt keinen Anmeldebildschirm da das Programm inhouse eingesetzt wird. Die Au
 
 * Es existiert eine relativ simple Ansicht zur Verwaltung von (abgelehnten) Anfragen und Entwürfen. Bearbeiter können alle Anfragen sehen. Die Entwürfe sind für deren Ersteller sichtbar. Abgelehnte Entwürfe sind für deren Ersteller sichtbar und können korrigiert werden.
 
+## Cron-Jobs
+
+Die Anwendung kann automatsch kurz vorher Personen benachrichtigungen welche als Ansprechpartner in einen Termin eingetragen sind und Unterstützergruppen kurz vor Terminen welche diese Betreffen.
+Diese Funktionen können auch über die WebApi angestuert werden unter
+* /api/debug/rememberrequesters - Benachrichtigung der Terminersteller
+* /api/debug/remembersupporters - Benachrichtigung der Unterstützergruppen
+
 ## E-Mail Versand
 
 Es sollen Benachrichtigungen wenn Ereignisse eintreten welche für die Betroffenen relevant sind (ggf. abschaltbar). 

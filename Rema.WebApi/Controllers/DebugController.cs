@@ -13,7 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Rema.ServiceLayer.Services;
 using Rema.Infrastructure.Models;
 using Rema.Infrastructure.LDAP;
-
+using Rema.ServiceLayer.Jobs;
+using System.Threading.Tasks;
 
 namespace Rema.WebApi.Controllers
 {
@@ -23,10 +24,43 @@ namespace Rema.WebApi.Controllers
   public class DebugController : BaseController
   {
     private IAdService _adService;
-
-    public DebugController(RpDbContext context, IMapper mapper, IAdService adService) : base(context, mapper)
+    private readonly ISupporterRemindJob _supporterRemind;
+    private readonly IRemindJob _remindJob;
+    public DebugController(RpDbContext context, IMapper mapper, IAdService adService, ISupporterRemindJob supporterRemindJob, IRemindJob remindJob) : base(context, mapper)
     {
       this._adService = adService;
+      this._supporterRemind = supporterRemindJob;
+      this._remindJob = remindJob;
+    }
+
+    [Route("rememberSupporters")]
+    [HttpGet]
+    public async Task<ActionResult> TriggerSupporterReminder()
+    {
+      try
+      {
+        await this._supporterRemind.Execute(null);
+        return Ok();
+      }
+      catch (Exception ex)
+      {
+        return BadRequest();
+      }
+    }
+
+    [Route("rememberRequesters")]
+    [HttpGet]
+    public async Task<ActionResult> TriggerAllocationReminder()
+    {
+      try
+      {
+        await this._remindJob.Execute(null);
+        return Ok();
+      }
+      catch (Exception ex)
+      {
+        return BadRequest();
+      }
     }
 
     [Route("CurrentUserMembers")]
