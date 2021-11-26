@@ -1,7 +1,8 @@
 {
   "name": "rema-app-vue",
   "version": "2.5.2-21262",
-  "private": true,
+  "license": "EUPL-1.2",
+  "author": "Oberverwaltungsgericht Rheinland-Pfalz",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

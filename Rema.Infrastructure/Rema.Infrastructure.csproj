@@ -3,6 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Version>2.0.0.20474</Version>
+    <Copyright>Copyright © 2019-2021 Oberverwaltungsgericht Rheinland-Pfalz</Copyright>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Product>Ressourcenplanung</Product>
+    <Company>Oberverwaltungsgericht Rheinland-Pfalz</Company>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +17,13 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Serilog" Version="2.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

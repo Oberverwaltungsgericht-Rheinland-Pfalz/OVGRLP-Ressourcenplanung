@@ -6,6 +6,10 @@
     <AssemblyName>Rema.WebApi</AssemblyName>
     <AssemblyVersion>1.0.0.20203</AssemblyVersion>
     <FileVersion>1.0.0.20203</FileVersion>
+    <Copyright>Copyright © 2019-2021 Oberverwaltungsgericht Rheinland-Pfalz</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Product>Ressourcenplanung</Product>
+    <Company>Oberverwaltungsgericht Rheinland-Pfalz</Company>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,6 +43,13 @@
     <ProjectReference Include="..\Rema.DbAccess\Rema.DbAccess.csproj" />
     <ProjectReference Include="..\Rema.Infrastructure\Rema.Infrastructure.csproj" />
     <ProjectReference Include="..\Rema.ServiceLayer\Rema.ServiceLayer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

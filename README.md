@@ -1,8 +1,8 @@
-# Raumplanungssystem
+# Ressourcenplanung
 
 ## Beschreibung
 
-Das System ist dazu bestimmt die Verwaltung der Räume im Haus zu planen und zu steuern
+Das System ist dazu bestimmt die Ressourcenallokation zu optimieren. Es können zusätzlich Hilfsmittel für Termine geordert werden. Die beteiligten werden vom System per E-Mail ständig informiert.
 
 ## Anforderungen
 
@@ -17,12 +17,13 @@ Das System ist dazu bestimmt die Verwaltung der Räume im Haus zu planen und zu 
 ### Fachlich:
 
 * Eine Kalenderansicht 
+* Eine Ressourcenansicht
+* Eine Terminansicht
 
 ### Technisch
 
 * Realisierung des Frontends mit SPA
-
-* Realisierung des Back-Ends mit .net Core
+* Realisierung des Back-Ends mit .net Core und Entity Framework
 
 ## Absicherung und Berechtigungen
 
@@ -74,13 +75,29 @@ Es sollen Benachrichtigungen wenn Ereignisse eintreten welche für die Betroffen
 ## Anwendungsfälle für Logik
 
 - [ ] Zeige bestätigte Termine
-
 - [ ] Zeige unbestätigte Termine
-
 - [ ] Zeige Termine pro Ressource
-
 - [ ] Erzeuge Terminanfrage
-
 - [ ] Bestätige Terminanfrage
 
-- [ ] 
+## Installation
+
+Die Projektmappe muss kompiliert werden mit dem Startprojekt Rema.WebApi, dies erfolgt automatisch über das Skript "build-all" des Web-UI Projekts. Dieses Skript erstellt automatisch eine gezippte Version der produktiven Dateien mit Versionsnummer im Namen und legt sie im Hauptverzeichnis ab.
+
+## Update
+
+Wenn Änderungen im Datenbankschema vorliegen muss die Datenbank aktualisiert werden, die entsprechenden Skripte liegen im Projekt Rema.DbAccess im Ordner Migrations. 
+Die Dateien des Webserver-Codes und des WEB-UI müssen überschrieben werden. Änderungen in den Konfigurationen eingetragen werden. Dies ist vor allem die appsettings.json.  
+
+# Kontakt
+
+Oberverwaltungsgericht Rheinland-Pfalz, Deinhardpassage 1, 56068 Koblenz 
+Telefon: 0261 1307 - 0
+poststelle(at)ovg.jm.rlp.de
+
+# Lizenz
+
+Copyright © 2019-2021 Oberverwaltungsgericht Rheinland-Pfalz 
+Lizenziert unter der EUPL, version 1.2 oder höher
+Für weitere Details siehe Lizenz.txt oder EUPL-1.2 EN.txt
+oder online unter https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
