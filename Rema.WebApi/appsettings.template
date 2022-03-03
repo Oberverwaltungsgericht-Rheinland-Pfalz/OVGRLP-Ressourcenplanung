@@ -1,0 +1,58 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=##SERVER-URL##;Database=##DATABASE##;Trusted_Connection=True;MultipleActiveResultSets=True"
+  },
+  "Reminder": 1,
+  "siteUrl": "http://localhost",
+  "RemindSupporterGroupsIfSetAtTime": "17:00",
+  "Requestable": true,
+  "RequestAcknowledgeEmail": "",
+  "ScrollToHour": 6,
+  "HideEarly": "true",
+  "SiteTitle": "Labor - Ressourcenmanagement lokal",
+  "SendEmails": false,
+  "Email": {
+    "useIISAccount": false,
+    "EmailUsername": "##EMAIL-USERNAME",
+    "EmailPassword": "",
+    "Domain": "##DOMAIN##",
+    "EnableSSL": false,
+    "Port": 25,
+    "EmailSenderAddress": "##EMAIL-SENDER##"
+  },
+  "Auth": {
+    "Reader": "##READER-GROUP",
+    "Editor": "##EDITOR-GROUP",
+    "Admin": "##ADMIN-GROUP"
+  },
+  "DomainsToSearch": [ "##DOMAIN1.de##", "DOMAIN2.de" ],
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "Serilog": {
+    "MinimumLevel": "Information",
+    "WriteTo": [
+      {
+        "Name": "Console"
+      },
+      {
+        "Name": "File",
+        "Args": {
+          "path": "logs\\log.txt",
+          "rollingInterval": "Day"
+        }
+      },
+      {
+        "Name": "MSSqlServer",
+        "Args": {
+          "connectionString": "Server=##SERVER##;Database=##LOG-DB##;Trusted_Connection=True;MultipleActiveResultSets=True",
+          "tableName": "Log",
+          "autoCreateSqlTable": "true"
+        }
+      }
+    ]
+  }
+}
