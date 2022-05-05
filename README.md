@@ -94,7 +94,6 @@ Die Dateien des Webserver-Codes und des WEB-UI müssen überschrieben werden. Ä
 # Kontakt
 
 Oberverwaltungsgericht Rheinland-Pfalz, Deinhardpassage 1, 56068 Koblenz 
-Telefon: 0261 1307 - 0
 poststelle(at)ovg.jm.rlp.de
 
 # Lizenz
