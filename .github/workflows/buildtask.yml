@@ -1,0 +1,23 @@
+name: build projects
+on: push
+jobs:
+  setup-project:
+    name: setup
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: init configs
+        run: Copy-Item .\Rema.WebApi\appsettings.template .\Rema.WebApi\appsettings.json
+        shell: pwsh
+      - name: Setup .net core
+        uses: actions/setup-dotnet@v2
+      - name: install dependencies
+        run: dotnet restore Rema.sln
+      - name: build C# project
+        run: dotnet build Rema.sln
+      - name: init web app project
+        working-directory: ./rema-app-vue
+        run: npm install
+      - name: build zip file
+        working-directory: ./rema-app-vue
+        run: npm run build-all
