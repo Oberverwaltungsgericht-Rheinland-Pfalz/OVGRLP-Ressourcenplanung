@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Security.Principal;
+﻿using System.Security.Principal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
 using Rema.DbAccess;
 using Rema.WebApi.Controllers;
 using Rema.WebApi.LogicServices;
-using Rema.WebApi.ViewModels;
 
 namespace Rema.WebApi.Filter
 {
@@ -25,7 +23,7 @@ namespace Rema.WebApi.Filter
       _userManagementService = new UserManagementService(context);
     }
 
-    public override void OnActionExecuting(ActionExecutingContext context)
+    public override void OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext context)
     {
       var user = context.HttpContext.User;
       var identity = (WindowsIdentity)user.Identity;

@@ -15,9 +15,9 @@ jobs:
         run: dotnet restore Rema.sln
       - name: build C# project
         run: dotnet build Rema.sln
-      - name: init web app project
-        working-directory: ./rema-app-vue
-        run: npm install
-      - name: build zip file
-        working-directory: ./rema-app-vue
-        run: npm run build-all
+#      - name: init web app project
+#        working-directory: ./rema-app-vue
+#        run: npm install
+#      - name: build spa
+#        working-directory: ./rema-app-vue
+#        run: npm run build
