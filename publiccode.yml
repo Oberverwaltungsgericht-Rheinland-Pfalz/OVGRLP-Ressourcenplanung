@@ -1,0 +1,80 @@
+# This repository adheres to the publiccode.yml standard by including this 
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+applicationSuite: OVGRLP
+categories:
+  - collaboration
+  - office
+  - workflow-management
+  - property-management
+description:
+  de:
+    features:
+      - planning
+    genericName: Ressourceplanning
+    longDescription: |
+      Diese Webanwendung ermöglicht die Allokation von verschiedenen Ressourcen
+      die miteinander in Verbindung stehen. 
+
+
+      Unterstützende Teams werden benachrichtigt und per E-Mail informiert.
+      Diese stellen Hilfsmittel bereit für Ressourcen an bestimmten Terminen.
+
+
+      Ressourcen können multidimensional verwaltet werden in zeitlicher
+      Hinsicht. 
+
+
+      Die Administration und Verwaltung ist durch ein Rollen und Rechte
+      Management möglich. 
+
+      Endnutzer können Ressourcen für Termine buchen und werden bei
+      Veränderungen benachrichtigt.
+
+
+      Die Authentifizierung läuft über Active Directory.
+
+
+      ​
+    shortDescription: Verwaltung von Ressourcen
+developmentStatus: stable
+intendedAudience:
+  countries:
+    - de
+it:
+  conforme:
+    gdpr: false
+    lineeGuidaDesign: false
+    misureMinimeSicurezza: false
+    modelloInteroperabilita: false
+  countryExtensionVersion: '0.2'
+  piattaforme:
+    anpr: false
+    cie: false
+    pagopa: false
+    spid: false
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: Oberverwaltungsgericht Rheinland-Pfalz
+  repoOwner: Oberverwaltungsgericht Rheinland-Pfalz
+localisation:
+  availableLanguages:
+    - de
+  localisationReady: false
+maintenance:
+  contacts:
+    - email: poststelle@ovg.jm.rlp.de
+      name: Oberverwaltungsgericht Rheinland-Pfalz
+      phone: '+026113070'
+  type: internal
+name: Ressourcenplanung
+platforms:
+  - web
+  - windows
+releaseDate: '2021-06-01'
+softwareType: standalone/web
+softwareVersion: 2.5.2
+url: |-
+  https://github.com/Oberverwaltungsgericht-Rheinland-Pfalz/OVGRLP-Ressourcenplanung
