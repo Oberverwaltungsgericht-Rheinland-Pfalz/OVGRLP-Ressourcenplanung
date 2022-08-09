@@ -20,11 +20,13 @@ jobs:
       - run: dotnet restore Rema.sln
       - run: dotnet build Rema.sln
 
-      - uses: actions/checkout@v2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.4.1
+      - uses: actions/checkout@v3
         with:
           working-directory: ./rema-app-vue
       - run: npm -v
-#      - run: npm ci
+      - run: npm ci
 
       - name: build SPA
         working-directory: ./rema-app-vue
