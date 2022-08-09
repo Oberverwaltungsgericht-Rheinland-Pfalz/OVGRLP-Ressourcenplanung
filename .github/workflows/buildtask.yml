@@ -1,20 +1,25 @@
-name: build projects
-on: push
+name: Build c# project
+on: 
+  push:
+    branches:
+      - 'github-actions'
 jobs:
   setup-project:
-    name: setup
+    name: build c#
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - name: init configs
         run: Copy-Item .\Rema.WebApi\appsettings.template .\Rema.WebApi\appsettings.json
         shell: pwsh
-      - name: Setup .net core
+
+      - name: restore packages and build project
         uses: actions/setup-dotnet@v2
-      - name: install dependencies
-        run: dotnet restore Rema.sln
-      - name: build C# project
-        run: dotnet build Rema.sln
+        with:
+          dotnet-version: '6.0.x'
+      - run: dotnet restore Rema.sln
+      - run: dotnet build Rema.sln
+
 #      - name: init web app project
 #        working-directory: ./rema-app-vue
 #        run: npm install
