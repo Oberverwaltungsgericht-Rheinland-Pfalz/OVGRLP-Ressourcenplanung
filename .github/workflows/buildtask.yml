@@ -20,9 +20,12 @@ jobs:
       - run: dotnet restore Rema.sln
       - run: dotnet build Rema.sln
 
-#      - name: init web app project
-#        working-directory: ./rema-app-vue
-#        run: npm install
-#      - name: build spa
-#        working-directory: ./rema-app-vue
-#        run: npm run build
+      - uses: actions/checkout@v2
+        with:
+          working-directory: ./rema-app-vue
+      - run: npm -v
+#      - run: npm ci
+
+      - name: build SPA
+        working-directory: ./rema-app-vue
+        run: npm run build
