@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
-using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
 using System.Security.Principal;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Rema.DbAccess;
 using Rema.WebApi.Filter;
-using Microsoft.Extensions.Configuration;
 using Rema.ServiceLayer.Services;
-using Rema.Infrastructure.Models;
 using Rema.Infrastructure.LDAP;
 using Rema.ServiceLayer.Jobs;
 using System.Threading.Tasks;
@@ -44,7 +39,7 @@ namespace Rema.WebApi.Controllers
       }
       catch (Exception ex)
       {
-        return BadRequest();
+        return BadRequest(ex.Message);
       }
     }
 
@@ -59,7 +54,7 @@ namespace Rema.WebApi.Controllers
       }
       catch (Exception ex)
       {
-        return BadRequest();
+        return BadRequest(ex.Message);
       }
     }
 

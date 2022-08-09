@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Serialization;
 using Quartz;
 using Rema.DbAccess;
 using Rema.Infrastructure.Email;
@@ -60,11 +55,7 @@ namespace Rema.WebApi
       services.AddAutoMapper(typeof(Startup));
       services.AddHttpContextAccessor();
 
-      services.AddControllers();
-      services.AddMvc(options => options.EnableEndpointRouting = false)
-        .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-        .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
-
+      services.AddControllers().AddNewtonsoftJson();
       services.AddScoped<IUserService, UsersService>();
       services.AddScoped<ISupplierGroupsService, SupplierGroupsService>();
       
@@ -97,12 +88,12 @@ namespace Rema.WebApi
           Contact = new OpenApiContact
           {
             Name = "EDV OVG",
-            Email = "OVG_EDV@ovg.jm.rlp.de"
+            Email = "poststelle@ovg.jm.rlp.de"
           },
           License = new OpenApiLicense
           {
             Name = "Use under RLP Justiz Lizenz",
-            Url = new Uri("https://ovg.justiz.rlp.de"),
+            Url = new Uri("https://ovg.justiz.rlp.de")
           }
         });
       });
@@ -118,23 +109,6 @@ namespace Rema.WebApi
       var remindSTimeString = Configuration["RemindSupporterGroupsIfSetAtTime"];
       //DateTime remindSupporterGroupsAtTime = DateTime.ParseExact("06:00", "HH:mm", CultureInfo.CurrentCulture);
       string remindSupporterHour = "0" , remindSupporterMinute = "0";
-
-      Task.Run(() => {
-        Thread.CurrentThread.IsBackground = true;
-        while (true)
-        {
-          WebRequest req = WebRequest.Create(Configuration["siteUrl"] +"/api/health");
-          req.GetResponse();
-          try
-          {
-            Thread.Sleep(19 * 60000);
-          }
-          catch (ThreadAbortException)
-          {
-            break;
-          }
-        }
-      });
 
       if (!string.IsNullOrEmpty(remindSTimeString))
       {
@@ -192,8 +166,12 @@ namespace Rema.WebApi
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
       app.UseHealthChecks("/health");
-//      app.UseRouting();
+      app.UseRouting();
       app.UseAuthentication();
+      app.UseEndpoints(endpoints =>
+      {
+        endpoints.MapControllerRoute("default", "{controller}/{action=Index}/{id?}");
+      });
 /*      app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers().RequireAuthorization();
@@ -207,13 +185,6 @@ namespace Rema.WebApi
           context.Context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
           context.Context.Response.Headers.Add("Expires", "-1");
         }
-      });
-
-      app.UseMvc(routes =>
-      {
-        routes.MapRoute(
-          name: "default",
-          template: "{controller}/{action=Index}/{id?}");
       });
 
       if (env.IsDevelopment())

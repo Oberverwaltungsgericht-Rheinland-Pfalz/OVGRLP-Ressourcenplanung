@@ -2,7 +2,7 @@ npm run build
 cd..
 dotnet publish -p:PublishProfile=Rema.WebApi\Properties\PublishProfiles\FolderProfile.pubxml -c Release
 MD .\rema-app-vue\dist\api\ -Force
-Copy-Item -Path Rema.WebApi\bin\Release\net5.0\publish\*.* -Destination .\rema-app-vue\dist\api\
+Copy-Item -Path Rema.WebApi\bin\Release\net6.0-windows\publish\*.* -Destination .\rema-app-vue\dist\api\
 Rename-Item -Path .\rema-app-vue\dist\api\appsettings.json -NewName "appsettings.template.json"
 Rename-Item -Path .\rema-app-vue\dist\api\web.config -NewName "web.template.config"
 
