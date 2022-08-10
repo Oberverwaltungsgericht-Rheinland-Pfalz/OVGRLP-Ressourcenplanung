@@ -34,7 +34,7 @@ jobs:
       - run: npm -v
 #      - run: npm ci
       - name: setup vue-cli-service
-        run: npm i -g vue-cli-service
+        run: npm install -g @vue/cli
       - name: build SPA
         working-directory: ./rema-app-vue
         run: npm run build
