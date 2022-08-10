@@ -33,8 +33,13 @@ jobs:
           cache-dependency-path: rema-app-vue/package-lock.json
       - run: npm -v
 #      - run: npm ci
+
       - name: setup vue-cli-service
-        run: npm install -g @vue/cli
+        run: npm install -D @vue/cli-service-global @vue/cli
+
       - name: build SPA
         working-directory: ./rema-app-vue
         run: npm run build
+      - name: build all
+        working-directory: ./rema-app-vue
+        run: npm run build-all
