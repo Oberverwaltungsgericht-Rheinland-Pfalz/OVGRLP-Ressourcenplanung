@@ -23,8 +23,8 @@ jobs:
     name: build webui
     runs-on: windows-latest
     steps:
-      - name: Setup Node.js environment
       - uses: actions/checkout@v3
+      - name: Setup Node.js environment
       - uses: actions/setup-node@v3.4.1
         with:
           working-directory: ./rema-app-vue
