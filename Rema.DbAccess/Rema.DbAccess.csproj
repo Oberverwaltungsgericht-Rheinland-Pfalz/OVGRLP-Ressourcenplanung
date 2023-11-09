@@ -6,8 +6,7 @@
     <Copyright>Copyright © 2019-2021 Oberverwaltungsgericht Rheinland-Pfalz</Copyright>
     <Product>Ressourcenplanung</Product>
     <Company>Oberverwaltungsgericht Rheinland-Pfalz</Company>
-    <Authors />
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageLicenseFile>EUPL-1.2</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,6 @@
-﻿using Rema.Infrastructure.Models;
+﻿// SPDX-FileCopyrightText: © 2019 Oberverwaltungsgericht Rheinland-Pfalz <poststelle@ovg.jm.rlp.de>
+// SPDX-License-Identifier: EUPL-1.2
+using Rema.Infrastructure.Models;
 
 namespace Rema.Infrastructure.Email.Templates
 {

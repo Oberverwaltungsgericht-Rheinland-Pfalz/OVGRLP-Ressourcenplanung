@@ -6,7 +6,7 @@
     <AssemblyVersion>1.0.0.20203</AssemblyVersion>
     <FileVersion>1.0.0.20203</FileVersion>
     <Copyright>Copyright © 2019-2021 Oberverwaltungsgericht Rheinland-Pfalz</Copyright>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageLicenseFile>EUPL-1.2</PackageLicenseFile>
     <Product>Ressourcenplanung</Product>
     <Company>Oberverwaltungsgericht Rheinland-Pfalz</Company>
     <StartupObject>Rema.WebApi.Program</StartupObject>
