@@ -35,10 +35,17 @@ jobs:
           cache-dependency-path: rema-app-vue/package-lock.json
       - run: npm -v
       - run: npm ci
+        working-directory: ./rema-app-vue
 
       - name: build SPA
         working-directory: ./rema-app-vue
         run: npm run build
+      - name: 'Upload web app artifacts'
+        uses: actions/upload-artifact@v3
+        with:
+          name: RemaUI
+          path: ./rema-app-vue/dist/R*.zip
+
       - name: build all
         working-directory: ./rema-app-vue
         run: npm run build-all
