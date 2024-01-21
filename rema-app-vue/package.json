@@ -5,10 +5,9 @@
   "type": "module",
   "author": "Oberverwaltungsgericht Rheinland-Pfalz",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "buildv": "vite build",
-    "lint": "vue-cli-service lint",
+    "serve": "vite",
+    "build": "vite build",
+    "lint": "ts-standard --fix",
     "build-all": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./build.ps1",
     "generate-api": "csharp-models-to-typescript --config=cs2ts-config.json"
   },

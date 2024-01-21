@@ -1,8 +1,10 @@
 name: Build c# project
-on: 
+on:
   push:
     branches:
-      - 'github-actions'
+      - '**'
+    paths-ignore:
+    - 'README.md'
 jobs:
   setup-csharp-project:
     name: build c#
@@ -32,10 +34,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: rema-app-vue/package-lock.json
       - run: npm -v
-#      - run: npm ci
-
-      - name: setup vue-cli-service
-        run: npm install -D @vue/cli-service-global @vue/cli
+      - run: npm ci
 
       - name: build SPA
         working-directory: ./rema-app-vue
