@@ -136,9 +136,9 @@ import { Names as Fnn } from './store/User/types'
 import { UserData } from './models/interfaces'
 import { Gadget, Ressource, Supplier, Allocation } from './models'
 import { Getters } from '@vuex-orm/core'
-import NewFormModal from '@/components/NewAllocation/NewFormModal.vue'
-import Toasts from '@/components/Toasts.vue'
-import Confirm from '@/components/Confirm.vue'
+import NewFormModal from './components/NewAllocation/NewFormModal.vue'
+import Toasts from './components/Toasts.vue'
+import Confirm from './components/Confirm.vue'
 import { refreshAllocations } from './services/AllocationApiService'
 
 @Component({

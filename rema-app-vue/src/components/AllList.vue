@@ -93,14 +93,14 @@ import print from 'print-js'
   components: { EditFormModal }
 })
 export default class AllList extends Vue {
-  private displayView: boolean = false
-  private displayId: number=0
-  private selectedGroup: SelectableGroup | null = null
-  private search: string = ''
-  private hideOld: boolean = true
-  private hideNotMine: boolean = false
-  private selectedOpen: number = -1
-  private headers: object[] = [
+  displayView: boolean = false
+  displayId: number=0
+  selectedGroup: SelectableGroup | null = null
+  search: string = ''
+  hideOld: boolean = true
+  hideNotMine: boolean = false
+  selectedOpen: number = -1
+  headers: object[] = [
     { text: 'Bearbeiten', value: 'action', sortable: false },
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Status', value: 'Status' },
@@ -193,7 +193,7 @@ export default class AllList extends Vue {
     return returnValues
   }
 
-  private confirmDelete (item: VisibleAllocation): void {
+  public confirmDelete (item: VisibleAllocation): void {
     let data: ConfirmData = { title: 'Löschen bestätigen',
       content: `Möchten sie diese Buchung ${item.Title} wirklich löschen?`,
       callback: this.deleteItem,
@@ -201,14 +201,14 @@ export default class AllList extends Vue {
     }
     this.$root.$emit('user-confirm', data)
   }
-  private async deleteItem (id: number): Promise<void> {
+  public async deleteItem (id: number): Promise<void> {
     let errorCallback = errorCallbackFactory(this)
     let success = await deleteAllocation(id, errorCallback)
 
     if (success) this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)
     else this.$root.$emit('notify-user', { text: 'Löschen fehlgeschlagen', color: 'error' } as ShowToast)
   }
-  private async printItem (item: VisibleAllocation): Promise<void> {
+  public async printItem (item: VisibleAllocation): Promise<void> {
     print('api/Allocations/print/' + item.Id)
   }
 
@@ -218,7 +218,7 @@ export default class AllList extends Vue {
       this.selectedOpen = id
     })
   }
-  private rowClicked (id: number): void {
+  public rowClicked (id: number): void {
     this.displayView = false
     this.displayId = id
     this.$nextTick(() => {

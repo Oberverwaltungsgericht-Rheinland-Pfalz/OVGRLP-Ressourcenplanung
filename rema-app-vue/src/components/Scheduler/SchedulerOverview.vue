@@ -59,8 +59,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Allocation, Ressource } from '../../models'
-import { ScheduledRessource } from '../../models/interfaces'
 import h24Table from './h24Table.vue'
 import moment from 'moment'
 
@@ -68,29 +66,29 @@ import moment from 'moment'
   components: { h24Table }
 })
 export default class SchedulerOverview extends Vue {
-  private dayOrWeek: boolean = true
-  private hideLateEarly: boolean = true
-  private nameFilter: string = ''
-  private detailFilter: string = ''
-  private hideEmptyRessources: boolean = false
+  public dayOrWeek: boolean = true
+  public hideLateEarly: boolean = true
+  public nameFilter: string = ''
+  public detailFilter: string = ''
+  public hideEmptyRessources: boolean = false
 
-  private daypickerOpen: boolean = false
-  private get allocationPossible () {
+  public daypickerOpen: boolean = false
+  public get allocationPossible () {
     return moment(moment().add(-1, 'days')).isBefore(this.today) &&
       // @ts-ignore
       (this.$store.state.user.isRequestable || this.permissionToEdit)
   }
-  private today: string = moment().format('YYYY-MM-DD')
-  private get pickedDate (): string {
+  public today: string = moment().format('YYYY-MM-DD')
+  public get pickedDate (): string {
     return this.today
   }
-  private todayPlus (addition: number) {
+  public todayPlus (addition: number) {
     return moment(this.today).add(addition, 'days').format('YYYY-MM-DD')
   }
-  private set pickedDate (v: string) {
+  public set pickedDate (v: string) {
     this.today = moment(v).format('YYYY-MM-DD')
   }
-  private jumpDays (days: number) {
+  public jumpDays (days: number) {
     this.today = moment(this.today).add(days, 'd').format('YYYY-MM-DD')
   }
 }

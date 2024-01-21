@@ -1,5 +1,5 @@
 import { Model } from '@vuex-orm/core'
-import { Gadget } from '.'
+import { Gadget } from './Gadget'
 
 export class Supplier extends Model {
   // This is the name used as module name of the Vuex Store.

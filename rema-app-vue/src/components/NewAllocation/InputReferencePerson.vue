@@ -19,17 +19,16 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Gadget, Ressource, Supplier, Allocation } from '../../models'
 import { ShowToast } from '../../models/interfaces'
-import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
+import DropDownTimePicker from '../DropdownTimePicker.vue'
 import { getUser } from '../../services/UserApiService'
 
 @Component({
   components: { DropDownTimePicker }
 })
 export default class InputReferencePerson extends Vue {
-  @Prop(Number) private userid!: number
-  @Prop(Boolean) private readonly!: boolean
+  @Prop(Number) userid!: number
+  @Prop(Boolean) readonly!: boolean
   public entries: WebApi.AdUserViewModel[] = []
   public isLoading: number = 0
   public model: WebApi.AdUserViewModel = { Name: '', Email: '', ActiveDirectoryID: '', Phone: '' }

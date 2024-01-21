@@ -1,5 +1,4 @@
 import { ShowToast } from '@/models/interfaces'
-import { Response } from '@vuex-orm/plugin-axios'
 import { Allocation } from '../models/Allocation'
 
 export async function editAllocationStatus (editedRequest: WebApi.AllocationRequestEdition, errorCallback?: Function) : Promise<boolean> {

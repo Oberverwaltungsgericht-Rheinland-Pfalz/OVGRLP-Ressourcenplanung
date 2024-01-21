@@ -1,4 +1,4 @@
-import { UserData } from '.'
+import { UserData } from './UserData'
 
 export interface UserState extends UserData {
   lastUpdated: Date | boolean,

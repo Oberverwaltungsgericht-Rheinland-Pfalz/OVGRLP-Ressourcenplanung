@@ -80,48 +80,48 @@ import { ShowToast, ConfirmData } from '../../models/interfaces'
 
 @Component
 export default class SupplierManagement extends Vue {
-  private dialog: number = 0
-  private editId: number = 0
-  private editTitle: string = ''
-  private editEmail: string = ''
-  private editRemind: boolean = false
-  private nameRules = [(v: string) => !!v || 'Name is required']
-  private emailRules = [
+  public dialog: number = 0
+  public editId: number = 0
+  public editTitle: string = ''
+  public editEmail: string = ''
+  public editRemind: boolean = false
+  public nameRules = [(v: string) => !!v || 'Name is required']
+  public emailRules = [
     (v: string) => !!v || 'E-mail ist notwendig',
     (v: string) => /.+@.+/.test(v) || 'E-mail ungültig'
   ]
-  private valid: boolean = false
-  private headers: object[] = [
+  public valid: boolean = false
+  public headers: object[] = [
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Email', value: 'GroupEmail' },
     { text: 'Erinnern', value: 'Remind' },
     { text: 'Bearbeiten', value: 'action', sortable: false }
   ]
-  private get ModalTitle () {
+  public get ModalTitle () {
     if (this.dialog === 1) return 'Neue Gruppe'
     if (this.dialog === 2) return 'Bearbeite Gruppe'
   }
-  private get items (): Array<WebApi.SupplierGroup> {
+  public get items (): Array<WebApi.SupplierGroup> {
     return Supplier.all()
   }
-  private get invalidForm (): boolean {
+  public get invalidForm (): boolean {
     return !this.editTitle || !this.editEmail
   }
-  private closeModal (): void {
+  public closeModal (): void {
     this.dialog = 0
     this.editId = 0
     this.editTitle = ''
     this.editEmail = ''
     this.editRemind = false
   }
-  private editItem (item: WebApi.SupplierGroup): void {
+  public editItem (item: WebApi.SupplierGroup): void {
     this.editId = item.Id
     this.editTitle = item.Title
     this.editEmail = item.GroupEmail
     this.editRemind = item.Remind
     this.dialog = 2
   }
-  private async updateItem () {
+  public async updateItem () {
     const gadget: WebApi.SupplierGroup = {
       Id: this.editId,
       Title: this.editTitle,
@@ -139,7 +139,7 @@ export default class SupplierManagement extends Vue {
     }
     this.closeModal()
   }
-  private openDialog (item: WebApi.SupplierGroup) {
+  public openDialog (item: WebApi.SupplierGroup) {
     let data: ConfirmData = { title: 'Löschen bestätigen',
       content: `Möchten sie die Unterstützergruppe ${item.Title} wirklich löschen?`,
       callback: this.deleteItem,
@@ -147,7 +147,7 @@ export default class SupplierManagement extends Vue {
     }
     this.$root.$emit('user-confirm', data)
   }
-  private async deleteItem (id: number) {
+  public async deleteItem (id: number) {
     try {
       let response = await Supplier.api().delete(`suppliergroups/${id}`, { delete: id })
       this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)

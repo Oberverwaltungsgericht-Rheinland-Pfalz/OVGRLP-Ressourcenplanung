@@ -97,7 +97,7 @@
 import moment from 'moment'
 import print from 'print-js'
 import { Names } from '../store/User/types'
-import Ressources from '@/views/Ressources.vue'
+import Ressources from '../views/Ressources.vue'
 import EditFormModal from './EditFormModal.vue'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { State, Action, Getter, Mutation } from 'vuex-class'
@@ -111,27 +111,27 @@ import { ShowToast, ConfirmData, CalendarElement } from '../models/interfaces'
 })
 export default class Calendar extends Vue {
   @State('ContactUsers', { namespace: 'user' })
-  private ContactUsers!: WebApi.ContactUser[]
+  ContactUsers!: WebApi.ContactUser[]
   @State('calendarFrom', { namespace: 'user' })
-  private CalendarFrom!: number
+  CalendarFrom!: number
   @State('hideCalendarFrom', { namespace: 'user' })
-  private HideCalendarFrom!: boolean
+  HideCalendarFrom!: boolean
   @Action(Names.a.loadUsers, { namespace: 'user' })
-  private loadUsers!: Function
+  loadUsers!: Function
 
-  private today: string = moment().format('YYYY-MM-DD')
-  private focus: string = moment().format('YYYY-MM-DD')
+  today: string = moment().format('YYYY-MM-DD')
+  focus: string = moment().format('YYYY-MM-DD')
 
-  private types: string[] =['month', 'week', 'day', '4day']
-  private currentview: string = 'month'
-  private start: CalendarTimestamp = {} as CalendarTimestamp
-  private end: CalendarTimestamp = {} as CalendarTimestamp
-  private selectedEvent: CalendarElement = {} as CalendarElement
-  private selectedElement: CalendarElement = {} as CalendarElement
-  private selectedOpen: Boolean = false
-  private titleFilter: Array<number> = []
-  private showFilterModal: boolean = false
-  private showWE: boolean = true
+  types: string[] =['month', 'week', 'day', '4day']
+  currentview: string = 'month'
+  start: CalendarTimestamp = {} as CalendarTimestamp
+  end: CalendarTimestamp = {} as CalendarTimestamp
+  selectedEvent: CalendarElement = {} as CalendarElement
+  selectedElement: CalendarElement = {} as CalendarElement
+  selectedOpen: Boolean = false
+  titleFilter: Array<number> = []
+  showFilterModal: boolean = false
+  showWE: boolean = true
 
   public formatEventText (e: CalendarEventParsed): string {
     // if (this.currentview === 'month') return e.input.name
@@ -254,7 +254,7 @@ export default class Calendar extends Vue {
   public printAllocation (id: number): void {
     print('api/Allocations/print/' + id)
   }
-  private confirmDelete (): void {
+  confirmDelete (): void {
     const { id, name } = this.selectedEvent as any
     let data: ConfirmData = { title: 'Löschen bestätigen',
       content: `Möchten sie dem Termin ${name} wirklich löschen?`,

@@ -20,15 +20,15 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { Gadget, Supplier } from '../models'
-import { GadgetItem } from '@/models/interfaces'
+import { GadgetItem } from '../models/interfaces'
 
 @Component
 export default class GadgetView extends Vue {
-  private headers: object[] = [
+  headers: object[] = [
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Unterstützergruppe', value: 'SuppliedBy' }
   ]
-  private get items (): Array<GadgetItem> {
+  get items (): Array<GadgetItem> {
     let supplierGroups = new Map()
     Supplier.query().get().forEach((s: Supplier) => {
       supplierGroups.set(s.Id, s.Title)

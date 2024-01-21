@@ -49,7 +49,7 @@ import { State, Action } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AllocationRequest, AllocationRequestView, UserData } from '../models/interfaces'
 import AcknowledgeView from './AcknowledgeView.vue'
-import { Allocation, Gadget, Ressource, Supplier } from '../models'
+import { Allocation, Ressource, Supplier } from '../models'
 import { Names } from '../store/User/types'
 import { refreshAllocations } from '../services/AllocationApiService'
 
@@ -60,17 +60,17 @@ const namespace = 'user'
 })
 export default class AcknowledgeList extends Vue {
   @State('ContactUsers', { namespace })
-  private ContactUsers!: WebApi.ContactUser[];
+  public ContactUsers!: WebApi.ContactUser[];
   @Action(Names.a.loadUsers, { namespace: 'user' })
-  private loadUsers!: Function
+  public loadUsers!: Function
 
-  private dialog: boolean = false
-  private viewAllocation: AllocationRequestView = {} as AllocationRequestView
-  private hideOld: boolean = true
-  private hideDone: boolean = true
+  public dialog: boolean = false
+  public viewAllocation: AllocationRequestView = {} as AllocationRequestView
+  public hideOld: boolean = true
+  public hideDone: boolean = true
 
-  private search: string = ''
-  private headers: object[] = [
+  public search: string = ''
+  public headers: object[] = [
     { text: 'Bearbeiten', value: 'action', sortable: false },
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Status', value: 'Status' },

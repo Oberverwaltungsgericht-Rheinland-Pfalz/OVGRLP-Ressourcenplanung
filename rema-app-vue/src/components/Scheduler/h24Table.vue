@@ -24,29 +24,29 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Allocation, Ressource, Supplier } from '../../models'
+import { Allocation, Ressource } from '../../models'
 import { ScheduledRessource, InitAllocation, ShowToast } from '../../models/interfaces'
 import moment from 'moment'
 
 @Component
 export default class h24Table extends Vue {
-  @Prop(String) private Day!: string
-  @Prop(String) private NameFilter!: string
-  @Prop(String) private DetailFilter!: string
-  @Prop(Boolean) private HideLateEarly!: boolean
-  @Prop(Boolean) private HideEmptyRessources!: boolean
+  @Prop(String) public Day!: string
+  @Prop(String) public NameFilter!: string
+  @Prop(String) public DetailFilter!: string
+  @Prop(Boolean) public HideLateEarly!: boolean
+  @Prop(Boolean) public HideEmptyRessources!: boolean
 
-  private hours: number = 24
-  private startHour: number = 8
-  private endHour: number = 17
+  public hours: number = 24
+  public startHour: number = 8
+  public endHour: number = 17
 
-  private get allocationPossible () {
+  public get allocationPossible () {
     return moment(moment().add(-1, 'days')).isBefore(this.Day) &&
       // @ts-ignore
       (this.$store.state.user.isRequestable || this.permissionToEdit)
   }
 
-  private get ressources (): Array<ScheduledRessource> {
+  public get ressources (): Array<ScheduledRessource> {
     const myId = this.$store.state.user.id
     const rArray: Array<ScheduledRessource> = []
     const start = moment(this.Day).valueOf()
@@ -115,7 +115,7 @@ export default class h24Table extends Vue {
     }
   }
 
-  private createAllocation (blocked: boolean, id: number, hourNumber: number) {
+  public createAllocation (blocked: boolean, id: number, hourNumber: number) {
     if (blocked || !this.allocationPossible) return
 
     // @ts-ignore

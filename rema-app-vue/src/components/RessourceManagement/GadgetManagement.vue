@@ -92,29 +92,29 @@ import { submitGadget, editGadget, deleteGadget } from '../../services/GadgetApi
 
 @Component
 export default class GadgetManagement extends Vue {
-  private dialog: number = 0
-  private editId: number = 0
-  private editTitle: string = ''
-  private editSupplier: number = 0
-  private IsDeactivated: boolean = false
+  public dialog: number = 0
+  public editId: number = 0
+  public editTitle: string = ''
+  public editSupplier: number = 0
+  public IsDeactivated: boolean = false
 
-  private nameRules = [(v: string) => !!v || 'Name is required']
-  private valid: boolean = false
-  private headers: object[] = [
+  public nameRules = [(v: string) => !!v || 'Name is required']
+  public valid: boolean = false
+  public headers: object[] = [
     { text: 'Bezeichnung', value: 'Title' },
     { text: 'Unterstützergruppe', value: 'SuppliedBy' },
     { text: 'Bearbeiten', value: 'action', sortable: false }
   ]
 
-  private get ModalTitle () {
+  public get ModalTitle () {
     if (this.dialog === 1) return 'Neues Hilfsmittel'
     if (this.dialog === 2) return 'Bearbeite Hilfsmittel'
   }
 
-  private get supplierItems () {
+  public get supplierItems () {
     return Supplier.all()
   }
-  private get items (): Array<GadgetItem> {
+  public get items (): Array<GadgetItem> {
     let supplierGroups = new Map()
     Supplier.query().get().forEach((s: Supplier) => {
       supplierGroups.set(s.Id, s.Title)
@@ -131,24 +131,24 @@ export default class GadgetManagement extends Vue {
 
     return rValue
   }
-  private get invalidForm (): boolean {
+  public get invalidForm (): boolean {
     return !this.editTitle || !this.editSupplier
   }
-  private closeModal () {
+  public closeModal () {
     this.dialog = 0
     this.editId = 0
     this.editTitle = ''
     this.IsDeactivated = false
     this.editSupplier = 0
   }
-  private editItem (item: GadgetItem) {
+  public editItem (item: GadgetItem) {
     this.editId = item.Id
     this.editTitle = item.Title
     this.IsDeactivated = item.IsDeactivated
     this.editSupplier = item.SuppliedBy
     this.dialog = 2
   }
-  private async updateItem () {
+  public async updateItem () {
     const data: WebApi.GadgetViewModel = {
       Id: this.editId,
       Title: this.editTitle,
@@ -170,7 +170,7 @@ export default class GadgetManagement extends Vue {
     }
     this.closeModal()
   }
-  private confirmDelete (item: WebApi.GadgetViewModel) {
+  public confirmDelete (item: WebApi.GadgetViewModel) {
     let data: ConfirmData = { title: 'Löschen bestätigen',
       content: `Möchten sie dieses Hilfsmittel ${item.Title} wirklich löschen?`,
       callback: this.deleteItem,
@@ -178,7 +178,7 @@ export default class GadgetManagement extends Vue {
     }
     this.$root.$emit('user-confirm', data)
   }
-  private async deleteItem (id: number) {
+  public async deleteItem (id: number) {
     let success = await deleteGadget(id)
     if (success) {
       this.$root.$emit('notify-user', { text: 'Hilfsmittel gelöscht', color: 'success' } as ShowToast)

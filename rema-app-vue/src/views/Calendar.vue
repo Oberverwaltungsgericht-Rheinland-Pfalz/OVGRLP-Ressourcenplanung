@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import CalendarComponent from '@/components/Calendar.vue'
+import CalendarComponent from '../components/Calendar.vue'
 
 @Component({
   components: { CalendarComponent }

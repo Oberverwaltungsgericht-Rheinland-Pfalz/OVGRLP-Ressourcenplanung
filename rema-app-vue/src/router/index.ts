@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router, { RouteConfig } from 'vue-router'
-import store from '@/store/index'
+import store from '../store/index'
 // import { RemaRouteConfig } from '@/models/interfaces/RemaRouteConfig'
 
 Vue.use(Router)
@@ -15,7 +15,7 @@ export default new Router({
       name: 'Kalender',
       icon: 'event_note',
       authLevel: 0,
-      component: () => import('@/views/Calendar.vue')
+      component: () => import('../views/Calendar.vue')
     } as any,
     {
       path: '/schedule',
@@ -23,14 +23,14 @@ export default new Router({
       icon: 'blur_linear',
       authLevel: 0,
       beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(0, to, from, next),
-      component: () => import('@/views/Schedules.vue')
+      component: () => import('../views/Schedules.vue')
     } as any,
     {
       path: '/overview',
       name: 'Terminliste',
       icon: 'list',
       authLevel: 1,
-      component: () => import('@/components/AllList.vue')
+      component: () => import('../components/AllList.vue')
     } as any,
     {
       path: '/acknowledge',
@@ -38,7 +38,7 @@ export default new Router({
       icon: 'playlist_add_check',
       authLevel: 10,
       beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(10, to, from, next),
-      component: () => import('@/views/Acknowledge.vue')
+      component: () => import('../views/Acknowledge.vue')
     } as any,
      {
        path: '/ressources',
@@ -46,7 +46,7 @@ export default new Router({
        icon: 'dvr',
        authLevel: 100,
        beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(100, to, from, next),
-       component: () => import('@/views/Ressources.vue')
+       component: () => import('../views/Ressources.vue')
      } as any,
     {
       path: '/roomlist',
@@ -54,7 +54,7 @@ export default new Router({
       icon: 'art_track',
       authLevel: 1,
       beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(1, to, from, next),
-      component: () => import('@/components/RoomView.vue')
+      component: () => import('../components/RoomView.vue')
     } as any,
     {
       path: '/gadgetlist',
@@ -62,7 +62,7 @@ export default new Router({
       icon: 'library_add',
       authLevel: 1,
       beforeEnter: (to: Function, from: Function, next: Function) => requireAuth(1, to, from, next),
-      component: () => import('@/components/GadgetView.vue')
+      component: () => import('../components/GadgetView.vue')
     } as any
     /*
     {

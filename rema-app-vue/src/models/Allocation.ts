@@ -1,5 +1,6 @@
 import { Model } from '@vuex-orm/core'
-import { Ressource, Gadget } from '.'
+import { Gadget } from './Gadget'
+import { Ressource } from './Ressource'
 import { User } from './User'
 
 export class Allocation extends Model {

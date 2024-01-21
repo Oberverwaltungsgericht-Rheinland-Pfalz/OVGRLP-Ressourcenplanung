@@ -87,37 +87,37 @@ import { ShowToast, ConfirmData } from '../../models/interfaces'
 
 @Component({})
 export default class RessourceManagement extends Vue {
-  private showNewForm: boolean = false;
-  private dialog: number = 0;
-  private editId: number = 0;
-  private editTitle: string = '';
-  private editType: string = '';
-  private editDescription: string = '';
-  private editIsDeactivated: boolean = false;
-  private editDetails: string = '';
+  public showNewForm: boolean = false;
+  public dialog: number = 0;
+  public editId: number = 0;
+  public editTitle: string = '';
+  public editType: string = '';
+  public editDescription: string = '';
+  public editIsDeactivated: boolean = false;
+  public editDetails: string = '';
 
-  private nameRules = [(v: string) => !!v || 'Name is required'];
-  private valid: boolean = false;
-  private ressourceTypes: string[] = ['Gemeinschaftsraum', 'Gerichtssaal'];
-  private headers: object[] = [
+  public nameRules = [(v: string) => !!v || 'Name is required'];
+  public valid: boolean = false;
+  public ressourceTypes: string[] = ['Gemeinschaftsraum', 'Gerichtssaal'];
+  public headers: {text: string, value: string, sortable?: boolean}[] = [
     { text: 'Bezeichnung', value: 'Name' },
     { text: 'Ressourcen-Typ', value: 'Type' },
     { text: 'Funktionsbeschreibung', value: 'FunctionDescription' },
     { text: 'Details', value: 'SpecialsDescription' },
     { text: 'Actions', value: 'action', sortable: false }
   ];
-  private editedIndex: number = -1;
+  public editedIndex: number = -1;
 
-  private get typeItems (): Array<string> {
+  public get typeItems (): Array<string> {
     return Ressource.query()
       .all()
       .map((e: Ressource) => e.Type)
   }
-  private get ModalTitle () {
+  public get ModalTitle () {
     if (this.dialog === 1) return 'Neue Ressource'
     if (this.dialog === 2) return 'Bearbeite Ressource'
   }
-  private async updateItem () {
+  public async updateItem () {
     const data: WebApi.RessourceViewModel = {
       Id: this.editId,
       Name: this.editTitle,
@@ -138,7 +138,7 @@ export default class RessourceManagement extends Vue {
     this.closeModal()
   }
 
-  private closeModal () {
+  public closeModal () {
     this.dialog = 0
     this.editId = 0
     this.editTitle = ''
@@ -147,18 +147,18 @@ export default class RessourceManagement extends Vue {
     this.editIsDeactivated = false
     this.editDetails = ''
   }
-  private get invalidForm (): boolean {
+  public get invalidForm (): boolean {
     return !this.editTitle || !this.editType
   }
-  private get editDialog (): boolean {
+  public get editDialog (): boolean {
     return this.editedIndex !== -1
   }
 
-  private get items (): Array<Ressource> {
+  public get items (): Array<Ressource> {
     return Ressource.all()
   }
 
-  private editItem (item: WebApi.RessourceViewModel) {
+  public editItem (item: WebApi.RessourceViewModel) {
     this.editId = item.Id
     this.editTitle = item.Name
     this.editType = item.Type
@@ -167,7 +167,7 @@ export default class RessourceManagement extends Vue {
     this.editDetails = item.SpecialsDescription
     this.dialog = 2
   }
-  private confirmItem (item: WebApi.RessourceViewModel) {
+  public confirmItem (item: WebApi.RessourceViewModel) {
     let data: ConfirmData = { title: 'Löschen bestätigen',
       content: `Möchten sie die Ressource ${item.Name} wirklich löschen?`,
       callback: this.deleteItem,
@@ -175,7 +175,7 @@ export default class RessourceManagement extends Vue {
     }
     this.$root.$emit('user-confirm', data)
   }
-  private async deleteItem (id: number) {
+  public async deleteItem (id: number) {
     try {
       let response = await Ressource.api().delete(`ressources/${id}`, { delete: id })
       this.$root.$emit('notify-user', { text: 'Löschung erfolgreich', color: 'success' } as ShowToast)

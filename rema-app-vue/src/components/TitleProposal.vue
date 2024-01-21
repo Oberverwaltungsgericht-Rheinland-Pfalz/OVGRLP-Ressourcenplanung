@@ -13,14 +13,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { Gadget, Ressource, Supplier, Allocation } from '../models'
-import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
+import { Allocation } from '../models/Allocation'
 
 @Component({})
 export default class TitleProposal extends Vue {
-  @Prop(String) private readonly value!: string
-  @Prop(Boolean) private readonly error!: boolean
-  @Prop(Boolean) private readonly readonly!: boolean
+  @Prop(String) readonly value!: string
+  @Prop(Boolean) readonly error!: boolean
+  @Prop(Boolean) readonly readonly!: boolean
 
   public internalModel: string = ''
   public searchInternal: string = ''

@@ -14,9 +14,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import RessourceManagement from '@/components/RessourceManagement/RessourceMngt.vue'
-import GadgetManagement from '@/components/RessourceManagement/GadgetManagement.vue'
-import SupplierManagement from '@/components/RessourceManagement/SupplierManagement.vue'
+import RessourceManagement from '../components/RessourceManagement/RessourceMngt.vue'
+import GadgetManagement from '../components/RessourceManagement/GadgetManagement.vue'
+import SupplierManagement from '../components/RessourceManagement/SupplierManagement.vue'
 
 @Component({
   components: { RessourceManagement, GadgetManagement, SupplierManagement }

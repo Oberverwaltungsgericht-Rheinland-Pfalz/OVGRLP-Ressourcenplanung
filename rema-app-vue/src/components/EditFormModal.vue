@@ -195,38 +195,38 @@ import { mixins } from 'vue-class-component'
 import TitleProposal from './TitleProposal.vue'
 import CollisionDetection from './CollisionDetection.vue'
 import { Gadget, Allocation } from '../models'
-import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
+import DropDownTimePicker from '../components/DropdownTimePicker.vue'
 import { Component, Prop, Watch } from 'vue-property-decorator'
 import { ShortAllocationView, ShowToast } from '../models/interfaces'
 import AllocationFormService from '../services/AllocationFormServices'
 import { refreshAllocations, editAllocation, errorCallbackFactory } from '../services/AllocationApiService'
-import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
+import InputReferencePerson from '../components/NewAllocation/InputReferencePerson.vue'
 
 @Component({
   components: { DropDownTimePicker, InputReferencePerson, TitleProposal, CollisionDetection }
 })
 export default class EditFormModal extends mixins(AllocationFormService) {
-  @Prop(Number) private eventId!: number
-  @Prop(Boolean) private show! : boolean
-  @Prop(Boolean) private readonly! : boolean
+  @Prop(Number) eventId!: number
+  @Prop(Boolean) show! : boolean
+  @Prop(Boolean) readonly! : boolean
 
-  private menu1: boolean = false
-  private title: string = ''
-  private Notes: string = ''
-  private fullday: boolean = false
-  private selectedGadgets: number[] = []
-  private multipleDates: string[] = []
-  private showMultipleDatesMenu: boolean = false
-  private ReferencePersonId: number = 0
-  private Status: number = 0
-  private Id: number = 0
-  private CreatedById: number = 0
-  private CreatedAt: string = ''
-  private ScheduleSeries: string = ''
-  private dateFromFocus: boolean = false
-  private dateToFocus: boolean = false
-  private dateOfSeries: string = ''
-  private eventAllocation: Allocation = {} as Allocation
+  menu1: boolean = false
+  title: string = ''
+  Notes: string = ''
+  fullday: boolean = false
+  selectedGadgets: number[] = []
+  multipleDates: string[] = []
+  showMultipleDatesMenu: boolean = false
+  ReferencePersonId: number = 0
+  Status: number = 0
+  Id: number = 0
+  CreatedById: number = 0
+  CreatedAt: string = ''
+  ScheduleSeries: string = ''
+  dateFromFocus: boolean = false
+  dateToFocus: boolean = false
+  dateOfSeries: string = ''
+eventAllocation: Allocation = {} as Allocation
 
   public isRepeating: boolean = false
   public dialog: boolean = false

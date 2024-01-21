@@ -87,7 +87,7 @@ export default class AllocationFormService extends Vue {
   public get GadgetGroups (): Array<Supplier> {
     return Supplier.all()
   }
-  private getGadgets (groupId: number) {
+  public getGadgets (groupId: number) {
     return Gadget.query()
       .where('SuppliedBy', groupId)
       .get()

@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import AcknowledgeList from '@/components/AcknowledgeList.vue'
+import AcknowledgeList from '../components/AcknowledgeList.vue'
 
 @Component({
   components: { AcknowledgeList }

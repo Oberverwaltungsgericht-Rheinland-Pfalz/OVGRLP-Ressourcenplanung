@@ -205,11 +205,10 @@
 <script lang="ts">
 import TitleProposal from '../TitleProposal.vue'
 import CollisionDetection from '../CollisionDetection.vue'
-import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
-import { Gadget } from '../../models'
+import DropDownTimePicker from '../DropdownTimePicker.vue'
 import AllocationFormService from '../../services/AllocationFormServices'
 import { Component, Prop, Mixins } from 'vue-property-decorator'
-import InputReferencePerson from '@/components/NewAllocation/InputReferencePerson.vue'
+import InputReferencePerson from './InputReferencePerson.vue'
 import { ConfirmData, InitAllocation, ShortAllocationView, ShowToast } from '../../models/interfaces'
 import { submitAllocation, submitAllocations, refreshAllocations, errorCallbackFactory } from '../../services/AllocationApiService'
 
@@ -219,15 +218,15 @@ import { submitAllocation, submitAllocations, refreshAllocations, errorCallbackF
   }
 })
 export default class AllocationForm extends Mixins(AllocationFormService) {
-  @Prop(Object) private readonly initValues!: InitAllocation
+  @Prop(Object) readonly initValues!: InitAllocation
   public title: string = ''
   public fullday: boolean = false
   public notes: string = ''
   public selectedGadgets: number[] = []
-  private multipleDates: string[] = []
-  private showMultipleDatesMenu: boolean = false
+  public multipleDates: string[] = []
+  public showMultipleDatesMenu: boolean = false
   public isRepeating: boolean = false
-  private loading: boolean = false
+  public loading: boolean = false
 
   beforeMount () {
     if (this.initValues && this.initValues.RessourceIds.length) {
@@ -237,7 +236,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     }
   }
 
-  private async sendAllocation (status: string): Promise<void> {
+  public async sendAllocation (status: string): Promise<void> {
     if (this.isFormInvalid()) return
     let callbackFn = () => { // eigentlich Funktion, wird aufgerufen wenn Bestätigung erteilt wurde
       this.saveAllocation(status)
@@ -305,7 +304,7 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     this.loading = false
   }
 
-  private close () {
+  public close () {
     this.clearAll()
     this.$emit('close')
   }
@@ -320,12 +319,12 @@ export default class AllocationForm extends Mixins(AllocationFormService) {
     return !rValue
   }
 
-  private removeDate (item: string): void {
+  public removeDate (item: string): void {
     const idx = this.multipleDates.findIndex(v => v === item)
     this.multipleDates.splice(idx, 1)
   }
 
-  private clearAll (): void {
+  public clearAll (): void {
     this.checkForm = false
     this.title = ''
     this.notes = ''

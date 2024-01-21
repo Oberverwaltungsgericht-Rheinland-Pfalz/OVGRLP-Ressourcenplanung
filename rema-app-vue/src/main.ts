@@ -1,13 +1,14 @@
 import Vue from 'vue'
-import './plugins/axios'
 import App from './App.vue'
 import router from './router'
-import store from '@/store/index'
-import './registerServiceWorker'
-import vuetify from './plugins/vuetify'
+import store from './store/index'
+import Vuetify from 'vuetify/lib'
 import '@mdi/font/css/materialdesignicons.css'
+import de from 'vuetify/src/locale/de'
+import 'moment/locale/de'
+import vue_moment from 'vue-moment'
 
-import './plugins/moment'
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import moment from 'moment'
 
 Vue.config.productionTip = false
@@ -46,10 +47,25 @@ Vue.mixin({
   }
 })
 
+Vue.use(Vuetify)
+const vuetify_ = new Vuetify({
+  icon: {
+    iconfont: 'md'
+  },
+  lang: {
+    locales: { de },
+    current: 'de'
+  }
+})
+
+moment.locale('de')
+Vue.use(vue_moment, {moment})
+
+
 new Vue({
   router,
   store,
-  vuetify,
+  vuetify_,
   render: h => h(App)
 }).$mount('#app')
 

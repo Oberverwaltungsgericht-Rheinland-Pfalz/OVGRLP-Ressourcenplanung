@@ -20,13 +20,13 @@ import { ConfirmData } from '../models/interfaces'
 
 @Component
 export default class Confirm extends Vue {
-  private title: string = ''
-  private content: string = ''
-  private dialogOpen: boolean = false
-  private id: number = 0
-  private callback!: Function
+  public title: string = ''
+  public content: string = ''
+  public dialogOpen: boolean = false
+  public id: number = 0
+  public callback!: Function
 
-  private create (payload: ConfirmData) {
+  public create (payload: ConfirmData) {
     this.title = payload.title
     this.content = payload.content
     this.callback = payload.callback
@@ -34,7 +34,7 @@ export default class Confirm extends Vue {
 
     this.dialogOpen = true
   }
-  private callCallback () {
+  public callCallback () {
     this.callback(this.id)
     this.dialogOpen = false
   }
@@ -49,7 +49,7 @@ export default class Confirm extends Vue {
     this.callback = () => {}
   }
 
-  private created () {
+  public created () {
     this.$root.$on('user-confirm', this.create)
   }
   private destroyed () {

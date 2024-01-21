@@ -19,7 +19,7 @@ import { ShowToast } from '../models/interfaces'
 
 @Component
 export default class Toasts extends Vue {
-  private toasts: Array<ToastSettings> = []
+  toasts: Array<ToastSettings> = []
 
   private openToast (payload: ShowToast) {
     let toast = new ToastSettings()

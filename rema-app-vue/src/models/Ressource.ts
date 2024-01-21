@@ -1,5 +1,5 @@
 import { Attr, Attribute, Fields, HasMany, Model } from '@vuex-orm/core'
-import { Allocation } from '.'
+import { Allocation } from './Allocation'
 
 export class Ressource extends Model {
   // This is the name used as module name of the Vuex Store.

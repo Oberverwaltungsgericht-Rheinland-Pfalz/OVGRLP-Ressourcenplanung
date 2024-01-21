@@ -146,7 +146,7 @@
 import { State } from 'vuex-class'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
-import DropDownTimePicker from '@/components/DropdownTimePicker.vue'
+import DropDownTimePicker from '../components/DropdownTimePicker.vue'
 import AllocationFormService from '../services/AllocationFormServices'
 import { AllocationRequestView, ShortAllocationView, ShowToast } from '../models/interfaces'
 import { Allocation } from '../models'
@@ -156,15 +156,15 @@ import CollisionDetection from './CollisionDetection.vue'
 @Component({ components: { DropDownTimePicker, CollisionDetection } })
 export default class AcknowledgeView extends mixins(AllocationFormService) {
   @State('ContactUsers', { namespace: 'user' })
-  private ContactUsers!: WebApi.ContactUser[]
-  @Prop(Boolean) private readonly value!: boolean
-  @Prop(Object) private viewAllocation!: AllocationRequestView
-  private moveEdit: boolean = false
-  private editFrom: string = ''
-  private editFromTime: string = ''
-  private editTo: string = ''
-  private editToTime: string = ''
-  private fullday: boolean = false
+  ContactUsers!: WebApi.ContactUser[]
+  @Prop(Boolean) readonly value!: boolean
+  @Prop(Object) viewAllocation!: AllocationRequestView
+  moveEdit: boolean = false
+  editFrom: string = ''
+  editFromTime: string = ''
+  editTo: string = ''
+  editToTime: string = ''
+  fullday: boolean = false
 
   public get timesInvalid (): boolean {
     if (!this.editFrom || !this.editTo) return true
