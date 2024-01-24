@@ -2,11 +2,14 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store/index'
-import Vuetify from 'vuetify/lib'
+//import Vuetify from 'vuetify/lib'
 import '@mdi/font/css/materialdesignicons.css'
 import de from 'vuetify/src/locale/de'
 import 'moment/locale/de'
 import vue_moment from 'vue-moment'
+import Vuetify from 'vuetify'
+import 'vuetify/dist/vuetify.min.css'
+
 
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import moment from 'moment'
@@ -48,24 +51,27 @@ Vue.mixin({
 })
 
 Vue.use(Vuetify)
-const vuetify_ = new Vuetify({
-  icon: {
-    iconfont: 'md'
-  },
-  lang: {
-    locales: { de },
-    current: 'de'
-  }
-})
+
 
 moment.locale('de')
 Vue.use(vue_moment, {moment})
+
+new Vue({
+}).$mount('#app')
 
 
 new Vue({
   router,
   store,
-  vuetify_, // https://stackoverflow.com/questions/57263757/how-do-i-add-vuetify-2-0-to-an-existing-project
+  vuetify: new Vuetify({
+    icon: {
+      iconfont: 'md'
+    },
+    lang: {
+      locales: { de },
+      current: 'de'
+    }
+  }),
   render: h => h(App)
 }).$mount('#app')
 
