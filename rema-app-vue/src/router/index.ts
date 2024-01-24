@@ -8,7 +8,6 @@ Vue.use(Router)
 /* tslint:disable:ter-indent */
 export default new Router({
   mode: 'hash',
-  base: process.env.BASE_URL,
   routes: [
     {
       path: '/',

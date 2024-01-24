@@ -65,7 +65,7 @@ Vue.use(vue_moment, {moment})
 new Vue({
   router,
   store,
-  vuetify_,
+  vuetify_, // https://stackoverflow.com/questions/57263757/how-do-i-add-vuetify-2-0-to-an-existing-project
   render: h => h(App)
 }).$mount('#app')
 
