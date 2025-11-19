@@ -184,7 +184,9 @@ export default class AllList extends Vue {
         groups.set(groupId, filterObj)
       } else {
         let filterObj = groups.get(groupId)
-        filterObj?.gadgetIds.push(f)
+        if (filterObj) {
+          filterObj.gadgetIds.push(f)
+        }
       }
     }))
     let rawValues: Array<SelectableGroup> = [...groups.values()]
